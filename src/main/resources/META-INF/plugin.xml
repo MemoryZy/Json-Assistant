@@ -9,7 +9,7 @@
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="MemoryZy.JsonWindow"
+        <toolWindow id="MemoryZy.JsonAssistant.JsonWindow"
                     icon="AllIcons.Toolwindows.ToolWindowJsonPath"
                     factoryClass="cn.memoryzy.json.toolwindows.JsonWindowTw"
                     anchor="right"
@@ -19,4 +19,12 @@
     </extensions>
 
 
+    <actions>
+        <action id="MemoryZy.JsonAssistant.actions.JsonStructureAnywhere"
+                class="cn.memoryzy.json.actions.JsonStructureAnywhereAction"
+                icon="JsonAssistantIcons.STRUCTURE_SMALL">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt S"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </action>
+    </actions>
 </idea-plugin>

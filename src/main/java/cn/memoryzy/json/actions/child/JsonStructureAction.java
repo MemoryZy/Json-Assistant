@@ -5,7 +5,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.icons.JsonAssistantIcons;
+import icons.JsonAssistantIcons;
 import cn.memoryzy.json.ui.JsonStructureWindow;
 import cn.memoryzy.json.ui.JsonWindow;
 import cn.memoryzy.json.utils.JsonUtil;

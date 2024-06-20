@@ -1,4 +1,4 @@
-package cn.memoryzy.json.icons;
+package icons;
 
 import com.intellij.openapi.util.IconLoader;
 
@@ -10,13 +10,14 @@ import javax.swing.*;
  */
 public class JsonAssistantIcons {
 
+    public static final Icon STRUCTURE_SMALL = load("/icons/structure_small.svg");
 
     /**
      * Json Structure Window
      */
     public static class Structure {
 
-        public static final Icon STRUCTURE = load("/icons/structure.svg");
+        public static final Icon STRUCTURE = load("/icons/inner_action/structure.svg");
         public static final Icon JSON_KEY = load("/icons/structure/json_key.svg");
         public static final Icon JSON_ARRAY = load("/icons/structure/json_array.svg");
         public static final Icon JSON_ITEM = load("/icons/structure/json_item.svg");

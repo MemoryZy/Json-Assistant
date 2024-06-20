@@ -43,7 +43,7 @@ intellij {
     version = properties("platformVersion")
     type = properties("platformType")
 
-//    instrumentCode.set(false)
+    downloadSources = properties("platformDownloadSources").map(String::toBoolean).getOrElse(true)
 
     // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
     plugins = properties("platformPlugins").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }

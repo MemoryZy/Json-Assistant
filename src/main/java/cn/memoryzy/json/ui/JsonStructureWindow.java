@@ -9,9 +9,8 @@ import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
-import cn.memoryzy.json.icons.JsonAssistantIcons;
+import icons.JsonAssistantIcons;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -21,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;

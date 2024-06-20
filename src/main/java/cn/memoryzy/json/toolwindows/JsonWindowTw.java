@@ -36,7 +36,7 @@ public class JsonWindowTw implements ToolWindowFactory {
         JsonWindow window = new JsonWindow(project);
         toolWindow.setTitleActions(List.of(new JsonStructureAction(toolWindow, project, window)));
 
-        Content content = contentFactory.createContent(window.getRootPanel(), "Json", false);
+        Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);
     }
 
