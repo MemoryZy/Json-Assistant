@@ -1,0 +1,22 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>cn.memoryzy.json</id>
+    <name>Json Assistant</name>
+    <vendor email="memoryzk@outlook.com" url="https://github.com/MemoryZy">Memory</vendor>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="MemoryZy.JsonWindow"
+                    icon="AllIcons.Toolwindows.ToolWindowJsonPath"
+                    factoryClass="cn.memoryzy.json.toolwindows.JsonWindowTw"
+                    anchor="right"
+                    largeStripeAnchor="right"
+                    secondary="true"
+                    doNotActivateOnStart="true"/>
+    </extensions>
+
+
+</idea-plugin>
