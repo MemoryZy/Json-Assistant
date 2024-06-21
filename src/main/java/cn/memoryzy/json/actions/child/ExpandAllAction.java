@@ -1,11 +1,11 @@
 package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import icons.JsonAssistantIcons;
 import cn.memoryzy.json.utils.TreeUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.ui.AnActionButton;
 import com.intellij.ui.treeStructure.Tree;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.TreeNode;

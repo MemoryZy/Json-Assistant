@@ -3,15 +3,15 @@ package cn.memoryzy.json.ui.basic;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
-import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.*;
+import com.intellij.ui.HorizontalScrollBarEditorCustomization;
+import com.intellij.ui.LanguageTextField;
+import com.intellij.ui.OneLineEditorCustomization;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.Objects;
 
 /**
  * @author Memory

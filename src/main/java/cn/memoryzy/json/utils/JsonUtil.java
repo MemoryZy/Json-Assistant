@@ -1,10 +1,13 @@
 package cn.memoryzy.json.utils;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * @author wcp
+ * @author Memory
  * @since 2024/6/20
  */
 public class JsonUtil {
@@ -20,6 +23,22 @@ public class JsonUtil {
         }
     }
 
+
+    public static String formatJson(String jsonStr) {
+        JSONObject jsonObject = JSONUtil.parseObj(jsonStr);
+        return jsonObject.toJSONString(2);
+    }
+
+    /**
+     * 将Json压缩成一行
+     *
+     * @param jsonStr json字符串
+     * @return 压缩json
+     * @throws JsonProcessingException 非法Json
+     */
+    public static String compressJson(String jsonStr) throws JsonProcessingException {
+        return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
+    }
 
     /**
      * 从给定的字符串中提取JSON字符串

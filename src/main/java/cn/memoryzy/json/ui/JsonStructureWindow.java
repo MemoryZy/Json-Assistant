@@ -9,13 +9,16 @@ import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
-import icons.JsonAssistantIcons;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionPopupMenu;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.*;
 import com.intellij.ui.treeStructure.Tree;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -325,11 +328,11 @@ public class JsonStructureWindow extends DialogWrapper {
         group.addSeparator();
         group.add(new CopyValueAction(tree));
         group.addSeparator();
-        // group.add(new CopyKeyValueAction());
+        group.add(new CopyKeyValueAction(tree));
         group.addSeparator();
-        // group.add(new ExpandMultiAction());
+        group.add(new ExpandMultiAction(tree));
         group.addSeparator();
-        // group.add(new CollapseMultiAction());
+        group.add(new CollapseMultiAction(tree));
         group.addSeparator();
         group.add(new RemoveAction(tree));
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
@@ -354,157 +357,5 @@ public class JsonStructureWindow extends DialogWrapper {
             }
         });
     }
-
-
-
-
-    // private class CopyKeyValueAction extends AnAction {
-    //     public CopyKeyValueAction() {
-    //         super("拷贝键值对..");
-    //     }
-    //
-    //     @Override
-    //     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-    //         TreePath[] paths = tree.getSelectionPaths();
-    //         if (paths != null) {
-    //             List<String> valueList = new ArrayList<>();
-    //             for (TreePath path : paths) {
-    //                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-    //                 // 获取value值，多个的话用其他处理方式
-    //                 Object correspondingValue = node.getCorrespondingValue();
-    //                 JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-    //
-    //                 String userObject = node.getUserObject().toString();
-    //                 // 只有JSONArrayEl是没有Value的
-    //                 if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
-    //                     valueList.add(userObject);
-    //                 } else if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONObjectKey, nodeValueType)) {
-    //                     valueList.add(userObject + ": " + (Objects.nonNull(correspondingValue) ? correspondingValue.toString() : "null"));
-    //                 } else {
-    //                     JSON json = (JSON) correspondingValue;
-    //                     String item;
-    //                     if (Objects.nonNull(json)) {
-    //                         try {
-    //                             item = CommonUtil.objectMapper.writeValueAsString(json);
-    //                         } catch (JsonProcessingException ex) {
-    //                             item = json.toJSONString(2);
-    //                         }
-    //                     } else {
-    //                         item = "null";
-    //                     }
-    //
-    //                     valueList.add(userObject + ": " + item);
-    //                 }
-    //             }
-    //             ActionUtil.setClipboard(StrUtil.join(", \n", valueList));
-    //         }
-    //     }
-    //
-    //     @Override
-    //     public @NotNull ActionUpdateThread getActionUpdateThread() {
-    //         return ActionUpdateThread.BGT;
-    //     }
-    //
-    //     @Override
-    //     public void update(@NotNull AnActionEvent e) {
-    //         TreePath[] paths = tree.getSelectionPaths();
-    //         boolean visible = true;
-    //         if (Objects.nonNull(paths) && paths.length == 1) {
-    //             TreePath path = paths[0];
-    //             JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-    //             JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-    //             if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
-    //                 visible = false;
-    //             }
-    //         }
-    //
-    //         e.getPresentation().setEnabledAndVisible(visible);
-    //     }
-    // }
-
-
-
-
-    // private class ExpandMultiAction extends AnAction {
-    //     public ExpandMultiAction() {
-    //         super("完全展开..");
-    //     }
-    //
-    //     @Override
-    //     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-    //         TreePath[] paths = tree.getSelectionPaths();
-    //         if (paths != null) {
-    //             for (TreePath path : paths) {
-    //                 // expandAll(path);
-    //                 CommonUtil.expandAll(tree, path);
-    //
-    //             }
-    //         }
-    //     }
-    //
-    //     @Override
-    //     public @NotNull ActionUpdateThread getActionUpdateThread() {
-    //         return ActionUpdateThread.BGT;
-    //     }
-    //
-    //     @Override
-    //     public void update(@NotNull AnActionEvent e) {
-    //         boolean enabled = false;
-    //         TreePath[] paths = tree.getSelectionPaths();
-    //         if (ArrayUtil.isNotEmpty(paths)) {
-    //             for (TreePath path : paths) {
-    //                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-    //                 JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-    //                 if (Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONObject)
-    //                         || Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONArray)
-    //                         || Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONObjectEl))
-    //                     enabled = true;
-    //             }
-    //         }
-    //
-    //         e.getPresentation().setEnabledAndVisible(enabled);
-    //     }
-    // }
-
-    // private class CollapseMultiAction extends AnAction {
-    //     public CollapseMultiAction() {
-    //         super("完全折叠..");
-    //     }
-    //
-    //     @Override
-    //     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
-    //         TreePath[] paths = tree.getSelectionPaths();
-    //         if (paths != null) {
-    //             for (TreePath path : paths) {
-    //                 // collapseAll(path);
-    //                 CommonUtil.collapseAll(tree, path);
-    //             }
-    //         }
-    //     }
-    //
-    //     @Override
-    //     public @NotNull ActionUpdateThread getActionUpdateThread() {
-    //         return ActionUpdateThread.BGT;
-    //     }
-    //
-    //     @Override
-    //     public void update(@NotNull AnActionEvent e) {
-    //         boolean enabled = false;
-    //         TreePath[] paths = tree.getSelectionPaths();
-    //         if (ArrayUtil.isNotEmpty(paths)) {
-    //             for (TreePath path : paths) {
-    //                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-    //                 JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-    //                 if (Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONObject)
-    //                         || Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONArray)
-    //                         || Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONObjectEl))
-    //                     enabled = true;
-    //             }
-    //         }
-    //
-    //         e.getPresentation().setEnabledAndVisible(enabled);
-    //     }
-    // }
-
 
 }

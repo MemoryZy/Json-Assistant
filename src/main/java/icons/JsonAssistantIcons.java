@@ -5,12 +5,13 @@ import com.intellij.openapi.util.IconLoader;
 import javax.swing.*;
 
 /**
- * @author wcp
+ * @author Memory
  * @since 2024/6/20
  */
 public class JsonAssistantIcons {
 
     public static final Icon STRUCTURE_SMALL = load("/icons/structure_small.svg");
+    public static final Icon COMPRESS = load("/icons/compress.svg");
 
     /**
      * Json Structure Window
