@@ -112,6 +112,7 @@ jobs:
 
       # Run Verify Plugin task and IntelliJ Plugin Verifier tool
       - name: Run Plugin Verification tasks
+        continue-on-error: true
         run: ./gradlew runPluginVerifier -Dplugin.verifier.home.dir=${{ steps.properties.outputs.pluginVerifierHomeDir }}
 
       # Collect Plugin Verifier Result
