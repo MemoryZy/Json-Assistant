@@ -78,6 +78,9 @@ jobs:
 
           ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
 
+          echo "Dir build:"
+          ls -R
+
       # Build plugin
       - name: Build plugin
         run: ./gradlew buildPlugin
