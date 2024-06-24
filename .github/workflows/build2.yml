@@ -81,7 +81,7 @@ jobs:
       - name: cat dir
         run: |
           echo "Dir build:"
-          ls
+          find .
 
       # Build plugin
       - name: Build plugin
