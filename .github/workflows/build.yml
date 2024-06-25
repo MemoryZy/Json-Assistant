@@ -78,8 +78,6 @@ jobs:
 
           ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
 
-          ./gradlew printProductsReleases
-
       # Build plugin
       - name: Build plugin
         run: ./gradlew buildPlugin
