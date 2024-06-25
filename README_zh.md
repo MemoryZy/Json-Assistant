@@ -1,3 +1,5 @@
+<div align="center">
+
 # Json Assistant
 
 [English](./README.md) / 简体中文
@@ -5,6 +7,8 @@
 基于 IntelliJ IDE 的 JSON 工具插件。
 
 [![IntelliJ IDEA][shields:idea]][jb:link]
+
+</div>
 
 <br/>
 
