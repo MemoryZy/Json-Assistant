@@ -1,5 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
+import org.jetbrains.intellij.tasks.RunPluginVerifierTask
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -120,6 +121,13 @@ tasks {
 
     runPluginVerifier {
         ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
+        failureLevel.set(listOf(
+            RunPluginVerifierTask.FailureLevel.COMPATIBILITY_PROBLEMS,
+            RunPluginVerifierTask.FailureLevel.INTERNAL_API_USAGES,
+            RunPluginVerifierTask.FailureLevel.INVALID_PLUGIN,
+            RunPluginVerifierTask.FailureLevel.MISSING_DEPENDENCIES,
+            RunPluginVerifierTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
+        ))
     }
 
     signPlugin {
