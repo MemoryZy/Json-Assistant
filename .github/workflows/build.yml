@@ -84,6 +84,10 @@ jobs:
           VERSION="$(echo "$PROPERTIES" | grep "^version:" | cut -f2- -d ' ')"
           CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
 
+          echo "version: $VERSION"
+          echo "changelog:"
+          echo "$CHANGELOG"
+                                        
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "pluginVerifierHomeDir=~/.pluginVerifier" >> $GITHUB_OUTPUT
           
