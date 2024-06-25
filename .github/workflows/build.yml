@@ -170,7 +170,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           ide-versions: |
-#            ideaIU:2021.1.3
             ideaIU:LATEST-EAP-SNAPSHOT
             ideaIC:LATEST-EAP-SNAPSHOT
             ideaIC:2021.1.3
