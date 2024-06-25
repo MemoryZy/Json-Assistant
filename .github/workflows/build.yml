@@ -100,6 +100,12 @@ jobs:
           name: ${{ steps.artifact.outputs.filename }}
           path: ./build/distributions/content/*/*
 
+      - name: Upload artifact listProduct
+        uses: actions/upload-artifact@v4
+        with:
+          name: listProduct
+          path: ./build/listProductsReleases.txt
+
   # Run tests and upload a code coverage report
   test:
     name: Test
