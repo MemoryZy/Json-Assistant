@@ -34,6 +34,7 @@ jobs:
       version: ${{ steps.properties.outputs.version }}
       changelog: ${{ steps.properties.outputs.changelog }}
       pluginVerifierHomeDir: ${{ steps.properties.outputs.pluginVerifierHomeDir }}
+      pluginName: ${{ steps.artifact.outputs.filename }}
     steps:
 
       # Check out the current repository
@@ -147,13 +148,11 @@ jobs:
           files: ${{ github.workspace }}/build/reports/kover/report.xml
 
 
-  # Run plugin structure verification along with IntelliJ Plugin Verifier
   verify:
     name: Verify plugin
     needs: [ build ]
     runs-on: ubuntu-latest
     steps:
-
       # Free GitHub Actions Environment Disk Space
       - name: Maximize Build Space
         uses: jlumbroso/free-disk-space@main
@@ -165,75 +164,135 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v4
 
-      # Set up Java environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          distribution: zulu
-          java-version: 11
+          name: ${{ needs.build.outputs.pluginName }}
+          path: artifacts
 
-      # Setup Gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-home-cache-cleanup: true
+      - name: Cat File
+        run: ls -R
 
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x ./gradlew
+#      - name: Verify Plugin on IntelliJ Platforms
+#        id: verify
+#        uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#        with:
+#          plugin-location: 'build/distributions/sample-intellij-plugin-*.zip'
+#          # 需要验证的IDEA，将指定的版本放至ide_versions_file.txt文件
+#          ide-versions: |
+#            ideaIU:2022.3
+#            ideaIU:LATEST-EAP-SNAPSHOT
+#
+#          failure-levels: |
+#            COMPATIBILITY_PROBLEMS
+#            INTERNAL_API_USAGES
+#            MISSING_DEPENDENCIES
+#            INVALID_PLUGIN
+#            OVERRIDE_ONLY_API_USAGES
 
-      # Cache Plugin Verifier IDEs
-      - name: Setup Plugin Verifier IDEs Cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ needs.build.outputs.pluginVerifierHomeDir }}/ides
-          key: plugin-verifier-${{ hashFiles('build/listProductsReleases.txt') }}
+          #  COMPATIBILITY_WARNINGS 	"兼容性警告"
+          #  COMPATIBILITY_PROBLEMS 	"兼容性问题"
+          #  DEPRECATED_API_USAGES 	"已弃用的API"
+          #  EXPERIMENTAL_API_USAGES 	"实验性API"
+          #  INTERNAL_API_USAGES 	"内部API"
+          #  OVERRIDE_ONLY_API_USAGES 	"仅覆盖API"
+          #  NON_EXTENDABLE_API_USAGES 	"不可扩展的API"
+          #  PLUGIN_STRUCTURE_WARNINGS 	"插件结构警告"
+          #  MISSING_DEPENDENCIES 	"缺少依赖项"
+          #  INVALID_PLUGIN 	"无效插件"
+          #  NOT_DYNAMIC 	"动态插件（不重启IDE就无法加载/卸载插件）"
 
-      # Run Verify Plugin task and IntelliJ Plugin Verifier tool
-      - name: Run Plugin Verification tasks
-        continue-on-error: true
-        run: ./gradlew runPluginVerifier -Dplugin.verifier.home.dir=${{ needs.build.outputs.pluginVerifierHomeDir }}
 
-      # Collect Plugin Verifier Result
-      - name: Collect Plugin Verifier Result
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: pluginVerifier-result
-          path: ${{ github.workspace }}/build/reports/pluginVerifier
+
+  # Run plugin structure verification along with IntelliJ Plugin Verifier
+#  verify:
+#    name: Verify plugin
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#
+#      # Free GitHub Actions Environment Disk Space
+#      - name: Maximize Build Space
+#        uses: jlumbroso/free-disk-space@main
+#        with:
+#          tool-cache: false
+#          large-packages: false
+#
+#      # Check out the current repository
+#      - name: Fetch Sources
+#        uses: actions/checkout@v4
+#
+#      # Set up Java environment for the next steps
+#      - name: Setup Java
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: zulu
+#          java-version: 11
+#
+#      # Setup Gradle
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@v3
+#        with:
+#          gradle-home-cache-cleanup: true
+#
+#      - name: Grant execute permission for Gradle wrapper
+#        run: chmod +x ./gradlew
+#
+#      # Cache Plugin Verifier IDEs
+#      - name: Setup Plugin Verifier IDEs Cache
+#        uses: actions/cache@v4
+#        with:
+#          path: ${{ needs.build.outputs.pluginVerifierHomeDir }}/ides
+#          key: plugin-verifier-${{ hashFiles('build/listProductsReleases.txt') }}
+#
+#      # Run Verify Plugin task and IntelliJ Plugin Verifier tool
+#      - name: Run Plugin Verification tasks
+#        continue-on-error: true
+#        run: ./gradlew runPluginVerifier -Dplugin.verifier.home.dir=${{ needs.build.outputs.pluginVerifierHomeDir }}
+#
+#      # Collect Plugin Verifier Result
+#      - name: Collect Plugin Verifier Result
+#        if: ${{ always() }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: pluginVerifier-result
+#          path: ${{ github.workspace }}/build/reports/pluginVerifier
 
   # Prepare a draft release for GitHub Releases page for the manual verification
   # If accepted and published, release workflow would be triggered
-  releaseDraft:
-    name: Release Draft
-    if: github.event_name != 'pull_request'
-    needs: [ build, test, verify ]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-
-      # Check out the current repository
-      - name: Fetch Sources
-        uses: actions/checkout@v4
-
-      # Remove old release drafts by using the curl request for the available releases with a draft flag
-      - name: Remove Old Release Drafts
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          gh api repos/{owner}/{repo}/releases \
-            --jq '.[] | select(.draft == true) | .id' \
-            | xargs -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{}
-
-      # Create a new release draft which is not publicly visible and requires manual acceptance
-      - name: Create Release Draft
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-        run: |
-          gh release create "v${{ needs.build.outputs.version }}" \
-            --draft \
-            --title "v${{ needs.build.outputs.version }}" \
-            --notes "$(cat << 'EOM'
-          ${{ needs.build.outputs.changelog }}
-          EOM
-          )"
+#  releaseDraft:
+#    name: Release Draft
+#    if: github.event_name != 'pull_request'
+#    needs: [ build, test, verify ]
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: write
+#    steps:
+#
+#      # Check out the current repository
+#      - name: Fetch Sources
+#        uses: actions/checkout@v4
+#
+#      # Remove old release drafts by using the curl request for the available releases with a draft flag
+#      - name: Remove Old Release Drafts
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#        run: |
+#          gh api repos/{owner}/{repo}/releases \
+#            --jq '.[] | select(.draft == true) | .id' \
+#            | xargs -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{}
+#
+#      # Create a new release draft which is not publicly visible and requires manual acceptance
+#      - name: Create Release Draft
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+#        run: |
+#          gh release create "v${{ needs.build.outputs.version }}" \
+#            --draft \
+#            --title "v${{ needs.build.outputs.version }}" \
+#            --notes "$(cat << 'EOM'
+#          ${{ needs.build.outputs.changelog }}
+#          EOM
+#          )"

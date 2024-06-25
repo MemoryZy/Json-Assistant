@@ -19,11 +19,12 @@
 - JSON 结构化
 
 <br/>
- 
-## 反馈
-> 在使用过程中发现任何问题，可随时提交 [Issue][gh:issue] 和 [PR][gh:pr]，感谢支持。
 
-[jb:link]: https://www.jetbrains.com/?from=Json%20Assistant
+## 反馈
+> 使用过程中发现任何问题，可随时提交 [Issue][gh:issue] 和 [PR][gh:pr]，感谢支持。
+
+
 [shields:idea]: https://img.shields.io/badge/Jetbrains-IntelliJ%20IDEA-%2311AB00.svg?style=Plastic&logo=intellij-idea&logoColor=white
+[jb:link]: https://www.jetbrains.com/?from=Json%20Assistant
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues
 [gh:pr]: https://github.com/MemoryZy/Json-Assistant/pulls
