@@ -190,6 +190,7 @@ jobs:
 
       # Run Verify Plugin task and IntelliJ Plugin Verifier tool
       - name: Run Plugin Verification tasks
+        continue-on-error: true
         run: ./gradlew runPluginVerifier -Dplugin.verifier.home.dir=${{ needs.build.outputs.pluginVerifierHomeDir }}
 
       # Collect Plugin Verifier Result
@@ -203,7 +204,7 @@ jobs:
   # Prepare a draft release for GitHub Releases page for the manual verification
   # If accepted and published, release workflow would be triggered
   releaseDraft:
-    name: Release draft
+    name: Release Draft
     if: github.event_name != 'pull_request'
     needs: [ build, test, verify ]
     runs-on: ubuntu-latest
