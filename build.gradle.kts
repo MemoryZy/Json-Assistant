@@ -118,8 +118,8 @@ tasks {
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
-    runPluginVerifier {
-        ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
+    runPluginVerifier {
+        ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
     }
 
     signPlugin {
