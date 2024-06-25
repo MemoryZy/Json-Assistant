@@ -119,8 +119,13 @@ tasks {
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
+    listProductsReleases {
+        sinceVersion = properties("productsReleasesSinceBuild")
+
+    }
+
     runPluginVerifier {
-        ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
+        // ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
         failureLevel.set(listOf(
             RunPluginVerifierTask.FailureLevel.COMPATIBILITY_PROBLEMS,
             RunPluginVerifierTask.FailureLevel.INTERNAL_API_USAGES,
