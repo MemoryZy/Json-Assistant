@@ -78,6 +78,8 @@ jobs:
 
           ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
 
+          ./gradlew printProductsReleases
+
       # Build plugin
       - name: Build plugin
         run: ./gradlew buildPlugin
@@ -100,11 +102,6 @@ jobs:
           name: ${{ steps.artifact.outputs.filename }}
           path: ./build/distributions/content/*/*
 
-      - name: Upload artifact listProduct
-        uses: actions/upload-artifact@v4
-        with:
-          name: listProduct
-          path: ./build/listProductsReleases.txt
 
   # Run tests and upload a code coverage report
   test:
@@ -185,13 +182,6 @@ jobs:
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
-
-      # Cache Plugin Verifier IDEs
-      - name: Setup Plugin Verifier IDEs Cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ needs.build.outputs.pluginVerifierHomeDir }}/ides
-          key: plugin-verifier-${{ hashFiles('build/listProductsReleases.txt') }}
 
       # Run Verify Plugin task and IntelliJ Plugin Verifier tool
       - name: Run Plugin Verification tasks
