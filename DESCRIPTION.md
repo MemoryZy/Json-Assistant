@@ -1,7 +1,6 @@
 **JSON Enhancement Plugin based on IntelliJ IDE.**
 
 <br/>
-<br/>
 
 
 ## Features

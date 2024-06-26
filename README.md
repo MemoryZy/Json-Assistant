@@ -12,7 +12,7 @@ JSON Enhancement Plugin based on IntelliJ IDE.
 
 <br/>
 
-## 功能 🎉
+## Features 🎉
 - Json display window
 - Json formatting
 - Json compress
@@ -20,7 +20,7 @@ JSON Enhancement Plugin based on IntelliJ IDE.
 
 <br/>
 
-## 反馈
+## Feedback
 > If you find any problem during use, you can submit [Issue][gh:issue] and [PR][gh:pr] at any time, thank you for your support.
 
 
