@@ -18,8 +18,7 @@ on:
   push:
     branches: [ main ]
     paths-ignore:
-      #      - '.github/**'
-      - 'gradle/**'
+      - '.github/**'
       - '.gitignore'
       - 'README.md'
       - 'README_zh.md'
@@ -27,11 +26,11 @@ on:
   # Trigger the workflow on any pull request
   pull_request:
     paths-ignore:
-      #      - '.github/**'
-      - 'gradle/**'
+      - '.github/**'
       - '.gitignore'
       - 'README.md'
       - 'README_zh.md'
+      
   # 可手动操控
   workflow_dispatch:
     

@@ -6,6 +6,11 @@ on:
     branches: # Specify your branches here
       - main # The 'main' branch
       - 'releases/*' # The release branches
+    paths-ignore:
+      - '.github/**'
+      - '.gitignore'
+      - 'README.md'
+      - 'README_zh.md'
 
 jobs:
   qodana:
