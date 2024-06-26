@@ -5,7 +5,7 @@
 name: Release
 on:
   release:
-    types: [prereleased, released]
+    types: [released]
 
 jobs:
 
@@ -50,6 +50,10 @@ jobs:
           EOM
           )"
           
+          echo "releaseTagName: ${{ github.event.release.tag_name }}"
+          echo "changelog:"
+          echo "$CHANGELOG"
+          
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -62,6 +66,11 @@ jobs:
         run: |
           ./gradlew patchChangelog --release-note="$CHANGELOG"
 
+      - name: Patch Changelog
+        if: ${{ steps.properties.outputs.changelog != '' }}
+        run: |
+          cat ./CHANGELOG.md
+
       # Publish the plugin to JetBrains Marketplace
       - name: Publish Plugin
         env:
@@ -69,7 +78,8 @@ jobs:
           CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
-        run: ./gradlew publishPlugin
+        run: ./gradlew signPlugin
+#        run: ./gradlew publishPlugin
 
       # Upload artifact as a release asset
       - name: Upload Release Asset
