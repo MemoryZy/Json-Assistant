@@ -2,8 +2,6 @@
 
 ## [Unreleased]
 
-### What’s New
-
  - Initial plugin project setup.
  - Provides core plugin functionality.
  - Supports major IDEs.
