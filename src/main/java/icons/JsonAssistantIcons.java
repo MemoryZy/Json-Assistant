@@ -38,7 +38,7 @@ public class JsonAssistantIcons {
     }
 
     public static Icon load(String iconPath) {
-        return IconLoader.getIcon(iconPath, JsonAssistantIcons.class.getClassLoader());
+        return IconLoader.getIcon(iconPath, JsonAssistantIcons.class);
     }
 
 }
