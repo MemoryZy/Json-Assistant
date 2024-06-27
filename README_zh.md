@@ -2,6 +2,8 @@
 
 > **[English](./README.md) / 简体中文**
 
+<br/>
+
 基于 IntelliJ IDEs 的 JSON 工具插件，让 JSON 处理变得更轻松！
 
 [![Homepage][shields:hp]][jb:plugin-link]

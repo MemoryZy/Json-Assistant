@@ -2,6 +2,7 @@
 
 > **English / [简体中文](./README_zh.md)**
 
+<br/>
 
 JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
