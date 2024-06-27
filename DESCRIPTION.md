@@ -1,9 +1,8 @@
-**JSON Enhancement Plugin based on IntelliJ IDE.**
+**JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!**
 
 <br/>
 
-
-## Features
+## Key Features
  - Json display window
  - Json formatting
  - Json compress
