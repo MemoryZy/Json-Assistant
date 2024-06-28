@@ -29,6 +29,11 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 <br/>
 
+## Get Started 🚀
+Refer to the plugin [documentation][plugin:docs].
+
+<br/>
+
 ## Installation
 
 - Using the IDE built-in plugin system:
@@ -55,3 +60,4 @@ If you find any problem during use, you can submit [Issue][gh:issue] and [PR][gh
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues/new/choose
 [gh:release]: https://github.com/MemoryZy/Json-Assistant/releases/latest
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
+[plugin:docs]: https://json.memoryzy.cn/overview

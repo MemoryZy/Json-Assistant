@@ -22,6 +22,11 @@
 
 <br/>
 
+## 快速开始 🚀
+请参阅插件 [文档][plugin:docs]。
+
+<br/>
+
 ## 安装
 
 - 使用 IDE 内置插件系统：
@@ -49,3 +54,4 @@
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues/new/choose
 [gh:release]: https://github.com/MemoryZy/Json-Assistant/releases/latest
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
+[plugin:docs]: https://json.memoryzy.cn/overview
