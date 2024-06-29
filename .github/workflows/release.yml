@@ -95,13 +95,20 @@ jobs:
           PLUGIN_ARTIFACT_NAME="$NAME-$VERSION.zip"
           PLUGIN_SIGNED_ARTIFACT_NAME="$NAME-$VERSION-signed.zip"
 
-          echo "Plugin Artifact Before"
+          echo "pluginName: $PLUGIN_ARTIFACT_NAME"
+          echo "pluginSignedName: $PLUGIN_SIGNED_ARTIFACT_NAME"
+
+          echo "Plugin Artifact Before:"
           ls ./build/distributions
 
           rm -f ./build/distributions/$PLUGIN_ARTIFACT_NAME
-          mv $PLUGIN_SIGNED_ARTIFACT_NAME $PLUGIN_ARTIFACT_NAME
+          
+          echo "Remove Plugin Artifact:"
+          ls ./build/distributions
+          
+          mv ./build/distributions/$PLUGIN_SIGNED_ARTIFACT_NAME ./build/distributions/$PLUGIN_ARTIFACT_NAME
 
-          echo "Plugin Artifact After"
+          echo "Plugin Artifact After:"
           ls ./build/distributions
 
       # Upload artifact as a release asset

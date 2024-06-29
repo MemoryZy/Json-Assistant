@@ -29,6 +29,7 @@ public class JsonStructureAction extends AnAction {
         String text = StrUtil.trim(PlatformUtil.getEditorContent(event));
         // todo 编辑器文本不属于Json，但是选中文本属于Json时，可以
         JsonStructureOnTwTitleAction.structuring(text, project);
+
     }
 
     @Override
