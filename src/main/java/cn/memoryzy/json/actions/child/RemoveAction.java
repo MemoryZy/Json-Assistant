@@ -29,6 +29,7 @@ public class RemoveAction extends AnAction {
                 }
             }
             ((DefaultTreeModel) tree.getModel()).reload();
+
         }
     }
 }

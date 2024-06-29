@@ -61,6 +61,7 @@ jobs:
           
           echo "name=$NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "pluginSignedName=$NAME-$VERSION-signed.zip" >> $GITHUB_OUTPUT
           
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
@@ -92,11 +93,7 @@ jobs:
       - name: Upload Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          NAME="${{ steps.properties.outputs.name }}"
-          VERSION="${{ steps.properties.outputs.version }}"
-          PLUGIN_SIGNED_ARTIFACT_NAME="$NAME-$VERSION-signed.zip"
-          gh release upload ${{ github.event.release.tag_name }} ./build/distributions/$PLUGIN_SIGNED_ARTIFACT_NAME
+        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.pluginSignedName }}
 
       # Create a pull request
       - name: Create Pull Request
