@@ -19,6 +19,8 @@ public class CollapseAllAction extends AnActionButton {
         this.tree = tree;
 
         // todo 待注册快捷键
+
+
     }
 
     @Override
