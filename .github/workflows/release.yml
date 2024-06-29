@@ -53,6 +53,9 @@ jobs:
           EOM
           )"
           
+          # 转义空格
+          NAME="$(echo "$NAME" | sed 's/ /\\ /g')"
+          
           echo "name: $NAME"
           echo "version: $VERSION"
           echo "releaseTagName: ${{ github.event.release.tag_name }}"
