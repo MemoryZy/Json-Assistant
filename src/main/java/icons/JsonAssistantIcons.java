@@ -10,8 +10,7 @@ import javax.swing.*;
  */
 public class JsonAssistantIcons {
 
-    public static final Icon STRUCTURE_SMALL = load("/icons/structure_small.svg");
-    public static final Icon COMPRESS = load("/icons/compress.svg");
+    public static final Icon BOX = load("/icons/box.svg");
 
     /**
      * Json Structure Window

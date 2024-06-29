@@ -10,26 +10,19 @@ import cn.memoryzy.json.ui.JsonWindow;
 import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.ToolWindow;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
 
 public class JsonStructureOnTwTitleAction extends AnAction {
     private final Project project;
     private final JsonWindow window;
 
-    public JsonStructureOnTwTitleAction(ToolWindow toolWindow, Project project, JsonWindow window) {
+    public JsonStructureOnTwTitleAction(Project project, JsonWindow window) {
         super(JsonAssistantBundle.message("action.json.structure.text"), null, JsonAssistantIcons.Structure.STRUCTURE);
 
         this.project = project;
         this.window = window;
-
-        JComponent component = toolWindow.getContentManager().getComponent();
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt S"), component);
     }
 
     @Override

@@ -21,29 +21,34 @@
 
     <actions>
         <action id="MemoryZy.JsonAssistant.actions.JsonFormat"
-                class="cn.memoryzy.json.actions.JsonFormatAction"
-                icon="AllIcons.Json.Object">
+                class="cn.memoryzy.json.actions.JsonFormatAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
         </action>
 
         <action id="MemoryZy.JsonAssistant.actions.JsonCompress"
-                class="cn.memoryzy.json.actions.JsonCompressAction"
-                icon="JsonAssistantIcons.COMPRESS">
+                class="cn.memoryzy.json.actions.JsonCompressAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt M"/>
         </action>
 
         <action id="MemoryZy.JsonAssistant.actions.JsonStructure"
-                class="cn.memoryzy.json.actions.JsonStructureAction"
-                icon="JsonAssistantIcons.STRUCTURE_SMALL">
+                class="cn.memoryzy.json.actions.JsonStructureAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt S"/>
         </action>
 
-        <group id="MemoryZy.groups.JsonAssistantPopupMenu" text="JsonAssistant Popup Menu Actions">
+        <group id="MemoryZy.groups.JsonProcessing"
+               popup="true"
+               icon="JsonAssistantIcons.BOX"
+               class="cn.memoryzy.json.group.JsonProcessingGroup">
             <separator/>
             <reference ref="MemoryZy.JsonAssistant.actions.JsonFormat"/>
             <reference ref="MemoryZy.JsonAssistant.actions.JsonCompress"/>
-            <separator/>
             <reference ref="MemoryZy.JsonAssistant.actions.JsonStructure"/>
+            <separator/>
+        </group>
+
+        <group id="MemoryZy.groups.JsonAssistantPopupMenu" text="JsonAssistant Popup Menu Actions">
+            <separator/>
+            <reference ref="MemoryZy.groups.JsonProcessing"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
