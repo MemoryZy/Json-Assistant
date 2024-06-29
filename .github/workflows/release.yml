@@ -96,13 +96,13 @@ jobs:
           PLUGIN_SIGNED_ARTIFACT_NAME="$NAME-$VERSION-signed.zip"
 
           echo "Plugin Artifact Before"
-          ll ./build/distributions
+          ls ./build/distributions
 
           rm -f ./build/distributions/$PLUGIN_ARTIFACT_NAME
           mv $PLUGIN_SIGNED_ARTIFACT_NAME $PLUGIN_ARTIFACT_NAME
 
           echo "Plugin Artifact After"
-          ll ./build/distributions
+          ls ./build/distributions
 
       # Upload artifact as a release asset
       - name: Upload Release Asset

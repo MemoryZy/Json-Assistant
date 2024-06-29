@@ -20,7 +20,6 @@ public class CollapseAllAction extends AnActionButton {
 
         // todo 待注册快捷键
 
-
     }
 
     @Override
