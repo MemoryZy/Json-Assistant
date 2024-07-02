@@ -5,7 +5,7 @@
 - 修改 Json 功能入口为弹出菜单
 
 
-## [1.0.0] - 2024-06-26
+## [1.0.0] - 2024-06-29
 
 - Initial plugin project setup.
 - Provides core plugin functionality.
