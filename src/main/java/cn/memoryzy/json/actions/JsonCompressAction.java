@@ -1,6 +1,5 @@
 package cn.memoryzy.json.actions;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -53,10 +52,4 @@ public class JsonCompressAction extends AnAction {
         });
     }
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        String content = PlatformUtil.getEditorContent(e);
-        String jsonStr = (JsonUtil.isJsonStr(content)) ? content : JsonUtil.extractJsonStr(content);
-        e.getPresentation().setEnabledAndVisible(StrUtil.isNotBlank(jsonStr));
-    }
 }

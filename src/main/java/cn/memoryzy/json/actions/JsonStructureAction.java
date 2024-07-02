@@ -31,9 +31,4 @@ public class JsonStructureAction extends AnAction {
         JsonStructureOnTwTitleAction.structuring(text, project);
     }
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        String text = StrUtil.trim(PlatformUtil.getEditorContent(e));
-        e.getPresentation().setEnabledAndVisible(JsonStructureOnTwTitleAction.structuringUpdate(text));
-    }
 }

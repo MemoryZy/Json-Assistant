@@ -18,41 +18,21 @@
                     doNotActivateOnStart="true"/>
     </extensions>
 
-
     <actions>
-        <action id="MemoryZy.JsonAssistant.actions.JsonFormat"
-                class="cn.memoryzy.json.actions.JsonFormatAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
+        <action id="MemoryZy.JsonAssistant.actions.JsonProcessing"
+                icon="JsonAssistantIcons.BOX"
+                class="cn.memoryzy.json.actions.JsonProcessingAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt 0"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 0"/>
         </action>
-
-        <action id="MemoryZy.JsonAssistant.actions.JsonCompress"
-                class="cn.memoryzy.json.actions.JsonCompressAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt M"/>
-        </action>
-
-        <action id="MemoryZy.JsonAssistant.actions.JsonStructure"
-                class="cn.memoryzy.json.actions.JsonStructureAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt S"/>
-        </action>
-
-        <group id="MemoryZy.groups.JsonProcessing"
-               popup="true"
-               icon="JsonAssistantIcons.BOX"
-               class="cn.memoryzy.json.group.JsonProcessingGroup">
-            <separator/>
-            <reference ref="MemoryZy.JsonAssistant.actions.JsonFormat"/>
-            <reference ref="MemoryZy.JsonAssistant.actions.JsonCompress"/>
-            <reference ref="MemoryZy.JsonAssistant.actions.JsonStructure"/>
-            <separator/>
-        </group>
 
         <group id="MemoryZy.groups.JsonAssistantPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
-            <reference ref="MemoryZy.groups.JsonProcessing"/>
+            <reference ref="MemoryZy.JsonAssistant.actions.JsonProcessing"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="EditorPopupMenu" relative-to-action="$Cut" anchor="before"/>
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
