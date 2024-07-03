@@ -10,17 +10,15 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 [![Homepage][shields:hp]][jb:plugin-link]
 &nbsp;
-[![Release][shields:release]][gh:release]
+[![Version][shields:version]][jb:version]
 &nbsp;
-[![GitHub Actions Build][shields:build]][gh:build]
+[![Build][shields:build]][gh:build]
+&nbsp;
+[![Downloads][shields:download]][jb:plugin-link]
+
 
 <br/>
 
-
-[//]: # ([![Version]&#40;https://img.shields.io/jetbrains/plugin/v/24738-json-assistant.svg&#41;]&#40;https://plugins.jetbrains.com/plugin/24738&#41;)
-
-[//]: # ()
-[//]: # ([![Downloads]&#40;https://img.shields.io/jetbrains/plugin/d/24738-json-assistant.svg&#41;][jb:pluginLink])
 
 ## Key Features
 - Json display window
@@ -54,12 +52,13 @@ Refer to the plugin [documentation][plugin:docs].
 If you find any problem during use, you can submit [Issue][gh:issue] and [PR][gh:pr] at any time, thank you for your support.
 
 
-[shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTEwIDE5di01aDR2NWMwIC41NS40NSAxIDEgMWgzYy41NSAwIDEtLjQ1IDEtMXYtN2gxLjdjLjQ2IDAgLjY4LS41Ny4zMy0uODdMMTIuNjcgMy42Yy0uMzgtLjM0LS45Ni0uMzQtMS4zNCAwbC04LjM2IDcuNTNjLS4zNC4zLS4xMy44Ny4zMy44N0g1djdjMCAuNTUuNDUgMSAxIDFoM2MuNTUgMCAxLS40NSAxLTEiLz48L3N2Zz4=
+[shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48ZyBmaWxsPSJub25lIj48cGF0aCBkPSJNMjQgMHYyNEgwVjB6TTEyLjU5MyAyMy4yNThsLS4wMTEuMDAybC0uMDcxLjAzNWwtLjAyLjAwNGwtLjAxNC0uMDA0bC0uMDcxLS4wMzVxLS4wMTYtLjAwNS0uMDI0LjAwNWwtLjAwNC4wMWwtLjAxNy40MjhsLjAwNS4wMmwuMDEuMDEzbC4xMDQuMDc0bC4wMTUuMDA0bC4wMTItLjAwNGwuMTA0LS4wNzRsLjAxMi0uMDE2bC4wMDQtLjAxN2wtLjAxNy0uNDI3cS0uMDA0LS4wMTYtLjAxNy0uMDE4bS4yNjUtLjExM2wtLjAxMy4wMDJsLS4xODUuMDkzbC0uMDEuMDFsLS4wMDMuMDExbC4wMTguNDNsLjAwNS4wMTJsLjAwOC4wMDdsLjIwMS4wOTNxLjAxOS4wMDUuMDI5LS4wMDhsLjAwNC0uMDE0bC0uMDM0LS42MTRxLS4wMDUtLjAxOS0uMDItLjAyMm0tLjcxNS4wMDJhLjAyLjAyIDAgMCAwLS4wMjcuMDA2bC0uMDA2LjAxNGwtLjAzNC42MTRxLjAwMS4wMTguMDE3LjAyNGwuMDE1LS4wMDJsLjIwMS0uMDkzbC4wMS0uMDA4bC4wMDQtLjAxMWwuMDE3LS40M2wtLjAwMy0uMDEybC0uMDEtLjAxeiIvPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMiA5YTMgMyAwIDAgMSAzLTNoMi44NTNjLjI5NyAwIC40OC0uMzA5LjM2Ni0uNTgzQTIuNSAyLjUgMCAwIDEgOC4wODMgNWMtLjMzMS0xLjQ4Ny43OTItMyAyLjQxNy0zYzEuNjI2IDAgMi43NDggMS41MTMgMi40MTcgM2EyLjUgMi41IDAgMCAxLS4xMzYuNDE3Yy0uMTE1LjI3NC4wNjkuNTgzLjM2Ni41ODNIMTVhMyAzIDAgMCAxIDMgM3YxLjg1M2MwIC4yOTcuMzA4LjQ4LjU4My4zNjZjLjEzNS0uMDU2LjI3My0uMTA0LjQxNy0uMTM2YzEuNDg3LS4zMzEgMyAuNzkxIDMgMi40MTdzLTEuNTEzIDIuNzQ4LTMgMi40MTdhMi41IDIuNSAwIDAgMS0uNDE3LS4xMzZjLS4yNzQtLjExNS0uNTgzLjA2OS0uNTgzLjM2NlYxOWEzIDMgMCAwIDEtMyAzaC0xLjg5M2MtLjI4OCAwLS40NzMtLjI5MS0uMzktLjU2NnEuMDYzLS4yMS4wODUtLjQzNGEyLjMxIDIuMzEgMCAxIDAtNC42MDQgMHEuMDIxLjIyNC4wODYuNDM0Yy4wODIuMjc1LS4xMDMuNTY2LS4zOS41NjZINWEzIDMgMCAwIDEtMy0zdi0yLjg5M2MwLS4yODguMjkxLS40NzMuNTY2LS4zOXEuMjEuMDYzLjQzNC4wODVhMi4zMSAyLjMxIDAgMSAwIDAtNC42MDRxLS4yMjQuMDIxLS40MzQuMDg2Yy0uMjc1LjA4Mi0uNTY2LS4xMDMtLjU2Ni0uMzl6Ii8+PC9nPjwvc3ZnPg==
 [shields:build]: https://github.com/MemoryZy/Json-Assistant/workflows/Build/badge.svg
-[shields:release]: https://img.shields.io/github/v/release/MemoryZy/Json-Assistant?style=Plastic&label=Release&color=d05ce3&logo=github
+[shields:version]: https://img.shields.io/jetbrains/plugin/v/24738-json-assistant.svg?label=Version&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTIwLjUwMiA1LjkyMkwxMiAxTDMuNDk4IDUuOTIyTDEyIDEwLjg0NXpNMi41IDcuNjU2VjE3LjVsOC41IDQuOTIxdi05Ljg0NHpNMTMgMjIuNDJsOC41LTQuOTIxVjcuNjU2bC04LjUgNC45MnoiLz48L3N2Zz4=
+[shields:download]: https://img.shields.io/jetbrains/plugin/d/24738-json-assistant.svg?label=Download&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0ibTEyIDE2bC01LTVsMS40LTEuNDVsMi42IDIuNlY0aDJ2OC4xNWwyLjYtMi42TDE3IDExem0tNiA0cS0uODI1IDAtMS40MTItLjU4N1Q0IDE4di0zaDJ2M2gxMnYtM2gydjNxMCAuODI1LS41ODcgMS40MTNUMTggMjB6Ii8+PC9zdmc+
 [jb:plugin-link]: https://plugins.jetbrains.com/plugin/24738-json-assistant
 [gh:pr]: https://github.com/MemoryZy/Json-Assistant/pulls
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues/new/choose
-[gh:release]: https://github.com/MemoryZy/Json-Assistant/releases/latest
+[jb:version]: https://plugins.jetbrains.com/plugin/24738-json-assistant/versions
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
 [plugin:docs]: https://json.memoryzy.cn/overview
