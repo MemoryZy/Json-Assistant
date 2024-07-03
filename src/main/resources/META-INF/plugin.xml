@@ -5,10 +5,12 @@
     <vendor email="memoryzk@outlook.com" url="https://github.com/MemoryZy">Memory</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="optional/plugin-java.xml">com.intellij.java</depends>
 
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup displayType="BALLOON" id="MemoryZy.JsonAssistant.notify.Balloon" isLogByDefault="false"/>
         <toolWindow id="MemoryZy.JsonAssistant.JsonWindow"
                     icon="AllIcons.Toolwindows.ToolWindowJsonPath"
                     factoryClass="cn.memoryzy.json.toolwindows.JsonWindowTw"
@@ -26,13 +28,13 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift 0"/>
         </action>
 
-        <group id="MemoryZy.groups.JsonAssistantPopupMenu" text="JsonAssistant Popup Menu Actions">
+        <group id="MemoryZy.groups.JsonAssistant.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
             <reference ref="MemoryZy.JsonAssistant.actions.JsonProcessing"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
-            <add-to-group group-id="EditorPopupMenu" relative-to-action="$Cut" anchor="before"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="EditorToggleColumnMode"/>
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>

@@ -11,6 +11,7 @@ import javax.swing.*;
 public class JsonAssistantIcons {
 
     public static final Icon BOX = load("/icons/box.svg");
+    public static final Icon JSON = load("/icons/json.svg");
 
     /**
      * Json Structure Window

@@ -4,6 +4,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.TextTransferable;
 
 /**
@@ -11,6 +13,33 @@ import com.intellij.util.ui.TextTransferable;
  * @since 2024/6/20
  */
 public class PlatformUtil {
+
+    /**
+     * 获取结构化文件
+     *
+     * @param event 事件源
+     * @return 结构化文件
+     */
+    public static PsiFile getPsiFile(AnActionEvent event) {
+        try {
+            return event.getData(CommonDataKeys.PSI_FILE);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    /**
+     * 通过当前光标的偏移量获取当前所在的Psi元素
+     * <p>亦可配合 PsiTreeUtil.getParentOfType(element, PsiClass.class)方法来获取该PsiElement所处的区域</p>
+     *
+     * @param editor  编辑器
+     * @param psiFile Psi文件
+     * @return Psi元素
+     */
+    public static PsiElement getPsiElementByOffset(Editor editor, PsiFile psiFile) {
+        return psiFile.findElementAt(editor.getCaretModel().getOffset());
+    }
+
 
     /**
      * 获取编辑器
@@ -31,7 +60,6 @@ public class PlatformUtil {
     public static String getEditorContent(AnActionEvent event) {
         return getEditor(event).getDocument().getText();
     }
-
 
 
     /**

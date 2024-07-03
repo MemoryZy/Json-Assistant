@@ -1,0 +1,18 @@
+<idea-plugin>
+    <actions>
+        <action id="MemoryZy.JsonAssistant.actions.JavaBeanToJson"
+                icon="JsonAssistantIcons.JSON"
+                class="cn.memoryzy.json.actions.JavaBeanToJsonAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt 9"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 9"/>
+        </action>
+
+        <group id="MemoryZy.groups.JsonAssistant.JavaBeanToJsonPopupMenu" text="JsonAssistant Popup Menu Actions">
+            <separator/>
+            <reference ref="MemoryZy.JsonAssistant.actions.JavaBeanToJson"/>
+            <separator/>
+
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
+    </actions>
+</idea-plugin>
