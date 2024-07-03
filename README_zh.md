@@ -19,11 +19,12 @@
 - JSON 格式化
 - JSON 压缩
 - JSON 结构化
+- 将 JavaBean 转换为 Json
 
 <br/>
 
 ## 快速开始 🚀
-请参阅插件 [文档][plugin:docs]。
+请参阅 [插件文档][plugin:docs]。
 
 <br/>
 

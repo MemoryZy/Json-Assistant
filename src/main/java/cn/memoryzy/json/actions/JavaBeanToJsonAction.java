@@ -24,16 +24,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.*;
 
 /**
- * Java类转Json（递归找嵌套属性）
- *
  * @author Memory
  * @since 2023/11/27
  */
 public class JavaBeanToJsonAction extends AnAction {
 
     public static final String PLUGIN_ID = "cn.memoryzy.json.Json-Assistant";
-    private static final Logger LOG = Logger.getInstance(JavaBeanToJsonAction.class);
 
+    private static final Logger LOG = Logger.getInstance(JavaBeanToJsonAction.class);
 
     public JavaBeanToJsonAction() {
         super();

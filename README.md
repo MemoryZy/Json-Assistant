@@ -19,6 +19,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 [//]: # ([![Version]&#40;https://img.shields.io/jetbrains/plugin/v/24738-json-assistant.svg&#41;]&#40;https://plugins.jetbrains.com/plugin/24738&#41;)
 
+[//]: # ()
 [//]: # ([![Downloads]&#40;https://img.shields.io/jetbrains/plugin/d/24738-json-assistant.svg&#41;][jb:pluginLink])
 
 ## Key Features
@@ -26,6 +27,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 - Formatted Json
 - Compressed Json
 - Structured Json
+- Convert JavaBean to Json
 
 <br/>
 

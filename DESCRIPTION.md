@@ -12,4 +12,5 @@
  - Json display window
  - Json formatting
  - Json compressing
- - Json Structuring
+ - Json structuring
+ - Convert JavaBean to Json

@@ -1,7 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- New feature: Convert JavaBean to Json.
 - Change the Json function entry to the popup menu.
+- 功能新增：将JavaBean转为Json
 - 修改 Json 功能入口为弹出菜单
 
 
