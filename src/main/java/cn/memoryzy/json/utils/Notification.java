@@ -24,26 +24,12 @@ public class Notification {
     /**
      * 给定程序通知
      *
-     * @param title            标题
-     * @param content          内容
-     * @param notificationType 通知级别
-     */
-    public static void notify(String title, String content, NotificationType notificationType, Project project) {
-        // 使用通知组创建通知
-        BALLOON.createNotification(title, content, notificationType).notify(project);
-    }
-
-
-    /**
-     * 给定程序通知
-     *
      * @param content          内容
      * @param notificationType 通知级别
      */
     public static void notify(String content, NotificationType notificationType, Project project) {
         // 使用通知组创建通知
-        BALLOON.createNotification("", content, notificationType).notify(project);
+        BALLOON.createNotification(content, notificationType).notify(project);
     }
-
 
 }
