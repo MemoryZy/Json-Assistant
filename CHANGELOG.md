@@ -6,8 +6,10 @@
 
 - New feature: Convert JavaBean to Json.
 - Change the Json function entry to the popup menu.
+- Optimize icon
 - 功能新增：将JavaBean转为Json
 - 修改 Json 功能入口为弹出菜单
+- 优化图标
 
 ## [1.0.0] - 2024-06-29
 
