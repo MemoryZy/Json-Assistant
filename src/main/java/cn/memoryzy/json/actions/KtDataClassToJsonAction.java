@@ -29,17 +29,21 @@ public class KtDataClassToJsonAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        PsiElement element = PlatformUtil.getPsiElementByOffset(PlatformUtil.getEditor(e), PlatformUtil.getPsiFile(e));
-
         PsiFile psiFile = PlatformUtil.getPsiFile(e);
 
-        KtFile ktFile = (KtFile) psiFile;
+        if (psiFile instanceof KtFile) {
+            KtFile ktFile = (KtFile) psiFile;
+            PsiClass[] classes = ktFile.getClasses();
 
-        PsiClass[] classes = ktFile.getClasses();
 
-        PsiClass psiClass = classes[0];
+            PsiClass psiClass = classes[0];
 
-        PsiField[] fields = JavaUtil.getAllFieldFilterStatic(psiClass);
+            PsiField[] fields = JavaUtil.getAllFieldFilterStatic(psiClass);
+
+        }
+
+
+
 
 
 
