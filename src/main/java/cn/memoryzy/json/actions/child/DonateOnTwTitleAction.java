@@ -8,7 +8,7 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author wcp
+ * @author Memory
  * @since 2024/7/5
  */
 public class DonateOnTwTitleAction extends AnAction {

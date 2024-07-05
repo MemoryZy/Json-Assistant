@@ -3,7 +3,6 @@ package cn.memoryzy.json.utils;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.intellij.ide.highlighter.JavaFileType;
-import com.intellij.lang.FileASTNode;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
@@ -12,7 +11,9 @@ import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -47,13 +48,28 @@ public class JavaUtil {
      */
     public static PsiClass getPsiClass(AnActionEvent event) {
         PsiClass psiClass = null;
-        try {
-            psiClass = getCurrentPsiClassByFile(event);
-            if (Objects.isNull(psiClass)) {
-                psiClass = getCurrentPsiClassByOffset(event);
-            }
-        } catch (Throwable e) {
 
+        try {
+            // 一个类中可能存在几个内部类
+            PsiClass[] psiClasses = getAllPsiClassByPsiFile(event);
+
+            if (ArrayUtil.isEmpty(psiClasses)) {
+                return getCurrentPsiClassByOffset(event);
+            } else {
+                // 单独Class
+                if (psiClasses.length == 1) {
+                    psiClass = psiClasses[0];
+                } else {
+                    // 偏移量获取
+                    PsiClass curClz = getCurrentPsiClassByOffset(event);
+                    if (Objects.nonNull(curClz)) {
+                        psiClass = curClz;
+                    } else {
+                        psiClass = psiClasses[0];
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
         }
 
         return psiClass;
@@ -61,25 +77,28 @@ public class JavaUtil {
 
 
     /**
-     * 根据Java文件获取当前Class文件
+     * 根据Java文件获取当前Class文件及所有内部类
      *
      * @param event 事件信息
      * @return Class
      */
-    public static PsiClass getCurrentPsiClassByFile(AnActionEvent event) {
-        PsiClass psiClass = null;
+    public static PsiClass[] getAllPsiClassByPsiFile(AnActionEvent event) {
+        List<PsiClass> psiClassList = new ArrayList<>();
         PsiFile psiFile = PlatformUtil.getPsiFile(event);
-        if (Objects.nonNull(psiFile)) {
-            FileASTNode node = psiFile.getNode();
-            PsiElement psi = node.getPsi();
-            if (psi instanceof PsiJavaFile) {
-                PsiJavaFile psiJavaFile = (PsiJavaFile) psi;
-                PsiClass[] classes = psiJavaFile.getClasses();
-                psiClass = classes[0];
+
+        if (psiFile instanceof PsiJavaFile) {
+            PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
+            PsiClass[] classes = psiJavaFile.getClasses();
+            for (PsiClass psiClass : classes) {
+                psiClassList.add(psiClass);
+                PsiClass[] innerClasses = psiClass.getInnerClasses();
+                if (ArrayUtil.isNotEmpty(innerClasses)) {
+                    psiClassList.addAll(Arrays.asList(innerClasses));
+                }
             }
         }
 
-        return psiClass;
+        return psiClassList.toArray(new PsiClass[0]);
     }
 
     /**

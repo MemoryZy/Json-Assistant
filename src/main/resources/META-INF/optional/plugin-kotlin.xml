@@ -1,0 +1,17 @@
+<idea-plugin>
+    <actions>
+<!--        <action id="MemoryZy.JsonAssistant.actions.KtDataClassToJson"-->
+<!--                icon="JsonAssistantIcons.JSON"-->
+<!--                class="cn.memoryzy.json.actions.KtDataClassToJsonAction">-->
+<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>-->
+<!--        </action>-->
+
+<!--        <group id="MemoryZy.groups.JsonAssistant.KtDataClassToJsonPopupMenu">-->
+<!--            <separator/>-->
+<!--            <reference ref="MemoryZy.JsonAssistant.actions.KtDataClassToJson"/>-->
+<!--            <separator/>-->
+
+<!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
+<!--        </group>-->
+    </actions>
+</idea-plugin>

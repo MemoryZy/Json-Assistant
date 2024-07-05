@@ -60,7 +60,7 @@ public class JavaBeanToJsonAction extends AnAction {
         } catch (Error e) {
             LOG.error(e);
             // 给通知
-            Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
+            Notification.notify("该类属性递归时深度过大，无法继续！", NotificationType.ERROR, project);
             return;
         }
 
@@ -69,7 +69,7 @@ public class JavaBeanToJsonAction extends AnAction {
         // 添加至剪贴板
         PlatformUtil.setClipboard(jsonStr);
         // 给通知
-        Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
+        Notification.notify("已拷贝到剪贴板！", NotificationType.INFORMATION, project);
     }
 
 

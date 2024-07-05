@@ -6,7 +6,7 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <group id="MemoryZy.groups.JsonAssistant.JavaBeanToJsonPopupMenu" text="JsonAssistant Popup Menu Actions">
+        <group id="MemoryZy.groups.JsonAssistant.JavaBeanToJsonPopupMenu">
             <separator/>
             <reference ref="MemoryZy.JsonAssistant.actions.JavaBeanToJson"/>
             <separator/>

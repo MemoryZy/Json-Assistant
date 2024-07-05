@@ -1,7 +1,7 @@
 package cn.memoryzy.json.toolwindows;
 
-import cn.memoryzy.json.actions.child.JsonStructureOnTwTitleAction;
 import cn.memoryzy.json.actions.child.DonateOnTwTitleAction;
+import cn.memoryzy.json.actions.child.JsonStructureOnTwTitleAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonWindow;
 import com.intellij.openapi.project.Project;

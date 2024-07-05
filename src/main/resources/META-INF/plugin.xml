@@ -6,6 +6,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends optional="true" config-file="optional/plugin-java.xml">com.intellij.java</depends>
+    <depends optional="true" config-file="optional/plugin-kotlin.xml">org.jetbrains.kotlin</depends>
 
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
 
