@@ -24,8 +24,7 @@
         <action id="MemoryZy.JsonAssistant.actions.JsonProcessing"
                 icon="JsonAssistantIcons.BOX"
                 class="cn.memoryzy.json.actions.JsonProcessingAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt 0"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 0"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift M"/>
         </action>
 
         <group id="MemoryZy.groups.JsonAssistant.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">

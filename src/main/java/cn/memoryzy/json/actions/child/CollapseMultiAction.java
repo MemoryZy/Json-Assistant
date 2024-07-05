@@ -17,7 +17,9 @@ public class CollapseMultiAction extends AnAction {
     private final Tree tree;
 
     public CollapseMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.collapse.multi.text"));
+        super(JsonAssistantBundle.message("action.json.structure.window.collapse.multi.text"),
+                JsonAssistantBundle.messageOnSystem("action.json.structure.window.collapse.multi.description"),
+                null);
         this.tree = tree;
     }
 

@@ -26,6 +26,7 @@ public class JsonCompressAction extends AnAction {
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.compress.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.compress.description"));
     }
 
     @Override

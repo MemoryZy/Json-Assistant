@@ -1,6 +1,7 @@
 package cn.memoryzy.json.toolwindows;
 
 import cn.memoryzy.json.actions.child.JsonStructureOnTwTitleAction;
+import cn.memoryzy.json.actions.child.DonateOnTwTitleAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonWindow;
 import com.intellij.openapi.project.Project;
@@ -34,7 +35,7 @@ public class JsonWindowTw implements ToolWindowFactory {
         ContentManager contentManager = toolWindow.getContentManager();
 
         JsonWindow window = new JsonWindow(project);
-        toolWindow.setTitleActions(List.of(new JsonStructureOnTwTitleAction(project, window)));
+        toolWindow.setTitleActions(List.of(new JsonStructureOnTwTitleAction(project, window), new DonateOnTwTitleAction()));
 
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);

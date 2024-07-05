@@ -21,6 +21,7 @@ public class JsonProcessingAction extends AnAction {
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.processing.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.processing.description"));
     }
 
     @Override

@@ -14,7 +14,9 @@ public class RemoveAction extends AnAction {
     private final Tree tree;
 
     public RemoveAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.remove.text"));
+        super(JsonAssistantBundle.message("action.json.structure.window.remove.text"),
+                JsonAssistantBundle.messageOnSystem("action.json.structure.window.remove.description"),
+                null);
         this.tree = tree;
     }
 

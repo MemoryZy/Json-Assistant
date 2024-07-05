@@ -15,7 +15,9 @@ public class ExpandAllAction extends AnActionButton {
     private final Tree tree;
 
     public ExpandAllAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.expand.all.text"), null, JsonAssistantIcons.InnerAction.EXPAND_ALL);
+        super(JsonAssistantBundle.message("action.expand.all.text"),
+                JsonAssistantBundle.messageOnSystem("action.expand.all.description"),
+                JsonAssistantIcons.InnerAction.EXPAND_ALL);
         this.tree = tree;
 
         // todo 待注册快捷键

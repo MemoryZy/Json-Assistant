@@ -18,7 +18,9 @@ public class ExpandMultiAction extends AnAction {
     private final Tree tree;
 
     public ExpandMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.expand.multi.text"));
+        super(JsonAssistantBundle.message("action.json.structure.window.expand.multi.text"),
+                JsonAssistantBundle.messageOnSystem("action.json.structure.window.expand.multi.description"),
+                null);
         this.tree = tree;
     }
 

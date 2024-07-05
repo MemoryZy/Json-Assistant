@@ -20,7 +20,9 @@ public class CopyKeyAction extends AnAction {
     private final Tree tree;
 
     public CopyKeyAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.copy.key.text"));
+        super(JsonAssistantBundle.message("action.json.structure.window.copy.key.text"),
+                JsonAssistantBundle.messageOnSystem("action.json.structure.window.copy.key.description"),
+                null);
         this.tree = tree;
     }
 

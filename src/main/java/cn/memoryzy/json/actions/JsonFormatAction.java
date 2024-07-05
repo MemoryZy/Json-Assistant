@@ -28,6 +28,7 @@ public class JsonFormatAction extends AnAction {
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.format.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.format.description"));
     }
 
     @Override

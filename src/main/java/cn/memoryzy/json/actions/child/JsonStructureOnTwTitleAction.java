@@ -19,7 +19,9 @@ public class JsonStructureOnTwTitleAction extends AnAction {
     private final JsonWindow window;
 
     public JsonStructureOnTwTitleAction(Project project, JsonWindow window) {
-        super(JsonAssistantBundle.message("action.json.structure.text"), null, JsonAssistantIcons.Structure.STRUCTURE);
+        super(JsonAssistantBundle.message("action.json.structure.text"),
+                JsonAssistantBundle.messageOnSystem("action.json.structure.description"),
+                JsonAssistantIcons.Structure.STRUCTURE);
 
         this.project = project;
         this.window = window;

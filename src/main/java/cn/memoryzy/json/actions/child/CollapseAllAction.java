@@ -15,7 +15,9 @@ public class CollapseAllAction extends AnActionButton {
     private final Tree tree;
 
     public CollapseAllAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.collapse.all.text"), null, JsonAssistantIcons.InnerAction.COLLAPSE_ALL);
+        super(JsonAssistantBundle.message("action.collapse.all.text"),
+                JsonAssistantBundle.messageOnSystem("action.collapse.all.description"),
+                JsonAssistantIcons.InnerAction.COLLAPSE_ALL);
         this.tree = tree;
 
         // todo 待注册快捷键

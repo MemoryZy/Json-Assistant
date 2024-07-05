@@ -21,6 +21,7 @@ public class JsonStructureAction extends AnAction {
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.structure.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.structure.description"));
     }
 
     @Override
