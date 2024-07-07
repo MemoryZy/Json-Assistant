@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 - The JavaBean to Json function adds internal class judgment (When the focus is on the inner class, the inner class is converted to Json)
+- Optimization function
+- Added Json to JavaBean functionality
 - JavaBean转Json功能增加内部类判断（当焦点处于内部类，优先将内部类转为Json）
+- 优化功能
+- 增加Json转为JavaBean功能
 
 
 ## [1.1.0] - 2024-07-03

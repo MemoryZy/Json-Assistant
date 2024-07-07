@@ -64,6 +64,7 @@ jobs:
           
           echo "name=$NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "pluginName=$NAME-$VERSION.zip" >> $GITHUB_OUTPUT
           echo "pluginSignedName=$NAME-$VERSION-signed.zip" >> $GITHUB_OUTPUT
           
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
@@ -92,13 +93,36 @@ jobs:
           PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
         run: ./gradlew publishPlugin
 
+      - name: Move zip
+        run: |
+          echo "${{ steps.properties.outputs.pluginName }}"
+          echo "${{ steps.properties.outputs.pluginSignedName }}"
+          
+          # 移除原本未签名的压缩包
+          mkdir test
+          mv ./build/distributions/${{ steps.properties.outputs.pluginName }} test/${{ steps.properties.outputs.pluginName }}
+
+          echo "已移除未签名压缩包，查看文件："
+          echo "/build/distributions："
+          ls ./build/distributions
+          echo "/test："
+          ls ./test
+
+          mv ./build/distributions/${{ steps.properties.outputs.pluginSignedName }} ./build/distributions/${{ steps.properties.outputs.pluginName }}
+
+          echo "已将签名压缩包更名，查看文件："
+          echo "/build/distributions："
+          ls ./build/distributions
+          echo "/test："
+          ls ./test
+
       # Upload artifact as a release asset
       - name: Upload Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.pluginSignedName }}
+        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.pluginName }}
 
-      - name: Check if branch exists
+      - name: Check If Branch Exists
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           BRANCH="changelog-update-$VERSION"
@@ -113,7 +137,7 @@ jobs:
             echo "branch_exists=false" >> $GITHUB_ENV
           fi
 
-      - name: Delete branch if exists
+      - name: Delete Branch If Exists
         if: env.branch_exists == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,9 @@
+{
+  "icons": {
+    "expui": {
+      "common": {
+        "groupByClass.svg": "icons/groupByClass.svg"
+      }
+    }
+  }
+}

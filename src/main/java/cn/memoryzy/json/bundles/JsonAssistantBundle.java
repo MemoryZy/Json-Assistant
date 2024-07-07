@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
+import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -55,8 +56,9 @@ public class JsonAssistantBundle extends AbstractBundle {
      * @return 翻译结果
      */
     @NotNull
-    public static String messageOnSystem(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key) {
-        return RESOURCE_BUNDLE.getString(key);
+    public static String messageOnSystem(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, Object... params) {
+        String result = RESOURCE_BUNDLE.getString(key);
+        return MessageFormat.format(result, params);
     }
 
     private String getAdaptedMessage(@PropertyKey(resourceBundle = BUNDLE) String key, Object... params) {

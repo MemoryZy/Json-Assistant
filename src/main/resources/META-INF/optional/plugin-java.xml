@@ -6,12 +6,25 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <group id="MemoryZy.groups.JsonAssistant.JavaBeanToJsonPopupMenu">
+        <action id="MemoryZy.JsonAssistant.actions.JsonToJavaBean"
+                icon="JsonAssistantIcons.GROUP_BY_CLASS"
+                class="cn.memoryzy.json.actions.JsonToJavaBeanAction">
+        </action>
+
+        <group id="MemoryZy.groups.JsonAssistant.JavaBeanToJson">
             <separator/>
             <reference ref="MemoryZy.JsonAssistant.actions.JavaBeanToJson"/>
             <separator/>
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
+
+        <group id="MemoryZy.groups.JsonAssistant.JsonToJavaBean">
+            <separator/>
+            <reference ref="MemoryZy.JsonAssistant.actions.JsonToJavaBean"/>
+            <separator/>
+
+            <add-to-group group-id="NewGroup" relative-to-action="NewFile" anchor="before"/>
         </group>
     </actions>
 </idea-plugin>

@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.TextTransferable;
@@ -70,6 +71,13 @@ public class PlatformUtil {
     public static void setClipboard(String content) {
         CopyPasteManager.getInstance().setContents(new TextTransferable(content));
         // CopyPasteManager.getInstance().setContents(new SimpleTransferable(content, DataFlavor.stringFlavor));
+    }
+
+    /**
+     * 刷新文件系统
+     */
+    public static void refreshFileSystem() {
+        VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
     }
 
 }

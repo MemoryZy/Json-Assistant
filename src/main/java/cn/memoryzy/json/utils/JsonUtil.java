@@ -4,7 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Memory
@@ -19,6 +22,24 @@ public class JsonUtil {
             MAPPER.readTree(text);
             return true;
         } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    public static boolean isJsonArray(String json) {
+        try {
+            JsonNode jsonNode = MAPPER.readTree(json);
+            return jsonNode instanceof ArrayNode;
+        } catch (JsonProcessingException e) {
+            return false;
+        }
+    }
+
+    public static boolean isJsonObject(String json) {
+        try {
+            JsonNode jsonNode = MAPPER.readTree(json);
+            return jsonNode instanceof ObjectNode;
+        } catch (JsonProcessingException e) {
             return false;
         }
     }
