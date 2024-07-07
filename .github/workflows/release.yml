@@ -99,7 +99,6 @@ jobs:
         run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.pluginSignedName }}
 
       - name: Check if branch exists
-        id: check_branch
         run: |
           VERSION="${{ github.event.release.tag_name }}"
           BRANCH="changelog-update-$VERSION"

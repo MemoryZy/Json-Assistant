@@ -1,5 +1,5 @@
 <idea-plugin>
-    <actions>
+<!--    <actions>-->
 <!--        <action id="MemoryZy.JsonAssistant.actions.KtDataClassToJson"-->
 <!--                icon="JsonAssistantIcons.JSON"-->
 <!--                class="cn.memoryzy.json.actions.KtDataClassToJsonAction">-->
@@ -13,5 +13,5 @@
 
 <!--            <add-to-group group-id="EditorPopupMenu" anchor="first"/>-->
 <!--        </group>-->
-    </actions>
+<!--    </actions>-->
 </idea-plugin>
