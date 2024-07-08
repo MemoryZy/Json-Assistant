@@ -1,0 +1,61 @@
+# 通过 Github actions， 在 Github 仓库的每一次 commit 后自动同步到 Gitee 上
+name: Sync to Gitee
+on:
+  push:
+    branches:
+      - main
+jobs:
+  repo-sync:
+    env:
+      dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+      dst_token: ${{ secrets.GITEE_TOKEN }}
+      gitee_user: ${{ secrets.GITEE_USER }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Sync Github to Gitee
+        uses: Yikun/hub-mirror-action@master
+        if: env.dst_key && env.dst_token && env.gitee_user
+        with:
+          # 必选，需要同步的 Github 用户（源）
+          src: 'github/${{ github.repository_owner }}'
+          # 必选，需要同步到的 Gitee 用户（目的）
+          dst: 'gitee/${{ secrets.GITEE_USER }}'
+          # 必选，Gitee公钥对应的私钥，https://gitee.com/profile/sshkeys
+          dst_key: ${{ secrets.GITEE_PRIVATE_KEY }}
+          # 必选，Gitee对应的用于创建仓库的token，https://gitee.com/profile/personal_access_tokens
+          dst_token: ${{ secrets.GITEE_TOKEN }}
+          # 如果是组织，指定组织即可，默认为用户 user
+          account_type: user
+          # 直接取当前项目的仓库名
+          static_list: ${{ github.event.repository.name }}
+          # 默认为false, 配置后，启用git push -f强制同步，注意：开启后，会强制覆盖目的端仓库。
+          # 开启强制提交，避免因下一步修改README文件的操作，导致的下一次同步失败，只要保证Gitee的文件都是这里同步过去的就好。
+          force_update: true
+          # 还有黑、白名单，静态名单机制，可以用于更新某些指定库
+          # static_list: 'repo_name,repo_name2'
+          # black_list: 'repo_name,repo_name2'
+          # white_list: 'repo_name,repo_name2'
+
+      - name: Modify README for Gitee
+        run: |
+          # 拉取代码
+          git clone https://oauth2:${{ secrets.GITEE_TOKEN }}@gitee.com/${{ secrets.GITEE_USER }}/${{ github.event.repository.name }}.git
+          # 切换目录
+          cd ${{ github.event.repository.name }}
+          
+          # 修改文件
+          sed -i 's|https://github.com/MemoryZy/Json-Assistant/pulls|https://gitee.com/MemoryZy/Json-Assistant/pulls|g' README.md README_zh.md
+          sed -i 's|https://github.com/MemoryZy/Json-Assistant/issues/new/choose|https://gitee.com/MemoryZy/Json-Assistant/issues/new/choose|g' README.md README_zh.md
+  
+          # 提交修改
+          git config --global user.name '${{ secrets.GITEE_USER }}'
+          git config --global user.email '${{ secrets.GITEE_MAIL }}'
+          git add README.md README_zh.md
+          git commit -m "Update README for Gitee"
+
+          # 推送修改到Gitee
+          git push origin main

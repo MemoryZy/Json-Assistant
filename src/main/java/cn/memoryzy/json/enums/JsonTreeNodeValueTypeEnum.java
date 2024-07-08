@@ -31,6 +31,4 @@ public enum JsonTreeNodeValueTypeEnum {
      */
     JSONObjectKey
 
-    ;
-
 }
