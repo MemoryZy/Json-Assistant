@@ -14,6 +14,7 @@
  - Json compressing
  - Json structuring
  - Convert JavaBean to Json
+ - Convert Json to JavaBean
 
 
 <br/>
