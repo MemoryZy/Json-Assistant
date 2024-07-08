@@ -57,6 +57,7 @@
 [jb:plugin-link]: https://plugins.jetbrains.com/plugin/24738-json-assistant
 [gh:pr]: https://github.com/MemoryZy/Json-Assistant/pulls
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues/new/choose
+[gh:release]: https://github.com/MemoryZy/Json-Assistant/releases/latest
 [jb:version]: https://plugins.jetbrains.com/plugin/24738-json-assistant/versions
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
 [plugin:docs]: https://json.memoryzy.cn/overview

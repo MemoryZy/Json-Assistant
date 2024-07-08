@@ -50,6 +50,7 @@ jobs:
           # 修改文件
           sed -i 's|https://github.com/MemoryZy/Json-Assistant/pulls|https://gitee.com/MemoryZy/Json-Assistant/pulls|g' README.md README_zh.md
           sed -i 's|https://github.com/MemoryZy/Json-Assistant/issues/new/choose|https://gitee.com/MemoryZy/Json-Assistant/issues/new/choose|g' README.md README_zh.md
+          sed -i 's|https://github.com/MemoryZy/Json-Assistant/releases/latest|https://gitee.com/MemoryZy/Json-Assistant/releases|g' README.md README_zh.md
   
           # 提交修改
           git config --global user.name '${{ secrets.GITEE_USER }}'
