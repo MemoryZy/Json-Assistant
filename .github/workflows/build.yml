@@ -22,6 +22,8 @@ on:
       - '.gitignore'
       - 'README.md'
       - 'README_zh.md'
+      - 'CHANGELOG.md'
+      - 'DESCRIPTION.md'
 
   # Trigger the workflow on any pull request
   pull_request:
@@ -30,6 +32,8 @@ on:
       - '.gitignore'
       - 'README.md'
       - 'README_zh.md'
+      - 'CHANGELOG.md'
+      - 'DESCRIPTION.md'
       
   # 可手动操控
   workflow_dispatch:
