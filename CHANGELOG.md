@@ -1,13 +1,15 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
-- The JavaBean to Json function adds internal class judgment (When the focus is on the inner class, the inner class is converted to Json)
+
+## [1.1.2] - 2024-07-08
+
 - Optimization function
 - Added Json to JavaBean functionality
-- JavaBean转Json功能增加内部类判断（当焦点处于内部类，优先将内部类转为Json）
+- The JavaBean to Json function adds internal class judgment (When the focus is on the inner class, the inner class is converted to Json)
 - 优化功能
 - 增加Json转为JavaBean功能
-
+- JavaBean转Json功能增加内部类判断（当焦点处于内部类，优先将内部类转为Json）
 
 ## [1.1.0] - 2024-07-03
 
@@ -29,6 +31,7 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.0...v1.1.2
 [1.1.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/MemoryZy/Json-Assistant/commits/v1.0.0
