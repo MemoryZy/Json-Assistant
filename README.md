@@ -26,6 +26,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 - Compressed Json
 - Structured Json
 - Convert JavaBean to Json
+- Convert Json to JavaBean 
 
 <br/>
 

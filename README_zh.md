@@ -22,6 +22,7 @@
 - JSON 压缩
 - JSON 结构化
 - 将 JavaBean 转换为 Json
+- 将 Json 转换为 JavaBean 
 
 <br/>
 
