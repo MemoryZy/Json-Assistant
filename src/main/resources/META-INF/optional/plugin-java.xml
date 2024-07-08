@@ -3,6 +3,7 @@
         <action id="MemoryZy.JsonAssistant.actions.JavaBeanToJson"
                 icon="JsonAssistantIcons.JSON"
                 class="cn.memoryzy.json.actions.JavaBeanToJsonAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 

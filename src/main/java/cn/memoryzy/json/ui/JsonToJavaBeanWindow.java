@@ -81,8 +81,8 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
         label.setText(JsonAssistantBundle.messageOnSystem("json.window.label.text"));
 
         setTitle(JsonAssistantBundle.message("json.to.javabean.title"));
-        setOKButtonText(JsonAssistantBundle.message("json.to.javabean.ok.button.text"));
-        setCancelButtonText(JsonAssistantBundle.message("json.to.javabean.cancel.button.text"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.ok.button.text"));
+        setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.cancel.button.text"));
 
         init();
     }
