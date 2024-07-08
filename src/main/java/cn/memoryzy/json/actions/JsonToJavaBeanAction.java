@@ -5,6 +5,7 @@ import cn.memoryzy.json.ui.JsonToJavaBeanWindow;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
@@ -50,7 +51,19 @@ public class JsonToJavaBeanAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        ActionManager.getInstance().getAction("NewClass").update(e);
+        final DataContext dataContext = e.getDataContext();
+        final Presentation presentation = e.getPresentation();
+        presentation.setEnabledAndVisible(isAvailable(dataContext));
     }
 
+    private boolean isAvailable(DataContext dataContext) {
+        Editor editor = CommonDataKeys.EDITOR.getData(dataContext);
+        if (editor != null && editor.getSelectionModel().hasSelection()) {
+            return false;
+        }
+
+        final Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
+        return project != null && view != null && view.getDirectories().length != 0;
+    }
 }
