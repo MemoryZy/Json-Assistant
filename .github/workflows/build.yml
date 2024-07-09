@@ -259,6 +259,51 @@ jobs:
           name: pluginVerifier-result
           path: ${{ github.workspace }}/build/reports/pluginVerifier
 
+  # 构建检测报告
+  build-report:
+    name: Build Report
+    needs: [ build, test, inspectCode, verify ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: pluginVerifier-result
+          path: reports
+
+      - name: Generate Entry File
+        run: |
+          echo '<!DOCTYPE html>' > reports/index.html
+          echo '<html lang=\"en\">' >> reports/index.html
+          echo '<head>' >> reports/index.html
+          echo '<meta charset=\"UTF-8\">' >> reports/index.html
+          echo '<title>Json Assistant Verify Report</title>' >> reports/index.html
+          echo '</head>' >> reports/index.html
+          echo '<body>' >> reports/index.html
+
+          # 遍历 reports 目录下的所有子文件夹
+          find reports -type d -print0 | while IFS= read -r -d $'\0' dir; do
+          # 获取 report.html 文件路径
+          report_path="$dir/report.html"
+          # 检查 report.html 文件是否存在
+          if [ -f "$report_path" ]; then
+          # 获取文件夹名称
+          folder_name=$(basename "$dir")
+          # 生成链接
+          echo "<a href=\"$folder_name/report.html\">$folder_name</a><br>" >> reports/index.html
+          fi
+          done
+
+          echo '</body>' >> reports/index.html
+          echo '</html>' >> reports/index.html
+
+      - name: Deploy Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CF_TOKEN }}
+          command: pages deploy reports --project-name=json-verify-report
+
+
   # Prepare a draft release for GitHub Releases page for the manual verification
   # If accepted and published, release workflow would be triggered
   releaseDraft:
