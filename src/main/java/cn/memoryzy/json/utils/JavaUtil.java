@@ -2,10 +2,13 @@ package cn.memoryzy.json.utils;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateException;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.enums.JsonAnnotationEnum;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -23,6 +26,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -30,6 +34,128 @@ import java.util.*;
  * @since 2024/7/3
  */
 public class JavaUtil {
+
+    /**
+     * 递归将属性转成Map元素
+     *
+     * @param psiClass class
+     * @param jsonMap  Map
+     */
+    public static void recursionAddProperty(PsiClass psiClass, Map<String, Object> jsonMap) {
+        // 获取该类所有字段
+        PsiField[] allFields = JavaUtil.getAllFieldFilterStatic(psiClass);
+        for (PsiField psiField : allFields) {
+            // -------------------------- 注解支持
+            // 获取Json键名
+            String jsonKeyName = getAnnotationJsonKeyName(psiField);
+
+            // 如果加了忽略，则忽略该属性
+            if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName)) {
+                continue;
+            }
+
+            // 字段名
+            String propertyName = (StrUtil.isBlank(jsonKeyName)) ? psiField.getName() : jsonKeyName;
+
+            // 字段类型
+            PsiType psiType = psiField.getType();
+
+            // 是否为引用类型
+            if (JavaUtil.isReferenceType(psiType)) {
+                // 嵌套Map（为了实现嵌套属性）
+                Map<String, Object> nestedJsonMap = new HashMap<>();
+                // 递归
+                recursionAddProperty(JavaUtil.getPsiClassByReferenceType(psiType), nestedJsonMap);
+                // 添加至主Map
+                jsonMap.put(propertyName, nestedJsonMap);
+            } else {
+                // key，名称；value，根据全限定名判断生成具体的内容
+                jsonMap.put(propertyName, getDefaultValue(psiType.getCanonicalText()));
+            }
+        }
+    }
+
+
+    /**
+     * 获取Json注解中的键名称
+     *
+     * @param psiField 字段属性
+     * @return 键名（如果是{@link PluginConstant#PLUGIN_ID}）则表示忽略该字段
+     */
+    private static String getAnnotationJsonKeyName(PsiField psiField) {
+        // ---------------------------------- 获取注解判断是否忽略序列化
+        // jackson 通过 @JsonIgnore 注解标记是否忽略序列化字段
+        PsiAnnotation jacksonIgnore = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_IGNORE.getValue());
+        if (Objects.nonNull(jacksonIgnore)) {
+            // 该字段需要忽略
+            return PluginConstant.PLUGIN_ID;
+        }
+
+        // 检测是否含有 fastjson 注解
+        PsiAnnotation fastJsonJsonField = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON_JSON_FIELD.getValue());
+        PsiAnnotation fastJson2JsonField = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON2_JSON_FIELD.getValue());
+        // 检测是否含有 Jackson 注解
+        PsiAnnotation jacksonJsonProperty = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_PROPERTY.getValue());
+
+        String annotationValue = "";
+        if (Objects.nonNull(fastJsonJsonField) || Objects.nonNull(fastJson2JsonField)) {
+            // 是否忽略序列化
+            String serialize = JavaUtil.getMemberValue(fastJsonJsonField, "serialize");
+            String serialize2 = JavaUtil.getMemberValue(fastJson2JsonField, "serialize");
+            if (Objects.equals(Boolean.FALSE.toString(), serialize) || Objects.equals(Boolean.FALSE.toString(), serialize2)) {
+                return PluginConstant.PLUGIN_ID;
+            }
+
+            // 获取值
+            annotationValue = JavaUtil.getMemberValue(fastJsonJsonField, "name");
+            if (StrUtil.isBlank(annotationValue)) {
+                annotationValue = JavaUtil.getMemberValue(fastJson2JsonField, "name");
+            }
+
+        } else if (Objects.nonNull(jacksonJsonProperty)) {
+            annotationValue = JavaUtil.getMemberValue(jacksonJsonProperty, "value");
+        }
+
+        return annotationValue;
+    }
+
+
+    /**
+     * 根据类全限定名获取其类型的默认值
+     *
+     * @param canonicalText 全限定名
+     * @return 默认值
+     */
+    public static Object getDefaultValue(String canonicalText) {
+        Object result;
+
+        if ("boolean".equals(canonicalText) || "java.lang.Boolean".equals(canonicalText)) {
+            result = false;
+        } else if ("char".equals(canonicalText) || "java.lang.Character".equals(canonicalText) || "java.lang.String".equals(canonicalText)) {
+            result = "";
+        } else if ("byte".equals(canonicalText) || "java.lang.Byte".equals(canonicalText)
+                || "short".equals(canonicalText) || "java.lang.Short".equals(canonicalText)
+                || "int".equals(canonicalText) || "java.lang.Integer".equals(canonicalText)
+                || "long".equals(canonicalText) || "java.lang.Long".equals(canonicalText)) {
+            result = 0;
+        } else if ("float".equals(canonicalText) || "java.lang.Float".equals(canonicalText)
+                || "double".equals(canonicalText) || "java.lang.Double".equals(canonicalText)
+                || "java.math.BigDecimal".equals(canonicalText)) {
+            result = new BigDecimal("1.0");
+        } else if (canonicalText.contains("Date")
+                || canonicalText.contains("DateTime")
+                || canonicalText.contains("Timestamp")) {
+            result = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
+        } else if (canonicalText.contains("List")
+                || canonicalText.contains("ArrayList")
+                || canonicalText.contains("Collection")) {
+            result = new ArrayList<>();
+        } else {
+            result = null;
+        }
+
+        return result;
+    }
 
     /**
      * 判断是否为引用类型（自己项目中的类）（不包括String、BigDecimal之类的）

@@ -2,6 +2,7 @@ package cn.memoryzy.json.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
+import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -46,7 +47,7 @@ public class JsonUtil {
 
 
     public static String formatJson(String jsonStr) {
-        JSON json = JSONUtil.parse(jsonStr);
+        JSON json = JSONUtil.parse(jsonStr, JSONConfig.create().setStripTrailingZeros(false));
         return json.toJSONString(2);
     }
 
