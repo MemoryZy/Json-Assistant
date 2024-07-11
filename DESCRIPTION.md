@@ -9,12 +9,12 @@
 <br/>
 
 ## Key Features
- - Json display window
- - Json formatting
- - Json compressing
- - Json structuring
- - Convert JavaBean to Json
- - Convert Json to JavaBean
+ - JSON Viewer
+ - JSON Beautifier
+ - JSON Minifier
+ - JSON Tree View
+ - JavaBean to JSON Serializer
+ - JSON to JavaBean Deserializer
 
 
 <br/>

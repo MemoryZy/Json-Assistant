@@ -21,12 +21,12 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 
 ## Key Features
-- Json display window
-- Formatted Json
-- Compressed Json
-- Structured Json
-- Convert JavaBean to Json
-- Convert Json to JavaBean 
+ - JSON Viewer
+ - JSON Beautifier
+ - JSON Minifier
+ - JSON Tree View
+ - JavaBean to JSON Serializer
+ - JSON to JavaBean Deserializer
 
 <br/>
 

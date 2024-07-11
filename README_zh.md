@@ -20,9 +20,9 @@
 - JSON 展示窗口
 - JSON 格式化
 - JSON 压缩
-- JSON 结构化
-- 将 JavaBean 转换为 Json
-- 将 Json 转换为 JavaBean 
+- JSON 结构化（树视图）
+- JavaBean 转换为 JSON
+- JSON 转换为 JavaBean
 
 <br/>
 
