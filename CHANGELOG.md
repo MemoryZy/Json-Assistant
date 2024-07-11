@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- 用户体验优化
+- User experience optimization.
+
 ## [1.1.2] - 2024-07-08
 
 - Optimization function

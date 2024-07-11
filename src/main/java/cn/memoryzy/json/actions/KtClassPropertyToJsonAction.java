@@ -33,7 +33,8 @@ public class KtClassPropertyToJsonAction extends AnAction {
         PsiClass currentPsiClass = KtUtil.getPsiClass(e);
         PsiField[] fields = JavaUtil.getAllFieldFilterStatic(currentPsiClass);
 
-        PsiMethod[] allMethods = currentPsiClass.getAllMethods();
+
+
 
         System.out.println();
     }
