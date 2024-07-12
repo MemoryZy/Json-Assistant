@@ -70,7 +70,7 @@ public class JsonToJavaBeanAction extends AnAction {
             if (Objects.nonNull(chooseDirectory)) {
                 VirtualFile virtualFile = chooseDirectory.getVirtualFile();
 
-                // todo 未找到解决方案
+                // todo 待找到解决方案
                 String path = virtualFile.getPath();
                 enabled = path.contains("/test/java") || path.contains("/main/java") || path.contains("/test/kotlin") || path.contains("/main/kotlin");
             }
