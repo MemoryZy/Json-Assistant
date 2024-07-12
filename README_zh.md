@@ -23,6 +23,7 @@
 - JSON 结构化（树视图）
 - JavaBean 转换为 JSON
 - JSON 转换为 JavaBean
+- Kotlin 属性转为 JSON
 
 <br/>
 
