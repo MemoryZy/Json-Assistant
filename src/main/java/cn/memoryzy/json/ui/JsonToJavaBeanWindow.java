@@ -8,6 +8,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
 import cn.memoryzy.json.ui.basic.MultiRowLanguageTextField;
 import cn.memoryzy.json.ui.basic.TextFieldErrorPopupDecorator;
@@ -91,7 +92,7 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
         // 声明 Json 类型编辑器
         jsonTextField = new MultiRowLanguageTextField(Json5Language.INSTANCE, project, "", true);
         jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
-        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text"));
+        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
     }
 
     @Override

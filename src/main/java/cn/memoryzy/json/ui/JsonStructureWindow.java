@@ -223,7 +223,7 @@ public class JsonStructureWindow extends DialogWrapper {
                             nodeTypeStr = "object";
                             squareBracketsEnd = "]";
                             sizeStrPre = " (";
-                            sizeStr = size + " " + JsonAssistantBundle.message("json.structure.window.size.obj.text");
+                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem("json.structure.window.size.obj.text");
                             sizeStrPost = ")";
 
                             icon = JsonAssistantIcons.Structure.JSON_OBJECT;
@@ -235,7 +235,7 @@ public class JsonStructureWindow extends DialogWrapper {
                             nodeTypeStr = "array";
                             squareBracketsEnd = "]";
                             sizeStrPre = " (";
-                            sizeStr = size + " " + JsonAssistantBundle.message("json.structure.window.size.array.text");
+                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem("json.structure.window.size.array.text");
                             sizeStrPost = ")";
 
                             icon = JsonAssistantIcons.Structure.JSON_ARRAY;
@@ -247,7 +247,7 @@ public class JsonStructureWindow extends DialogWrapper {
                             nodeTypeStr = "array_object";
                             squareBracketsEnd = "]";
                             sizeStrPre = " (";
-                            sizeStr = size + " " + JsonAssistantBundle.message("json.structure.window.size.obj.text");
+                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem("json.structure.window.size.obj.text");
                             sizeStrPost = ")";
 
                             icon = JsonAssistantIcons.Structure.JSON_OBJECT_ITEM;

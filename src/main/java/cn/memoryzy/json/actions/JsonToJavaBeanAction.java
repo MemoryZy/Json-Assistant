@@ -9,6 +9,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +40,6 @@ public class JsonToJavaBeanAction extends AnAction {
         // 文件夹(包)
         PsiDirectory directory = ideView.getOrChooseDirectory();
         if (Objects.isNull(directory)) {
-            LOG.error(JsonAssistantBundle.messageOnSystem("json.to.javabean.null.directory.text"));
             return;
         }
 
@@ -62,8 +62,20 @@ public class JsonToJavaBeanAction extends AnAction {
             return false;
         }
 
+        boolean enabled = false;
         final Project project = CommonDataKeys.PROJECT.getData(dataContext);
         final IdeView view = LangDataKeys.IDE_VIEW.getData(dataContext);
-        return project != null && view != null && view.getDirectories().length != 0;
+        if (project != null && view != null && view.getDirectories().length != 0) {
+            PsiDirectory chooseDirectory = view.getOrChooseDirectory();
+            if (Objects.nonNull(chooseDirectory)) {
+                VirtualFile virtualFile = chooseDirectory.getVirtualFile();
+
+                // todo 未找到解决方案
+                String path = virtualFile.getPath();
+                enabled = path.contains("/test/java") || path.contains("/main/java") || path.contains("/test/kotlin") || path.contains("/main/kotlin");
+            }
+        }
+
+        return enabled;
     }
 }
