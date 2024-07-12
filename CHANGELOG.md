@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-07-12
+
 - Bug修复
 - 用户体验优化
 - 实现 Kotlin 属性转 JSON 功能
@@ -38,7 +40,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.0...v1.1.2
 [1.1.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/MemoryZy/Json-Assistant/commits/v1.0.0
