@@ -13,8 +13,9 @@
  - JSON Beautifier
  - JSON Minifier
  - JSON Tree View
- - JavaBean to JSON Serializer
- - JSON to JavaBean Deserializer
+ - JavaBean to JSON
+ - JSON to JavaBean
+ - Kotlin Properties to JSON
 
 
 <br/>

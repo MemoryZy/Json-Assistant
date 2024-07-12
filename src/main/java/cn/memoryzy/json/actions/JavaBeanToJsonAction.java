@@ -74,7 +74,4 @@ public class JavaBeanToJsonAction extends AnAction {
         event.getPresentation().setEnabledAndVisible(Objects.nonNull(event.getProject()) && JavaUtil.isJavaFile(event) && JavaUtil.hasJavaProperty(event));
     }
 
-
-
-
 }
