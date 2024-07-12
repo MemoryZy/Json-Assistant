@@ -2,8 +2,12 @@
 
 ## [Unreleased]
 
+- Bug修复
 - 用户体验优化
+- 实现 Kotlin 属性转 JSON 功能
+- Bug fixes.
 - User experience optimization.
+- Added Kotlin attribute to JSON functionality.
 
 ## [1.1.2] - 2024-07-08
 
