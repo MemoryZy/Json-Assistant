@@ -6,7 +6,7 @@
 
 - Bug修复
 - 用户体验优化
-- 新增 Kotlin 属性转 JSON 功能
+- 实现 Kotlin 属性转 JSON 功能
 - Bug fixes.
 - User experience optimization.
 - Added Kotlin attribute to JSON functionality.
