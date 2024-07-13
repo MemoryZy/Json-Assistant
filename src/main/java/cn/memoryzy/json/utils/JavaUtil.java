@@ -49,8 +49,8 @@ public class JavaUtil {
             // 获取Json键名
             String jsonKeyName = getAnnotationJsonKeyName(psiField);
 
-            // 如果加了忽略，则忽略该属性
-            if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName)) {
+            // 如果加了忽略，则忽略该属性；或属性为临时属性，也忽略
+            if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName) || psiField.hasModifierProperty(PsiModifier.TRANSIENT)) {
                 continue;
             }
 
