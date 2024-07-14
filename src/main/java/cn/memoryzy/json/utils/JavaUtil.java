@@ -38,24 +38,30 @@ public class JavaUtil {
     /**
      * 递归将属性转成Map元素
      *
-     * @param psiClass class
-     * @param jsonMap  Map
+     * @param psiClass        class
+     * @param jsonMap         Map
+     * @param ignoreFieldList
      */
-    public static void recursionAddProperty(PsiClass psiClass, Map<String, Object> jsonMap) {
+    public static void recursionAddProperty(PsiClass psiClass, Map<String, Object> jsonMap, List<String> ignoreFieldList) {
         // 获取该类所有字段
         PsiField[] allFields = JavaUtil.getAllFieldFilterStatic(psiClass);
         for (PsiField psiField : allFields) {
+            String fieldName = psiField.getName();
+
             // -------------------------- 注解支持
             // 获取Json键名
             String jsonKeyName = getAnnotationJsonKeyName(psiField);
 
             // 如果加了忽略，则忽略该属性；或属性为临时属性，也忽略
-            if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName) || psiField.hasModifierProperty(PsiModifier.TRANSIENT)) {
+            if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName)
+                    || psiField.hasModifierProperty(PsiModifier.TRANSIENT)
+                    || psiField.hasAnnotation(PluginConstant.KOTLIN_TRANSIENT)) {
+                ignoreFieldList.add(fieldName);
                 continue;
             }
 
             // 字段名
-            String propertyName = (StrUtil.isBlank(jsonKeyName)) ? psiField.getName() : jsonKeyName;
+            String propertyName = (StrUtil.isBlank(jsonKeyName)) ? fieldName : jsonKeyName;
 
             // 字段类型
             PsiType psiType = psiField.getType();
@@ -65,7 +71,7 @@ public class JavaUtil {
                 // 嵌套Map（为了实现嵌套属性）
                 Map<String, Object> nestedJsonMap = new HashMap<>();
                 // 递归
-                recursionAddProperty(JavaUtil.getPsiClassByReferenceType(psiType), nestedJsonMap);
+                recursionAddProperty(JavaUtil.getPsiClassByReferenceType(psiType), nestedJsonMap, ignoreFieldList);
                 // 添加至主Map
                 jsonMap.put(propertyName, nestedJsonMap);
             } else {

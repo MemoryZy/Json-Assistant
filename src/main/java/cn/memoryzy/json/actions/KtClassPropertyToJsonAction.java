@@ -1,5 +1,7 @@
 package cn.memoryzy.json.actions;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
@@ -16,9 +18,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * @author Memory
@@ -42,10 +42,11 @@ public class KtClassPropertyToJsonAction extends AnAction {
         Project project = event.getProject();
         PsiClass currentPsiClass = KtUtil.getPsiClass(event);
         Map<String, Object> jsonMap = new TreeMap<>();
+        List<String> ignoreFieldList = new ArrayList<>();
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(currentPsiClass, jsonMap);
+            JavaUtil.recursionAddProperty(currentPsiClass, jsonMap, ignoreFieldList);
         } catch (Error e) {
             LOG.error(e);
             // 给通知
@@ -57,6 +58,12 @@ public class KtClassPropertyToJsonAction extends AnAction {
         String jsonStr = JSONUtil.toJsonStr(jsonMap, JSONConfig.create().setStripTrailingZeros(false));
         // 添加至剪贴板
         PlatformUtil.setClipboard(jsonStr);
+
+        if (CollUtil.isNotEmpty(ignoreFieldList)) {
+            String ignoreStr = StrUtil.join(" , ", ignoreFieldList);
+            Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore", ignoreStr), NotificationType.INFORMATION, project);
+        }
+
         // 给通知
         Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
     }

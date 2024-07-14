@@ -19,7 +19,9 @@ public class Notification {
     /**
      * 获取注册的通知组
      */
-    public static final NotificationGroup BALLOON = MANAGER.getNotificationGroup("MemoryZy.JsonAssistant.notify.Balloon");
+    public static final NotificationGroup BALLOON = MANAGER.getNotificationGroup("MemoryZy.JsonAssistant.Notify.WithoutLog.Balloon");
+
+    public static final NotificationGroup BALLOON_WITH_LOG = MANAGER.getNotificationGroup("MemoryZy.JsonAssistant.Notify.WithLog.Balloon");
 
     /**
      * 给定程序通知
@@ -30,6 +32,11 @@ public class Notification {
     public static void notify(String content, NotificationType notificationType, Project project) {
         // 使用通知组创建通知
         BALLOON.createNotification(content, notificationType).notify(project);
+    }
+
+    public static void notifyLog(String content, NotificationType notificationType, Project project) {
+        // 使用通知组创建通知
+        BALLOON_WITH_LOG.createNotification(content, notificationType).notify(project);
     }
 
 }
