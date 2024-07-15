@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## [1.2.1] - 2024-07-15
+
+- BUG 解决
+- 增强 FastJson、Jackson 注解支持
+- 序列化时增加被忽略属性提示
+- JavaBean 进行 Json 序列化时判断是否存在 `transient` 关键字
+- Kotlin 属性进行 Json 序列化时判断是否存在 `kotlin.jvm.Transient`
+- Bug fixes.
+- Enhanced FastJson and Jackson annotation support.
+- Added hints for ignored attributes when serializing.
+- JavaBean determines the presence of the `transient` keyword during JSON serialization.
+- When using Kotlin properties for JSON serialization, check if there is `kotlin. jvm.Transient`.
+
 ## [1.2.0] - 2024-07-12
 
 - Bug修复
@@ -40,7 +53,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.0...v1.1.2
 [1.1.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.0.0...v1.1.0
