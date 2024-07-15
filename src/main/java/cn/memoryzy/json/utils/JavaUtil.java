@@ -24,6 +24,7 @@ import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiTypesUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -40,7 +41,7 @@ public class JavaUtil {
      *
      * @param psiClass        class
      * @param jsonMap         Map
-     * @param ignoreFieldList
+     * @param ignoreFieldList 忽略元素列表
      */
     public static void recursionAddProperty(PsiClass psiClass, Map<String, Object> jsonMap, List<String> ignoreFieldList) {
         // 获取该类所有字段
@@ -67,18 +68,93 @@ public class JavaUtil {
             PsiType psiType = psiField.getType();
 
             // 是否为引用类型
-            if (JavaUtil.isReferenceType(psiType)) {
+            if (JavaUtil.isApplicationClsType(psiType)) {
                 // 嵌套Map（为了实现嵌套属性）
                 Map<String, Object> nestedJsonMap = new HashMap<>();
                 // 递归
-                recursionAddProperty(JavaUtil.getPsiClassByReferenceType(psiType), nestedJsonMap, ignoreFieldList);
+                recursionAddProperty(PsiTypesUtil.getPsiClass(psiType), nestedJsonMap, ignoreFieldList);
                 // 添加至主Map
                 jsonMap.put(propertyName, nestedJsonMap);
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
-                jsonMap.put(propertyName, getDefaultValue(psiType.getCanonicalText()));
+                jsonMap.put(propertyName, getDefaultValue(psiField, psiType));
             }
         }
+    }
+
+    private static Object getDefaultValue(PsiField psiField, PsiType psiType) {
+        // 如果是加了时间序列化注解，但是类型不属于时间相关类型，那注解不生效
+        PsiAnnotation jacksonFormatAnnotation = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_FORMAT.getValue());
+        PsiAnnotation fastJsonFieldAnnotation = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON_JSON_FIELD.getValue());
+        PsiAnnotation fastJsonField2Annotation = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON2_JSON_FIELD.getValue());
+
+        // 因为 @JsonFormat 是独立注解，如果存在，则直接返回时间类型
+        if (Objects.nonNull(jacksonFormatAnnotation)) {
+            // 获取 @JsonFormat 中的格式
+            String format = StrUtil.trim(getMemberValue(jacksonFormatAnnotation, "pattern"));
+            if (StrUtil.isNotBlank(format)) {
+                try {
+                    String formatted = DateUtil.format(new Date(), format);
+                    // 防止 pattern 中出现 纯数字的情况
+                    if (!Objects.equals(format, formatted)) {
+                        return formatted;
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+
+            return DateUtil.now();
+        }
+
+        // 而 @JsonField 是集成注解，依靠属性分开功能
+        if (Objects.nonNull(fastJsonField2Annotation)) {
+            // 获取 @JsonField 中的格式
+            String format = StrUtil.trim(getMemberValue(fastJsonField2Annotation, "format"));
+            // format不为空，表示声明了属性
+            if (StrUtil.isNotBlank(format)) {
+                try {
+                    String formatted = DateUtil.format(new Date(), format);
+                    // 防止 pattern 中出现 纯数字的情况
+                    if (!Objects.equals(format, formatted)) {
+                        return formatted;
+                    }
+                } catch (Exception ignored) {
+                }
+
+                return DateUtil.now();
+            }
+
+            // defaultValue
+            String defaultValue = getMemberValue(fastJsonField2Annotation, "defaultValue");
+            if (StrUtil.isNotBlank(defaultValue)) {
+                return defaultValue;
+            }
+        }
+
+        if (Objects.nonNull(fastJsonFieldAnnotation)) {
+            // 获取 @JsonFormat 中的格式
+            String format = StrUtil.trim(getMemberValue(fastJsonFieldAnnotation, "format"));
+            if (StrUtil.isNotBlank(format)) {
+                try {
+                    String formatted = DateUtil.format(new Date(), format);
+                    // 防止 pattern 中出现 纯数字的情况
+                    if (!Objects.equals(format, formatted)) {
+                        return formatted;
+                    }
+                } catch (Exception ignored) {
+                }
+
+                return DateUtil.now();
+            }
+
+            // defaultValue
+            String defaultValue = getMemberValue(fastJsonFieldAnnotation, "defaultValue");
+            if (StrUtil.isNotBlank(defaultValue)) {
+                return defaultValue;
+            }
+        }
+
+        return getDefaultValue(psiType);
     }
 
 
@@ -129,39 +205,78 @@ public class JavaUtil {
     /**
      * 根据类全限定名获取其类型的默认值
      *
-     * @param canonicalText 全限定名
+     * @param psiType 类型
      * @return 默认值
      */
-    public static Object getDefaultValue(String canonicalText) {
-        Object result;
+    public static Object getDefaultValue(PsiType psiType) {
+        String canonicalText = psiType.getCanonicalText();
 
-        if ("boolean".equals(canonicalText) || "java.lang.Boolean".equals(canonicalText)) {
-            result = false;
-        } else if ("char".equals(canonicalText) || "java.lang.Character".equals(canonicalText) || "java.lang.String".equals(canonicalText)) {
-            result = "";
-        } else if ("byte".equals(canonicalText) || "java.lang.Byte".equals(canonicalText)
-                || "short".equals(canonicalText) || "java.lang.Short".equals(canonicalText)
-                || "int".equals(canonicalText) || "java.lang.Integer".equals(canonicalText)
-                || "long".equals(canonicalText) || "java.lang.Long".equals(canonicalText)) {
-            result = 0;
-        } else if ("float".equals(canonicalText) || "java.lang.Float".equals(canonicalText)
-                || "double".equals(canonicalText) || "java.lang.Double".equals(canonicalText)
-                || "java.math.BigDecimal".equals(canonicalText)) {
-            result = new BigDecimal("1.0");
-        } else if (canonicalText.contains("Date")
-                || canonicalText.contains("DateTime")
-                || canonicalText.contains("Timestamp")) {
-            result = DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
-        } else if (canonicalText.contains("List")
-                || canonicalText.contains("ArrayList")
-                || canonicalText.contains("Collection")) {
-            result = new ArrayList<>();
+        // 8大包装类皆不许继承
+        // 防止类型为继承的类，光靠类型名称判断不够严谨
+        if (PsiKeyword.BOOLEAN.equals(canonicalText) || Boolean.class.getName().equals(canonicalText)) {
+            return false;
+        } else if (PsiKeyword.CHAR.equals(canonicalText)
+                || Character.class.getName().equals(canonicalText)
+                || String.class.getName().equals(canonicalText)) {
+            return "";
+        } else if (PsiKeyword.BYTE.equals(canonicalText) || Byte.class.getName().equals(canonicalText)
+                || PsiKeyword.SHORT.equals(canonicalText) || Short.class.getName().equals(canonicalText)
+                || PsiKeyword.INT.equals(canonicalText) || Integer.class.getName().equals(canonicalText)
+                || PsiKeyword.LONG.equals(canonicalText) || Long.class.getName().equals(canonicalText)) {
+            return 0;
+        } else if (PsiKeyword.FLOAT.equals(canonicalText) || Float.class.getName().equals(canonicalText)
+                || PsiKeyword.DOUBLE.equals(canonicalText) || Double.class.getName().equals(canonicalText)
+                || isAssignType(psiType, PluginConstant.BIGDECIMAL_FQN)) {
+            return new BigDecimal("0.1");
+        } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN)) {
+            return new ArrayList<>();
+        } else if (isAssignType(psiType, PluginConstant.DATE_FQN)) {
+            return DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
+        } else if (isAssignType(psiType, PluginConstant.TIME_FQN)) {
+            return DateUtil.format(new Date(), DatePattern.NORM_TIME_PATTERN);
+        } else if (isAssignType(psiType, PluginConstant.DATE_TIME_FQN)) {
+            return DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
         } else {
-            result = null;
+            return null;
+        }
+    }
+
+
+    public static boolean isAssignType(PsiType psiType, String[] clsNameList) {
+        // 顶级接口预判断（Collection 接口父接口只有 Iterable 接口）
+        String canonicalText = psiType.getCanonicalText();
+        for (String className : clsNameList) {
+            if (canonicalText.startsWith(className)) {
+                return true;
+            }
         }
 
-        return result;
+        Set<String> superTypeNameSet = new HashSet<>();
+        collTypeName(psiType.getSuperTypes(), superTypeNameSet);
+
+        if (CollUtil.isNotEmpty(superTypeNameSet)) {
+            for (String typeName : superTypeNameSet) {
+                if (Arrays.stream(clsNameList).anyMatch(typeName::startsWith)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
+
+
+    private static void collTypeName(PsiType[] psiTypes, Set<String> superTypeNameSet) {
+        for (PsiType psiType : psiTypes) {
+            superTypeNameSet.add(psiType.getCanonicalText());
+            PsiType[] superTypes = psiType.getSuperTypes();
+
+            if (ArrayUtil.isNotEmpty(superTypes)) {
+                collTypeName(superTypes, superTypeNameSet);
+            }
+        }
+    }
+
 
     /**
      * 判断是否为引用类型（自己项目中的类）（不包括String、BigDecimal之类的）
@@ -169,7 +284,7 @@ public class JavaUtil {
      * @param psiType 类型
      * @return true，引用类型；false，不为引用类型
      */
-    public static boolean isReferenceType(PsiType psiType) {
+    public static boolean isApplicationClsType(PsiType psiType) {
         // 不为引用类型
         if (!(psiType instanceof PsiClassReferenceType)) {
             return false;
@@ -177,6 +292,16 @@ public class JavaUtil {
 
         // 全限定名（基本类型就只有基本类型名 long、int）
         String canonicalText = psiType.getCanonicalText();
+
+        // 排除可继承的类型，如果是 集合、BigDecimal、Date、Time等，不将其视为对象
+        if (isAssignType(psiType, PluginConstant.COLLECTION_FQN)
+                || isAssignType(psiType, PluginConstant.BIGDECIMAL_FQN)
+                || isAssignType(psiType, PluginConstant.DATE_TIME_FQN)
+                || isAssignType(psiType, PluginConstant.DATE_FQN)
+                || isAssignType(psiType, PluginConstant.TIME_FQN)) {
+            return false;
+        }
+
         // 判断是否为java包其他类
         return !StrUtil.startWith(canonicalText, "java.");
     }
@@ -311,21 +436,6 @@ public class JavaUtil {
 
 
     /**
-     * 通过引用类型获取Class
-     *
-     * @param psiType 引用类型，必须是类引用类型{@link PsiClassReferenceType}
-     * @return Class
-     */
-    public static PsiClass getPsiClassByReferenceType(PsiType psiType) {
-        if (psiType instanceof PsiClassReferenceType) {
-            PsiClassReferenceType psiClassReferenceType = (PsiClassReferenceType) psiType;
-            return psiClassReferenceType.resolve();
-        }
-
-        return null;
-    }
-
-    /**
      * 获取该类的所有字段
      *
      * @param psiClass class
@@ -356,10 +466,24 @@ public class JavaUtil {
             return value;
         }
 
-        // value属性值
-        value = memberValue.getText();
-        if (StringUtils.isNotBlank(value)) {
-            value = value.replace("\"", "");
+        if (memberValue instanceof PsiLiteralExpression) {
+            // value属性值
+            value = memberValue.getText();
+            if (StringUtils.isNotBlank(value)) {
+                value = value.replace("\"", "");
+            }
+        } else if (memberValue instanceof PsiReferenceExpression) {
+            PsiElement resolve = ((PsiReferenceExpression) memberValue).resolve();
+
+            if (resolve instanceof PsiField) {
+                PsiExpression initializer = ((PsiField) resolve).getInitializer();
+                if (Objects.nonNull(initializer)) {
+                    String text = initializer.getText();
+                    if (StringUtils.isNotBlank(text)) {
+                        value = text.replace("\"", "");
+                    }
+                }
+            }
         }
 
         return value;
@@ -461,6 +585,5 @@ public class JavaUtil {
         JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
         return psiFacade.findClass(qualifiedName, GlobalSearchScope.allScope(project));
     }
-
 
 }

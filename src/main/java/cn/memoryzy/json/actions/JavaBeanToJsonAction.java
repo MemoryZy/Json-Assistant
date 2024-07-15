@@ -6,6 +6,7 @@ import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JavaUtil;
+import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.Notification;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.notification.NotificationType;
@@ -60,8 +61,9 @@ public class JavaBeanToJsonAction extends AnAction {
             return;
         }
 
-        // 将Map转换为Json
         String jsonStr = JSONUtil.toJsonStr(jsonMap, JSONConfig.create().setStripTrailingZeros(false));
+        jsonStr = JsonUtil.formatJson(jsonStr);
+
         // 添加至剪贴板
         PlatformUtil.setClipboard(jsonStr);
 
