@@ -2,6 +2,7 @@ package cn.memoryzy.json.utils;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.vfs.VirtualFileManager;
@@ -78,6 +79,11 @@ public class PlatformUtil {
      */
     public static void refreshFileSystem() {
         VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
+    }
+
+    public static boolean isNewUiVersion(){
+        int baselineVersion = ApplicationInfo.getInstance().getBuild().getBaselineVersion();
+        return baselineVersion >= 223;
     }
 
 }

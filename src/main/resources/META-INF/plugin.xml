@@ -24,7 +24,6 @@
 
     <actions>
         <action id="MemoryZy.JsonAssistant.actions.JsonProcessing"
-                icon="JsonAssistantIcons.BOX"
                 class="cn.memoryzy.json.actions.JsonProcessingAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>

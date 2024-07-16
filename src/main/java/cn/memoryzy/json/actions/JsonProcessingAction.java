@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.TextRange;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,8 +27,14 @@ public class JsonProcessingAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.processing.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.processing.description"));
-    }
 
+        if (PlatformUtil.isNewUiVersion()) {
+            presentation.setIcon(JsonAssistantIcons.NEW_BOX);
+        } else {
+            presentation.setIcon(JsonAssistantIcons.BOX);
+        }
+    }
+// {}
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         new JsonProcessingPopupGroup().actionPerformed(e);

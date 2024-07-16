@@ -3,6 +3,7 @@ package cn.memoryzy.json.actions;
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonToJavaBeanWindow;
+import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -44,9 +45,7 @@ public class JsonToJavaBeanAction extends AnAction {
         presentation.setText(JsonAssistantBundle.message("action.json.to.javabean.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.javabean.description"));
 
-        // 获取当前系统的版本号
-        int baselineVersion = ApplicationInfo.getInstance().getBuild().getBaselineVersion();
-        if (baselineVersion >= 223) {
+        if (PlatformUtil.isNewUiVersion()) {
             presentation.setIcon(JsonAssistantIcons.NEW_GROUP_BY_CLASS);
         } else {
             presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);

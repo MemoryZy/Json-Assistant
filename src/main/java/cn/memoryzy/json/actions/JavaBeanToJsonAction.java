@@ -16,6 +16,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -34,6 +35,12 @@ public class JavaBeanToJsonAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.javabean.to.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.javabean.to.json.description"));
+
+        if (PlatformUtil.isNewUiVersion()) {
+            presentation.setIcon(JsonAssistantIcons.NEW_JSON);
+        } else {
+            presentation.setIcon(JsonAssistantIcons.JSON);
+        }
     }
 
 
