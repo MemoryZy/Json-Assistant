@@ -20,7 +20,7 @@ public class JsonUtil {
 
     public static boolean isJsonStr(String text) {
         try {
-            MAPPER.readTree(text);
+            JSONUtil.parseObj(text);
             return true;
         } catch (Throwable e) {
             return false;

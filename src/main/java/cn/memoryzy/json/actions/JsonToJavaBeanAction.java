@@ -4,13 +4,14 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonToJavaBeanWindow;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -21,14 +22,20 @@ import java.util.Objects;
  */
 public class JsonToJavaBeanAction extends AnAction {
 
-    private static final Logger LOG = Logger.getInstance(JsonToJavaBeanAction.class);
-
     public JsonToJavaBeanAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.to.json.javabean.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.to.json.javabean.description"));
+        presentation.setText(JsonAssistantBundle.message("action.json.to.javabean.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.javabean.description"));
+
+        // 获取当前系统的版本号
+        int baselineVersion = ApplicationInfo.getInstance().getBuild().getBaselineVersion();
+        if (baselineVersion >= 223) {
+            presentation.setIcon(JsonAssistantIcons.NEW_GROUP_BY_CLASS);
+        } else {
+            presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
+        }
     }
 
     @Override

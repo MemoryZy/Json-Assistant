@@ -1,7 +1,7 @@
 package cn.memoryzy.json.group;
 
-import cn.memoryzy.json.actions.JsonCompressAction;
-import cn.memoryzy.json.actions.JsonFormatAction;
+import cn.memoryzy.json.actions.JsonBeautifyAction;
+import cn.memoryzy.json.actions.JsonMinifyAction;
 import cn.memoryzy.json.actions.JsonStructureAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -40,8 +40,8 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup {
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         return new AnAction[]{
-                new JsonFormatAction(),
-                new JsonCompressAction(),
+                new JsonBeautifyAction(),
+                new JsonMinifyAction(),
                 new JsonStructureAction()
         };
     }

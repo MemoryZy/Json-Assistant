@@ -14,6 +14,7 @@ public class JsonAssistantIcons {
     public static final Icon JSON = load("/icons/json.svg");
     public static final Icon DONATE = load("/icons/donate.svg");
     public static final Icon GROUP_BY_CLASS = load("/icons/groupByClass.svg");
+    public static final Icon NEW_GROUP_BY_CLASS = load("/icons/newGroupByClass.svg");
 
     /**
      * Json Structure Window

@@ -3,11 +3,16 @@ package cn.memoryzy.json.actions;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.actions.child.JsonStructureOnTwTitleAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -27,9 +32,21 @@ public class JsonStructureAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        String text = StrUtil.trim(PlatformUtil.getEditorContent(event));
-        // todo 编辑器文本不属于Json，但是选中文本属于Json时，可以
-        JsonStructureOnTwTitleAction.structuring(text, project);
+        Editor editor = PlatformUtil.getEditor(event);
+        Document document = editor.getDocument();
+
+        // 选中文本
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int start = primaryCaret.getSelectionStart();
+        int end = primaryCaret.getSelectionEnd();
+        String selectText = document.getText(new TextRange(start, end));
+        String jsonStr = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
+
+        if (StrUtil.isBlank(jsonStr)) {
+            jsonStr = StrUtil.trim(document.getText());
+        }
+
+        JsonStructureOnTwTitleAction.structuring(jsonStr, project);
     }
 
 }

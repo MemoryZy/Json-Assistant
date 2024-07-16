@@ -8,7 +8,6 @@
         </action>
 
         <action id="MemoryZy.JsonAssistant.actions.JsonToJavaBean"
-                icon="JsonAssistantIcons.GROUP_BY_CLASS"
                 class="cn.memoryzy.json.actions.JsonToJavaBeanAction">
         </action>
 

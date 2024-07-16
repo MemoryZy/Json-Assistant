@@ -8,6 +8,10 @@ import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,9 +35,29 @@ public class JsonProcessingAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        String content = PlatformUtil.getEditorContent(e);
-        String jsonStr = (JsonUtil.isJsonStr(content)) ? content : JsonUtil.extractJsonStr(content);
-        e.getPresentation().setEnabledAndVisible(StrUtil.isNotBlank(jsonStr));
+        e.getPresentation().setEnabledAndVisible(jsonUpdate(e));
+    }
+
+
+    public static boolean jsonUpdate(@NotNull AnActionEvent e) {
+        Editor editor = PlatformUtil.getEditor(e);
+        Document document = editor.getDocument();
+
+        // 选中文本
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int start = primaryCaret.getSelectionStart();
+        int end = primaryCaret.getSelectionEnd();
+        String selectText = document.getText(new TextRange(start, end));
+        String jsonStr = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
+
+        // 如果选中了 Json 文本，就用选中的
+        if (StrUtil.isNotBlank(jsonStr)) {
+            return true;
+        }
+
+        String documentText = document.getText();
+        jsonStr = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+        return StrUtil.isNotBlank(jsonStr);
     }
 
 }
