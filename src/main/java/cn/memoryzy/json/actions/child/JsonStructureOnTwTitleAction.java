@@ -20,7 +20,7 @@ public class JsonStructureOnTwTitleAction extends AnAction {
 
     public JsonStructureOnTwTitleAction(Project project, JsonWindow window) {
         super(JsonAssistantBundle.message("action.json.structure.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.structure.description"),
+                JsonAssistantBundle.messageOnSystem("action.json.structure.on.tw.description"),
                 JsonAssistantIcons.Structure.STRUCTURE);
 
         this.project = project;

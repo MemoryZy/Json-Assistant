@@ -24,6 +24,19 @@ import java.util.Objects;
  */
 public class JsonToJavaBeanAction extends AnAction {
 
+    private static Class<?> clz;
+    private static Method updateMethod;
+
+    static {
+        try {
+            clz = Class.forName("com.intellij.ide.actions.CreateClassAction");
+            updateMethod = ReflectUtil.getMethod(clz, "update", AnActionEvent.class);
+        } catch (ClassNotFoundException e) {
+            clz = null;
+            updateMethod = null;
+        }
+    }
+
     public JsonToJavaBeanAction() {
         super();
         setEnabledInModalContext(true);
@@ -61,11 +74,8 @@ public class JsonToJavaBeanAction extends AnAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         try {
-            Class<?> clz = Class.forName("com.intellij.ide.actions.CreateClassAction");
-            Method updateMethod = ReflectUtil.getMethod(clz, "update", AnActionEvent.class);
             Object action = clz.getDeclaredConstructor().newInstance();
             ReflectUtil.invoke(action, updateMethod, e);
-
         } catch (Exception ex) {
             final DataContext dataContext = e.getDataContext();
             final Presentation presentation = e.getPresentation();
@@ -88,8 +98,6 @@ public class JsonToJavaBeanAction extends AnAction {
             PsiDirectory chooseDirectory = view.getOrChooseDirectory();
             if (Objects.nonNull(chooseDirectory)) {
                 VirtualFile virtualFile = chooseDirectory.getVirtualFile();
-
-                // todo 待找到解决方案
                 String path = virtualFile.getPath();
                 enabled = path.contains("/test/java") || path.contains("/main/java") || path.contains("/test/kotlin") || path.contains("/main/kotlin");
             }
