@@ -1,5 +1,6 @@
 package cn.memoryzy.json.actions;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonToJavaBeanWindow;
 import com.intellij.ide.IdeView;
@@ -14,6 +15,7 @@ import com.intellij.psi.PsiDirectory;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Method;
 import java.util.Objects;
 
 /**
@@ -58,9 +60,19 @@ public class JsonToJavaBeanAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        final DataContext dataContext = e.getDataContext();
-        final Presentation presentation = e.getPresentation();
-        presentation.setEnabledAndVisible(isAvailable(dataContext));
+        try {
+            Class<?> clz = Class.forName("com.intellij.ide.actions.CreateClassAction");
+            Method updateMethod = ReflectUtil.getMethod(clz, "update", AnActionEvent.class);
+            Object action = clz.getDeclaredConstructor().newInstance();
+            ReflectUtil.invoke(action, updateMethod, e);
+
+        } catch (Exception ex) {
+            final DataContext dataContext = e.getDataContext();
+            final Presentation presentation = e.getPresentation();
+            if (!presentation.isEnabledAndVisible()) {
+                presentation.setEnabledAndVisible(isAvailable(dataContext));
+            }
+        }
     }
 
     private boolean isAvailable(DataContext dataContext) {
