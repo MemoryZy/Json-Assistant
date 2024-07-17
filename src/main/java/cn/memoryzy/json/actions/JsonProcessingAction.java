@@ -34,7 +34,7 @@ public class JsonProcessingAction extends AnAction {
             presentation.setIcon(JsonAssistantIcons.BOX);
         }
     }
-// {}
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         new JsonProcessingPopupGroup().actionPerformed(e);
