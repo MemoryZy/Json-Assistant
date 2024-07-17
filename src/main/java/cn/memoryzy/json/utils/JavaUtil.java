@@ -540,6 +540,9 @@ public class JavaUtil {
             // 时间类型判断
             return checkJsonDateType(str);
 
+        } else if (obj instanceof BigDecimal) {
+            type = Double.class.getSimpleName();
+
         } else if (obj instanceof List) {
             List list = (List) obj;
             // 判断是否有值
@@ -568,8 +571,7 @@ public class JavaUtil {
             if (Objects.nonNull(time)) {
                 type = Date.class.getSimpleName();
             }
-        } catch (DateException e) {
-            // 忽略异常
+        } catch (DateException ignored) {
         }
         return type;
     }

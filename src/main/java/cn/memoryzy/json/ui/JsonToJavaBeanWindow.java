@@ -14,9 +14,11 @@ import cn.memoryzy.json.ui.basic.MultiRowLanguageTextField;
 import cn.memoryzy.json.ui.basic.TextFieldErrorPopupDecorator;
 import cn.memoryzy.json.utils.JavaUtil;
 import cn.memoryzy.json.utils.JsonUtil;
+import cn.memoryzy.json.utils.Notification;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.json.json5.Json5Language;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
@@ -29,6 +31,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.EditorTextField;
+import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,8 +40,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Memory
@@ -173,19 +175,23 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
         PsiClass newClass = directoryService.createClass(directory, className);
 
         // 判断是否存在lombok依赖
-        boolean hasLibrary = JavaUtil.hasLibrary(module, "org.projectlombok:lombok");
+        boolean hasLibrary = JavaUtil.hasLibrary(module, PluginConstant.LOMBOK_LIB);
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             try {
+                Set<String> needImportList = new HashSet<>();
                 // Java元素构建器
                 PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
                 // 递归添加Json字段
-                recursionAddProperty(jsonObject, newClass, factory);
+                recursionAddProperty(jsonObject, newClass, factory, needImportList);
                 // 添加lombok注解，给内部类也加上
                 if (hasLibrary) {
                     // 增加导入
                     this.importClass(project, newClass, factory);
                 }
+
+                // 导入
+                JavaUtil.importClassesInClass(project, newClass, needImportList.toArray(new String[0]));
 
                 // 刷新文件系统
                 PlatformUtil.refreshFileSystem();
@@ -215,7 +221,7 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                 "@" + StringUtil.getShortName(LombokAnnotationEnum.ACCESSORS.getValue()) + "(chain = true)", null);
 
         // 导入类
-        JavaUtil.importClassesInClass(project, newClass, LombokAnnotationEnum.DATA.getValue(), LombokAnnotationEnum.ACCESSORS.getValue(), List.class.getName());
+        JavaUtil.importClassesInClass(project, newClass, LombokAnnotationEnum.DATA.getValue(), LombokAnnotationEnum.ACCESSORS.getValue());
 
         PsiElement firstChild = newClass.getFirstChild();
         if (firstChild instanceof PsiDocComment) {
@@ -244,7 +250,7 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
     }
 
 
-    private void recursionAddProperty(JSONObject jsonObject, PsiClass psiClass, PsiElementFactory factory) {
+    private void recursionAddProperty(JSONObject jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
         // 循环所有Json字段
         for (Map.Entry<String, Object> entry : jsonObject) {
             String key = entry.getKey();
@@ -256,11 +262,11 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                 // 如果是对象，则还需要创建内部类
                 PsiClass innerClass = factory.createClass(StrUtil.upperFirst(key));
                 // 则递归添加
-                recursionAddProperty(childJsonObject, innerClass, factory);
+                recursionAddProperty(childJsonObject, innerClass, factory, needImportList);
                 // 添加内部类至主类
                 psiClass.add(innerClass);
                 // 添加当前内部类类型的字段
-                String fieldText = StrUtil.format("private {} {};", innerClass.getName(), StrUtil.lowerFirst(key));
+                String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, innerClass.getName(), StrUtil.lowerFirst(key));
                 // 构建字段对象
                 PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
                 // 添加到Class
@@ -277,7 +283,7 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                         // 如果是对象，则还需要创建内部类
                         PsiClass innerClass = factory.createClass(innerClassName);
                         // 则递归添加
-                        recursionAddProperty(jsonObj, innerClass, factory);
+                        recursionAddProperty(jsonObj, innerClass, factory, needImportList);
                         // 添加内部类至主类
                         psiClass.add(innerClass);
                     } else {
@@ -285,8 +291,9 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                         innerClassName = (Objects.nonNull(element)) ? element.getClass().getSimpleName() : Object.class.getSimpleName();
                     }
 
+                    needImportList.add(List.class.getName());
                     // 添加当前内部类类型的字段
-                    String fieldText = StrUtil.format("private List<{}> {};", innerClassName, StrUtil.lowerFirst(key));
+                    String fieldText = StrUtil.format("{} List<{}> {};", PsiModifier.PRIVATE, innerClassName, StrUtil.lowerFirst(key));
                     // 构建字段对象
                     PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
                     // 添加到Class
@@ -297,9 +304,23 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                 // 获取字段类型
                 String propertyType = JavaUtil.getStrType(value);
                 // 定义字段文本
-                String fieldText = StrUtil.format("private {} {};", propertyType, StrUtil.lowerFirst(key));
+                String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, propertyType, StrUtil.lowerFirst(key));
+
+                if (Objects.equals(propertyType, Date.class.getSimpleName())) {
+                    needImportList.add(Date.class.getName());
+                } else if (propertyType.startsWith(List.class.getSimpleName())) {
+                    needImportList.add(List.class.getName());
+                }
+
                 // 构建字段对象
-                PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
+                PsiField psiField;
+                try {
+                    psiField = factory.createFieldFromText(fieldText, psiClass);
+                } catch (IncorrectOperationException e) {
+                    Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.json.to.javabean.incorrect.field.text", key), NotificationType.ERROR, project);
+                    throw e;
+                }
+
                 // 添加到Class
                 psiClass.add(psiField);
             }
