@@ -6,7 +6,6 @@ import cn.memoryzy.json.ui.JsonToJavaBeanWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;

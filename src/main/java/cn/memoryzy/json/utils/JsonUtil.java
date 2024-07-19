@@ -1,5 +1,6 @@
 package cn.memoryzy.json.utils;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONConfig;
@@ -9,6 +10,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Memory
@@ -20,8 +26,9 @@ public class JsonUtil {
 
     public static boolean isJsonStr(String text) {
         try {
-            JSONUtil.parseObj(text);
-            return true;
+            JSONUtil.parse(text);
+            JsonNode jsonNode = MAPPER.readTree(text);
+            return jsonNode instanceof ArrayNode || jsonNode instanceof ObjectNode;
         } catch (Throwable e) {
             return false;
         }
@@ -73,9 +80,42 @@ public class JsonUtil {
             return "";
         }
 
-        String json = extractJsonString(includeJsonStr);
+        String json = extractJsonStringOnRegular(includeJsonStr);
+        if (StrUtil.isNotBlank(json)) {
+            return json;
+        }
+
+        json = extractJsonString(includeJsonStr);
         // 判断是否是JSON字符串
         return isJsonStr(json) ? json : "";
+    }
+
+
+    public static String extractJsonStringOnRegular(String includeJsonStr) {
+        List<String> jsonStrings = findJsonStrings(includeJsonStr);
+        return CollUtil.isNotEmpty(jsonStrings) ? jsonStrings.get(0) : "";
+    }
+
+
+    public static List<String> findJsonStrings(String text) {
+        List<String> jsonStrings = new ArrayList<>();
+
+        // 注意：这个正则表达式是宽松的，并且可能无法捕获所有有效或无效的JSON字符串
+        // 它尝试匹配以{或[开头，并且以}或]结尾的字符串，但会忽略内部的复杂性
+        String jsonPattern = "\\{[^\\}]+\\}|\\[[^\\]]+\\]";
+
+        Pattern pattern = Pattern.compile(jsonPattern);
+        Matcher matcher = pattern.matcher(text);
+
+        while (matcher.find()) {
+            // 捕获整个匹配项
+            String jsonString = matcher.group();
+            if (isJsonStr(jsonString)) {
+                jsonStrings.add(StrUtil.trim(jsonString));
+            }
+        }
+
+        return jsonStrings;
     }
 
 

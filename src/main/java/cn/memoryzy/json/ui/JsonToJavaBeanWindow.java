@@ -261,6 +261,14 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                 JSONObject childJsonObject = (JSONObject) value;
                 // 如果是对象，则还需要创建内部类
                 PsiClass innerClass = factory.createClass(StrUtil.upperFirst(key));
+
+                // 添加 static 关键字
+                PsiKeyword keyword = factory.createKeyword(PsiModifier.STATIC);
+                PsiModifierList modifierList = innerClass.getModifierList();
+                if (Objects.nonNull(modifierList)) {
+                    modifierList.add(keyword);
+                }
+
                 // 则递归添加
                 recursionAddProperty(childJsonObject, innerClass, factory, needImportList);
                 // 添加内部类至主类
@@ -282,6 +290,12 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                         innerClassName = StrUtil.upperFirst(key + "Bean");
                         // 如果是对象，则还需要创建内部类
                         PsiClass innerClass = factory.createClass(innerClassName);
+                        // 添加 static 关键字
+                        PsiKeyword keyword = factory.createKeyword(PsiModifier.STATIC);
+                        PsiModifierList modifierList = innerClass.getModifierList();
+                        if (Objects.nonNull(modifierList)) {
+                            modifierList.add(keyword);
+                        }
                         // 则递归添加
                         recursionAddProperty(jsonObj, innerClass, factory, needImportList);
                         // 添加内部类至主类

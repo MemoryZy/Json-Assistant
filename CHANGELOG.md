@@ -1,6 +1,27 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- Enhanced formatting, compression, tree and other basic features, on the basis of the original added a new ability: select Json text to operate.
+- Handles the timing of the deserialization feature entry display, synchronizing it with (New -> Java Class).
+- Custom IDE new UI icon support.
+- Solve the problem that the deserialization function cannot convert decimals, and automatically import java.util.Date, java.util.List and other classes selectively.
+- Fixed an issue where the Json tree structure window could not display nested arrays.
+- Fixed an issue where the Json tree structure window could not highlight elements under an array.
+- Add the static keyword to the inner class generated for deserialization.
+- Resolve the problem of inaccurate Json judgment.
+- Part shows text optimization.
+- Optimize the text displayed in the plug-in section and add the Json Assistant plug-in identifier.
+- 增强格式化、压缩、树化等基础功能，在原先的基础上增加了新的能力：选中 Json 文本进行操作。
+- 处理 （Json 反序列化为 Java 类） 功能入口展示时机的问题，使其与 （New -> Java Class） 同步。
+- 自定义 IDE 新 UI 图标支持。
+- 解决 （Json 反序列化为 Java 类） 功能无法转小数的问题，并自动选择性导入 java.util.Date、java.util.List 等类。
+- 解决 （Json 树结构）窗口无法展示数组嵌套数组的问题。
+- 解决 （Json 树结构）窗口无法高亮显示数组下的元素的问题。
+- 为 （Json 反序列化为 Java 类）功能生成的内部类加上 static 关键字。
+- 解决 Json 判断不准确问题。
+- 部分展示文本优化。
+- 优化插件部分展示文本，增加 Json Assistant 插件标识。
+
 
 ## [1.2.1] - 2024-07-15
 

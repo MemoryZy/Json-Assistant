@@ -39,9 +39,8 @@ public class CopyValueAction extends AnAction {
                 Object correspondingValue = node.getCorrespondingValue();
                 JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
                 // 只有JSONArrayEl是没有Value的
-                if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
-                    valueList.add(node.getUserObject().toString());
-                } else if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONObjectKey, nodeValueType)) {
+                if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)
+                        || Objects.equals(JsonTreeNodeValueTypeEnum.JSONObjectKey, nodeValueType)) {
                     valueList.add(Objects.nonNull(correspondingValue) ? correspondingValue.toString() : "null");
                 } else {
                     JSON json = (JSON) correspondingValue;
