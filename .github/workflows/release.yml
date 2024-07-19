@@ -53,16 +53,20 @@ jobs:
           EOM
           )"
           
+          COMING_NAME="$(echo "$NAME" | sed 's/ /\-/g')"
+          
           # 转义空格
           NAME="$(echo "$NAME" | sed 's/ /\\ /g')"
           
           echo "name: $NAME"
+          echo "coming_name: $COMING_NAME"
           echo "version: $VERSION"
           echo "releaseTagName: ${{ github.event.release.tag_name }}"
           echo "changelog:"
           echo "$CHANGELOG"
           
           echo "name=$NAME" >> $GITHUB_OUTPUT
+          echo "coming_name=$COMING_NAME" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "pluginName=$NAME-$VERSION.zip" >> $GITHUB_OUTPUT
           echo "pluginSignedName=$NAME-$VERSION-signed.zip" >> $GITHUB_OUTPUT
@@ -108,7 +112,7 @@ jobs:
           echo "/test："
           ls ./test
 
-          mv ./build/distributions/${{ steps.properties.outputs.pluginSignedName }} ./build/distributions/${{ steps.properties.outputs.pluginName }}
+          mv ./build/distributions/${{ steps.properties.outputs.pluginSignedName }} ./build/distributions/${{ steps.properties.outputs.coming_name }}
 
           echo "已将签名压缩包更名，查看文件："
           echo "/build/distributions："
@@ -120,7 +124,7 @@ jobs:
       - name: Upload Release Asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.pluginName }}
+        run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.coming_name }}
 
       - name: Check If Branch Exists
         run: |
