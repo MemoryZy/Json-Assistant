@@ -35,5 +35,6 @@ public class PluginConstant {
 
     public static final String[] TIME_FQN = {LocalTime.class.getName(), Time.class.getName()};
 
-
+    public static final String JSON_VIEWER_LAST_RECORD = PLUGIN_ID + ".Json-Viewer.Last.Record";
+    
 }
