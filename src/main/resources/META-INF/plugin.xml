@@ -20,6 +20,8 @@
                     largeStripeAnchor="right"
                     secondary="true"
                     doNotActivateOnStart="true"/>
+
+        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerLastRecordState"/>
     </extensions>
 
     <actions>

@@ -10,6 +10,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.util.ui.TextTransferable;
 
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
+import java.util.Objects;
+
 /**
  * @author Memory
  * @since 2024/6/20
@@ -73,6 +79,20 @@ public class PlatformUtil {
         CopyPasteManager.getInstance().setContents(new TextTransferable(content));
         // CopyPasteManager.getInstance().setContents(new SimpleTransferable(content, DataFlavor.stringFlavor));
     }
+
+    public static String getClipboard() {
+        try {
+            Transferable contents = CopyPasteManager.getInstance().getContents();
+            if (Objects.isNull(contents)) {
+                return "";
+            }
+
+            return (String) contents.getTransferData(DataFlavor.stringFlavor);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
 
     /**
      * 刷新文件系统

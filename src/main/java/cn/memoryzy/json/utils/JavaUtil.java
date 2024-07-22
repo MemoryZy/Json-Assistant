@@ -6,6 +6,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotationEnum;
@@ -39,13 +40,16 @@ public class JavaUtil {
     /**
      * 递归将属性转成Map元素
      *
-     * @param psiClass        class
-     * @param jsonMap         Map
-     * @param ignoreFieldList 忽略元素列表
+     * @param psiClass  class
+     * @param jsonMap   Map
+     * @param ignoreMap 忽略元素列表
      */
-    public static void recursionAddProperty(PsiClass psiClass, Map<String, Object> jsonMap, List<String> ignoreFieldList) {
+    public static void recursionAddProperty(Project project, PsiClass psiClass, Map<String, Object> jsonMap, Map<String, List<String>> ignoreMap) {
         // 获取该类所有字段
         PsiField[] allFields = JavaUtil.getAllFieldFilterStatic(psiClass);
+        List<String> fieldNameList = new ArrayList<>();
+        ignoreMap.put(psiClass.getQualifiedName(), fieldNameList);
+
         for (PsiField psiField : allFields) {
             String fieldName = psiField.getName();
 
@@ -57,7 +61,8 @@ public class JavaUtil {
             if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName)
                     || psiField.hasModifierProperty(PsiModifier.TRANSIENT)
                     || psiField.hasAnnotation(PluginConstant.KOTLIN_TRANSIENT)) {
-                ignoreFieldList.add(fieldName);
+
+                fieldNameList.add(fieldName);
                 continue;
             }
 
@@ -72,9 +77,18 @@ public class JavaUtil {
                 // 嵌套Map（为了实现嵌套属性）
                 Map<String, Object> nestedJsonMap = new HashMap<>();
                 // 递归
-                recursionAddProperty(PsiTypesUtil.getPsiClass(psiType), nestedJsonMap, ignoreFieldList);
+                recursionAddProperty(project, PsiTypesUtil.getPsiClass(psiType), nestedJsonMap, ignoreMap);
                 // 添加至主Map
                 jsonMap.put(propertyName, nestedJsonMap);
+            } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN)) {
+                String canonicalText = psiType.getCanonicalText();
+                String genericClassName = ReUtil.get("<(.*?)>", canonicalText, 1);
+                PsiClass psiClz = findClass(project, genericClassName);
+
+
+                System.out.println();
+
+
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
                 jsonMap.put(propertyName, getDefaultValue(psiField, psiType));

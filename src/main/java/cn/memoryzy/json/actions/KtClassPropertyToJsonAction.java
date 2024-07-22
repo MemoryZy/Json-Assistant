@@ -39,11 +39,12 @@ public class KtClassPropertyToJsonAction extends AnAction {
         Project project = event.getProject();
         PsiClass currentPsiClass = KtUtil.getPsiClass(event);
         Map<String, Object> jsonMap = new TreeMap<>();
-        List<String> ignoreFieldList = new ArrayList<>();
+        // 忽略的属性
+        Map<String, List<String>> ignoreMap = new HashMap<>();
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(currentPsiClass, jsonMap, ignoreFieldList);
+            JavaUtil.recursionAddProperty(project, currentPsiClass, jsonMap, ignoreMap);
         } catch (Error e) {
             LOG.error(e);
             // 给通知
@@ -57,8 +58,8 @@ public class KtClassPropertyToJsonAction extends AnAction {
         // 添加至剪贴板
         PlatformUtil.setClipboard(jsonStr);
 
-        if (CollUtil.isNotEmpty(ignoreFieldList)) {
-            String ignoreStr = StrUtil.join(" , ", ignoreFieldList);
+        if (CollUtil.isNotEmpty(ignoreMap)) {
+            String ignoreStr = "";/*StrUtil.join(" , ", ignoreFieldList);*/
             Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore", ignoreStr), NotificationType.INFORMATION, project);
         }
 
