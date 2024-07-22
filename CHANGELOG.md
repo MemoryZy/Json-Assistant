@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.3.0] - 2024-07-19
+
 - 增强格式化、压缩、树化等基础功能，在原先的基础上增加了新的能力：选中 Json 文本进行操作。
 - 处理 （Json 反序列化为 Java 类） 功能入口展示时机的问题，使其与 （New -> Java Class） 同步。
 - 自定义 IDE 新 UI 图标支持。
@@ -21,8 +24,6 @@
 - Resolve the problem of inaccurate Json judgment.
 - Part shows text optimization.
 - Optimize the text displayed in the plug-in section and add the Json Assistant plug-in identifier.
-
-
 
 ## [1.2.1] - 2024-07-15
 
@@ -75,7 +76,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.2...v1.2.0
 [1.1.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.0...v1.1.2
