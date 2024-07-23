@@ -23,6 +23,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
+import com.intellij.psi.impl.source.PsiImmediateClassType;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
@@ -80,15 +81,33 @@ public class JavaUtil {
                 recursionAddProperty(project, PsiTypesUtil.getPsiClass(psiType), nestedJsonMap, ignoreMap);
                 // 添加至主Map
                 jsonMap.put(propertyName, nestedJsonMap);
-            } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN)) {
+            } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType) {
+                String typeClassName;
                 String canonicalText = psiType.getCanonicalText();
-                String genericClassName = ReUtil.get("<(.*?)>", canonicalText, 1);
-                PsiClass psiClz = findClass(project, genericClassName);
+                if (psiType instanceof PsiArrayType) {
+                    typeClassName = canonicalText.replace("[]", "");
+                } else {
+                    typeClassName = ReUtil.get("<(.*?)>", canonicalText, 1);
+                }
 
+                PsiClass psiClz = findClass(project, typeClassName);
+                ArrayList<Object> list = new ArrayList<>();
+                if (psiClz != null) {
+                    PsiClassType classType = PsiTypesUtil.getClassType(psiClz);
+                    if (JavaUtil.isApplicationClsType(classType)) {
+                        Map<String, Object> nestedJsonMap = new HashMap<>();
+                        // 递归
+                        recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap);
+                        // 添加至list
+                        list.add(nestedJsonMap);
+                    } else {
+                        Object defaultValue = getDefaultValue(classType);
+                        if (Objects.nonNull(defaultValue))
+                            list.add(defaultValue);
+                    }
+                }
 
-                System.out.println();
-
-
+                jsonMap.put(propertyName, list);
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
                 jsonMap.put(propertyName, getDefaultValue(psiField, psiType));
@@ -300,7 +319,7 @@ public class JavaUtil {
      */
     public static boolean isApplicationClsType(PsiType psiType) {
         // 不为引用类型
-        if (!(psiType instanceof PsiClassReferenceType)) {
+        if ((!(psiType instanceof PsiClassReferenceType)) && (!(psiType instanceof PsiImmediateClassType))) {
             return false;
         }
 

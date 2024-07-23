@@ -98,44 +98,27 @@ public class JavaBeanToJsonAction extends AnAction {
 
     public static String createNotifyIgnoreHtml(Set<Map.Entry<String, List<String>>> entries) {
         StringBuilder builder = new StringBuilder("<br/>");
-        if (entries.size() == 1) {
-            builder.append("<ul>");
-            // 类名 key，value 字段集
-            for (Map.Entry<String, List<String>> entry : entries) {
-                // 类全限定名
-                String key = entry.getKey();
-                // 被忽略字段集合
-                List<String> value = entry.getValue();
 
-                for (String fieldName : value) {
-                    builder.append("<li>").append(fieldName).append("</li>");
-                }
+        List<String> nameList = new ArrayList<>(entries.size());
+        // 类名 key，value 字段集
+        for (Map.Entry<String, List<String>> entry : entries) {
+            // 类全限定名
+            String key = entry.getKey();
+            // 被忽略字段集合
+            List<String> value = entry.getValue();
+
+            key = StringUtil.getShortName(key);
+            for (String fieldName : value) {
+                nameList.add(fieldName + "&nbsp;-&nbsp;(<b>" + key + "</b>)");
             }
-
-            builder.append("</ul>");
-        } else {
-            List<String> nameList = new ArrayList<>(entries.size());
-            // 类名 key，value 字段集
-            for (Map.Entry<String, List<String>> entry : entries) {
-                // 类全限定名
-                String key = entry.getKey();
-                // 被忽略字段集合
-                List<String> value = entry.getValue();
-
-                key = StringUtil.getShortName(key);
-                for (String fieldName : value) {
-                    nameList.add(fieldName + " (" + key + ")");
-                }
-            }
-
-            builder.append("<ul>");
-            for (int i = nameList.size() - 1; i >= 0; i--) {
-                builder.append("<li>").append(nameList.get(i)).append("</li>");
-            }
-
-            builder.append("</ul>");
         }
 
+        builder.append("<p>");
+        for (int i = nameList.size() - 1; i >= 0; i--) {
+            builder.append("&nbsp;").append(nameList.get(i)).append("<br/>");
+        }
+
+        builder.append("</p>");
         return builder.toString();
     }
 

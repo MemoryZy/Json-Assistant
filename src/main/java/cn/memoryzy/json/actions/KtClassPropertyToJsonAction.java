@@ -58,9 +58,13 @@ public class KtClassPropertyToJsonAction extends AnAction {
         // 添加至剪贴板
         PlatformUtil.setClipboard(jsonStr);
 
+        Set<Map.Entry<String, List<String>>> entries = ignoreMap.entrySet();
+        // 移除 value 为空列表的键值对
+        entries.removeIf(entry -> entry.getValue().isEmpty());
+
         if (CollUtil.isNotEmpty(ignoreMap)) {
-            String ignoreStr = "";/*StrUtil.join(" , ", ignoreFieldList);*/
-            Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore", ignoreStr), NotificationType.INFORMATION, project);
+            String ignoreHtml = JavaBeanToJsonAction.createNotifyIgnoreHtml(entries);
+            Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore", ignoreHtml), NotificationType.INFORMATION, project);
         }
 
         // 给通知
