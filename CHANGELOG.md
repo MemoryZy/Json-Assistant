@@ -1,6 +1,14 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 增加 Json Viewer 窗口的历史记录、从剪贴板解析 Json 功能。
+- 增强 Json 序列化中对于 List、数组 的支持。
+- BUG解决。
+- 用户体验优化。
+- Added Json Viewer window history and Json parsing from the clipboard.
+- Enhanced support for lists and arrays in Json serialization.
+- Bug fixes.
+- User experience optimization.
 
 ## [1.3.0] - 2024-07-19
 
