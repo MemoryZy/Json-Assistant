@@ -5,15 +5,15 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.TreeUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.TreePath;
 import java.util.Objects;
 
-public class ExpandMultiAction extends AnAction {
+public class ExpandMultiAction extends DumbAwareAction {
 
     private final Tree tree;
 

@@ -97,7 +97,7 @@ public class JavaBeanToJsonAction extends AnAction {
 
 
     public static String createNotifyIgnoreHtml(Set<Map.Entry<String, List<String>>> entries) {
-        StringBuilder builder = new StringBuilder("<br/>");
+        StringBuilder builder = new StringBuilder();
 
         List<String> nameList = new ArrayList<>(entries.size());
         // 类名 key，value 字段集
@@ -109,16 +109,16 @@ public class JavaBeanToJsonAction extends AnAction {
 
             key = StringUtil.getShortName(key);
             for (String fieldName : value) {
-                nameList.add(fieldName + "&nbsp;-&nbsp;(<b>" + key + "</b>)");
+                nameList.add(fieldName + " (" + key + ")");
             }
         }
 
-        builder.append("<p>");
+        builder.append("<ul>");
         for (int i = nameList.size() - 1; i >= 0; i--) {
-            builder.append("&nbsp;").append(nameList.get(i)).append("<br/>");
+            builder.append("<li>").append(nameList.get(i)).append("</li>");
         }
 
-        builder.append("</p>");
+        builder.append("</ul>");
         return builder.toString();
     }
 

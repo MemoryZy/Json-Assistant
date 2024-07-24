@@ -1,8 +1,8 @@
 package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-public class RemoveAction extends AnAction {
+public class RemoveAction extends DumbAwareAction {
     private final Tree tree;
 
     public RemoveAction(Tree tree) {

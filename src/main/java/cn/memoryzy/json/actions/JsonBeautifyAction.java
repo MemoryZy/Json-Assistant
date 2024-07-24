@@ -7,7 +7,6 @@ import cn.memoryzy.json.utils.Notification;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -15,6 +14,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
@@ -28,7 +28,7 @@ import java.util.Optional;
  * @author Memory
  * @since 2024/6/21
  */
-public class JsonBeautifyAction extends AnAction {
+public class JsonBeautifyAction extends DumbAwareAction {
 
     private static final Logger LOG = Logger.getInstance(JsonBeautifyAction.class);
 

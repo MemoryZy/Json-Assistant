@@ -617,6 +617,10 @@ public class JavaUtil {
      * @return 匹配的PsiClass对象，如果没有找到则返回null
      */
     public static PsiClass findClass(Project project, String qualifiedName) {
+        if (StrUtil.isBlank(qualifiedName)) {
+            return null;
+        }
+
         JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
         return psiFacade.findClass(qualifiedName, GlobalSearchScope.allScope(project));
     }

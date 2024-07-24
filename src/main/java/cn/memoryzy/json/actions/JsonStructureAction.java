@@ -5,12 +5,12 @@ import cn.memoryzy.json.actions.child.JsonStructureOnTwTitleAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/6/20
  */
-public class JsonStructureAction extends AnAction {
+public class JsonStructureAction extends DumbAwareAction {
 
     public JsonStructureAction() {
         super();

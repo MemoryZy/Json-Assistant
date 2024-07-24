@@ -8,8 +8,8 @@ import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CopyValueAction extends AnAction {
+public class CopyValueAction extends DumbAwareAction {
     private final Tree tree;
 
     public CopyValueAction(Tree tree) {

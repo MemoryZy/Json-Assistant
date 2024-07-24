@@ -5,8 +5,8 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.PlatformUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CopyKeyAction extends AnAction {
+public class CopyKeyAction extends DumbAwareAction {
 
     private final Tree tree;
 

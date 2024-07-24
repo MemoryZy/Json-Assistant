@@ -12,8 +12,6 @@ import com.intellij.util.ui.TextTransferable;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.Objects;
 
 /**

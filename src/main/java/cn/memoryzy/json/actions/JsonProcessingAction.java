@@ -5,12 +5,12 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.group.JsonProcessingPopupGroup;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.TextRange;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/7/2
  */
-public class JsonProcessingAction extends AnAction {
+public class JsonProcessingAction extends DumbAwareAction {
 
     public JsonProcessingAction() {
         super();

@@ -11,8 +11,8 @@
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup displayType="BALLOON" id="MemoryZy.JsonAssistant.Notify.WithoutLog.Balloon" isLogByDefault="false"/>
-        <notificationGroup displayType="BALLOON" id="MemoryZy.JsonAssistant.Notify.WithLog.Balloon" isLogByDefault="true"/>
+        <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
+        <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin With Log" isLogByDefault="true"/>
         <toolWindow id="MemoryZy.JsonAssistant.JsonWindow"
                     icon="AllIcons.Toolwindows.ToolWindowJsonPath"
                     factoryClass="cn.memoryzy.json.toolwindows.JsonWindowTw"
