@@ -9,14 +9,16 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.PluginDocument;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
 import cn.memoryzy.json.ui.basic.MultiRowLanguageTextField;
 import cn.memoryzy.json.ui.basic.TextFieldErrorPopupDecorator;
 import cn.memoryzy.json.utils.JavaUtil;
 import cn.memoryzy.json.utils.JsonUtil;
-import cn.memoryzy.json.utils.Notification;
+import cn.memoryzy.json.utils.Notifications;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.json.json5.Json5Language;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -33,6 +35,7 @@ import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.EditorTextField;
 import com.intellij.util.IncorrectOperationException;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -100,6 +103,20 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         return rootPanel;
+    }
+
+    @Override
+    protected Action @NotNull [] createActions() {
+        List<Action> actions = new ArrayList<>();
+        actions.add(getOKAction());
+        actions.add(getCancelAction());
+        actions.add(getHelpAction());
+        return actions.toArray(new Action[0]);
+    }
+
+    @Override
+    protected void doHelpAction() {
+        BrowserUtil.browse(PluginDocument.JSON_TO_JAVA_BEAN_LINK);
     }
 
     @Override
@@ -331,7 +348,7 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
                 try {
                     psiField = factory.createFieldFromText(fieldText, psiClass);
                 } catch (IncorrectOperationException e) {
-                    Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.json.to.javabean.incorrect.field.text", key), NotificationType.ERROR, project);
+                    Notifications.showLogNotification(JsonAssistantBundle.messageOnSystem("notify.json.to.javabean.incorrect.field.text", key), NotificationType.ERROR, project);
                     throw e;
                 }
 

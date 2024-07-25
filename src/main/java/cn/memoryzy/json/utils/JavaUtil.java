@@ -8,6 +8,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotationEnum;
 import com.intellij.ide.highlighter.JavaFileType;
@@ -59,7 +60,7 @@ public class JavaUtil {
             String jsonKeyName = getAnnotationJsonKeyName(psiField);
 
             // 如果加了忽略，则忽略该属性；或属性为临时属性，也忽略
-            if (Objects.equals(PluginConstant.PLUGIN_ID, jsonKeyName)
+            if (Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, jsonKeyName)
                     || psiField.hasModifierProperty(PsiModifier.TRANSIENT)
                     || psiField.hasAnnotation(PluginConstant.KOTLIN_TRANSIENT)) {
 
@@ -195,7 +196,7 @@ public class JavaUtil {
      * 获取Json注解中的键名称
      *
      * @param psiField 字段属性
-     * @return 键名（如果是{@link PluginConstant#PLUGIN_ID}）则表示忽略该字段
+     * @return 键名（如果是{@link JsonAssistantPlugin#PLUGIN_ID_NAME}）则表示忽略该字段
      */
     private static String getAnnotationJsonKeyName(PsiField psiField) {
         // ---------------------------------- 获取注解判断是否忽略序列化
@@ -203,7 +204,7 @@ public class JavaUtil {
         PsiAnnotation jacksonIgnore = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_IGNORE.getValue());
         if (Objects.nonNull(jacksonIgnore)) {
             // 该字段需要忽略
-            return PluginConstant.PLUGIN_ID;
+            return JsonAssistantPlugin.PLUGIN_ID_NAME;
         }
 
         // 检测是否含有 fastjson 注解
@@ -218,7 +219,7 @@ public class JavaUtil {
             String serialize = JavaUtil.getMemberValue(fastJsonJsonField, "serialize");
             String serialize2 = JavaUtil.getMemberValue(fastJson2JsonField, "serialize");
             if (Objects.equals(Boolean.FALSE.toString(), serialize) || Objects.equals(Boolean.FALSE.toString(), serialize2)) {
-                return PluginConstant.PLUGIN_ID;
+                return JsonAssistantPlugin.PLUGIN_ID_NAME;
             }
 
             // 获取值

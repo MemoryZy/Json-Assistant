@@ -28,8 +28,8 @@ public class JsonProcessingAction extends DumbAwareAction {
         presentation.setText(JsonAssistantBundle.message("action.json.processing.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.processing.description"));
 
-        if (PlatformUtil.isNewUiVersion()) {
-            presentation.setIcon(JsonAssistantIcons.NEW_BOX);
+        if (PlatformUtil.isNewUi()) {
+            presentation.setIcon(JsonAssistantIcons.ExpUi.NEW_BOX);
         } else {
             presentation.setIcon(JsonAssistantIcons.BOX);
         }

@@ -10,14 +10,20 @@ import javax.swing.*;
  */
 public class JsonAssistantIcons {
 
+    public static final Icon LOGO = load("/icons/logo.svg");
     public static final Icon BOX = load("/icons/box.svg");
-    public static final Icon NEW_BOX = load("/icons/expui/common/box.svg");
     public static final Icon JSON = load("/icons/json.svg");
-    public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
     public static final Icon GROUP_BY_CLASS = load("/icons/groupByClass.svg");
-    public static final Icon NEW_GROUP_BY_CLASS = load("/icons/expui/common/groupByClass.svg");
     public static final Icon DONATE = load("/icons/donate.svg");
     public static final Icon MINIFY = load("/icons/minify.svg");
+    public static final Icon TOOL_WINDOW_JSON_PATH = load("/icons/toolWindowJsonPath.svg");
+
+    public static class ExpUi {
+        public static final Icon NEW_BOX = load("/icons/expui/common/box.svg");
+        public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
+        public static final Icon NEW_GROUP_BY_CLASS = load("/icons/expui/common/groupByClass.svg");
+        public static final Icon NEW_TOOL_WINDOW_JSON_PATH = load("/icons/expui/common/toolWindowJsonPath.svg");
+    }
 
     /**
      * Json Structure Window

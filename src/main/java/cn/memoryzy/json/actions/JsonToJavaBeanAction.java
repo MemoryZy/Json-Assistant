@@ -44,8 +44,8 @@ public class JsonToJavaBeanAction extends AnAction {
         presentation.setText(JsonAssistantBundle.message("action.json.to.javabean.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.javabean.description"));
 
-        if (PlatformUtil.isNewUiVersion()) {
-            presentation.setIcon(JsonAssistantIcons.NEW_GROUP_BY_CLASS);
+        if (PlatformUtil.isNewUi()) {
+            presentation.setIcon(JsonAssistantIcons.ExpUi.NEW_GROUP_BY_CLASS);
         } else {
             presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
         }

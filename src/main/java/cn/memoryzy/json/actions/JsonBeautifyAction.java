@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonUtil;
-import cn.memoryzy.json.utils.Notification;
+import cn.memoryzy.json.utils.Notifications;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.notification.NotificationType;
@@ -95,7 +95,7 @@ public class JsonBeautifyAction extends DumbAwareAction {
             });
         } else {
             PlatformUtil.setClipboard(formattedJson);
-            Notification.notify(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
         }
 
         if (useSelect) {

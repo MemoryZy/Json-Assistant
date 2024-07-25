@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonUtil;
-import cn.memoryzy.json.utils.Notification;
+import cn.memoryzy.json.utils.Notifications;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.intellij.codeInsight.hint.HintManager;
@@ -83,7 +83,7 @@ public class JsonMinifyAction extends DumbAwareAction {
             });
         } else {
             PlatformUtil.setClipboard(compressedJson);
-            Notification.notify(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
         }
 
         if (useSelect) {

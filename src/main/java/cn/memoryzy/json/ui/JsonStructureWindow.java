@@ -8,8 +8,10 @@ import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.constant.PluginDocument;
 import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
@@ -83,9 +85,14 @@ public class JsonStructureWindow extends DialogWrapper {
     protected Action @NotNull [] createActions() {
         List<Action> actions = new ArrayList<>();
         actions.add(getOKAction());
+        actions.add(getHelpAction());
         return actions.toArray(new Action[0]);
     }
 
+    @Override
+    protected void doHelpAction() {
+        BrowserUtil.browse(PluginDocument.TREE_LINK);
+    }
 
     public void convertToTreeNode(JSON json, JsonCollectInfoMutableTreeNode node) {
         if (json instanceof JSONObject) {

@@ -1,15 +1,15 @@
 <idea-plugin>
     <actions>
-        <action id="MemoryZy.JsonAssistant.actions.KtClassPropertyToJson"
+        <action id="JsonAssistant.actions.KtClassPropertyToJson"
                 icon="JsonAssistantIcons.JSON"
                 class="cn.memoryzy.json.actions.KtClassPropertyToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <group id="MemoryZy.groups.JsonAssistant.KtClassPropertyToJson">
+        <group id="JsonAssistant.groups.KtClassPropertyToJson">
             <separator/>
-            <reference ref="MemoryZy.JsonAssistant.actions.KtClassPropertyToJson"/>
+            <reference ref="JsonAssistant.actions.KtClassPropertyToJson"/>
             <separator/>
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>

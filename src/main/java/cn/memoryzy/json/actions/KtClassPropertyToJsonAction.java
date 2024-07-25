@@ -47,27 +47,28 @@ public class KtClassPropertyToJsonAction extends AnAction {
         } catch (Error e) {
             LOG.error(e);
             // 给通知
-            Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
             return;
         }
 
         // 将Map转换为Json
         String jsonStr = JSONUtil.toJsonStr(jsonMap, JSONConfig.create().setStripTrailingZeros(false));
-        jsonStr = JsonUtil.formatJson(jsonStr);
         // 添加至剪贴板
-        PlatformUtil.setClipboard(jsonStr);
+        PlatformUtil.setClipboard(JsonUtil.formatJson(jsonStr));
 
         Set<Map.Entry<String, List<String>>> entries = ignoreMap.entrySet();
         // 移除 value 为空列表的键值对
         entries.removeIf(entry -> entry.getValue().isEmpty());
 
         if (CollUtil.isNotEmpty(ignoreMap)) {
-            String ignoreHtml = JavaBeanToJsonAction.createNotifyIgnoreHtml(entries);
-            Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore", ignoreHtml), NotificationType.INFORMATION, project);
+            Notifications.showFullNotification(
+                    JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore.title"),
+                    JavaBeanToJsonAction.generateNotificationContent(entries),
+                    NotificationType.INFORMATION,
+                    project);
+        } else {
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
         }
-
-        // 给通知
-        Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
     }
 
     @Override

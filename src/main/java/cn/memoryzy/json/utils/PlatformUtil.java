@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -99,9 +100,9 @@ public class PlatformUtil {
         VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
     }
 
-    public static boolean isNewUiVersion(){
+    public static boolean isNewUi(){
         int baselineVersion = ApplicationInfo.getInstance().getBuild().getBaselineVersion();
-        return baselineVersion >= 223;
+        return baselineVersion >= 222 && Registry.is("ide.experimental.ui", true);
     }
 
 }

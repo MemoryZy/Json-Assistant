@@ -1,12 +1,13 @@
 package cn.memoryzy.json.actions;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JavaUtil;
 import cn.memoryzy.json.utils.JsonUtil;
-import cn.memoryzy.json.utils.Notification;
+import cn.memoryzy.json.utils.Notifications;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -36,8 +37,8 @@ public class JavaBeanToJsonAction extends AnAction {
         presentation.setText(JsonAssistantBundle.message("action.javabean.to.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.javabean.to.json.description"));
 
-        if (PlatformUtil.isNewUiVersion()) {
-            presentation.setIcon(JsonAssistantIcons.NEW_JSON);
+        if (PlatformUtil.isNewUi()) {
+            presentation.setIcon(JsonAssistantIcons.ExpUi.NEW_JSON);
         } else {
             presentation.setIcon(JsonAssistantIcons.JSON);
         }
@@ -65,27 +66,28 @@ public class JavaBeanToJsonAction extends AnAction {
         } catch (Error e) {
             LOG.error(e);
             // 给通知
-            Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
             return;
         }
 
         String jsonStr = JSONUtil.toJsonStr(jsonMap, JSONConfig.create().setStripTrailingZeros(false));
-        jsonStr = JsonUtil.formatJson(jsonStr);
 
         // 添加至剪贴板
-        PlatformUtil.setClipboard(jsonStr);
+        PlatformUtil.setClipboard(JsonUtil.formatJson(jsonStr));
 
         Set<Map.Entry<String, List<String>>> entries = ignoreMap.entrySet();
         // 移除 value 为空列表的键值对
         entries.removeIf(entry -> entry.getValue().isEmpty());
 
         if (CollUtil.isNotEmpty(entries)) {
-            String ignoreHtml = createNotifyIgnoreHtml(entries);
-            Notification.notifyLog(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore", ignoreHtml), NotificationType.INFORMATION, project);
+            Notifications.showFullNotification(
+                    JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore.title"),
+                    generateNotificationContent(entries),
+                    NotificationType.INFORMATION,
+                    project);
+        } else {
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
         }
-
-        // 给通知
-        Notification.notify(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
     }
 
 
@@ -96,8 +98,9 @@ public class JavaBeanToJsonAction extends AnAction {
     }
 
 
-    public static String createNotifyIgnoreHtml(Set<Map.Entry<String, List<String>>> entries) {
-        StringBuilder builder = new StringBuilder();
+    public static String generateNotificationContent(Set<Map.Entry<String, List<String>>> entries) {
+        String notificationContent = "<ul>{}</ul>";
+        String concreteContent = "<li>{}</li>";
 
         List<String> nameList = new ArrayList<>(entries.size());
         // 类名 key，value 字段集
@@ -113,13 +116,13 @@ public class JavaBeanToJsonAction extends AnAction {
             }
         }
 
-        builder.append("<ul>");
+        // 强调倒序
+        StringBuilder builder = new StringBuilder();
         for (int i = nameList.size() - 1; i >= 0; i--) {
-            builder.append("<li>").append(nameList.get(i)).append("</li>");
+            builder.append(StrUtil.format(concreteContent, nameList.get(i)));
         }
 
-        builder.append("</ul>");
-        return builder.toString();
+        return StrUtil.format(notificationContent, builder.toString());
     }
 
 }

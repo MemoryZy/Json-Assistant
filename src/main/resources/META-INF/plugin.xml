@@ -12,28 +12,27 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
-        <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin With Log" isLogByDefault="true"/>
-        <toolWindow id="MemoryZy.JsonAssistant.JsonWindow"
-                    icon="AllIcons.Toolwindows.ToolWindowJsonPath"
-                    factoryClass="cn.memoryzy.json.toolwindows.JsonWindowTw"
+        <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
+        <toolWindow id="JsonAssistant.JsonView"
+                    factoryClass="cn.memoryzy.json.toolwindows.JsonViewToolWindowFactory"
                     anchor="right"
-                    largeStripeAnchor="right"
                     secondary="true"
                     doNotActivateOnStart="true"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerLastRecordState"/>
+        <postStartupActivity implementation="cn.memoryzy.json.listener.PluginInitAndUpdateManager"/>
     </extensions>
 
     <actions>
-        <action id="MemoryZy.JsonAssistant.actions.JsonProcessing"
+        <action id="JsonAssistant.actions.JsonProcessing"
                 class="cn.memoryzy.json.actions.JsonProcessingAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
-        <group id="MemoryZy.groups.JsonAssistant.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
+        <group id="JsonAssistant.groups.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
-            <reference ref="MemoryZy.JsonAssistant.actions.JsonProcessing"/>
+            <reference ref="JsonAssistant.actions.JsonProcessing"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
