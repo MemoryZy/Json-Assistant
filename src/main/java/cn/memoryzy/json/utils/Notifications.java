@@ -16,15 +16,11 @@ import org.jetbrains.annotations.NotNull;
 public class Notifications {
 
     /**
-     * 获取通知组管理器
-     */
-    private static final NotificationGroupManager MANAGER = NotificationGroupManager.getInstance();
-    /**
      * 获取注册的通知组
      */
-    public static final NotificationGroup BALLOON_GROUP = MANAGER.getNotificationGroup("JsonAssistant Plugin");
+    public static final NotificationGroup BALLOON_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin");
 
-    public static final NotificationGroup BALLOON_LOG_GROUP = MANAGER.getNotificationGroup("JsonAssistant Plugin Log");
+    public static final NotificationGroup BALLOON_LOG_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin Log");
 
     /**
      * 展示通知（瞬态通知）
