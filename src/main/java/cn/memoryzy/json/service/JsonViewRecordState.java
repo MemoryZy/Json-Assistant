@@ -10,22 +10,22 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/7/22
  */
-@State(name = "JsonAssistantViewerLastRecord")
-public class JsonViewerLastRecordState implements PersistentStateComponent<JsonViewerLastRecordState> {
+@State(name = "JsonAssistantViewRecord")
+public class JsonViewRecordState implements PersistentStateComponent<JsonViewRecordState> {
 
-    public static JsonViewerLastRecordState getInstance(Project project) {
-        return project.getService(JsonViewerLastRecordState.class);
+    public static JsonViewRecordState getInstance(Project project) {
+        return project.getService(JsonViewRecordState.class);
     }
 
     public String record;
 
     @Override
-    public @Nullable JsonViewerLastRecordState getState() {
+    public @Nullable JsonViewRecordState getState() {
         return this;
     }
 
     @Override
-    public void loadState(@NotNull JsonViewerLastRecordState state) {
+    public void loadState(@NotNull JsonViewRecordState state) {
         this.record = state.record;
     }
 }

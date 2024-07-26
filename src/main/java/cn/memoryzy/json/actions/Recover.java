@@ -41,14 +41,18 @@ public class Recover extends DumbAwareAction {
 
 
     public static void customNotification(Project project) {
+
+        String s = JsonAssistantBundle.messageOnSystem("notify.welcome.content",
+                PluginDocument.GITHUB_LINK,
+                PluginDocument.SPONSOR_LINK);
         // todo 弹窗的位置需要把侧边栏展示出来
         Notification notification = Notifications.BALLOON_LOG_GROUP
-                .createNotification(
-                        JsonAssistantBundle.messageOnSystem("notify.welcome.content",
-                                PluginDocument.GITHUB_LINK,
-                                PluginDocument.SPONSOR_LINK),
+                .createNotification(s,
                         NotificationType.INFORMATION)
-                .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()));
+                .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
+                .setImportant(true)
+                // .setListener()
+                ;
 
         notification.addAction(new QuickStartAction());
 

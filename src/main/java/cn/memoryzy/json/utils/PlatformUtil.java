@@ -9,6 +9,7 @@ import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
 
 import java.awt.datatransfer.DataFlavor;
@@ -100,9 +101,15 @@ public class PlatformUtil {
         VirtualFileManager.getInstance().refreshWithoutFileWatcher(true);
     }
 
-    public static boolean isNewUi(){
+
+    public static boolean isNewUi() {
         int baselineVersion = ApplicationInfo.getInstance().getBuild().getBaselineVersion();
         return baselineVersion >= 222 && Registry.is("ide.experimental.ui", true);
+    }
+
+
+    public static boolean canBrowseInHTMLEditor() {
+        return JBCefApp.isSupported();
     }
 
 }

@@ -19,7 +19,7 @@
                     secondary="true"
                     doNotActivateOnStart="true"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerLastRecordState"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewRecordState"/>
         <postStartupActivity implementation="cn.memoryzy.json.listener.PluginWelcomeAndUpdateManager"/>
     </extensions>
 
