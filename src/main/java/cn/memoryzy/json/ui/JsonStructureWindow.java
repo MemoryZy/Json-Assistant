@@ -9,7 +9,7 @@ import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginDocument;
-import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
+import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -99,7 +99,7 @@ public class JsonStructureWindow extends DialogWrapper {
             JSONObject jsonObject = (JSONObject) json;
             // 为了确定图标
             if (Objects.isNull(node.getValueType())) {
-                node.setValueType(JsonTreeNodeValueTypeEnum.JSONObject);
+                node.setValueType(JsonTreeNodeTypeEnum.JSONObject);
             }
 
             if (Objects.isNull(node.getCorrespondingValue())) {
@@ -115,12 +115,12 @@ public class JsonStructureWindow extends DialogWrapper {
 
                 if (value instanceof JSONObject) {
                     JSONObject jsonObjectValue = (JSONObject) value;
-                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeValueTypeEnum.JSONObject).setSize(jsonObjectValue.size());
+                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeTypeEnum.JSONObject).setSize(jsonObjectValue.size());
                     convertToTreeNode(jsonObjectValue, childNode);
 
                 } else if (value instanceof JSONArray) {
                     JSONArray jsonArray = (JSONArray) value;
-                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeValueTypeEnum.JSONArray).setSize(jsonArray.size());
+                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeTypeEnum.JSONArray).setSize(jsonArray.size());
                     for (int i = 0; i < jsonArray.size(); i++) {
                         Object el = jsonArray.get(i);
                         if (el instanceof JSONObject) {
@@ -128,7 +128,7 @@ public class JsonStructureWindow extends DialogWrapper {
                             JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
                                     "item" + i,
                                     el,
-                                    JsonTreeNodeValueTypeEnum.JSONObjectEl,
+                                    JsonTreeNodeTypeEnum.JSONObjectEl,
                                     jsonObjectEl.size());
 
                             convertToTreeNode(jsonObjectEl, childNodeEl);
@@ -138,7 +138,7 @@ public class JsonStructureWindow extends DialogWrapper {
                             JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
                                     "item" + i,
                                     el,
-                                    JsonTreeNodeValueTypeEnum.JSONArrayEl,
+                                    JsonTreeNodeTypeEnum.JSONArrayEl,
                                     jsonArrayEl.size());
 
                             convertToTreeNode(jsonArrayEl, childNodeEl);
@@ -154,7 +154,7 @@ public class JsonStructureWindow extends DialogWrapper {
                                 el = null;
                             }
 
-                            childNode.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeValueTypeEnum.JSONArrayEl));
+                            childNode.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeTypeEnum.JSONArrayEl));
                         }
                     }
 
@@ -165,7 +165,7 @@ public class JsonStructureWindow extends DialogWrapper {
                     }
 
                     childNode.setCorrespondingValue(value)
-                            .setValueType(JsonTreeNodeValueTypeEnum.JSONObjectKey)
+                            .setValueType(JsonTreeNodeTypeEnum.JSONObjectKey)
                             .setUserObject(key);
                 }
 
@@ -174,7 +174,7 @@ public class JsonStructureWindow extends DialogWrapper {
         } else if (json instanceof JSONArray) {
             JSONArray jsonArray = (JSONArray) json;
             // 为了确定图标
-            node.setValueType(JsonTreeNodeValueTypeEnum.JSONArray).setSize(jsonArray.size());
+            node.setValueType(JsonTreeNodeTypeEnum.JSONArray).setSize(jsonArray.size());
             if (Objects.isNull(node.getCorrespondingValue())) {
                 node.setCorrespondingValue(jsonArray);
             }
@@ -183,7 +183,7 @@ public class JsonStructureWindow extends DialogWrapper {
                 Object el = jsonArray.get(i);
                 if (el instanceof JSONObject) {
                     JSONObject jsonObject = (JSONObject) el;
-                    JsonCollectInfoMutableTreeNode childNode = new JsonCollectInfoMutableTreeNode("item" + i, el, JsonTreeNodeValueTypeEnum.JSONObjectEl, jsonObject.size());
+                    JsonCollectInfoMutableTreeNode childNode = new JsonCollectInfoMutableTreeNode("item" + i, el, JsonTreeNodeTypeEnum.JSONObjectEl, jsonObject.size());
                     convertToTreeNode(jsonObject, childNode);
                     node.add(childNode);
                 } else if (el instanceof JSONArray) {
@@ -191,7 +191,7 @@ public class JsonStructureWindow extends DialogWrapper {
                     JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
                             "item" + i,
                             el,
-                            JsonTreeNodeValueTypeEnum.JSONArrayEl,
+                            JsonTreeNodeTypeEnum.JSONArrayEl,
                             jsonArrayEl.size());
 
                     convertToTreeNode(jsonArrayEl, childNodeEl);
@@ -207,7 +207,7 @@ public class JsonStructureWindow extends DialogWrapper {
                         el = null;
                     }
 
-                    node.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeValueTypeEnum.JSONArrayEl));
+                    node.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeTypeEnum.JSONArrayEl));
                 }
             }
         }
@@ -219,7 +219,7 @@ public class JsonStructureWindow extends DialogWrapper {
             @Override
             public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 JsonCollectInfoMutableTreeNode jsonCollectInfoMutableTreeNode = (JsonCollectInfoMutableTreeNode) value;
-                JsonTreeNodeValueTypeEnum nodeValueType = jsonCollectInfoMutableTreeNode.getValueType();
+                JsonTreeNodeTypeEnum nodeValueType = jsonCollectInfoMutableTreeNode.getValueType();
 
                 String text = jsonCollectInfoMutableTreeNode.getUserObject().toString();
                 SimpleTextAttributes simpleTextAttributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
@@ -236,7 +236,7 @@ public class JsonStructureWindow extends DialogWrapper {
 
                 Integer size = jsonCollectInfoMutableTreeNode.getSize();
                 Object correspondingValue = jsonCollectInfoMutableTreeNode.getCorrespondingValue();
-                JsonTreeNodeValueTypeEnum valueType = jsonCollectInfoMutableTreeNode.getValueType();
+                JsonTreeNodeTypeEnum valueType = jsonCollectInfoMutableTreeNode.getValueType();
 
                 String squareBracketsStart = "";
                 String nodeTypeStr = "";
@@ -355,8 +355,8 @@ public class JsonStructureWindow extends DialogWrapper {
                     }
                 }
 
-                if (!Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
-                    append(Objects.equals(JsonTreeNodeValueTypeEnum.JSONObjectKey, nodeValueType) ? text + ": " : text, simpleTextAttributes);
+                if (!Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType)) {
+                    append(Objects.equals(JsonTreeNodeTypeEnum.JSONObjectKey, nodeValueType) ? text + ": " : text, simpleTextAttributes);
                 }
 
                 if (StrUtil.isNotBlank(squareBracketsStart)) append(squareBracketsStart, lightAttributes, false);
@@ -379,7 +379,7 @@ public class JsonStructureWindow extends DialogWrapper {
                         attributes = stringColorAttributes;
                     }
 
-                    append(jsonValue, attributes, Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType));
+                    append(jsonValue, attributes, Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType));
                 }
 
                 setIcon(icon);

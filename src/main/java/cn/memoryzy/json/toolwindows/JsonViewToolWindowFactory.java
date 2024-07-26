@@ -1,9 +1,10 @@
 package cn.memoryzy.json.toolwindows;
 
-import cn.memoryzy.json.actions.child.DonateOnTwTitleAction;
+import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.FloatingWindowAction;
 import cn.memoryzy.json.actions.child.JsonStructureOnTitleAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.constant.PluginDocument;
 import cn.memoryzy.json.ui.JsonWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -48,11 +49,14 @@ public class JsonViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         List<AnAction> dumbAwareActions =
                 List.of(new FloatingWindowAction(toolWindowEx),
                         new JsonStructureOnTitleAction(project, window, toolWindowEx),
-                        new DonateOnTwTitleAction());
+                        new DonateAction());
 
         toolWindow.setTitleActions(dumbAwareActions);
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);
+
+        // 验证地址可达性
+        PluginDocument.verifyReachable();
     }
 
 }

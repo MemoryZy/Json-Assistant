@@ -1,5 +1,7 @@
 package cn.memoryzy.json.utils;
 
+import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationGroup;
 import com.intellij.notification.NotificationGroupManager;
@@ -61,6 +63,16 @@ public class Notifications {
         new FullContentNotification(BALLOON_LOG_GROUP.getDisplayId(), title, content, notificationType).notify(project);
     }
 
+    public static void showWelcomeNotification() {
+        Notification notification = BALLOON_LOG_GROUP
+                .createNotification("感谢你的使用！\n" +
+                                "<b><a href=\"https://github.com/MemoryZy/Json-Assistant\">Json Assistant</a></b> &nbsp;是一款开源插件，它源于个人兴趣与使用需求，我将会长期维护它。\n" +
+                                "如果你觉得 <b>Json Assistant</b> 对你有帮助的话，请考虑给予 <b><a href=\"https://json.memoryzy.cn/support\">捐赠</a></b>，" +
+                                "你的支持将极大地鼓励我继续改进和维护这个项目。<br/><br/>",
+                        NotificationType.INFORMATION)
+                .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()));
+
+    }
 
     private static class FullContentNotification extends Notification implements NotificationFullContent {
         public FullContentNotification(@NotNull @NonNls String groupId, @NotNull String title, @NotNull String content, @NotNull NotificationType type) {

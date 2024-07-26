@@ -42,8 +42,7 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup {
         return new AnAction[]{
                 new JsonBeautifyAction(),
                 new JsonMinifyAction(),
-                new JsonStructureAction()
-        };
+                new JsonStructureAction()};
     }
 
 }

@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions.child;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
+import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -37,10 +37,10 @@ public class CopyValueAction extends DumbAwareAction {
                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
                 // 获取value值，多个的话用其他处理方式
                 Object correspondingValue = node.getCorrespondingValue();
-                JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
+                JsonTreeNodeTypeEnum nodeValueType = node.getValueType();
                 // 只有JSONArrayEl是没有Value的
-                if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)
-                        || Objects.equals(JsonTreeNodeValueTypeEnum.JSONObjectKey, nodeValueType)) {
+                if (Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType)
+                        || Objects.equals(JsonTreeNodeTypeEnum.JSONObjectKey, nodeValueType)) {
                     valueList.add(Objects.nonNull(correspondingValue) ? correspondingValue.toString() : "null");
                 } else {
                     JSON json = (JSON) correspondingValue;

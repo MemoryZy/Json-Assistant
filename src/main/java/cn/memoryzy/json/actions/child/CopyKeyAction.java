@@ -2,7 +2,7 @@ package cn.memoryzy.json.actions.child;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
+import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,7 +35,7 @@ public class CopyKeyAction extends DumbAwareAction {
             for (TreePath path : paths) {
                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
                 // 有key
-                if (!JsonTreeNodeValueTypeEnum.JSONArrayEl.equals(node.getValueType())) {
+                if (!JsonTreeNodeTypeEnum.JSONArrayEl.equals(node.getValueType())) {
                     // key
                     keyList.add(node.getUserObject().toString());
                 }
@@ -53,8 +53,8 @@ public class CopyKeyAction extends DumbAwareAction {
         if (Objects.nonNull(paths) && paths.length == 1) {
             TreePath path = paths[0];
             JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-            JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-            if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
+            JsonTreeNodeTypeEnum nodeValueType = node.getValueType();
+            if (Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType)) {
                 visible = false;
             }
         }

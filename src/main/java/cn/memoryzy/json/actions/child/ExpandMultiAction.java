@@ -2,7 +2,7 @@ package cn.memoryzy.json.actions.child;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
+import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.TreeUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -42,10 +42,10 @@ public class ExpandMultiAction extends DumbAwareAction {
         if (ArrayUtil.isNotEmpty(paths)) {
             for (TreePath path : paths) {
                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-                JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-                if (Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONObject)
-                        || Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONArray)
-                        || Objects.equals(nodeValueType, JsonTreeNodeValueTypeEnum.JSONObjectEl))
+                JsonTreeNodeTypeEnum nodeValueType = node.getValueType();
+                if (Objects.equals(nodeValueType, JsonTreeNodeTypeEnum.JSONObject)
+                        || Objects.equals(nodeValueType, JsonTreeNodeTypeEnum.JSONArray)
+                        || Objects.equals(nodeValueType, JsonTreeNodeTypeEnum.JSONObjectEl))
                     enabled = true;
             }
         }

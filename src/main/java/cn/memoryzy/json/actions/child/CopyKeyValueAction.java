@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions.child;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonTreeNodeValueTypeEnum;
+import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -38,13 +38,13 @@ public class CopyKeyValueAction extends DumbAwareAction {
                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
                 // 获取value值，多个的话用其他处理方式
                 Object correspondingValue = node.getCorrespondingValue();
-                JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
+                JsonTreeNodeTypeEnum nodeValueType = node.getValueType();
 
                 String userObject = node.getUserObject().toString();
                 // 只有JSONArrayEl是没有Value的
-                if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
+                if (Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType)) {
                     valueList.add(userObject);
-                } else if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONObjectKey, nodeValueType)) {
+                } else if (Objects.equals(JsonTreeNodeTypeEnum.JSONObjectKey, nodeValueType)) {
                     valueList.add(userObject + ": " + (Objects.nonNull(correspondingValue) ? correspondingValue.toString() : "null"));
                 } else {
                     JSON json = (JSON) correspondingValue;
@@ -74,8 +74,8 @@ public class CopyKeyValueAction extends DumbAwareAction {
         if (Objects.nonNull(paths) && paths.length == 1) {
             TreePath path = paths[0];
             JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-            JsonTreeNodeValueTypeEnum nodeValueType = node.getValueType();
-            if (Objects.equals(JsonTreeNodeValueTypeEnum.JSONArrayEl, nodeValueType)) {
+            JsonTreeNodeTypeEnum nodeValueType = node.getValueType();
+            if (Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType)) {
                 visible = false;
             }
         }
