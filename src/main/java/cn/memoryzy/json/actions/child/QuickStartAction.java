@@ -1,4 +1,4 @@
-package cn.memoryzy.json.actions.notify;
+package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HTMLConstant;

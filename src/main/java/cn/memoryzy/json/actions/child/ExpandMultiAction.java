@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions.child;
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
-import cn.memoryzy.json.ui.treenode.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.utils.TreeUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;

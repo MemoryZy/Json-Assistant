@@ -2,10 +2,10 @@ package cn.memoryzy.json.toolwindows;
 
 import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.FloatingWindowAction;
-import cn.memoryzy.json.actions.child.JsonStructureOnTitleAction;
+import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginDocument;
-import cn.memoryzy.json.ui.JsonWindow;
+import cn.memoryzy.json.ui.JsonViewWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.DumbAware;
@@ -45,10 +45,10 @@ public class JsonViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         ContentManager contentManager = toolWindow.getContentManager();
 
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
-        JsonWindow window = new JsonWindow(project);
+        JsonViewWindow window = new JsonViewWindow(project);
         List<AnAction> dumbAwareActions =
                 List.of(new FloatingWindowAction(toolWindowEx),
-                        new JsonStructureOnTitleAction(project, window, toolWindowEx),
+                        new JsonStructureOnToolWindowAction(project, window, toolWindowEx),
                         new DonateAction());
 
         toolWindow.setTitleActions(dumbAwareActions);

@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.actions.child.JsonStructureOnTitleAction;
+import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -46,7 +46,7 @@ public class JsonStructureAction extends DumbAwareAction {
             jsonStr = StrUtil.trim(document.getText());
         }
 
-        JsonStructureOnTitleAction.structuring(jsonStr, project);
+        JsonStructureOnToolWindowAction.structuring(jsonStr, project);
     }
 
 }

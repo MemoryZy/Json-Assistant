@@ -1,6 +1,6 @@
 package cn.memoryzy.json.actions;
 
-import cn.memoryzy.json.actions.notify.QuickStartAction;
+import cn.memoryzy.json.actions.child.QuickStartAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginDocument;

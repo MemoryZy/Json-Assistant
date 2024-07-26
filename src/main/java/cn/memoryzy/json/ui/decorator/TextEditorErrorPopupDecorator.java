@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.basic;
+package cn.memoryzy.json.ui.decorator;
 
 import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -21,14 +21,14 @@ import java.awt.event.ComponentEvent;
  * @author Memory
  * @since 2024/1/26
  */
-public class TextFieldErrorPopupDecorator {
+public class TextEditorErrorPopupDecorator {
 
     private final JComponent myTextField;
     private RelativePoint myErrorShowPoint;
     private AbstractPopup myErrorPopup;
     private Dimension hintSize;
 
-    public TextFieldErrorPopupDecorator(JRootPane rootPane, JComponent myTextField) {
+    public TextEditorErrorPopupDecorator(JRootPane rootPane, JComponent myTextField) {
         this.myTextField = myTextField;
         // 初始化监听事件
         initElement(rootPane, myTextField);

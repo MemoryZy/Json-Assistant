@@ -11,8 +11,8 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.PluginDocument;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
-import cn.memoryzy.json.ui.basic.MultiRowLanguageTextField;
-import cn.memoryzy.json.ui.basic.TextFieldErrorPopupDecorator;
+import cn.memoryzy.json.ui.basic.CustomLanguageTextEditor;
+import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.utils.JavaUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.Notifications;
@@ -49,9 +49,9 @@ import java.util.*;
  * @author Memory
  * @since 2023/12/11
  */
-public class JsonToJavaBeanWindow extends DialogWrapper {
+public class JsonToJavaBeanDialog extends DialogWrapper {
 
-    private static final Logger LOG = Logger.getInstance(JsonToJavaBeanWindow.class);
+    private static final Logger LOG = Logger.getInstance(JsonToJavaBeanDialog.class);
 
     private JPanel rootPanel;
     private JTextField classNameTextField;
@@ -62,17 +62,17 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
     private final PsiDirectory directory;
     private final Module module;
 
-    private final TextFieldErrorPopupDecorator classNameErrorPopupDecorator;
-    private final TextFieldErrorPopupDecorator jsonErrorPopupDecorator;
+    private final TextEditorErrorPopupDecorator classNameErrorPopupDecorator;
+    private final TextEditorErrorPopupDecorator jsonErrorPopupDecorator;
 
-    public JsonToJavaBeanWindow(Project project, PsiDirectory directory, Module module) {
+    public JsonToJavaBeanDialog(Project project, PsiDirectory directory, Module module) {
         super(project, true);
         this.project = project;
         this.directory = directory;
         this.module = module;
 
-        this.classNameErrorPopupDecorator = new TextFieldErrorPopupDecorator(getRootPane(), classNameTextField);
-        this.jsonErrorPopupDecorator = new TextFieldErrorPopupDecorator(getRootPane(), jsonTextField);
+        this.classNameErrorPopupDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
+        this.jsonErrorPopupDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
 
         getWindow().addWindowListener(new WindowAdapter() {
             @Override
@@ -95,7 +95,7 @@ public class JsonToJavaBeanWindow extends DialogWrapper {
 
     private void createUIComponents() {
         // 声明 Json 类型编辑器
-        jsonTextField = new MultiRowLanguageTextField(Json5Language.INSTANCE, project, "", true);
+        jsonTextField = new CustomLanguageTextEditor(Json5Language.INSTANCE, project, "", true);
         jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
     }

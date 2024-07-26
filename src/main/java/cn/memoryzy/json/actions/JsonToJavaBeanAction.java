@@ -2,7 +2,7 @@ package cn.memoryzy.json.actions;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonToJavaBeanWindow;
+import cn.memoryzy.json.ui.JsonToJavaBeanDialog;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
@@ -66,7 +66,7 @@ public class JsonToJavaBeanAction extends AnAction {
         // 当前 module
         Module module = ModuleUtil.findModuleForPsiElement(directory);
         // 窗口
-        new JsonToJavaBeanWindow(project, directory, module).show();
+        new JsonToJavaBeanDialog(project, directory, module).show();
     }
 
     @Override
