@@ -23,7 +23,6 @@ public class PluginWelcomeAndUpdateManager implements StartupActivity {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         String lastVersion = propertiesComponent.getValue(JsonAssistantPlugin.PLUGIN_VERSION);
 
-
         // 如果 lastVersion 为 null，表示第一次安装，todo 测试一下unload又load的情况
         if (lastVersion == null) {
 

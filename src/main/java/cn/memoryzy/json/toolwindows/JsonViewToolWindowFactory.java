@@ -49,7 +49,7 @@ public class JsonViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         List<AnAction> dumbAwareActions =
                 List.of(new FloatingWindowAction(toolWindowEx),
                         new JsonStructureOnToolWindowAction(project, window, toolWindowEx),
-                        new DonateAction());
+                        new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text"), PluginDocument.SPONSOR_LINK));
 
         toolWindow.setTitleActions(dumbAwareActions);
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);

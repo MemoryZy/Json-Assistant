@@ -1,15 +1,28 @@
 package cn.memoryzy.json.utils;
 
+import cn.memoryzy.json.actions.child.DonateAction;
+import cn.memoryzy.json.actions.child.QuickStartAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationGroup;
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
+import cn.memoryzy.json.constant.PluginDocument;
+import com.intellij.ide.BrowserUtil;
+import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
+import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.ui.BalloonImpl;
+import com.intellij.ui.BalloonLayoutData;
+import com.intellij.ui.awt.RelativePoint;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
+import java.awt.*;
+import java.net.URL;
+import java.util.Arrays;
 
 /**
  * @author Memory
@@ -63,16 +76,60 @@ public class Notifications {
         new FullContentNotification(BALLOON_LOG_GROUP.getDisplayId(), title, content, notificationType).notify(project);
     }
 
-    public static void showWelcomeNotification() {
-        Notification notification = BALLOON_LOG_GROUP
-                .createNotification("感谢你的使用！\n" +
-                                "<b><a href=\"https://github.com/MemoryZy/Json-Assistant\">Json Assistant</a></b> &nbsp;是一款开源插件，它源于个人兴趣与使用需求，我将会长期维护它。\n" +
-                                "如果你觉得 <b>Json Assistant</b> 对你有帮助的话，请考虑给予 <b><a href=\"https://json.memoryzy.cn/support\">捐赠</a></b>，" +
-                                "你的支持将极大地鼓励我继续改进和维护这个项目。<br/><br/>",
+
+    @SuppressWarnings("deprecation")
+    public static void showWelcomeNotification(Project project) {
+        Notification notification = Notifications.BALLOON_LOG_GROUP
+                .createNotification(
+                        JsonAssistantBundle.messageOnSystem("notify.welcome.content",
+                                PluginDocument.GITHUB_LINK,
+                                PluginDocument.SPONSOR_LINK),
                         NotificationType.INFORMATION)
-                .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()));
+                .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
+                .setImportant(true)
+                .setListener(new NotificationListenerImpl())
+                .addAction(new QuickStartAction())
+                .addAction(new DonateAction(
+                        JsonAssistantBundle.messageOnSystem("action.welcome.donate.text"),
+                        PluginDocument.SUPPORT_LINK));
+
+        IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
+        if (window != null) {
+            Balloon balloon = NotificationsManagerImpl.createBalloon(window,
+                    notification,
+                    false,
+                    false,
+                    BalloonLayoutData.fullContent(),
+                    () -> System.out.println());
+
+            JComponent component = window.getComponent();
+            balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
+        }
 
     }
+
+    public static RelativePoint getUpperRightRelativePoint(JComponent component, BalloonImpl balloon) {
+        // 在其他平台上，气球提示显示在标题栏的右侧边缘
+        // 获取分层窗格
+        // todo 弹窗的位置需要把侧边栏展示出来
+        JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
+        // 查找标题栏组件
+        Component titleBar = Arrays.stream(layeredPane.getComponents())
+                .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
+                .findFirst()
+                .orElse(null);
+
+        // 计算垂直偏移量
+        int insetTop = balloon.getShadowBorderInsets().top;
+        int contentHalfHeight = (int) (balloon.getContent().getPreferredSize().getHeight() / 2);
+        int titleBarHeight = titleBar != null ? titleBar.getHeight() : 40;
+        int offsetY = titleBarHeight + insetTop + contentHalfHeight;
+
+        // 设置气球提示的显示位置
+        Component relativeComponent = titleBar != null ? titleBar : component;
+        return new RelativePoint(relativeComponent, new Point(relativeComponent.getWidth(), offsetY));
+    }
+
 
     private static class FullContentNotification extends Notification implements NotificationFullContent {
         public FullContentNotification(@NotNull @NonNls String groupId, @NotNull String title, @NotNull String content, @NotNull NotificationType type) {
@@ -80,4 +137,11 @@ public class Notifications {
         }
     }
 
+    private static class NotificationListenerImpl extends NotificationListener.Adapter {
+        @Override
+        protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
+            URL url = e.getURL();
+            BrowserUtil.browse(url.toExternalForm());
+        }
+    }
 }

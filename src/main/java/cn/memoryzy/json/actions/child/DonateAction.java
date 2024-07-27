@@ -14,16 +14,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DonateAction extends DumbAwareAction {
 
-    public DonateAction() {
-        super(JsonAssistantBundle.messageOnSystem("action.donate.text"),
-                JsonAssistantBundle.messageOnSystem("action.donate.description"),
-                JsonAssistantIcons.DONATE);
+    private final String hyperLink;
+
+    public DonateAction(String text, String hyperLink) {
+        super(text, JsonAssistantBundle.messageOnSystem("action.donate.description"), JsonAssistantIcons.DONATE);
+        this.hyperLink = hyperLink;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         if (PluginDocument.reachableAtomic.get()) {
-            BrowserUtil.browse(PluginDocument.SUPPORT_LINK);
+            BrowserUtil.browse(hyperLink);
         } else {
             // 构建弹窗
 
