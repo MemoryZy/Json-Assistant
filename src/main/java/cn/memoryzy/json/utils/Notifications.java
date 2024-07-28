@@ -1,5 +1,6 @@
 package cn.memoryzy.json.utils;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.QuickStartAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
@@ -12,6 +13,7 @@ import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.toolWindow.ToolWindowPane;
 import com.intellij.ui.BalloonImpl;
 import com.intellij.ui.BalloonLayoutData;
 import com.intellij.ui.awt.RelativePoint;
@@ -23,6 +25,7 @@ import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -110,14 +113,32 @@ public class Notifications {
 
     public static RelativePoint getUpperRightRelativePoint(JComponent component, BalloonImpl balloon) {
         // 在其他平台上，气球提示显示在标题栏的右侧边缘
-        // 获取分层窗格
-        // todo 弹窗的位置需要把侧边栏展示出来
         JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
+        Container contentPane = component.getRootPane().getContentPane();
+
         // 查找标题栏组件
         Component titleBar = Arrays.stream(layeredPane.getComponents())
                 .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
                 .findFirst()
                 .orElse(null);
+
+        int addWidth = 0;
+        memory:
+        for (Component contentComponent : contentPane.getComponents()) {
+            if (contentComponent instanceof ToolWindowPane) {
+                ToolWindowPane toolWindowPane = (ToolWindowPane) contentComponent;
+                for (Component toolWindowPaneComponent : toolWindowPane.getComponents()) {
+                    Object anchor = ReflectUtil.getFieldValue(toolWindowPaneComponent, "anchor");
+                    if (Objects.equals(SwingConstants.RIGHT, anchor)) {
+                        Object width = ReflectUtil.getFieldValue(toolWindowPaneComponent, "width");
+                        if (width instanceof Integer) {
+                            addWidth = (int) width;
+                            break memory;
+                        }
+                    }
+                }
+            }
+        }
 
         // 计算垂直偏移量
         int insetTop = balloon.getShadowBorderInsets().top;
@@ -127,7 +148,13 @@ public class Notifications {
 
         // 设置气球提示的显示位置
         Component relativeComponent = titleBar != null ? titleBar : component;
-        return new RelativePoint(relativeComponent, new Point(relativeComponent.getWidth(), offsetY));
+
+        int insetRight = balloon.getShadowBorderInsets().right;
+        int contentHalfWidth = (int) (balloon.getContent().getPreferredSize().getWidth() / 2);
+        int stripeRightWidth = addWidth > 0 ? addWidth : 25;
+        int offsetX = relativeComponent.getWidth() - (stripeRightWidth + insetRight + contentHalfWidth);
+
+        return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
     }
 
 
