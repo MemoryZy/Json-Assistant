@@ -1,6 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.ui.SupportDialog;
 import cn.memoryzy.json.utils.Notifications;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -15,8 +16,10 @@ public class Recover extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        propertiesComponent.unsetValue(JsonAssistantPlugin.PLUGIN_VERSION);
+        // PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
+        // propertiesComponent.unsetValue(JsonAssistantPlugin.PLUGIN_VERSION);
+
+
     }
 
 
