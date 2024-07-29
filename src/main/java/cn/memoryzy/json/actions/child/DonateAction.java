@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -23,7 +23,7 @@ public class DonateAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        if (PluginDocument.reachableAtomic.get()) {
+        if (HyperLinks.reachableAtomic.get()) {
             BrowserUtil.browse(hyperLink);
         } else {
             // 构建弹窗

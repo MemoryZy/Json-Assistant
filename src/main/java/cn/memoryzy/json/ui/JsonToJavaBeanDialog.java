@@ -9,7 +9,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
 import cn.memoryzy.json.ui.basic.CustomLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
@@ -116,7 +116,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     @Override
     protected void doHelpAction() {
-        BrowserUtil.browse(PluginDocument.JSON_TO_JAVA_BEAN_LINK);
+        BrowserUtil.browse(HyperLinks.JSON_TO_JAVA_BEAN_LINK);
     }
 
     @Override

@@ -5,7 +5,7 @@ import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.QuickStartAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
@@ -85,8 +85,8 @@ public class Notifications {
         Notification notification = Notifications.BALLOON_LOG_GROUP
                 .createNotification(
                         JsonAssistantBundle.messageOnSystem("notify.welcome.content",
-                                PluginDocument.GITHUB_LINK,
-                                PluginDocument.SPONSOR_LINK),
+                                HyperLinks.GITHUB_LINK,
+                                HyperLinks.SPONSOR_LINK),
                         NotificationType.INFORMATION)
                 .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
                 .setImportant(true)
@@ -94,7 +94,7 @@ public class Notifications {
                 .addAction(new QuickStartAction())
                 .addAction(new DonateAction(
                         JsonAssistantBundle.messageOnSystem("action.welcome.donate.text"),
-                        PluginDocument.SUPPORT_LINK));
+                        HyperLinks.SUPPORT_LINK));
 
         IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
         if (window != null) {

@@ -1,7 +1,7 @@
 package cn.memoryzy.json.listener;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.utils.Notifications;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
@@ -17,7 +17,7 @@ public class PluginWelcomeAndUpdateManager implements StartupActivity {
     @Override
     public void runActivity(@NotNull Project project) {
         // 验证地址可达性
-        PluginDocument.verifyReachable();
+        HyperLinks.verifyReachable();
 
         // 获取版本
         String currentVersion = JsonAssistantPlugin.getVersion();

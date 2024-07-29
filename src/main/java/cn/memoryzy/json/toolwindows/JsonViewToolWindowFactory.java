@@ -4,7 +4,7 @@ import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.FloatingWindowAction;
 import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.ui.JsonViewWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -49,14 +49,14 @@ public class JsonViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         List<AnAction> dumbAwareActions =
                 List.of(new FloatingWindowAction(toolWindowEx),
                         new JsonStructureOnToolWindowAction(project, window, toolWindowEx),
-                        new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text"), PluginDocument.SPONSOR_LINK));
+                        new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text"), HyperLinks.SPONSOR_LINK));
 
         toolWindow.setTitleActions(dumbAwareActions);
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);
 
         // 验证地址可达性
-        PluginDocument.verifyReachable();
+        HyperLinks.verifyReachable();
     }
 
 }

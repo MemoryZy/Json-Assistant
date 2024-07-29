@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
@@ -36,7 +36,7 @@ public class QuickStartAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        String url = PluginDocument.OVERVIEW;
+        String url = HyperLinks.OVERVIEW;
         boolean darkTheme = UIUtil.isUnderDarcula();
         Map<String, String> parameters = darkTheme ? Map.of("theme", "dark") : Map.of("theme", "light");
         url = Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();

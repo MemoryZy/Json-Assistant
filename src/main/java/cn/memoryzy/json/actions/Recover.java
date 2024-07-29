@@ -19,7 +19,8 @@ public class Recover extends DumbAwareAction {
         // PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         // propertiesComponent.unsetValue(JsonAssistantPlugin.PLUGIN_VERSION);
 
-
+        SupportDialog supportDialog = new SupportDialog();
+        supportDialog.show();
     }
 
 

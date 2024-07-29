@@ -14,9 +14,13 @@ public class JsonAssistantIcons {
     public static final Icon BOX = load("/icons/box.svg");
     public static final Icon JSON = load("/icons/json.svg");
     public static final Icon GROUP_BY_CLASS = load("/icons/groupByClass.svg");
+    public static final Icon HEART = load("/icons/heart.svg");
     public static final Icon DONATE = load("/icons/donate.svg");
     public static final Icon MINIFY = load("/icons/minify.svg");
     public static final Icon TOOL_WINDOW_JSON_PATH = load("/icons/toolWindowJsonPath.svg");
+    public static final Icon WECHAT_PAY = load("/icons/wechatPay.svg");
+    public static final Icon ALIPAY = load("/icons/aliPay.svg");
+    public static final Icon LABEL = load("/icons/label.svg");
 
     public static class ExpUi {
         public static final Icon NEW_BOX = load("/icons/expui/common/box.svg");

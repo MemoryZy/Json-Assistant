@@ -8,7 +8,7 @@ import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginDocument;
+import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
 import com.intellij.ide.BrowserUtil;
@@ -91,7 +91,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
     @Override
     protected void doHelpAction() {
-        BrowserUtil.browse(PluginDocument.TREE_LINK);
+        BrowserUtil.browse(HyperLinks.TREE_LINK);
     }
 
     public void convertToTreeNode(JSON json, JsonCollectInfoMutableTreeNode node) {

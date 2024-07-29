@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Memory
  * @since 2024/7/25
  */
-public class PluginDocument {
+public class HyperLinks {
 
     public static volatile AtomicBoolean reachableAtomic = new AtomicBoolean(false);
 
@@ -22,6 +22,12 @@ public class PluginDocument {
     public static final String JSON_TO_JAVA_BEAN_LINK = "https://json.memoryzy.cn/json-to-javabean";
     // public static final String OVERVIEW = "https://json-assistant.pages.dev/overview";
     public static final String OVERVIEW = "https://json.memoryzy.cn/overview";
+    public static final String MARKETPLACE_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant";
+    public static final String MARKETPLACE_REVIEWS_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews";
+    public static final String EMAIL_LINK = "memoryzk@outlook.com";
+    public static final String PLUGIN_SHARE_LINK = "#PLGUIN_SHARE";
+    public static final String PLUGIN_EMAIL_LINK = "#PLGUIN_MAIL";
+
 
     public static void verifyReachable() {
         new Thread(() -> {
