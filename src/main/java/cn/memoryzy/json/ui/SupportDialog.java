@@ -85,9 +85,9 @@ public class SupportDialog extends DialogWrapper {
                 JBColor color = new JBColor(new Color(186, 238, 186), new Color(51, 65, 46));
 
                 JBPopupFactory.getInstance()
-                        .createHtmlTextBalloonBuilder("<p>使用微信赞赏 / 支付宝捐赠时请留言提供你的 <b>名称（昵称）</b> 和 <b>网站</b>。</p>\n" +
+                        .createHtmlTextBalloonBuilder("<p>使用微信赞赏 / 支付宝捐赠时请留言提供您的 <b>名称（昵称）</b> 和 <b>网站</b>。</p>\n" +
                                 "<p>赞助者名称及网站将被添加至赞助者列表中。</p>\n" +
-                                "<p>有疑问的话，可通过<a href=\"" + HyperLinks.PLUGIN_EMAIL_LINK + "\">邮箱</a>与我联系。</p>", JsonAssistantIcons.HEART, color, new HyperLinkListenerImpl())
+                                "<p>有疑问的话，可通过 <a href=\"" + HyperLinks.PLUGIN_EMAIL_LINK + "\">邮箱</a> 与我联系。</p>", JsonAssistantIcons.HEART, color, new HyperLinkListenerImpl())
 
                         .setShadow(true)
                         .setHideOnAction(true)

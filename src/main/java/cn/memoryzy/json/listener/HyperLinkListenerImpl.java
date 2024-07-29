@@ -3,8 +3,10 @@ package cn.memoryzy.json.listener;
 import cn.hutool.core.net.url.UrlBuilder;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.ui.JsonToJavaBeanDialog;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -13,6 +15,9 @@ import com.intellij.ui.awt.RelativePoint;
 
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 /**
@@ -20,6 +25,8 @@ import java.util.Objects;
  * @since 2024/7/29
  */
 public class HyperLinkListenerImpl extends HyperlinkAdapter {
+
+    private static final Logger LOG = Logger.getInstance(HyperLinkListenerImpl.class);
 
     @Override
     protected void hyperlinkActivated(HyperlinkEvent e) {
@@ -34,7 +41,12 @@ public class HyperLinkListenerImpl extends HyperlinkAdapter {
     }
 
     private void execEmailLinkAction(HyperlinkEvent e) {
-
+        String uri = "mailto:" + HyperLinks.EMAIL_LINK;
+        try {
+            Desktop.getDesktop().mail(new URI(uri));
+        } catch (Exception ex) {
+            LOG.error(ex);
+        }
     }
 
     private void execShareLinkAction(HyperlinkEvent e) {
