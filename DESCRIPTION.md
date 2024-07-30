@@ -2,7 +2,7 @@
 
 <br/>
 
-**[Get Started](https://json.memoryzy.cn/overview) | 
+**[Getting Started](https://json.memoryzy.cn/overview) | 
 [Github](https://github.com/MemoryZy/Json-Assistant) | 
 [Donate](https://json.memoryzy.cn/support)**
 

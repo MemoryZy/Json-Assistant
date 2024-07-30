@@ -3,11 +3,13 @@
 ## [Unreleased]
 - 增加 Json Viewer 窗口的历史记录、从剪贴板解析 Json 功能。
 - 增强 Json 序列化中对于 List、数组 的支持。
+- 增加插件首次安装的欢迎弹窗、更新插件弹窗。
 - 处理低版本IDE兼容性。
 - BUG解决。
 - 用户体验优化。
 - Added Json Viewer window history and Json parsing from the clipboard.
 - Enhanced support for lists and arrays in Json serialization.
+- Added the welcome popup window for the first installation of the plugin and the pop-up window for updating the plugin.
 - Handle low version IDE compatibility.
 - Bug fixes.
 - User experience optimization.

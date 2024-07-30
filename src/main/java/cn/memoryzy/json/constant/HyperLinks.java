@@ -20,12 +20,12 @@ public class HyperLinks {
     public static final String SPONSOR_LINK = "https://json.memoryzy.cn/support#sponsor";
     public static final String TREE_LINK = "https://json.memoryzy.cn/tree";
     public static final String JSON_TO_JAVA_BEAN_LINK = "https://json.memoryzy.cn/json-to-javabean";
-    // public static final String OVERVIEW = "https://json-assistant.pages.dev/overview";
     public static final String OVERVIEW = "https://json.memoryzy.cn/overview";
     public static final String MARKETPLACE_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant";
     public static final String MARKETPLACE_REVIEWS_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews";
     public static final String EMAIL_LINK = "memoryzk@outlook.com";
     public static final String PLUGIN_SHARE_LINK = "#PLGUIN_SHARE";
+    public static final String PLUGIN_SPONSOR_LINK = "#PLGUIN_SPONSOR";
     public static final String PLUGIN_EMAIL_LINK = "#PLGUIN_MAIL";
 
 
@@ -35,6 +35,9 @@ public class HyperLinks {
         }).start();
     }
 
+    public static boolean isReachable() {
+        return reachableAtomic.get();
+    }
 
     /**
      * 验证地址是否可达

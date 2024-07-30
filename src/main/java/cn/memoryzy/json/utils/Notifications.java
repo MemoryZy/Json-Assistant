@@ -1,11 +1,13 @@
 package cn.memoryzy.json.utils;
 
-import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.QuickStartAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.ui.SupportDialog;
+import cn.memoryzy.json.ui.basic.MyUI;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
@@ -13,7 +15,6 @@ import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.wm.IdeFrame;
-import com.intellij.toolWindow.ToolWindowPane;
 import com.intellij.ui.BalloonImpl;
 import com.intellij.ui.BalloonLayoutData;
 import com.intellij.ui.awt.RelativePoint;
@@ -23,9 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.net.URL;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -80,21 +79,18 @@ public class Notifications {
     }
 
 
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "DuplicatedCode"})
     public static void showWelcomeNotification(Project project) {
         Notification notification = Notifications.BALLOON_LOG_GROUP
                 .createNotification(
                         JsonAssistantBundle.messageOnSystem("notify.welcome.content",
-                                HyperLinks.GITHUB_LINK,
-                                HyperLinks.SPONSOR_LINK),
+                                HyperLinks.GITHUB_LINK, HyperLinks.PLUGIN_SPONSOR_LINK) + "<br/>",
                         NotificationType.INFORMATION)
                 .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
                 .setImportant(true)
                 .setListener(new NotificationListenerImpl())
                 .addAction(new QuickStartAction())
-                .addAction(new DonateAction(
-                        JsonAssistantBundle.messageOnSystem("action.welcome.donate.text"),
-                        HyperLinks.SUPPORT_LINK));
+                .addAction(new DonateAction(JsonAssistantBundle.messageOnSystem("action.welcome.donate.text")));
 
         IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
         if (window != null) {
@@ -103,42 +99,56 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    () -> System.out.println());
+                    new MyUI());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
         }
-
     }
+
+
+    @SuppressWarnings({"DuplicatedCode", "deprecation"})
+    public static void showUpdateNotification(Project project) {
+        String changeNotes = JsonAssistantPlugin.getJsonAssistant().getChangeNotes();
+        if (StrUtil.isBlank(changeNotes)) {
+            changeNotes = "<ul></ul>";
+        }
+
+        String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", HyperLinks.GITHUB_LINK, HyperLinks.PLUGIN_SPONSOR_LINK);
+        content += "<br/>" + JsonAssistantBundle.messageOnSystem("notify.update.content", changeNotes);
+
+        Notification notification = Notifications.BALLOON_LOG_GROUP
+                .createNotification(content, NotificationType.INFORMATION)
+                .setTitle(JsonAssistantBundle.messageOnSystem("notify.update.title", JsonAssistantPlugin.getVersion()))
+                .setImportant(true)
+                .setListener(new NotificationListenerImpl())
+                .addAction(new QuickStartAction())
+                .addAction(new DonateAction(JsonAssistantBundle.messageOnSystem("action.welcome.donate.text")));
+
+        IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
+        if (window != null) {
+            Balloon balloon = NotificationsManagerImpl.createBalloon(window,
+                    notification,
+                    false,
+                    false,
+                    BalloonLayoutData.fullContent(),
+                    new MyUI());
+
+            JComponent component = window.getComponent();
+            balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
+        }
+    }
+
 
     public static RelativePoint getUpperRightRelativePoint(JComponent component, BalloonImpl balloon) {
         // 在其他平台上，气球提示显示在标题栏的右侧边缘
         JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
-        Container contentPane = component.getRootPane().getContentPane();
 
         // 查找标题栏组件
         Component titleBar = Arrays.stream(layeredPane.getComponents())
                 .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
                 .findFirst()
                 .orElse(null);
-
-        int addWidth = 0;
-        memory:
-        for (Component contentComponent : contentPane.getComponents()) {
-            if (contentComponent instanceof ToolWindowPane) {
-                ToolWindowPane toolWindowPane = (ToolWindowPane) contentComponent;
-                for (Component toolWindowPaneComponent : toolWindowPane.getComponents()) {
-                    Object anchor = ReflectUtil.getFieldValue(toolWindowPaneComponent, "anchor");
-                    if (Objects.equals(SwingConstants.RIGHT, anchor)) {
-                        Object width = ReflectUtil.getFieldValue(toolWindowPaneComponent, "width");
-                        if (width instanceof Integer) {
-                            addWidth = (int) width;
-                            break memory;
-                        }
-                    }
-                }
-            }
-        }
 
         // 计算垂直偏移量
         int insetTop = balloon.getShadowBorderInsets().top;
@@ -151,8 +161,7 @@ public class Notifications {
 
         int insetRight = balloon.getShadowBorderInsets().right;
         int contentHalfWidth = (int) (balloon.getContent().getPreferredSize().getWidth() / 2);
-        int stripeRightWidth = addWidth > 0 ? addWidth : 25;
-        int offsetX = relativeComponent.getWidth() - (stripeRightWidth + insetRight + contentHalfWidth);
+        int offsetX = relativeComponent.getWidth() - (25 + insetRight + contentHalfWidth);
 
         return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
     }
@@ -167,8 +176,17 @@ public class Notifications {
     private static class NotificationListenerImpl extends NotificationListener.Adapter {
         @Override
         protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
-            URL url = e.getURL();
-            BrowserUtil.browse(url.toExternalForm());
+            String url = e.getDescription();
+
+            if (url.equals(HyperLinks.PLUGIN_SPONSOR_LINK)) {
+                if (HyperLinks.isReachable()) {
+                    BrowserUtil.browse(HyperLinks.SPONSOR_LINK);
+                } else {
+                    new SupportDialog().show();
+                }
+            } else {
+                BrowserUtil.browse(url);
+            }
         }
     }
 }

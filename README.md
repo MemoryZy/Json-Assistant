@@ -31,7 +31,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 <br/>
 
-## Get Started 🚀
+## Getting Started 🚀
 Refer to the plugin [documentation][plugin:docs].
 
 <br/>

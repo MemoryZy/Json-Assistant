@@ -40,10 +40,6 @@
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
-
-        <action id="JsonAssistant.Recover" class="cn.memoryzy.json.actions.Recover" text="Recover">
-            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="EditorToggleColumnMode"/>
-        </action>
     </actions>
 
 </idea-plugin>

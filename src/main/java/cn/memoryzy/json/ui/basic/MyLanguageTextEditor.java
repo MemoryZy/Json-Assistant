@@ -17,11 +17,11 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/1/19
  */
-public class CustomLanguageTextEditor extends LanguageTextField {
+public class MyLanguageTextEditor extends LanguageTextField {
 
     private final boolean needBorder;
 
-    public CustomLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
+    public MyLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
         super(language, project, value);
         this.needBorder = needBorder;
     }

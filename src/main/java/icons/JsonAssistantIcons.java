@@ -18,8 +18,8 @@ public class JsonAssistantIcons {
     public static final Icon DONATE = load("/icons/donate.svg");
     public static final Icon MINIFY = load("/icons/minify.svg");
     public static final Icon TOOL_WINDOW_JSON_PATH = load("/icons/toolWindowJsonPath.svg");
-    public static final Icon WECHAT_PAY = load("/icons/wechatPay.svg");
-    public static final Icon ALIPAY = load("/icons/aliPay.svg");
+    public static final Icon WECHAT_PAY = load("/images/wechat_pay.png");
+    public static final Icon ALIPAY = load("/images/alipay.png");
     public static final Icon LABEL = load("/icons/label.svg");
 
     public static class ExpUi {

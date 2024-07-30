@@ -9,10 +9,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,51 +82,26 @@ public class SupportDialog extends DialogWrapper {
             public void actionPerformed(ActionEvent e) {
                 Component source = (Component) e.getSource();
                 RelativePoint relativePoint = new RelativePoint(source, new Point(source.getWidth() / 2, source.getHeight() - 25));
-                JBColor color = new JBColor(new Color(186, 238, 186), new Color(51, 65, 46));
 
                 JBPopupFactory.getInstance()
-                        .createHtmlTextBalloonBuilder("<p>使用微信赞赏 / 支付宝捐赠时请留言提供您的 <b>名称（昵称）</b> 和 <b>网站</b>。</p>\n" +
-                                "<p>赞助者名称及网站将被添加至赞助者列表中。</p>\n" +
-                                "<p>有疑问的话，可通过 <a href=\"" + HyperLinks.PLUGIN_EMAIL_LINK + "\">邮箱</a> 与我联系。</p>", JsonAssistantIcons.HEART, color, new HyperLinkListenerImpl())
-
+                        .createHtmlTextBalloonBuilder(
+                                JsonAssistantBundle.messageOnSystem("dialog.support.donate.note.text",
+                                        HyperLinks.PLUGIN_EMAIL_LINK, HyperLinks.EMAIL_LINK),
+                                null,
+                                JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
+                                new HyperLinkListenerImpl())
                         .setShadow(true)
                         .setHideOnAction(true)
                         .setHideOnClickOutside(true)
                         .setHideOnFrameResize(true)
                         .setHideOnKeyOutside(true)
                         .setHideOnLinkClick(true)
+                        .setContentInsets(JBUI.insets(10))
                         .createBalloon()
                         .show(relativePoint, Balloon.Position.above);
             }
         });
     }
-
-    /**
-     * 计算组件下方的位置
-     *
-     * @param component 组件
-     * @return 位置
-     */
-    public static RelativePoint calculateBelowPoint(Component component) {
-        int offsetX = 0;
-        int offsetY = 1;
-        // 获取组件大小
-        Dimension size = component.getSize();
-        Point point;
-
-        if (size != null) {
-            int x = size.width / 2;
-            int y = size.height;
-
-            point = new Point(x + offsetX, y + offsetY);
-        } else {
-            // 如果 size 为 null，则使用 offsetX 和 offsetY 作为默认坐标
-            point = new Point(offsetX, offsetY);
-        }
-
-        return new RelativePoint(component, point);
-    }
-
 
     private void createUIComponents() {
         supportContent = new HyperLinkJBLabel();

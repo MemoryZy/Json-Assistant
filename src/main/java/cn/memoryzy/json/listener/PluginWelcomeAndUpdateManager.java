@@ -1,7 +1,7 @@
 package cn.memoryzy.json.listener;
 
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.utils.Notifications;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
@@ -24,16 +24,16 @@ public class PluginWelcomeAndUpdateManager implements StartupActivity {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         String lastVersion = propertiesComponent.getValue(JsonAssistantPlugin.PLUGIN_VERSION);
 
-        // 如果 lastVersion 为 null，表示第一次安装，todo 测试一下unload又load的情况
         if (lastVersion == null) {
             Notifications.showWelcomeNotification(project);
             propertiesComponent.setValue(JsonAssistantPlugin.PLUGIN_VERSION, currentVersion);
-            return;
+        } else {
+            // 是否版本更高
+            if (JsonAssistantPlugin.isNewerVersion(lastVersion, currentVersion)) {
+                Notifications.showUpdateNotification(project);
+                propertiesComponent.setValue(JsonAssistantPlugin.PLUGIN_VERSION, currentVersion);
+            }
         }
-
-        // 是否版本更高
-
-
-
     }
+
 }

@@ -41,7 +41,6 @@ public class QuickStartAction extends DumbAwareAction {
         Map<String, String> parameters = darkTheme ? Map.of("theme", "dark") : Map.of("theme", "light");
         url = Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();
 
-
         if (PlatformUtil.canBrowseInHTMLEditor()) {
             String timeoutContent = null;
             try (InputStream html = QuickStartAction.class.getResourceAsStream("timeout.html")) {
@@ -56,13 +55,16 @@ public class QuickStartAction extends DumbAwareAction {
                 LOG.error(ex);
             }
 
-            HTMLEditorProvider.openEditor(
-                    Objects.requireNonNull(e.getProject()),
-                    JsonAssistantBundle.messageOnSystem("action.quick.start.text"),
-                    url, timeoutContent);
-        } else {
-            BrowserUtil.browse(url);
+            if (HyperLinks.isReachable()) {
+                HTMLEditorProvider.openEditor(
+                        Objects.requireNonNull(e.getProject()),
+                        JsonAssistantBundle.messageOnSystem("action.quick.start.text"),
+                        url, timeoutContent);
+                return;
+            }
         }
+
+        BrowserUtil.browse(url);
     }
 
 }

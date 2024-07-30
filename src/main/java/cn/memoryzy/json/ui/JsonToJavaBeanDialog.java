@@ -8,10 +8,10 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
-import cn.memoryzy.json.ui.basic.CustomLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.MyLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.utils.JavaUtil;
 import cn.memoryzy.json.utils.JsonUtil;
@@ -95,7 +95,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private void createUIComponents() {
         // 声明 Json 类型编辑器
-        jsonTextField = new CustomLanguageTextEditor(Json5Language.INSTANCE, project, "", true);
+        jsonTextField = new MyLanguageTextEditor(Json5Language.INSTANCE, project, "", true);
         jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
     }
