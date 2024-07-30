@@ -66,7 +66,7 @@ jobs:
           echo "$CHANGELOG"
           
           echo "name=$NAME" >> $GITHUB_OUTPUT
-          echo "coming_name=$COMING_NAME" >> $GITHUB_OUTPUT
+          echo "coming_name=$COMING_NAME-$VERSION.zip" >> $GITHUB_OUTPUT
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "pluginName=$NAME-$VERSION.zip" >> $GITHUB_OUTPUT
           echo "pluginSignedName=$NAME-$VERSION-signed.zip" >> $GITHUB_OUTPUT
