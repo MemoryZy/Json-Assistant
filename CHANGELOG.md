@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.3.1] - 2024-07-30
+
 - 增加 Json Viewer 窗口的历史记录、从剪贴板解析 Json 功能。
 - 增强 Json 序列化中对于 List、数组 的支持。
 - 增加插件首次安装的欢迎弹窗、更新插件弹窗。
@@ -88,7 +91,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.1.2...v1.2.0
