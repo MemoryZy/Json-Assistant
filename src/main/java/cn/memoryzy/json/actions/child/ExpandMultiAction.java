@@ -3,8 +3,8 @@ package cn.memoryzy.json.actions.child;
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
+import cn.memoryzy.json.ui.basic.CustomizedUI;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
-import cn.memoryzy.json.utils.TreeUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
@@ -29,7 +29,7 @@ public class ExpandMultiAction extends DumbAwareAction {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
-                TreeUtil.expandAll(tree, path);
+                CustomizedUI.expandAll(tree, path);
             }
         }
     }

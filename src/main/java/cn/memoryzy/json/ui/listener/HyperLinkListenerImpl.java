@@ -1,4 +1,4 @@
-package cn.memoryzy.json.listener;
+package cn.memoryzy.json.ui.listener;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;

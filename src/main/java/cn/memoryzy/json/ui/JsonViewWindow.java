@@ -2,7 +2,7 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.service.JsonViewRecordState;
-import cn.memoryzy.json.ui.basic.MyLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.json.json5.Json5Language;
@@ -33,7 +33,7 @@ public class JsonViewWindow {
     }
 
     private void createUIComponents() {
-        jsonTextField = new MyLanguageTextEditor(Json5Language.INSTANCE, project, "", false);
+        jsonTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", false);
         jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         jsonTextField.addFocusListener(new FocusListenerImpl());

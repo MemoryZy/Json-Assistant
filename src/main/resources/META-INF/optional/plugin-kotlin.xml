@@ -2,7 +2,7 @@
     <actions>
         <action id="JsonAssistant.actions.KtClassPropertyToJson"
                 icon="JsonAssistantIcons.JSON"
-                class="cn.memoryzy.json.actions.KtClassPropertyToJsonAction">
+                class="cn.memoryzy.json.actions.KotlinPropertyToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>

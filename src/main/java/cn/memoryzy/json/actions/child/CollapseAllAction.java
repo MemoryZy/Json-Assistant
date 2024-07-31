@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.utils.TreeUtil;
+import cn.memoryzy.json.ui.basic.CustomizedUI;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.ui.AnActionButton;
@@ -29,6 +29,6 @@ public class CollapseAllAction extends AnActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
-        TreeUtil.collapseAll(tree, new TreePath(root));
+        CustomizedUI.collapseAll(tree, new TreePath(root));
     }
 }

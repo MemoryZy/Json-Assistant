@@ -22,7 +22,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/7/5
  */
-public class KtUtil {
+public class KotlinUtil {
 
 
     public static KtClass getKtClass(AnActionEvent e) {

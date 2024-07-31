@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.basic;
 
-import cn.memoryzy.json.listener.HyperLinkListenerImpl;
+import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 
