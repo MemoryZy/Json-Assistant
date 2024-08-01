@@ -30,8 +30,12 @@
                     doNotActivateOnStart="true"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewRecordState"/>
-        <postStartupActivity implementation="cn.memoryzy.json.listener.PluginWelcomeAndUpdateManager"/>
+        <postStartupActivity implementation="cn.memoryzy.json.listener.PluginActivityManager"/>
     </extensions>
+
+    <applicationListeners>
+        <listener class="cn.memoryzy.json.listener.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+    </applicationListeners>
 
     <actions>
         <action id="JsonAssistant.actions.JsonProcessing"
