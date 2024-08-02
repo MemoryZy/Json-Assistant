@@ -44,8 +44,8 @@ public class JsonStructureDialog extends DialogWrapper {
     private Tree tree;
     private final JSON json;
 
-    public JsonStructureDialog(@Nullable Project project, JSON json) {
-        super(project, true);
+    public JsonStructureDialog(JSON json) {
+        super((Project) null, true);
         this.json = json;
 
         setModal(false);

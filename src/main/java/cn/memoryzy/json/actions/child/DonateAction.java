@@ -3,6 +3,7 @@ package cn.memoryzy.json.actions.child;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.SupportDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,8 @@ public class DonateAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        new SupportDialog().show();
+        SupportDialog dialog = new SupportDialog();
+        ApplicationManager.getApplication().invokeLater(dialog::show);
     }
 
 }

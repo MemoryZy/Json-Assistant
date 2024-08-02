@@ -11,7 +11,6 @@ import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,7 +30,6 @@ public class JsonStructureAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        Project project = event.getProject();
         Editor editor = PlatformUtil.getEditor(event);
         Document document = editor.getDocument();
 
@@ -46,7 +44,7 @@ public class JsonStructureAction extends DumbAwareAction {
             jsonStr = StrUtil.trim(document.getText());
         }
 
-        JsonStructureOnToolWindowAction.structuring(jsonStr, project);
+        JsonStructureOnToolWindowAction.structuring(jsonStr);
     }
 
 }

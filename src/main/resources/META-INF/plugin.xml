@@ -23,7 +23,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
-        <toolWindow id="JsonAssistant.JsonView"
+        <toolWindow id="JsonAssistant.ToolWindow.JsonView"
                     factoryClass="cn.memoryzy.json.toolwindows.JsonViewToolWindowFactory"
                     anchor="right"
                     secondary="true"
@@ -38,15 +38,14 @@
     </applicationListeners>
 
     <actions>
-        <action id="JsonAssistant.actions.JsonProcessing"
-                class="cn.memoryzy.json.actions.JsonProcessingAction">
+        <action id="JsonAssistant.Action.JsonProcessing" class="cn.memoryzy.json.actions.JsonProcessingAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
-        <group id="JsonAssistant.groups.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
+        <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
-            <reference ref="JsonAssistant.actions.JsonProcessing"/>
+            <reference ref="JsonAssistant.Action.JsonProcessing"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>

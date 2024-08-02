@@ -12,6 +12,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
 import com.intellij.notification.impl.NotificationsManagerImpl;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.wm.IdeFrame;
@@ -182,7 +183,8 @@ public class Notifications {
                 if (HyperLinks.isReachable()) {
                     BrowserUtil.browse(HyperLinks.SPONSOR_LINK);
                 } else {
-                    new SupportDialog().show();
+                    SupportDialog dialog = new SupportDialog();
+                    ApplicationManager.getApplication().invokeLater(dialog::show);
                 }
             } else {
                 BrowserUtil.browse(url);

@@ -1,26 +1,24 @@
 <idea-plugin>
     <actions>
-        <action id="JsonAssistant.actions.JavaBeanToJson"
-                class="cn.memoryzy.json.actions.JavaBeanToJsonAction">
+        <action id="JsonAssistant.Action.JavaBeanToJson" class="cn.memoryzy.json.actions.JavaBeanToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <action id="JsonAssistant.actions.JsonToJavaBean"
-                class="cn.memoryzy.json.actions.JsonToJavaBeanAction">
+        <action id="JsonAssistant.Action.JsonToJavaBean" class="cn.memoryzy.json.actions.JsonToJavaBeanAction">
         </action>
 
-        <group id="JsonAssistant.groups.JavaBeanToJson">
+        <group id="JsonAssistant.Group.JavaBeanToJson">
             <separator/>
-            <reference ref="JsonAssistant.actions.JavaBeanToJson"/>
+            <reference ref="JsonAssistant.Action.JavaBeanToJson"/>
             <separator/>
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </group>
 
-        <group id="JsonAssistant.groups.JsonToJavaBean">
+        <group id="JsonAssistant.Group.JsonToJavaBean">
             <separator/>
-            <reference ref="JsonAssistant.actions.JsonToJavaBean"/>
+            <reference ref="JsonAssistant.Action.JsonToJavaBean"/>
             <separator/>
 
             <add-to-group group-id="NewGroup" relative-to-action="NewFile" anchor="before"/>

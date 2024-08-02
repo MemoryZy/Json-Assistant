@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -30,6 +31,12 @@ public class KotlinPropertyToJsonAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.kt.class.property.to.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.kt.class.property.to.json.description"));
+
+        if (PlatformUtil.isNewUi()) {
+            presentation.setIcon(JsonAssistantIcons.ExpUi.NEW_JSON);
+        } else {
+            presentation.setIcon(JsonAssistantIcons.JSON);
+        }
     }
 
     @Override
