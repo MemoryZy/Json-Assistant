@@ -107,7 +107,11 @@ public class PlatformUtil {
         return baselineVersion >= 222 && Registry.is("ide.experimental.ui", true);
     }
 
-
+    /**
+     * 部分平台不支持内部打开页面的功能，例如 DataGrip
+     *
+     * @return 是否支持打开HTMLEditor
+     */
     public static boolean canBrowseInHTMLEditor() {
         return JBCefApp.isSupported();
     }

@@ -21,6 +21,7 @@ public class JsonAssistantIcons {
     public static final Icon WECHAT_PAY = load("/images/wechat_pay.png");
     public static final Icon ALIPAY = load("/images/alipay.png");
     public static final Icon LABEL = load("/icons/label.svg");
+    public static final Icon SHORTCUTS = load("/icons/shortcuts.svg");
 
     public static class ExpUi {
         public static final Icon NEW_BOX = load("/icons/expui/common/box.svg");

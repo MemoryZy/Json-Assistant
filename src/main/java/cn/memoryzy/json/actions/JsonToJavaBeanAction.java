@@ -10,6 +10,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -23,7 +24,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/07/07
  */
-public class JsonToJavaBeanAction extends AnAction {
+public class JsonToJavaBeanAction extends DumbAwareAction {
 
     private static Class<?> clz;
     private static Method updateMethod;
@@ -44,12 +45,7 @@ public class JsonToJavaBeanAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.javabean.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.javabean.description"));
-
-        if (PlatformUtil.isNewUi()) {
-            presentation.setIcon(JsonAssistantIcons.ExpUi.NEW_GROUP_BY_CLASS);
-        } else {
-            presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
-        }
+        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_GROUP_BY_CLASS : JsonAssistantIcons.GROUP_BY_CLASS);
     }
 
     @Override
