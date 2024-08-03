@@ -1,6 +1,5 @@
-package cn.memoryzy.json.actions;
+package cn.memoryzy.json.actions.child.transform;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.model.JsonEditorInfoModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
@@ -12,43 +11,42 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
- * @since 2024/6/21
+ * @since 2024/8/3
  */
-public class JsonBeautifyAction extends DumbAwareAction {
+public class ToXmlAction extends DumbAwareAction {
 
-    private static final Logger LOG = Logger.getInstance(JsonBeautifyAction.class);
+    private static final Logger LOG = Logger.getInstance(ToXmlAction.class);
 
-    public JsonBeautifyAction() {
+    public ToXmlAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.beautify.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.beautify.description"));
+        presentation.setText(JsonAssistantBundle.message("action.json.to.xml.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.xml.description"));
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
         JsonEditorInfoModel info = new JsonEditorInfoModel(editor);
 
-        String formattedJson;
+        String xmlStr;
         try {
-            formattedJson = StrUtil.trim(JsonUtil.formatJson(info.jsonContent));
+            xmlStr = JsonUtil.jsonToXml(info.jsonContent);
+            xmlStr = xmlStr.replaceAll("\r\n", "\n");
         } catch (Exception ex) {
-            LOG.error("Json format error", ex);
+            LOG.error("xml conversion failure", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, info,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, info,
+                JsonAssistantBundle.messageOnSystem("hint.select.json.to.xml.text"),
+                JsonAssistantBundle.messageOnSystem("hint.all.json.to.xml.text"));
     }
 
 }

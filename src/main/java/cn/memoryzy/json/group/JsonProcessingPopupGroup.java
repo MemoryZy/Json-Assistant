@@ -1,9 +1,6 @@
 package cn.memoryzy.json.group;
 
-import cn.memoryzy.json.actions.JsonBeautifyAction;
-import cn.memoryzy.json.actions.JsonMinifyAction;
-import cn.memoryzy.json.actions.JsonStructureAction;
-import cn.memoryzy.json.actions.ShortcutAction;
+import cn.memoryzy.json.actions.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAware;
@@ -42,6 +39,7 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup implements Dumb
                 new JsonMinifyAction(),
                 new JsonStructureAction(),
                 Separator.create(JsonAssistantBundle.message("separator.transform")),
+                new OtherFormatsToJsonAction(),
                 new ConvertOtherFormatsGroup(),
                 Separator.create(),
                 new ShortcutAction()

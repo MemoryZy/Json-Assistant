@@ -1,8 +1,11 @@
 package cn.memoryzy.json.actions;
 
+import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareAction;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,8 +20,9 @@ public class OtherFormatsToJsonAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        // presentation.setText(JsonAssistantBundle.message("action.shortcut.text"));
-        // presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.shortcut.description"));
+        presentation.setText(JsonAssistantBundle.message("action.other.formats.to.json.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.other.formats.to.json.description"));
+        presentation.setIcon(JsonAssistantIcons.CONVERSION);
     }
 
     @Override
@@ -26,4 +30,8 @@ public class OtherFormatsToJsonAction extends DumbAwareAction {
 
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+
+    }
 }

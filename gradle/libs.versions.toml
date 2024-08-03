@@ -2,6 +2,7 @@
 # libraries
 annotations = "24.0.1"
 hutool-all = "5.8.28"
+jackson-dataformat-xml = "2.16.1"
 
 # plugins
 dokka = "1.8.10"
@@ -14,6 +15,7 @@ kover = "0.6.1"
 [libraries]
 annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
 hutool = { group = "cn.hutool", name = "hutool-all", version.ref = "hutool-all" }
+dataformat = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson-dataformat-xml" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

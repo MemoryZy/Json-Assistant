@@ -1,17 +1,13 @@
 package cn.memoryzy.json.actions;
 
-import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.utils.JsonUtil;
+import cn.memoryzy.json.model.JsonEditorInfoModel;
+import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.util.TextRange;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,20 +29,8 @@ public class JsonStructureAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Editor editor = PlatformUtil.getEditor(event);
-        Document document = editor.getDocument();
-
-        // 选中文本
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int start = primaryCaret.getSelectionStart();
-        int end = primaryCaret.getSelectionEnd();
-        String selectText = document.getText(new TextRange(start, end));
-        String jsonStr = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
-
-        if (StrUtil.isBlank(jsonStr)) {
-            jsonStr = StrUtil.trim(document.getText());
-        }
-
-        JsonStructureOnToolWindowAction.structuring(jsonStr);
+        JsonEditorInfoModel info = new JsonEditorInfoModel(editor);
+        JsonAssistantUtil.showJsonStructureDialog(info.jsonContent);
     }
 
 }

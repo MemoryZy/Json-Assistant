@@ -24,6 +24,7 @@ public class JsonAssistantIcons {
     public static final Icon SHORTCUTS = load("/icons/shortcuts.svg");
     public static final Icon FUNCTION = load("/icons/function.svg");
     public static final Icon SMALL_STRUCTURE = load("/icons/small_structure.svg");
+    public static final Icon CONVERSION = load("/icons/conversion.svg");
 
     public static class ExpUi {
         public static final Icon NEW_BOX = load("/icons/expui/common/box.svg");
