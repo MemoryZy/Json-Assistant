@@ -12,6 +12,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.TextRange;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,6 +27,7 @@ public class JsonStructureAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.structure.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.structure.description"));
+        presentation.setIcon(JsonAssistantIcons.SMALL_STRUCTURE);
     }
 
     @Override

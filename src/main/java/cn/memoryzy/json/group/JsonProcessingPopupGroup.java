@@ -41,11 +41,10 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup implements Dumb
                 new JsonBeautifyAction(),
                 new JsonMinifyAction(),
                 new JsonStructureAction(),
+                Separator.create(JsonAssistantBundle.message("separator.transform")),
+                new ConvertOtherFormatsGroup(),
                 Separator.create(),
                 new ShortcutAction()
-                // Separator.create("Transform"),
-
-
         };
     }
 }
