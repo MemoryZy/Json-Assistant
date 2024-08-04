@@ -36,7 +36,7 @@ public class JsonAssistantAction extends DumbAwareAction {
     }
 
     public static boolean isOrHasJsonStr(@NotNull AnActionEvent e) {
-        return new JsonEditorInfoModel(PlatformUtil.getEditor(e)).isJsonStr;
+        return JsonEditorInfoModel.of(PlatformUtil.getEditor(e)).isJsonStr();
     }
 
 }

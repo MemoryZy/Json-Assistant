@@ -41,23 +41,23 @@ public class JsonAssistantUtil {
 
     public static void writeOrCopyJsonOnEditor(Project project, Editor editor,
                                                Document document, String processedText,
-                                               JsonEditorInfoModel info, String selectHint, String defaultHint) {
+                                               JsonEditorInfoModel model, String selectHint, String defaultHint) {
         // 可写的话就写，不可写就拷贝到剪贴板
         if (document.isWritable()) {
             // 获取当前文档内的psiFile
             PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
             WriteCommandAction.runWriteCommandAction(project, () -> {
                 String hintText;
-                if (info.isSelectedText) {
-                    document.replaceString(info.startOffset, info.endOffset, processedText);
-                    info.primaryCaret.moveToOffset(info.startOffset);
+                if (model.getSelectedText()) {
+                    document.replaceString(model.getStartOffset(), model.getEndOffset(), processedText);
+                    model.getPrimaryCaret().moveToOffset(model.getStartOffset());
                     hintText = selectHint;
                 } else {
                     document.setText(processedText);
                     // 格式化
                     Optional.ofNullable(psiFile).ifPresent(el -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
 
-                    info.primaryCaret.moveToOffset(document.getTextLength());
+                    model.getPrimaryCaret().moveToOffset(document.getTextLength());
                     hintText = defaultHint;
                 }
 
@@ -68,8 +68,8 @@ public class JsonAssistantUtil {
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
         }
 
-        if (info.isSelectedText) {
-            info.primaryCaret.removeSelection();
+        if (model.getSelectedText()) {
+            model.getPrimaryCaret().removeSelection();
         }
     }
 

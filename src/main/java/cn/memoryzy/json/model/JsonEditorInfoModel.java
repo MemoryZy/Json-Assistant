@@ -43,22 +43,55 @@ public class JsonEditorInfoModel {
      */
     public String jsonContent;
 
-
-    public JsonEditorInfoModel(Editor editor) {
+    public static JsonEditorInfoModel of(Editor editor) {
         Document document = editor.getDocument();
-        this.primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        this.startOffset = this.primaryCaret.getSelectionStart();
-        this.endOffset = this.primaryCaret.getSelectionEnd();
-        String selectText = document.getText(new TextRange(this.startOffset, this.endOffset));
-        this.jsonContent = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int startOffset = primaryCaret.getSelectionStart();
+        int endOffset = primaryCaret.getSelectionEnd();
+        String selectText = document.getText(new TextRange(startOffset, endOffset));
+        String jsonContent = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
 
-        this.isSelectedText = true;
-        if (StrUtil.isBlank(this.jsonContent)) {
-            this.isSelectedText = false;
+        boolean isSelectedText = true;
+        if (StrUtil.isBlank(jsonContent)) {
+            isSelectedText = false;
             String documentText = document.getText();
-            this.jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+            jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
         }
 
-        this.isJsonStr = StrUtil.isNotBlank(this.jsonContent);
+        return new JsonEditorInfoModel(isSelectedText, startOffset, endOffset, primaryCaret, StrUtil.isNotBlank(jsonContent), jsonContent);
+    }
+
+
+    public JsonEditorInfoModel(Boolean isSelectedText, int startOffset, int endOffset, Caret primaryCaret, boolean isJsonStr, String jsonContent) {
+        this.isSelectedText = isSelectedText;
+        this.startOffset = startOffset;
+        this.endOffset = endOffset;
+        this.primaryCaret = primaryCaret;
+        this.isJsonStr = isJsonStr;
+        this.jsonContent = jsonContent;
+    }
+
+    public Boolean getSelectedText() {
+        return isSelectedText;
+    }
+
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+    public int getEndOffset() {
+        return endOffset;
+    }
+
+    public Caret getPrimaryCaret() {
+        return primaryCaret;
+    }
+
+    public boolean isJsonStr() {
+        return isJsonStr;
+    }
+
+    public String getJsonContent() {
+        return jsonContent;
     }
 }

@@ -29,8 +29,8 @@ public class JsonStructureAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Editor editor = PlatformUtil.getEditor(event);
-        JsonEditorInfoModel info = new JsonEditorInfoModel(editor);
-        JsonAssistantUtil.showJsonStructureDialog(info.jsonContent);
+        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
+        JsonAssistantUtil.showJsonStructureDialog(model.getJsonContent());
     }
 
 }

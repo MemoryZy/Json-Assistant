@@ -35,17 +35,17 @@ public class JsonMinifyAction extends DumbAwareAction {
         Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
-        JsonEditorInfoModel info = new JsonEditorInfoModel(editor);
+        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
 
         String compressedJson;
         try {
-            compressedJson = JsonUtil.compressJson(info.jsonContent);
+            compressedJson = JsonUtil.compressJson(model.jsonContent);
         } catch (JsonProcessingException ex) {
             LOG.error("Json format error", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson, info,
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson, model,
                 JsonAssistantBundle.messageOnSystem("hint.select.json.minify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.all.json.minify.text"));
     }

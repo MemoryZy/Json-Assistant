@@ -7,5 +7,6 @@ package cn.memoryzy.json.model.formats;
 public abstract class BaseFormatModel {
 
 
+    public abstract String convertToJson();
 
 }

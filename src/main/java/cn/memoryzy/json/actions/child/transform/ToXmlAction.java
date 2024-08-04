@@ -33,18 +33,18 @@ public class ToXmlAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
-        JsonEditorInfoModel info = new JsonEditorInfoModel(editor);
+        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
 
         String xmlStr;
         try {
-            xmlStr = JsonUtil.jsonToXml(info.jsonContent);
+            xmlStr = JsonUtil.jsonToXml(model.jsonContent);
             xmlStr = xmlStr.replaceAll("\r\n", "\n");
         } catch (Exception ex) {
             LOG.error("xml conversion failure", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, info,
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model,
                 JsonAssistantBundle.messageOnSystem("hint.select.json.to.xml.text"),
                 JsonAssistantBundle.messageOnSystem("hint.all.json.to.xml.text"));
     }

@@ -36,17 +36,17 @@ public class JsonBeautifyAction extends DumbAwareAction {
         Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
-        JsonEditorInfoModel info = new JsonEditorInfoModel(editor);
+        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
 
         String formattedJson;
         try {
-            formattedJson = StrUtil.trim(JsonUtil.formatJson(info.jsonContent));
+            formattedJson = StrUtil.trim(JsonUtil.formatJson(model.getJsonContent()));
         } catch (Exception ex) {
             LOG.error("Json format error", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, info,
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model,
                 JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
     }
