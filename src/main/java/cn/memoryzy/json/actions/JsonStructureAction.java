@@ -33,8 +33,4 @@ public class JsonStructureAction extends DumbAwareAction {
         JsonAssistantUtil.showJsonStructureDialog(model.getContent());
     }
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
-    }
 }

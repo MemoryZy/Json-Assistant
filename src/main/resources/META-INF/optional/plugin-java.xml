@@ -5,8 +5,7 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <action id="JsonAssistant.Action.JsonToJavaBean" class="cn.memoryzy.json.actions.JsonToJavaBeanAction">
-        </action>
+        <action id="JsonAssistant.Action.JsonToJavaBean" class="cn.memoryzy.json.actions.JsonToJavaBeanAction"/>
 
         <group id="JsonAssistant.Group.JavaBeanToJson">
             <separator/>

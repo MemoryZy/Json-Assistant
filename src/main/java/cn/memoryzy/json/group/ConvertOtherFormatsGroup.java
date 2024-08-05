@@ -1,6 +1,5 @@
 package cn.memoryzy.json.group;
 
-import cn.memoryzy.json.actions.JsonAssistantAction;
 import cn.memoryzy.json.actions.child.transform.ToXmlAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -35,8 +34,4 @@ public class ConvertOtherFormatsGroup extends DefaultActionGroup implements Dumb
         };
     }
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
-    }
 }

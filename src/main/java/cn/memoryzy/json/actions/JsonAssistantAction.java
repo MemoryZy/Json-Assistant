@@ -3,7 +3,6 @@ package cn.memoryzy.json.actions;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.group.JsonProcessingPopupGroup;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
-import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -11,8 +10,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -36,17 +33,12 @@ public class JsonAssistantAction extends DumbAwareAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(isOrHasJsonStr(e) || isOrHasMatchTypeStr(e));
+        e.getPresentation().setEnabledAndVisible(isOrHasJsonStr(e));
     }
 
     public static boolean isOrHasJsonStr(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e);
         return editor != null && JsonFormatHandleModel.of(editor).isJsonStr();
-    }
-
-    public static boolean isOrHasMatchTypeStr(@NotNull AnActionEvent e) {
-        Editor editor = PlatformUtil.getEditor(e);
-        return editor != null && Objects.nonNull(JsonAssistantUtil.matchFormats(editor));
     }
 
 }

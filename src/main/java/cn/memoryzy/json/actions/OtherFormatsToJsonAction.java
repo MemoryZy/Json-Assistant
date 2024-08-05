@@ -48,6 +48,6 @@ public class OtherFormatsToJsonAction extends DumbAwareAction {
             presentation.setDescription(model.getActionDescription());
         }
 
-        presentation.setEnabled(enabled);
+        presentation.setEnabledAndVisible(enabled);
     }
 }

@@ -51,8 +51,4 @@ public class JsonBeautifyAction extends DumbAwareAction {
         JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model, true);
     }
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
-    }
 }

@@ -5,6 +5,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.ByteArrayInputStream;
+
 /**
  * @author Memory
  * @since 2024/8/5
@@ -15,7 +19,9 @@ public class XmlUtil {
         if (StrUtil.isBlank(text)) return false;
 
         try {
-            cn.hutool.core.util.XmlUtil.parseXml(text);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            builder.parse(new ByteArrayInputStream(text.getBytes()));
             return true;
         } catch (Exception e) {
             return false;

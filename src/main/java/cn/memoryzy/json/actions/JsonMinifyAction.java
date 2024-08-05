@@ -50,8 +50,4 @@ public class JsonMinifyAction extends DumbAwareAction {
         JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson, model, false);
     }
 
-    @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
-    }
 }

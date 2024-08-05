@@ -53,6 +53,24 @@
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
+
+        <action id="JsonAssistant.Action.OtherFormatsToJson" class="cn.memoryzy.json.actions.OtherFormatsToJsonAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt J"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift J"/>
+        </action>
+
+        <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
+            <separator/>
+            <reference ref="JsonAssistant.Action.OtherFormatsToJson"/>
+            <separator/>
+
+            <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
+        </group>
+
+
     </actions>
 
 </idea-plugin>
