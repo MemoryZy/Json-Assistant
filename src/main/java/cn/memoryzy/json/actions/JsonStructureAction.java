@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.JsonEditorInfoModel;
+import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -29,8 +29,12 @@ public class JsonStructureAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Editor editor = PlatformUtil.getEditor(event);
-        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
-        JsonAssistantUtil.showJsonStructureDialog(model.getJsonContent());
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor);
+        JsonAssistantUtil.showJsonStructureDialog(model.getContent());
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
+    }
 }

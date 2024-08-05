@@ -29,7 +29,7 @@ public class KotlinUtil {
         PsiFile psiFile = PlatformUtil.getPsiFile(e);
         Editor editor = PlatformUtil.getEditor(e);
 
-        if (Objects.isNull(psiFile)) {
+        if (Objects.isNull(psiFile) || Objects.isNull(editor)) {
             return null;
         }
 

@@ -56,17 +56,7 @@ public class PlatformUtil {
      * @return 编辑器
      */
     public static Editor getEditor(AnActionEvent event) {
-        return event.getRequiredData(CommonDataKeys.EDITOR);
-    }
-
-    /**
-     * 获取编辑器中的文本
-     *
-     * @param event 事件源
-     * @return 编辑器文本
-     */
-    public static String getEditorContent(AnActionEvent event) {
-        return getEditor(event).getDocument().getText();
+        return event.getData(CommonDataKeys.EDITOR);
     }
 
 

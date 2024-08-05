@@ -2,7 +2,7 @@ package cn.memoryzy.json.actions;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.JsonEditorInfoModel;
+import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -36,19 +36,23 @@ public class JsonBeautifyAction extends DumbAwareAction {
         Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
-        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
+                JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
+                JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
 
         String formattedJson;
         try {
-            formattedJson = StrUtil.trim(JsonUtil.formatJson(model.getJsonContent()));
+            formattedJson = StrUtil.trim(JsonUtil.formatJson(model.getContent()));
         } catch (Exception ex) {
             LOG.error("Json format error", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model, true);
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
+    }
 }

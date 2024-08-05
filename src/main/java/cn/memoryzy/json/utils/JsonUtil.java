@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +82,13 @@ public class JsonUtil {
             return "";
         }
 
-        String json = extractJsonStringOnRegular(includeJsonStr);
+        // 转义判断
+        String json = StringEscapeUtils.unescapeJava(includeJsonStr);
+        if (isJsonStr(json)) {
+            return json;
+        }
+
+        json = extractJsonStringOnRegular(includeJsonStr);
         if (StrUtil.isNotBlank(json)) {
             return json;
         }
@@ -163,12 +170,9 @@ public class JsonUtil {
     public static String jsonToXml(String json) throws Exception {
         JsonNode jsonNode = MAPPER.readTree(json.getBytes());
         XmlMapper xmlMapper = new XmlMapper();
-        String xml = xmlMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
-
-        StringBuilder builder = new StringBuilder(StrUtil.trim(xml))
-                .replace(0, 12, "<root>");
-        builder.replace(builder.length() - 13, builder.length(), "</root>");
-        return builder.toString();
+        return xmlMapper.writerWithDefaultPrettyPrinter()
+                .withRootName("root")
+                .writeValueAsString(jsonNode);
     }
 
 

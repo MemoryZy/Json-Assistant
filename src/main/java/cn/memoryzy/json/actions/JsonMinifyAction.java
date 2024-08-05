@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.JsonEditorInfoModel;
+import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -35,19 +35,23 @@ public class JsonMinifyAction extends DumbAwareAction {
         Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
-        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
+                JsonAssistantBundle.messageOnSystem("hint.select.json.minify.text"),
+                JsonAssistantBundle.messageOnSystem("hint.all.json.minify.text"));
 
         String compressedJson;
         try {
-            compressedJson = JsonUtil.compressJson(model.jsonContent);
+            compressedJson = JsonUtil.compressJson(model.getContent());
         } catch (JsonProcessingException ex) {
             LOG.error("Json format error", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson, model,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.minify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.minify.text"));
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson, model, false);
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(JsonAssistantAction.isOrHasJsonStr(e));
+    }
 }

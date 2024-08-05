@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child.transform;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.JsonEditorInfoModel;
+import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -33,20 +33,20 @@ public class ToXmlAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
-        JsonEditorInfoModel model = JsonEditorInfoModel.of(editor);
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
+                JsonAssistantBundle.messageOnSystem("hint.select.json.to.xml.text"),
+                JsonAssistantBundle.messageOnSystem("hint.all.json.to.xml.text"));
 
         String xmlStr;
         try {
-            xmlStr = JsonUtil.jsonToXml(model.jsonContent);
+            xmlStr = JsonUtil.jsonToXml(model.getContent());
             xmlStr = xmlStr.replaceAll("\r\n", "\n");
         } catch (Exception ex) {
             LOG.error("xml conversion failure", ex);
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.to.xml.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.to.xml.text"));
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model, true);
     }
 
 }

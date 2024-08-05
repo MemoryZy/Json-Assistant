@@ -4,8 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.JsonEditorInfoModel;
 import cn.memoryzy.json.model.formats.BaseFormatModel;
+import cn.memoryzy.json.model.formats.XmlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.notification.NotificationType;
@@ -39,9 +39,7 @@ public class JsonAssistantUtil {
         ApplicationManager.getApplication().invokeLater(dialog::show);
     }
 
-    public static void writeOrCopyJsonOnEditor(Project project, Editor editor,
-                                               Document document, String processedText,
-                                               JsonEditorInfoModel model, String selectHint, String defaultHint) {
+    public static void writeOrCopyJsonOnEditor(Project project, Editor editor, Document document, String processedText, BaseFormatModel model, boolean noMinify) {
         // 可写的话就写，不可写就拷贝到剪贴板
         if (document.isWritable()) {
             // 获取当前文档内的psiFile
@@ -51,14 +49,19 @@ public class JsonAssistantUtil {
                 if (model.getSelectedText()) {
                     document.replaceString(model.getStartOffset(), model.getEndOffset(), processedText);
                     model.getPrimaryCaret().moveToOffset(model.getStartOffset());
-                    hintText = selectHint;
+                    hintText = model.getSelectHint();
                 } else {
                     document.setText(processedText);
-                    // 格式化
-                    Optional.ofNullable(psiFile).ifPresent(el -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
+                    int moveToOffset = 0;
 
-                    model.getPrimaryCaret().moveToOffset(document.getTextLength());
-                    hintText = defaultHint;
+                    if (noMinify) {
+                        // 格式化
+                        Optional.ofNullable(psiFile).ifPresent(el -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
+                        moveToOffset = document.getTextLength();
+                    }
+
+                    model.getPrimaryCaret().moveToOffset(moveToOffset);
+                    hintText = model.getDefaultHint();
                 }
 
                 HintManager.getInstance().showInformationHint(editor, hintText);
@@ -73,23 +76,29 @@ public class JsonAssistantUtil {
         }
     }
 
-    public static BaseFormatModel obtainFormatModel(Editor editor) {
+    @SuppressWarnings("DuplicatedCode")
+    public static BaseFormatModel matchFormats(Editor editor) {
+        if (editor == null) {
+            return null;
+        }
+
         Document document = editor.getDocument();
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
         int startOffset = primaryCaret.getSelectionStart();
         int endOffset = primaryCaret.getSelectionEnd();
         String selectText = document.getText(new TextRange(startOffset, endOffset));
-        String jsonContent = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
+        String documentText = document.getText();
 
-        boolean isSelectedText = true;
-        if (StrUtil.isBlank(jsonContent)) {
-            isSelectedText = false;
-            String documentText = document.getText();
-            jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+        BaseFormatModel model = new XmlFormatModel(startOffset, endOffset, primaryCaret);
+        BaseFormatModel.fillModel(selectText, documentText, model);
+
+        if (StrUtil.isBlank(model.getContent())) {
+            return null;
         }
 
+        // 其他格式 .........
 
-        return null;
+        return model;
     }
 
 }

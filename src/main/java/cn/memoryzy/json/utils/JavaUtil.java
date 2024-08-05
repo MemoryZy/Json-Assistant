@@ -411,7 +411,7 @@ public class JavaUtil {
         PsiFile psiFile = PlatformUtil.getPsiFile(event);
         Editor editor = PlatformUtil.getEditor(event);
 
-        if (Objects.nonNull(psiFile) && (psiFile.getFileType() instanceof JavaFileType)) {
+        if (Objects.nonNull(psiFile) && Objects.nonNull(editor) && (psiFile.getFileType() instanceof JavaFileType)) {
             return PsiTreeUtil.getParentOfType(PlatformUtil.getPsiElementByOffset(editor, psiFile), PsiClass.class);
         }
 

@@ -27,7 +27,7 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup implements Dumb
 
         DataContext dataContext = e.getDataContext();
         ListPopup popup = JBPopupFactory.getInstance()
-                .createActionGroupPopup(JsonAssistantBundle.messageOnSystem("popup.json.processing.title"),
+                .createActionGroupPopup(JsonAssistantBundle.message("popup.json.processing.title"),
                         this, dataContext, JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING, true);
         popup.showInBestPositionFor(dataContext);
     }
