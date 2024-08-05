@@ -1,10 +1,12 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
-- JSON 与 其他格式（例如 XML）的互相转化功能
+- Json 与 其他格式（例如 XML）的互相转化功能
+- Json 文本转义处理
 - 支持快速修改操作快捷键
 - 功能界面优化
 - The ability to convert JSON to and from other formats, such as XML.
+- Json text escape processing.
 - Supports quick change of operation shortcut keys.
 - Functional interface optimization.
 
