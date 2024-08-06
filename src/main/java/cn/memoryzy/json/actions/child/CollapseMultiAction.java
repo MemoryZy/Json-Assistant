@@ -35,6 +35,7 @@ public class CollapseMultiAction extends DumbAwareAction {
 
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void update(@NotNull AnActionEvent e) {
         boolean enabled = false;
         TreePath[] paths = tree.getSelectionPaths();
