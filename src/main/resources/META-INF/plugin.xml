@@ -34,7 +34,8 @@
     </extensions>
 
     <applicationListeners>
-        <listener class="cn.memoryzy.json.listener.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+        <listener class="cn.memoryzy.json.listener.PluginActivityManager"
+                  topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
     <actions>
@@ -73,6 +74,9 @@
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
 
+        <action id="JsonAssistant.Action.OnlineDoc" class="cn.memoryzy.json.actions.OnlineDocAction">
+            <add-to-group group-id="HelpMenu" relative-to-action="OnlineDocAction" anchor="after"/>
+        </action>
 
     </actions>
 
