@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class HyperLinks {
 
-    public static AtomicBoolean reachableAtomic = new AtomicBoolean(false);
+    public static final AtomicBoolean reachableAtomic = new AtomicBoolean(false);
 
     public static final String GITHUB_LINK = "https://github.com/MemoryZy/Json-Assistant";
     public static final String SUPPORT_LINK = "https://json.memoryzy.cn/support";
@@ -30,9 +30,7 @@ public class HyperLinks {
 
 
     public static void verifyReachable() {
-        new Thread(() -> {
-            reachableAtomic.getAndSet(isReachable(OVERVIEW));
-        }).start();
+        new Thread(() -> reachableAtomic.getAndSet(isReachable(OVERVIEW))).start();
     }
 
     public static boolean isReachable() {

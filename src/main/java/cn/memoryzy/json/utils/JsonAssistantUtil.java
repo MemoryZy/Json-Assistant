@@ -8,7 +8,7 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.formats.BaseFormatModel;
 import cn.memoryzy.json.model.formats.XmlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
-import cn.memoryzy.json.ui.basic.JsonViewPanel;
+import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
@@ -58,15 +58,13 @@ public class JsonAssistantUtil {
                     hintText = model.getSelectHint();
                 } else {
                     document.setText(processedText);
-                    int moveToOffset = 0;
 
                     if (noMinify) {
                         // 格式化
                         Optional.ofNullable(psiFile).ifPresent(el -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
-                        moveToOffset = document.getTextLength();
                     }
 
-                    model.getPrimaryCaret().moveToOffset(moveToOffset);
+                    model.getPrimaryCaret().moveToOffset(0);
                     hintText = model.getDefaultHint();
                 }
 
@@ -74,7 +72,7 @@ public class JsonAssistantUtil {
             });
         } else {
             ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
-            JsonViewPanel panel = (JsonViewPanel) PlatformUtil.getMainComponentWithOpenToolWindow(toolWindow);
+            JsonViewerPanel panel = (JsonViewerPanel) PlatformUtil.getMainComponentWithOpenToolWindow(toolWindow);
             if (toolWindow != null && panel != null) {
                 LanguageTextField jsonTextField = panel.getJsonTextField();
                 jsonTextField.setText(processedText);
@@ -91,7 +89,7 @@ public class JsonAssistantUtil {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static BaseFormatModel matchFormats(Editor editor) {
+    public static BaseFormatModel matchFormats(Project project, Editor editor) {
         if (editor == null) {
             return null;
         }
@@ -104,7 +102,7 @@ public class JsonAssistantUtil {
         String documentText = document.getText();
 
         BaseFormatModel model = new XmlFormatModel(startOffset, endOffset, primaryCaret);
-        BaseFormatModel.fillModel(selectText, documentText, model);
+        BaseFormatModel.fillModel(project, document, selectText, documentText, model);
 
         if (StrUtil.isBlank(model.getContent())) {
             return null;

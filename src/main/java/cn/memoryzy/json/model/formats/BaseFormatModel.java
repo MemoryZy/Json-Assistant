@@ -1,7 +1,14 @@
 package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -60,20 +67,34 @@ public abstract class BaseFormatModel {
 
     public abstract String getDefaultHint();
 
+    public abstract FileType getFileType();
 
 
-    public static void fillModel(String selectText, String documentText, BaseFormatModel model) {
-        String text = model.isConformFormat(selectText) ? selectText.trim() : null;
+    public static void fillModel(Project project, @NotNull Document document, String selectText, String documentText, BaseFormatModel model) {
+        String text = null;
+        boolean isSelected = false;
 
-        boolean isSelected = true;
-        if (StrUtil.isBlank(text)) {
-            isSelected = false;
-            if (model.isConformFormat(documentText)) {
-                text = documentText.trim();
+        // 选中了文本，那就判断这段文本
+        if (StrUtil.isNotBlank(selectText)) {
+            text = model.isConformFormat(selectText) ? selectText : null;
+            if (StrUtil.isNotBlank(text)) {
+                isSelected = true;
+            } else {
+                throw new RuntimeException();
+            }
+        } else {
+            // 没选择文本，那就判断是否为指定文件类型，如果不是就不显示
+            FileType fileType = PlatformUtil.getDocumentFileType(project, document);
+            if (Objects.equals(fileType, model.getFileType())) {
+                text = model.isConformFormat(documentText) ? documentText : null;
+            }
+
+            if (StrUtil.isBlank(text)) {
+                throw new RuntimeException();
             }
         }
 
-        model.setContent(StrUtil.isNotBlank(text) ? text : null).setSelectedText(isSelected);
+        model.setContent(text).setSelectedText(isSelected);
     }
 
 

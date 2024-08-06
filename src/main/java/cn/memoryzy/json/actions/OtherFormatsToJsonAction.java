@@ -8,10 +8,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiFile;
+import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,15 +27,18 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.other.formats.to.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.other.formats.to.json.description"));
-        presentation.setIcon(JsonAssistantIcons.CONVERSION);
+        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_ROTATE : JsonAssistantIcons.ROTATE);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e);
-        BaseFormatModel model = JsonAssistantUtil.matchFormats(editor);
-        if (Objects.nonNull(model)) {
-            JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(), model.convertToJson(), model, true, true);
+        try {
+            BaseFormatModel model = JsonAssistantUtil.matchFormats(e.getProject(), editor);
+            if (Objects.nonNull(model)) {
+                JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(), model.convertToJson(), model, true, true);
+            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -45,20 +46,20 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     public void update(@NotNull AnActionEvent e) {
         boolean enabled = false;
         Presentation presentation = e.getPresentation();
+        Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
-        PsiFile psiFile = PsiDocumentManager.getInstance(e.getProject()).getPsiFile(editor.getDocument());
-
-        // todo 这里改
-        FileType fileType = psiFile.getFileType();
-
-
-        BaseFormatModel model = JsonAssistantUtil.matchFormats(editor);
-        if (Objects.nonNull(model)) {
-            enabled = true;
-            presentation.setText(model.getActionName());
-            presentation.setDescription(model.getActionDescription());
+        if (Objects.nonNull(project) && Objects.nonNull(editor)) {
+            try {
+                BaseFormatModel model = JsonAssistantUtil.matchFormats(project, editor);
+                if (Objects.nonNull(model)) {
+                    enabled = true;
+                    presentation.setText(model.getActionName());
+                    presentation.setDescription(model.getActionDescription());
+                }
+            } catch (Exception ignored) {
+            }
         }
-
         presentation.setEnabledAndVisible(enabled);
     }
+
 }

@@ -23,7 +23,7 @@ public class JsonStructureAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.structure.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.structure.description"));
-        presentation.setIcon(JsonAssistantIcons.SMALL_STRUCTURE);
+        presentation.setIcon(JsonAssistantIcons.STRUCTURE);
     }
 
     @Override

@@ -2,9 +2,11 @@ package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.utils.JsonUtil;
+import com.intellij.json.json5.Json5FileType;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.util.TextRange;
 
 /**
@@ -27,11 +29,6 @@ public class JsonFormatHandleModel extends BaseFormatModel {
      * 全部的文本转变后发出的提示
      */
     private String defaultHint;
-
-    public JsonFormatHandleModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, boolean isJsonStr) {
-        super(isSelected, startOffset, endOffset, primaryCaret, content);
-        this.isJsonStr = isJsonStr;
-    }
 
     public JsonFormatHandleModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, boolean isJsonStr, String selectHint, String defaultHint) {
         super(isSelected, startOffset, endOffset, primaryCaret, content);
@@ -113,5 +110,10 @@ public class JsonFormatHandleModel extends BaseFormatModel {
     @Override
     public String getDefaultHint() {
         return defaultHint;
+    }
+
+    @Override
+    public FileType getFileType() {
+        return Json5FileType.INSTANCE;
     }
 }

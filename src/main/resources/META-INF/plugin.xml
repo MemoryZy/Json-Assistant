@@ -23,13 +23,13 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
-        <toolWindow id="JsonAssistant.ToolWindow.JsonView"
-                    factoryClass="cn.memoryzy.json.toolwindows.JsonViewToolWindowFactory"
+        <toolWindow id="JsonAssistant.ToolWindow.JsonViewer"
+                    factoryClass="cn.memoryzy.json.toolwindows.JsonViewerToolWindowFactory"
                     anchor="right"
                     secondary="true"
                     doNotActivateOnStart="true"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewRecordState"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerRecordState"/>
         <postStartupActivity implementation="cn.memoryzy.json.listener.PluginActivityManager"/>
     </extensions>
 
@@ -58,8 +58,8 @@
         </group>
 
         <action id="JsonAssistant.Action.OtherFormatsToJson" class="cn.memoryzy.json.actions.OtherFormatsToJsonAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt J"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift J"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
         </action>
 
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">

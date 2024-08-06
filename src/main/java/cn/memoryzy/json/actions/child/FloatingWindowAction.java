@@ -18,7 +18,7 @@ public class FloatingWindowAction extends DumbAwareAction {
     public FloatingWindowAction(ToolWindowEx toolWindow) {
         super(JsonAssistantBundle.messageOnSystem("action.floating.window.text"),
                 JsonAssistantBundle.messageOnSystem("action.floating.window.description"),
-                JsonAssistantIcons.MINIFY);
+                JsonAssistantIcons.FLOATING);
 
         this.toolWindow = toolWindow;
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt F"), toolWindow.getComponent());

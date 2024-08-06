@@ -9,11 +9,11 @@ import java.awt.*;
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonViewPanel extends JPanel {
+public class JsonViewerPanel extends JPanel {
 
     private final LanguageTextField jsonTextField;
 
-    public JsonViewPanel(LayoutManager layout, LanguageTextField jsonTextField) {
+    public JsonViewerPanel(LayoutManager layout, LanguageTextField jsonTextField) {
         super(layout);
         this.jsonTextField = jsonTextField;
     }

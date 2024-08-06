@@ -2,7 +2,9 @@ package cn.memoryzy.json.model.formats;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.XmlUtil;
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.fileTypes.FileType;
 
 /**
  * @author Memory
@@ -42,5 +44,10 @@ public class XmlFormatModel extends BaseFormatModel {
     @Override
     public String getDefaultHint() {
         return JsonAssistantBundle.messageOnSystem("hint.all.xml.to.json.text");
+    }
+
+    @Override
+    public FileType getFileType() {
+        return XmlFileType.INSTANCE;
     }
 }

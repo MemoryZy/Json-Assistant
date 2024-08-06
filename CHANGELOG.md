@@ -4,10 +4,12 @@
 - Json 与 其他格式（例如 XML）的互相转化功能
 - Json 文本转义处理
 - 支持快速修改操作快捷键
+- 插件运行效率优化
 - 功能界面优化
 - The ability to convert JSON to and from other formats, such as XML.
 - Json text escape processing.
 - Supports quick change of operation shortcut keys.
+- Plug-in efficiency optimization.
 - Functional interface optimization.
 
 ## [1.3.1] - 2024-07-30

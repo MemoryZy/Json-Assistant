@@ -27,7 +27,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/6/20
  */
-public class JsonViewToolWindowFactory implements ToolWindowFactory, DumbAware {
+public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {

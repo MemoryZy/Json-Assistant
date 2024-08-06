@@ -3,11 +3,15 @@ package cn.memoryzy.json.utils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.content.Content;
@@ -121,6 +125,12 @@ public class PlatformUtil {
         }
 
         return null;
+    }
+
+    public static FileType getDocumentFileType(Project project, Document document) {
+        if (project == null || null == document) return null;
+        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+        return psiFile == null ? null : psiFile.getFileType();
     }
 
 }

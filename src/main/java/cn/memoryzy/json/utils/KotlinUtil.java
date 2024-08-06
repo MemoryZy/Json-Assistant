@@ -72,14 +72,6 @@ public class KotlinUtil {
 
 
     public static boolean hasKtProperty(AnActionEvent e) {
-        // KtClass ktClass = getKtClass(e);
-        // if (Objects.isNull(ktClass)) {
-        //     return false;
-        // }
-        //
-        // // 如果是数据类，那么 ktClass.getProperties() 获取不到属性，数据类 只能在主构造函数中定义属性
-        // return CollUtil.isNotEmpty(ktClass.isData() ? ktClass.getPrimaryConstructorParameters() : ktClass.getProperties());
-
         PsiClass psiClass = getPsiClass(e);
         if (Objects.isNull(psiClass)) {
             return false;

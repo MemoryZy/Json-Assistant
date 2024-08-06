@@ -1,11 +1,13 @@
 package cn.memoryzy.json.group;
 
-import cn.memoryzy.json.actions.*;
+import cn.memoryzy.json.actions.JsonBeautifyAction;
+import cn.memoryzy.json.actions.JsonMinifyAction;
+import cn.memoryzy.json.actions.JsonStructureAction;
+import cn.memoryzy.json.actions.ShortcutAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.UpdateHolder;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -14,6 +16,8 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,6 +26,8 @@ import java.util.Objects;
  */
 public class JsonProcessingPopupGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
 
+    private final boolean actionEventPopup;
+
     public JsonProcessingPopupGroup() {
         super();
         setPopup(true);
@@ -29,7 +35,12 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup implements Dumb
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.processing.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.processing.description"));
-        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_BOX : JsonAssistantIcons.BOX);
+        presentation.setIcon(JsonAssistantIcons.BOX);
+        this.actionEventPopup = false;
+    }
+
+    public JsonProcessingPopupGroup(boolean actionEventPopup) {
+        this.actionEventPopup = actionEventPopup;
     }
 
     @Override
@@ -48,16 +59,21 @@ public class JsonProcessingPopupGroup extends DefaultActionGroup implements Dumb
 
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
-        return new AnAction[]{
-                new JsonBeautifyAction(),
-                new JsonMinifyAction(),
-                new JsonStructureAction(),
-                Separator.create(),
-                Separator.create(JsonAssistantBundle.message("separator.transform")),
-                new ConvertOtherFormatsGroup(),
-                Separator.create(),
-                new ShortcutAction()
-        };
+        List<AnAction> actions = new ArrayList<>();
+        actions.add(new JsonBeautifyAction());
+        actions.add(new JsonMinifyAction());
+        actions.add(new JsonStructureAction());
+        // ------- 分隔符
+        actions.add(Separator.create());
+        if (actionEventPopup || PlatformUtil.isNewUi()) {
+            actions.add(Separator.create(JsonAssistantBundle.message("separator.transform")));
+        }
+
+        actions.add(new ConvertOtherFormatsGroup());
+        actions.add(Separator.create());
+        actions.add(new ShortcutAction());
+
+        return actions.toArray(new AnAction[0]);
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -29,6 +30,7 @@ public class JsonBeautifyAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.beautify.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.beautify.description"));
+        presentation.setIcon(JsonAssistantIcons.DIZZY_STAR);
     }
 
     @Override

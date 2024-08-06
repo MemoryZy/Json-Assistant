@@ -1,9 +1,9 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.service.JsonViewRecordState;
+import cn.memoryzy.json.service.JsonViewerRecordState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
-import cn.memoryzy.json.ui.basic.JsonViewPanel;
+import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.json.json5.Json5Language;
@@ -28,7 +28,7 @@ public class JsonViewerWindow {
 
     private LanguageTextField jsonTextField;
     private final Project project;
-    private JsonViewRecordState state;
+    private JsonViewerRecordState state;
 
     public JsonViewerWindow(Project project) {
         this.project = project;
@@ -39,8 +39,8 @@ public class JsonViewerWindow {
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
-        this.state = JsonViewRecordState.getInstance(project);
-        JsonViewPanel rootPanel = new JsonViewPanel(new BorderLayout(), this.jsonTextField);
+        this.state = JsonViewerRecordState.getInstance(project);
+        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
 
         String jsonStr = "";
         String clipboard = PlatformUtil.getClipboard();
