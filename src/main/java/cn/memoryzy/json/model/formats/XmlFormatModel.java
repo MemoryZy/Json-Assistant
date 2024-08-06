@@ -35,7 +35,7 @@ public class XmlFormatModel extends BaseFormatModel {
 
     @Override
     public String getActionDescription() {
-        return JsonAssistantBundle.message("action.xml.to.json.description");
+        return JsonAssistantBundle.messageOnSystem("action.xml.to.json.description");
     }
 
     @Override

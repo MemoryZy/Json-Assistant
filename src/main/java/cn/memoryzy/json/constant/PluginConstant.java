@@ -14,6 +14,8 @@ import java.util.*;
 public class PluginConstant {
 
     public static final String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
+    public static final String JSON_VIEWER_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonView";
+
     public static final String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     public static final String LOMBOK_LIB = "org.projectlombok:lombok";
     public static final String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";

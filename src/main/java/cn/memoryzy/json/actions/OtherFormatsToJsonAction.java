@@ -6,6 +6,7 @@ import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
@@ -17,7 +18,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/3
  */
-public class OtherFormatsToJsonAction extends DumbAwareAction {
+public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateInBackground {
 
     public OtherFormatsToJsonAction() {
         super();
@@ -33,7 +34,7 @@ public class OtherFormatsToJsonAction extends DumbAwareAction {
         Editor editor = PlatformUtil.getEditor(e);
         BaseFormatModel model = JsonAssistantUtil.matchFormats(editor);
         if (Objects.nonNull(model)) {
-            JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(), model.convertToJson(), model, true);
+            JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(), model.convertToJson(), model, true, true);
         }
     }
 

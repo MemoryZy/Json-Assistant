@@ -9,6 +9,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
@@ -21,7 +22,7 @@ import java.util.*;
  * @author Memory
  * @since 2024/7/5
  */
-public class KotlinPropertyToJsonAction extends AnAction {
+public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBackground {
 
     private static final Logger LOG = Logger.getInstance(KotlinPropertyToJsonAction.class);
 

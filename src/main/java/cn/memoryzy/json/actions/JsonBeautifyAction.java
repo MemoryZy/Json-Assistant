@@ -48,7 +48,7 @@ public class JsonBeautifyAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model, true);
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model, true, false);
     }
 
 }

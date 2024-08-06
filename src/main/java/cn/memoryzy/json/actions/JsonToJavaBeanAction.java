@@ -24,7 +24,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/07/07
  */
-public class JsonToJavaBeanAction extends DumbAwareAction {
+public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBackground {
 
     private static Class<?> clz;
     private static Method updateMethod;

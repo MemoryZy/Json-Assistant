@@ -2,7 +2,7 @@ package cn.memoryzy.json.actions.child;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonViewWindow;
+import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -13,9 +13,9 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 public class JsonStructureOnToolWindowAction extends DumbAwareAction {
-    private final JsonViewWindow window;
+    private final JsonViewerWindow window;
 
-    public JsonStructureOnToolWindowAction(JsonViewWindow window, ToolWindowEx toolWindowEx) {
+    public JsonStructureOnToolWindowAction(JsonViewerWindow window, ToolWindowEx toolWindowEx) {
         super(JsonAssistantBundle.messageOnSystem("action.json.structure.text"),
                 JsonAssistantBundle.messageOnSystem("action.json.structure.on.tw.title.description"),
                 JsonAssistantIcons.Structure.STRUCTURE);

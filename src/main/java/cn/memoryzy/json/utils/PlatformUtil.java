@@ -7,11 +7,15 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
 
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.Objects;
@@ -98,12 +102,25 @@ public class PlatformUtil {
     }
 
     /**
-     * 部分平台不支持内部打开页面的功能，例如 DataGrip
+     * 部分平台没有内嵌 Chromium，例如 DataGrip
      *
      * @return 是否支持打开HTMLEditor
      */
     public static boolean canBrowseInHTMLEditor() {
         return JBCefApp.isSupported();
+    }
+
+
+    public static JComponent getMainComponentWithOpenToolWindow(ToolWindow toolWindow) {
+        if (Objects.nonNull(toolWindow)) {
+            ContentManager contentManager = toolWindow.getContentManager();
+            Content content = contentManager.getContent(0);
+            if (Objects.nonNull(content)) {
+                return content.getComponent();
+            }
+        }
+
+        return null;
     }
 
 }

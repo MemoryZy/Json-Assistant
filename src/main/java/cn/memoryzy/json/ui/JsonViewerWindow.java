@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.service.JsonViewRecordState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.JsonViewPanel;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.json.json5.Json5Language;
@@ -10,6 +11,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.LanguageTextField;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -20,24 +22,25 @@ import java.util.Objects;
 
 /**
  * @author Memory
- * @since 2024/6/20
+ * @since 2024/8/6
  */
-public class JsonViewWindow {
-    private JPanel rootPanel;
+public class JsonViewerWindow {
+
     private LanguageTextField jsonTextField;
     private final Project project;
     private JsonViewRecordState state;
 
-    public JsonViewWindow(Project project) {
+    public JsonViewerWindow(Project project) {
         this.project = project;
     }
 
-    private void createUIComponents() {
-        jsonTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", false);
-        jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
-        jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
-        jsonTextField.addFocusListener(new FocusListenerImpl());
+    public JPanel getRootPanel() {
+        this.jsonTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", false);
+        this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
+        this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
+        this.jsonTextField.addFocusListener(new FocusListenerImpl());
         this.state = JsonViewRecordState.getInstance(project);
+        JsonViewPanel rootPanel = new JsonViewPanel(new BorderLayout(), this.jsonTextField);
 
         String jsonStr = "";
         String clipboard = PlatformUtil.getClipboard();
@@ -53,15 +56,19 @@ public class JsonViewWindow {
                 jsonTextField.setText(record);
             }
         }
-    }
 
-    public JPanel getRootPanel() {
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBorder(JBUI.Borders.empty(1, 2));
+        centerPanel.add(jsonTextField, BorderLayout.CENTER);
+        rootPanel.add(centerPanel, BorderLayout.CENTER);
+
         return rootPanel;
     }
 
     public String getJsonContent() {
         return jsonTextField.getText();
     }
+
 
     private class DocumentListenerImpl implements DocumentListener {
         @Override
@@ -93,4 +100,5 @@ public class JsonViewWindow {
 
         }
     }
+
 }

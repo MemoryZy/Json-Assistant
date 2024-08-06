@@ -43,9 +43,12 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.group.JsonProcessingPopupGroup"/>
+
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
             <reference ref="JsonAssistant.Action.Main"/>
+            <reference ref="JsonAssistant.Group.Main"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>

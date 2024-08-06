@@ -13,6 +13,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -26,7 +27,7 @@ import java.util.*;
  * @author Memory
  * @since 2023/11/27
  */
-public class JavaBeanToJsonAction extends AnAction {
+public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground {
 
     private static final Logger LOG = Logger.getInstance(JavaBeanToJsonAction.class);
 

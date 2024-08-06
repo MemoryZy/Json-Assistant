@@ -46,7 +46,7 @@ public class ToXmlAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model, true);
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model, true, false);
     }
 
 }
