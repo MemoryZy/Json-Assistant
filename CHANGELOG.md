@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.4.0] - 2024-08-06
+
 - Json 与 其他格式（例如 XML）的互相转化功能
 - Json 文本转义处理
 - 支持快速修改操作快捷键
@@ -103,7 +106,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.1...v1.3.0
 [1.2.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.0...v1.2.1
