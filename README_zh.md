@@ -24,6 +24,7 @@
 - JavaBean 转换为 JSON
 - JSON 转换为 JavaBean
 - Kotlin 属性转为 JSON
+- 格式转换 (XML 与 JSON 互相转换)
 
 <br/>
 

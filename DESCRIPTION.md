@@ -16,9 +16,7 @@
  - JavaBean to JSON
  - JSON to JavaBean
  - Kotlin Properties to JSON
- - Format conversion
-   - XML to JSON
-   - JSON to XML
+ - Format conversion (XML and JSON)
 
 
 <br/>
