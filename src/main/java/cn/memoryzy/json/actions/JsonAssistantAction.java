@@ -1,8 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.UpdateHolder;
-import cn.memoryzy.json.group.JsonProcessingPopupGroup;
+import cn.memoryzy.json.group.JsonAssistantPopupGroup;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -23,14 +22,14 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.processing.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.processing.description"));
+        presentation.setText(JsonAssistantBundle.message("action.json.assistant.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.assistant.description"));
         presentation.setIcon(JsonAssistantIcons.BOX);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        new JsonProcessingPopupGroup(true).actionPerformed(e);
+        new JsonAssistantPopupGroup(true).actionPerformed(e);
     }
 
     @Override
@@ -44,7 +43,6 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
         }
 
         presentation.setEnabled(isHasJsonStr);
-        UpdateHolder.supplementaryState(isHasJsonStr);
     }
 
     public static boolean isOrHasJsonStr(Editor editor) {
