@@ -8,7 +8,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +45,14 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     public void update(@NotNull AnActionEvent e) {
         boolean enabled = false;
         Presentation presentation = e.getPresentation();
-        BaseFormatModel model = JsonAssistantUtil.matchFormats(PlatformUtil.getEditor(e));
+        Editor editor = PlatformUtil.getEditor(e);
+        PsiFile psiFile = PsiDocumentManager.getInstance(e.getProject()).getPsiFile(editor.getDocument());
+
+        // todo 这里改
+        FileType fileType = psiFile.getFileType();
+
+
+        BaseFormatModel model = JsonAssistantUtil.matchFormats(editor);
         if (Objects.nonNull(model)) {
             enabled = true;
             presentation.setText(model.getActionName());

@@ -28,6 +28,8 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
         presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_BOX : JsonAssistantIcons.BOX);
     }
 
+    // todo 正常看当前文件类型，例如 json、xml，来显示update，如果有选中文本，那再判断选中文本是什么格式，json、xml什么的
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         new JsonProcessingPopupGroup().actionPerformed(e);

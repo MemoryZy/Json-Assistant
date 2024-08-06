@@ -14,10 +14,6 @@ public class XmlFormatModel extends BaseFormatModel {
         super(startOffset, endOffset, primaryCaret);
     }
 
-    public XmlFormatModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content) {
-        super(isSelected, startOffset, endOffset, primaryCaret, content);
-    }
-
     @Override
     public boolean isConformFormat(String text) {
         return XmlUtil.isXML(text);
