@@ -39,12 +39,27 @@
     </applicationListeners>
 
     <actions>
+        <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.actions.JsonBeautifyAction"/>
+        <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.actions.JsonMinifyAction"/>
+        <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.actions.JsonStructureAction"/>
+        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.actions.ShortcutAction"/>
+
+        <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.actions.OtherFormatsToJsonAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
+        </action>
+
+        <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.actions.OnlineDocAction">
+            <add-to-group group-id="HelpMenu" relative-to-action="OnlineDocAction" anchor="after"/>
+        </action>
+
         <action id="JsonAssistant.Action.Main" class="cn.memoryzy.json.actions.JsonAssistantAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
         <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.group.JsonAssistantPopupGroup"/>
+        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.group.ConvertOtherFormatsGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
@@ -58,14 +73,9 @@
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
 
-        <action id="JsonAssistant.Action.OtherFormatsToJson" class="cn.memoryzy.json.actions.OtherFormatsToJsonAction">
-            <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
-        </action>
-
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
             <separator/>
-            <reference ref="JsonAssistant.Action.OtherFormatsToJson"/>
+            <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
@@ -73,10 +83,6 @@
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
-
-        <action id="JsonAssistant.Action.OnlineDoc" class="cn.memoryzy.json.actions.OnlineDocAction">
-            <add-to-group group-id="HelpMenu" relative-to-action="OnlineDocAction" anchor="after"/>
-        </action>
 
     </actions>
 

@@ -42,6 +42,8 @@ public class JsonBeautifyAction extends DumbAwareAction {
                 JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
 
+        String place = e.getPlace();
+
         String formattedJson;
         try {
             formattedJson = StrUtil.trim(JsonUtil.formatJson(model.getContent()));

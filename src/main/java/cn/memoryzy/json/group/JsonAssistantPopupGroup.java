@@ -2,6 +2,7 @@ package cn.memoryzy.json.group;
 
 import cn.memoryzy.json.actions.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
@@ -57,18 +58,20 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         List<AnAction> actions = new ArrayList<>();
-        actions.add(new JsonBeautifyAction());
-        actions.add(new JsonMinifyAction());
-        actions.add(new JsonStructureAction());
+        actions.add(ActionHolder.JSON_BEAUTIFY_ACTION);
+        actions.add(ActionHolder.JSON_MINIFY_ACTION);
+        actions.add(ActionHolder.JSON_STRUCTURE_ACTION);
         // ------- 分隔符
         actions.add(Separator.create());
         if (actionEventPopup || PlatformUtil.isNewUi()) {
             actions.add(Separator.create(JsonAssistantBundle.message("separator.transform")));
         }
 
-        actions.add(new ConvertOtherFormatsGroup());
+        actions.add(ActionHolder.CONVERT_OTHER_FORMATS_GROUP);
         actions.add(Separator.create());
-        actions.add(new ShortcutAction());
+        actions.add(ActionHolder.SHORTCUT_ACTION);
+        actions.add(Separator.create());
+        actions.add(ActionHolder.ONLINE_DOC_ACTION);
 
         return actions.toArray(new AnAction[0]);
     }
