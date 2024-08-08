@@ -1,6 +1,7 @@
 package cn.memoryzy.json.group;
 
-import cn.memoryzy.json.actions.*;
+import cn.memoryzy.json.actions.JsonAssistantAction;
+import cn.memoryzy.json.actions.OnlineDocAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.utils.PlatformUtil;
@@ -71,7 +72,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         actions.add(Separator.create());
         actions.add(ActionHolder.SHORTCUT_ACTION);
         actions.add(Separator.create());
-        actions.add(ActionHolder.ONLINE_DOC_ACTION);
+        actions.add(new OnlineDocAction(true));
 
         return actions.toArray(new AnAction[0]);
     }
