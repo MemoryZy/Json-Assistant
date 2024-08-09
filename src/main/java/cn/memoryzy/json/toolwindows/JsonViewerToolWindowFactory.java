@@ -1,9 +1,6 @@
 package cn.memoryzy.json.toolwindows;
 
-import cn.memoryzy.json.actions.child.DonateAction;
-import cn.memoryzy.json.actions.child.FloatingWindowAction;
-import cn.memoryzy.json.actions.child.JsonPathFilterOnTextFieldAction;
-import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
+import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.ui.JsonViewerWindow;
@@ -14,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -53,7 +51,11 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
                         new JsonPathFilterOnTextFieldAction(window),
                         new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
 
+        SimpleActionGroup group = new SimpleActionGroup();
+        group.add(new JsonHistoryAction());
+
         toolWindow.setTitleActions(dumbAwareActions);
+        toolWindow.setAdditionalGearActions(group);
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);
 
