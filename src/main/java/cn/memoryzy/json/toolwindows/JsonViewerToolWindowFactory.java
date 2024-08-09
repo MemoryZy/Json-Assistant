@@ -2,6 +2,7 @@ package cn.memoryzy.json.toolwindows;
 
 import cn.memoryzy.json.actions.child.DonateAction;
 import cn.memoryzy.json.actions.child.FloatingWindowAction;
+import cn.memoryzy.json.actions.child.JsonPathFilterOnTextFieldAction;
 import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
@@ -49,6 +50,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         List<AnAction> dumbAwareActions =
                 List.of(new FloatingWindowAction(toolWindowEx),
                         new JsonStructureOnToolWindowAction(window, toolWindowEx),
+                        new JsonPathFilterOnTextFieldAction(window),
                         new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
 
         toolWindow.setTitleActions(dumbAwareActions);

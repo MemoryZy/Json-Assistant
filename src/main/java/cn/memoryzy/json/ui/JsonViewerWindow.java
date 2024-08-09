@@ -69,6 +69,9 @@ public class JsonViewerWindow {
         return jsonTextField.getText();
     }
 
+    public LanguageTextField getJsonTextField() {
+        return jsonTextField;
+    }
 
     private class DocumentListenerImpl implements DocumentListener {
         @Override
