@@ -42,8 +42,6 @@ public class JsonBeautifyAction extends DumbAwareAction {
                 JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
 
-        String place = e.getPlace();
-
         String formattedJson;
         try {
             formattedJson = StrUtil.trim(JsonUtil.formatJson(model.getContent()));
@@ -51,6 +49,9 @@ public class JsonBeautifyAction extends DumbAwareAction {
             LOG.error("Json format error", ex);
             return;
         }
+
+        // TODO 在非 JSON 的文件中，不修改全局文本
+        Boolean selectedText = model.getSelectedText();
 
         JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model, true, false);
     }

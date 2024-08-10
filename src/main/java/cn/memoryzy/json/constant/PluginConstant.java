@@ -16,6 +16,8 @@ public class PluginConstant {
     public static final String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
     public static final String JSON_VIEWER_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonViewer";
 
+    public static final String JSON_VIEWER_HISTORY_NAME = JsonAssistantPlugin.PLUGIN_ID + "Json.Viewer.History.Name";
+
     public static final String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     public static final String LOMBOK_LIB = "org.projectlombok:lombok";
     public static final String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";

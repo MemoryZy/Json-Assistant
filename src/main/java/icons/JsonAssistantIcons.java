@@ -29,7 +29,8 @@ public class JsonAssistantIcons {
     public static final Icon DIZZY_STAR = load("/icons/dizzy_star.svg");
     public static final Icon ROTATE = load("/icons/rotate.svg");
     public static final Icon BOOK = load("/icons/book.svg");
-    public static final Icon FILTER = load("/icons/filter.svg");
+    public static final Icon SEARCH = load("/icons/search.svg");
+    public static final Icon HISTORY = load("/icons/history.svg");
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");

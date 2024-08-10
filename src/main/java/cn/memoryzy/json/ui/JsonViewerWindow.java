@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.service.JsonViewerRecordState;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import cn.memoryzy.json.utils.JsonUtil;
@@ -18,6 +18,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,7 +29,7 @@ public class JsonViewerWindow {
 
     private LanguageTextField jsonTextField;
     private final Project project;
-    private JsonViewerRecordState state;
+    private JsonViewerHistoryState historyState;
 
     public JsonViewerWindow(Project project) {
         this.project = project;
@@ -39,7 +40,7 @@ public class JsonViewerWindow {
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
-        this.state = JsonViewerRecordState.getInstance(project);
+        this.historyState = JsonViewerHistoryState.getInstance(project);
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
 
         String jsonStr = "";
@@ -51,9 +52,11 @@ public class JsonViewerWindow {
         if (StrUtil.isNotBlank(jsonStr)) {
             jsonTextField.setText(jsonStr);
         } else {
-            String record = state.record;
-            if (StrUtil.isNotBlank(record)) {
-                jsonTextField.setText(record);
+            List<String> historyList = historyState.historyList;
+            int historySize = historyList.size();
+
+            if (historySize > 0) {
+                jsonTextField.setText(historyList.get(historySize - 1));
             }
         }
 
@@ -73,14 +76,14 @@ public class JsonViewerWindow {
         return jsonTextField;
     }
 
+
     private class DocumentListenerImpl implements DocumentListener {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
-            String record = state.record;
+            List<String> historyList = historyState.historyList;
             String text = jsonTextField.getText();
-
-            if (!Objects.equals(record, text)) {
-                state.record = text;
+            if (!historyList.contains(text) && JsonUtil.isJsonStr(text)) {
+                historyList.add(text);
             }
         }
     }

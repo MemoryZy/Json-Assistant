@@ -3,6 +3,7 @@ package cn.memoryzy.json.toolwindows;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -49,18 +50,21 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
                 List.of(new FloatingWindowAction(toolWindowEx),
                         new JsonStructureOnToolWindowAction(window, toolWindowEx),
                         new JsonPathFilterOnTextFieldAction(window),
+                        new JsonHistoryAction(),
                         new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
 
-        SimpleActionGroup group = new SimpleActionGroup();
-        group.add(new JsonHistoryAction());
+        // SimpleActionGroup group = new SimpleActionGroup();
+        // group.add(new JsonHistoryAction());
+        // toolWindow.setAdditionalGearActions(group);
 
         toolWindow.setTitleActions(dumbAwareActions);
-        toolWindow.setAdditionalGearActions(group);
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);
 
         // 验证地址可达性
         HyperLinks.verifyReachable();
+        // 初始化历史记录
+        JsonViewerHistoryState.getInstance(project).initHistoryList();
     }
 
 }

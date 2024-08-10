@@ -1,7 +1,9 @@
 package cn.memoryzy.json.actions;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -9,6 +11,8 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * @author Memory
@@ -31,7 +35,16 @@ public class OnlineDocAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        BrowserUtil.browse(HyperLinks.OVERVIEW);
+        // BrowserUtil.browse(HyperLinks.OVERVIEW);
+        JsonViewerHistoryState state = JsonViewerHistoryState.getInstance(e.getProject());
+        List<String> historyList = state.historyList;
+        if (CollUtil.isNotEmpty(historyList)) {
+            String record = historyList.get(historyList.size() - 1);
+            System.out.println(record);
+            return;
+        }
+
+        System.out.println("empty");
     }
 
 }

@@ -2,6 +2,7 @@ package cn.memoryzy.json.listener;
 
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.utils.Notifications;
 import com.intellij.ide.plugins.DynamicPluginListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -9,6 +10,10 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -25,6 +30,8 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     public void runActivity(@NotNull Project project) {
         // 验证地址可达性
         HyperLinks.verifyReachable();
+        // 初始化历史记录
+        JsonViewerHistoryState.getInstance(project).initHistoryList();
 
         // 获取版本
         String currentVersion = JsonAssistantPlugin.getVersion();
