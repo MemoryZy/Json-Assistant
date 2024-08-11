@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +35,12 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
         this.historyList = state.historyList;
     }
 
-    public void initHistoryList() {
+    public List<String> getHistoryList() {
+        initHistoryList();
+        return historyList;
+    }
+
+    private void initHistoryList() {
         if (Objects.isNull(historyList)) {
             historyList = new LimitedList<>(HISTORY_LIMIT);
         }

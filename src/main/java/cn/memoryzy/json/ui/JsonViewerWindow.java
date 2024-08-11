@@ -19,7 +19,6 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -52,7 +51,7 @@ public class JsonViewerWindow {
         if (StrUtil.isNotBlank(jsonStr)) {
             jsonTextField.setText(jsonStr);
         } else {
-            List<String> historyList = historyState.historyList;
+            List<String> historyList = historyState.getHistoryList();
             int historySize = historyList.size();
 
             if (historySize > 0) {
@@ -80,9 +79,16 @@ public class JsonViewerWindow {
     private class DocumentListenerImpl implements DocumentListener {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
-            List<String> historyList = historyState.historyList;
+            List<String> historyList = historyState.getHistoryList();
             String text = jsonTextField.getText();
-            if (!historyList.contains(text) && JsonUtil.isJsonStr(text)) {
+            boolean contains = false;
+            for (String history : historyList) {
+                if (StrUtil.equals(StrUtil.trim(text), StrUtil.trim(history))) {
+                    contains = true;
+                }
+            }
+
+            if (!contains && JsonUtil.isJsonStr(text)) {
                 historyList.add(text);
             }
         }

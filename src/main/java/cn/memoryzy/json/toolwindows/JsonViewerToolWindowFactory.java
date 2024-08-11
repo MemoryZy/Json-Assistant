@@ -3,7 +3,6 @@ package cn.memoryzy.json.toolwindows;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
-import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -12,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -63,8 +61,6 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
 
         // 验证地址可达性
         HyperLinks.verifyReachable();
-        // 初始化历史记录
-        JsonViewerHistoryState.getInstance(project).initHistoryList();
     }
 
 }

@@ -1,14 +1,16 @@
 package cn.memoryzy.json.actions.child;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.ui.extension.SearchExtension;
 import cn.memoryzy.json.utils.JsonUtil;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.awt.RelativePoint;
@@ -23,6 +25,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,13 +47,14 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
         Component source = (Component) e.getInputEvent().getSource();
         RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 2), source.getHeight() + 1));
 
         ExtendableTextField extendableTextField = new ExtendableTextField(20);
         extendableTextField.addExtension(new SearchExtension());
         Document document = extendableTextField.getDocument();
-        document.addDocumentListener(new DocumentListenerImpl());
+        document.addDocumentListener(new DocumentListenerImpl(project));
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(extendableTextField, BorderLayout.CENTER);
@@ -75,18 +79,24 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
     }
 
 
-    public void matchJsonPath(String jsonPath) {
+    public void matchJsonPath(String jsonPath, Project project, boolean isRemove) {
         LanguageTextField jsonTextField = window.getJsonTextField();
         String json = jsonTextField.getText();
         if (Objects.isNull(jsonPath)) {
             return;
         }
 
-        if (StrUtil.isBlank(jsonPath)) {
-
+        JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
+        if ((StrUtil.isBlank(jsonPath) || Objects.equals("$", jsonPath)) && isRemove) {
+            // 恢复上一次的完整记录
+            List<String> historyList = historyState.getHistoryList();
+            if (CollUtil.isNotEmpty(historyList)) {
+                jsonTextField.setText(historyList.get(historyList.size() - 1));
+                return;
+            }
         }
 
-        if (StrUtil.isBlank(jsonPath) || StrUtil.isBlank(json) || !JsonUtil.isJsonStr(json)) {
+        if (StrUtil.isBlank(json) || !JsonUtil.isJsonStr(json)) {
             return;
         }
 
@@ -97,16 +107,23 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
         }
     }
 
+
     public class DocumentListenerImpl implements DocumentListener {
+
+        private final Project project;
+
+        public DocumentListenerImpl(Project project) {
+            this.project = project;
+        }
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            matchJsonPath(getWholeText(e));
+            matchJsonPath(getWholeText(e), project, false);
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            matchJsonPath(getWholeText(e));
+            matchJsonPath(getWholeText(e), project, true);
         }
 
         @Override
