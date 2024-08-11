@@ -1,7 +1,6 @@
 package cn.memoryzy.json.ui.extension;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.util.NlsContexts;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.scale.JBUIScale;
 
