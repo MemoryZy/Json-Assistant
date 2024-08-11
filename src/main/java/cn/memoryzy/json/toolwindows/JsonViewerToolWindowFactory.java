@@ -48,7 +48,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
                 List.of(new FloatingWindowAction(toolWindowEx),
                         new JsonStructureOnToolWindowAction(window, toolWindowEx),
                         new JsonPathFilterOnTextFieldAction(window),
-                        new JsonHistoryAction(),
+                        new JsonHistoryAction(window),
                         new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
 
         // SimpleActionGroup group = new SimpleActionGroup();

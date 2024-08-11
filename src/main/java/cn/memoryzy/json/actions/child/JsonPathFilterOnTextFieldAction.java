@@ -79,6 +79,14 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
     }
 
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        String text = StrUtil.trim(window.getJsonContent());
+        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
+        e.getPresentation().setEnabled(StrUtil.isNotBlank(jsonStr));
+    }
+
+
     public void matchJsonPath(String jsonPath, Project project, boolean isRemove) {
         LanguageTextField jsonTextField = window.getJsonTextField();
         String json = jsonTextField.getText();
@@ -101,8 +109,8 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
         }
 
         try {
-            String result = JsonPath.read(json, jsonPath);
-            jsonTextField.setText(result);
+            Object result = JsonPath.read(json, jsonPath);
+            jsonTextField.setText(Objects.toString(result));
         } catch (Exception ignored) {
         }
     }
