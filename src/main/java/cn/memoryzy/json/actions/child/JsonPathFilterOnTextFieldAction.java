@@ -1,31 +1,29 @@
 package cn.memoryzy.json.actions.child;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.JsonViewerWindow;
-import cn.memoryzy.json.ui.extension.SearchExtension;
 import cn.memoryzy.json.utils.JsonUtil;
+import com.intellij.icons.AllIcons;
+import com.intellij.jsonpath.JsonPathFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.awt.RelativePoint;
-import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.ui.JBUI;
 import com.jayway.jsonpath.JsonPath;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import java.awt.*;
-import java.util.List;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.util.Objects;
 
 /**
@@ -48,21 +46,22 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
+        if (project == null) return;
+
         Component source = (Component) e.getInputEvent().getSource();
-        RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 2), source.getHeight() + 1));
+        RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 3), source.getHeight() + 1));
+        EditorTextField jsonPathTextField = getEditorTextField(project);
 
-        ExtendableTextField extendableTextField = new ExtendableTextField(20);
-        extendableTextField.addExtension(new SearchExtension());
-        Document document = extendableTextField.getDocument();
-        document.addDocumentListener(new DocumentListenerImpl(project));
-
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(extendableTextField, BorderLayout.CENTER);
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.add(jsonPathTextField, BorderLayout.NORTH);
+        rootPanel.setBorder(JBUI.Borders.empty(2));
+        rootPanel.setPreferredSize(new Dimension(200, 35));
 
         JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(panel, extendableTextField)
+                .createComponentPopupBuilder(rootPanel, jsonPathTextField)
                 .setFocusable(true)
                 .setTitle(JsonAssistantBundle.messageOnSystem("popup.json.path.filter.on.text.field.title"))
+                .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("popup.json.path.filter.cancel.btn.tooltip"), AllIcons.Actions.Cancel))
                 .setShowShadow(true)
                 .setShowBorder(true)
                 .setModalContext(false)
@@ -70,12 +69,26 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
                 .setFocusable(true)
                 .setRequestFocus(true)
                 .setModalContext(false)
-                .setCancelOnClickOutside(true)
-                .setCancelOnOtherWindowOpen(true)
+                .setCancelOnClickOutside(false)
+                .setCancelOnOtherWindowOpen(false)
                 .setCancelKeyEnabled(true)
                 .setMovable(true)
                 .createPopup()
                 .show(relativePoint);
+    }
+
+    private @NotNull EditorTextField getEditorTextField(Project project) {
+        EditorTextField jsonPathTextField = new EditorTextField(project, JsonPathFileType.INSTANCE);
+        jsonPathTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
+        Runnable runnable = () -> matchJsonPath(jsonPathTextField.getText());
+        jsonPathTextField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                runnable.run();
+            }
+        });
+
+        return jsonPathTextField;
     }
 
 
@@ -87,70 +100,18 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction {
     }
 
 
-    public void matchJsonPath(String jsonPath, Project project, boolean isRemove) {
+    public void matchJsonPath(String jsonPath) {
         LanguageTextField jsonTextField = window.getJsonTextField();
         String json = jsonTextField.getText();
-        if (Objects.isNull(jsonPath)) {
-            return;
-        }
-
-        JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
-        if ((StrUtil.isBlank(jsonPath) || Objects.equals("$", jsonPath)) && isRemove) {
-            // 恢复上一次的完整记录
-            List<String> historyList = historyState.getHistoryList();
-            if (CollUtil.isNotEmpty(historyList)) {
-                jsonTextField.setText(historyList.get(historyList.size() - 1));
-                return;
-            }
-        }
-
-        if (StrUtil.isBlank(json) || !JsonUtil.isJsonStr(json)) {
+        if (Objects.isNull(jsonPath) || StrUtil.isBlank(json) || !JsonUtil.isJsonStr(json)) {
             return;
         }
 
         try {
             Object result = JsonPath.read(json, jsonPath);
             jsonTextField.setText(Objects.toString(result));
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            LOG.warn("JSONPath resolution failed", ex);
         }
     }
-
-
-    public class DocumentListenerImpl implements DocumentListener {
-
-        private final Project project;
-
-        public DocumentListenerImpl(Project project) {
-            this.project = project;
-        }
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            matchJsonPath(getWholeText(e), project, false);
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            matchJsonPath(getWholeText(e), project, true);
-        }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-
-        }
-
-        public String getWholeText(DocumentEvent e) {
-            Document document = e.getDocument();
-            String wholeText;
-            try {
-                wholeText = document.getText(0, document.getLength());
-            } catch (BadLocationException ex) {
-                LOG.error("Failed to obtain the input field text!", ex);
-                return null;
-            }
-
-            return wholeText;
-        }
-    }
-
 }

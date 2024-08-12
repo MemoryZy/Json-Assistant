@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.wm.ToolWindowType;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -18,7 +17,7 @@ public class FloatingWindowAction extends DumbAwareAction {
     public FloatingWindowAction(ToolWindowEx toolWindow) {
         super(JsonAssistantBundle.messageOnSystem("action.floating.window.text"),
                 JsonAssistantBundle.messageOnSystem("action.floating.window.description"),
-                JsonAssistantIcons.FLOATING);
+                null);
 
         this.toolWindow = toolWindow;
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt F"), toolWindow.getComponent());

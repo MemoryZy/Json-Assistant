@@ -6,11 +6,13 @@ import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -45,17 +47,17 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
         JsonViewerWindow window = new JsonViewerWindow(project);
         List<AnAction> dumbAwareActions =
-                List.of(new FloatingWindowAction(toolWindowEx),
-                        new JsonStructureOnToolWindowAction(window, toolWindowEx),
+                List.of(new JsonStructureOnToolWindowAction(window, toolWindowEx),
                         new JsonPathFilterOnTextFieldAction(window),
-                        new JsonHistoryAction(window),
+                        Separator.create(),
+                        new JsonHistoryAction(window, toolWindowEx),
                         new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
 
-        // SimpleActionGroup group = new SimpleActionGroup();
-        // group.add(new JsonHistoryAction());
-        // toolWindow.setAdditionalGearActions(group);
+        SimpleActionGroup group = new SimpleActionGroup();
+        group.add(new FloatingWindowAction(toolWindowEx));
 
         toolWindow.setTitleActions(dumbAwareActions);
+        toolWindow.setAdditionalGearActions(group);
         Content content = contentFactory.createContent(window.getRootPanel(), null, false);
         contentManager.addContent(content);
 
