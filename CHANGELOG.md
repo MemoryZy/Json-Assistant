@@ -1,6 +1,14 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 增加 JSONPath 匹配 JSON 功能
+- 增加 JSON 历史记录功能
+- 插件性能优化
+- 增设快捷入门指南
+- Added the JSONPath matching JSON function.
+- Added JSON history function.
+- Plug-in performance optimization.
+- Added the quick Start Guide.
 
 ## [1.4.0] - 2024-08-06
 
