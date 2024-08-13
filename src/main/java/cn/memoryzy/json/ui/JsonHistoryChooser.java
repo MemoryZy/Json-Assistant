@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui;
 
+import cn.memoryzy.json.actions.child.RemoveListElementAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
@@ -9,6 +10,10 @@ import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.json.json5.Json5Language;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionPopupMenu;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ToolWindow;
@@ -18,6 +23,7 @@ import com.intellij.ui.EditorTextField;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,8 +31,11 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -56,26 +65,31 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     private void createUIComponents() {
-        Font font = new Font("Consolas", Font.PLAIN, 15);
         showTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", true);
-        showTextField.setFont(font);
+        showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
-        List<HistoryModel> historyModels = HistoryModel.of(JsonViewerHistoryState.getInstance(project).getHistoryList());
+        List<String> historyList = JsonViewerHistoryState.getInstance(project).getHistoryList();
+        List<HistoryModel> historyModels = HistoryModel.of(historyList);
         DefaultListModel<HistoryModel> defaultListModel = JBList.createDefaultListModel(historyModels);
 
         showList = new JBList<>(defaultListModel);
-        showList.setFont(font);
+        showList.setFont(JBUI.Fonts.create("JetBrains Mono", 13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new ListSelectionListenerImpl());
         showList.setCellRenderer(new IconListCellRenderer());
-        ((JBList<?>)showList).setEmptyText(JsonAssistantBundle.messageOnSystem("json.history.window.empty.text"));
+        ((JBList<?>) showList).setEmptyText(JsonAssistantBundle.messageOnSystem("json.history.window.empty.text"));
+
+        initRightMousePopupMenu();
 
         // 选中第一条
         if (!historyModels.isEmpty()) {
             showList.setSelectedIndex(0);
         }
+    }
 
-        showList.requestFocusInWindow();
+    @Override
+    public @Nullable JComponent getPreferredFocusedComponent() {
+        return showList;
     }
 
     @Override
@@ -115,6 +129,38 @@ public class JsonHistoryChooser extends DialogWrapper {
 
         return true;
     }
+
+
+    private void initRightMousePopupMenu() {
+        DefaultActionGroup group = new DefaultActionGroup();
+        group.add(new RemoveListElementAction(showList));
+
+        ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
+        JPopupMenu popupMenu = actionPopupMenu.getComponent();
+
+        showList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    int x = e.getX();
+                    int y = e.getY();
+
+                    HistoryModel selectedValue = showList.getSelectedValue();
+                    if (Objects.isNull(selectedValue)) {
+                        int index = showList.locationToIndex(new Point(x, y));
+                        if (index != -1) {
+                            showList.setSelectedIndex(index);
+                            popupMenu.show(showList, x, y);
+                        }
+                    } else {
+                        popupMenu.show(showList, x, y);
+                    }
+                }
+            }
+        });
+    }
+
+
 
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryModel> {

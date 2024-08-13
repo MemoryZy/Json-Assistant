@@ -16,6 +16,8 @@
  - JavaBean to JSON
  - JSON to JavaBean
  - Kotlin Properties to JSON
+ - JSON History
+ - JSONPath Match
  - Format conversion (XML and JSON)
 
 

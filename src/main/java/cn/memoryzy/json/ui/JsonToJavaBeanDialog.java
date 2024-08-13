@@ -40,8 +40,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 import java.util.*;
 
@@ -74,13 +72,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.classNameErrorPopupDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
         this.jsonErrorPopupDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
 
-        getWindow().addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowOpened(WindowEvent e) {
-                classNameTextField.requestFocusInWindow();
-            }
-        });
-
         // 非模态弹窗（可以在展示弹窗时，不限制主页面的操作）
         setModal(false);
 
@@ -112,6 +103,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         actions.add(getCancelAction());
         actions.add(getHelpAction());
         return actions.toArray(new Action[0]);
+    }
+
+    @Override
+    public @Nullable JComponent getPreferredFocusedComponent() {
+        return classNameTextField;
     }
 
     @Override

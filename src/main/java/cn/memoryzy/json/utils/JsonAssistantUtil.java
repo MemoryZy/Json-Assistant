@@ -1,5 +1,7 @@
 package cn.memoryzy.json.utils;
 
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
@@ -25,6 +27,9 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.ui.LanguageTextField;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -114,12 +119,38 @@ public class JsonAssistantUtil {
     }
 
 
-    public static String truncateText(String text, int maxLength) {
+    public static String truncateText(String text, int maxLength, String omitHint) {
         if (text.length() > maxLength) {
-            return text.substring(0, maxLength);
+            return text.substring(0, maxLength) + " " + omitHint;
         } else {
             return text;
         }
+    }
+
+    public static Class<?> getClass(String classQualifiedName){
+        try {
+            return Class.forName(classQualifiedName);
+        } catch (ClassNotFoundException e) {
+            return null;
+        }
+    }
+
+    public static Object getStaticFinalFieldValue(Class<?> clz, String fieldName) {
+        Field matchField = null;
+        try {
+            for (Field field : ClassUtil.getDeclaredFields(clz)) {
+                if (Objects.equals(fieldName, field.getName())) {
+                    // 检查字段是否是静态且Final的
+                    if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) {
+                        matchField = field;
+                        break;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+        }
+
+        return Objects.isNull(matchField) ? null : ReflectUtil.getStaticFieldValue(matchField);
     }
 
 }

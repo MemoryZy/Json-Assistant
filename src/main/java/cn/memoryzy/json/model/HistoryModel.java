@@ -42,7 +42,7 @@ public class HistoryModel {
         List<HistoryModel> models = new ArrayList<>();
         for (int i = 0; i < historyList.size(); i++) {
             String element = historyList.get(i);
-            models.add(new HistoryModel(i, JsonAssistantUtil.truncateText(element, 45) + " ...", element));
+            models.add(new HistoryModel(i, JsonAssistantUtil.truncateText(element, 45, "..."), element));
         }
 
         return models;

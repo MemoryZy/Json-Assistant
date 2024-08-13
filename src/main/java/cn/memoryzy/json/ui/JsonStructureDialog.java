@@ -400,7 +400,7 @@ public class JsonStructureDialog extends DialogWrapper {
         group.addSeparator();
         group.add(new CollapseMultiAction(tree));
         group.addSeparator();
-        group.add(new RemoveAction(tree));
+        group.add(new RemoveTreeNodeAction(tree));
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
         JPopupMenu popupMenu = actionPopupMenu.getComponent();
 

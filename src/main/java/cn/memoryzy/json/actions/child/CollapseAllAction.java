@@ -4,7 +4,7 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.basic.CustomizedUI;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.ui.AnActionButton;
+import com.intellij.ui.DumbAwareActionButton;
 import com.intellij.ui.treeStructure.Tree;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-public class CollapseAllAction extends AnActionButton {
+public class CollapseAllAction extends DumbAwareActionButton {
     private final Tree tree;
 
     public CollapseAllAction(Tree tree, JRootPane rootPane) {

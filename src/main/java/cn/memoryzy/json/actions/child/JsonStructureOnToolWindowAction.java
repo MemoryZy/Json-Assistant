@@ -7,12 +7,13 @@ import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
-public class JsonStructureOnToolWindowAction extends DumbAwareAction {
+public class JsonStructureOnToolWindowAction extends DumbAwareAction implements UpdateInBackground {
     private final JsonViewerWindow window;
 
     public JsonStructureOnToolWindowAction(JsonViewerWindow window, ToolWindowEx toolWindowEx) {
