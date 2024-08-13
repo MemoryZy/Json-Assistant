@@ -2,7 +2,7 @@ package cn.memoryzy.json.toolwindows;
 
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;

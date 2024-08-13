@@ -1,4 +1,4 @@
-package cn.memoryzy.json.constant;
+package cn.memoryzy.json.constants;
 
 import java.math.BigDecimal;
 import java.sql.Time;

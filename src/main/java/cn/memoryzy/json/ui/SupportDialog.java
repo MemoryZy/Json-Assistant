@@ -2,7 +2,7 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.ui.basic.HyperLinkJBLabel;
 import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import com.intellij.openapi.project.Project;

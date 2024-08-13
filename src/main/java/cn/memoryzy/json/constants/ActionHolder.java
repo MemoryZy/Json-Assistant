@@ -1,4 +1,4 @@
-package cn.memoryzy.json.constant;
+package cn.memoryzy.json.constants;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.AnAction;

@@ -2,9 +2,9 @@ package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.actions.child.RemoveListElementAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
-import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.model.HistoryModel;
+import cn.memoryzy.json.constants.HyperLinks;
+import cn.memoryzy.json.constants.PluginConstant;
+import cn.memoryzy.json.models.HistoryModel;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import com.intellij.icons.AllIcons;

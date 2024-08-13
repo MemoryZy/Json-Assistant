@@ -1,4 +1,4 @@
-package cn.memoryzy.json.constant;
+package cn.memoryzy.json.constants;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;

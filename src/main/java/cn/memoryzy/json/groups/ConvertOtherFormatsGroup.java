@@ -1,4 +1,4 @@
-package cn.memoryzy.json.group;
+package cn.memoryzy.json.groups;
 
 import cn.memoryzy.json.actions.child.transform.ToXmlAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;

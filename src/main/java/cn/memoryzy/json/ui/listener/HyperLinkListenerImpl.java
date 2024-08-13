@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.listener;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;

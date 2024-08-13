@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.formats.BaseFormatModel;
+import cn.memoryzy.json.models.formats.BaseFormatModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;

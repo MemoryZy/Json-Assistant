@@ -30,11 +30,11 @@
                     doNotActivateOnStart="true"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
-        <postStartupActivity implementation="cn.memoryzy.json.listener.PluginActivityManager"/>
+        <postStartupActivity implementation="cn.memoryzy.json.listeners.PluginActivityManager"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="cn.memoryzy.json.listener.PluginActivityManager"
+        <listener class="cn.memoryzy.json.listeners.PluginActivityManager"
                   topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
@@ -58,8 +58,8 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.group.JsonAssistantPopupGroup"/>
-        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.group.ConvertOtherFormatsGroup"/>
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.groups.JsonAssistantPopupGroup"/>
+        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.groups.ConvertOtherFormatsGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>

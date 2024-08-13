@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constants.PluginConstant;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;

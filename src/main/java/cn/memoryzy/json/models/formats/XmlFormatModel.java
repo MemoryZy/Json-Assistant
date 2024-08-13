@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.models.formats;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.XmlUtil;

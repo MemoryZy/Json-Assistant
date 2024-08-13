@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.model.HistoryModel;
+import cn.memoryzy.json.models.HistoryModel;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;

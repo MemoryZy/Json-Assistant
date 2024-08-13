@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model;
+package cn.memoryzy.json.models;
 
 import java.util.AbstractList;
 import java.util.ArrayList;

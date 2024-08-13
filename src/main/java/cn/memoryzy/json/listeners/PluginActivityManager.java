@@ -1,7 +1,7 @@
-package cn.memoryzy.json.listener;
+package cn.memoryzy.json.listeners;
 
-import cn.memoryzy.json.constant.HyperLinks;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constants.HyperLinks;
+import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.utils.Notifications;
 import com.intellij.ide.plugins.DynamicPluginListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;

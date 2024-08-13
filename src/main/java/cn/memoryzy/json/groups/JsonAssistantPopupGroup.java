@@ -1,9 +1,9 @@
-package cn.memoryzy.json.group;
+package cn.memoryzy.json.groups;
 
 import cn.memoryzy.json.actions.JsonAssistantAction;
 import cn.memoryzy.json.actions.OnlineDocAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constant.ActionHolder;
+import cn.memoryzy.json.constants.ActionHolder;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;

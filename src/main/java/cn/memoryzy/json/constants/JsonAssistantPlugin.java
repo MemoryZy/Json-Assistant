@@ -1,4 +1,4 @@
-package cn.memoryzy.json.constant;
+package cn.memoryzy.json.constants;
 
 import com.intellij.diagnostic.PluginException;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;

@@ -1,8 +1,8 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.group.JsonAssistantPopupGroup;
-import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
+import cn.memoryzy.json.groups.JsonAssistantPopupGroup;
+import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;

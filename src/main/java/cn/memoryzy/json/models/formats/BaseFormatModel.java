@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.models.formats;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
