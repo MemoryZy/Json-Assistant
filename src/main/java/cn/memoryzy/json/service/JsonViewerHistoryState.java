@@ -1,9 +1,11 @@
 package cn.memoryzy.json.service;
 
 import cn.memoryzy.json.models.LimitedList;
+import cn.memoryzy.json.service.converter.LimitedListConverter;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.xmlb.annotations.OptionTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,7 +25,8 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
         return project.getService(JsonViewerHistoryState.class);
     }
 
-    public List<String> historyList;
+    @OptionTag(converter = LimitedListConverter.class)
+    public LimitedList<String> historyList;
 
     @Override
     public @Nullable JsonViewerHistoryState getState() {
