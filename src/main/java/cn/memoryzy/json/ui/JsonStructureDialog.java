@@ -66,7 +66,7 @@ public class JsonStructureDialog extends DialogWrapper {
         tree.setFont(new Font("JetBrains Mono", Font.PLAIN, 12));
 
         initCellRenderer();
-        initPopupMenu();
+        initRightMousePopupMenu();
         // 触发快速检索
         new TreeSpeedSearch(tree);
 
@@ -387,7 +387,7 @@ public class JsonStructureDialog extends DialogWrapper {
         });
     }
 
-    private void initPopupMenu() {
+    private void initRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
         group.addSeparator();
         group.add(new CopyKeyAction(tree));

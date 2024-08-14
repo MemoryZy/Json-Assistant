@@ -41,4 +41,10 @@ public class LimitedList<T> extends AbstractList<T> {
     public boolean contains(Object element) {
         return list.contains(element);
     }
+
+    @Override
+    public T remove(int index) {
+        return list.remove(index);
+    }
+
 }

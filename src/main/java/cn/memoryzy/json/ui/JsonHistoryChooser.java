@@ -51,7 +51,6 @@ public class JsonHistoryChooser extends DialogWrapper {
         this.project = project;
         this.window = window;
 
-        // scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setViewportBorder(JBUI.Borders.empty());
         scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
 
@@ -70,7 +69,8 @@ public class JsonHistoryChooser extends DialogWrapper {
         showTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
-        List<String> historyList = JsonViewerHistoryState.getInstance(project).getHistoryList();
+        JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
+        List<String> historyList = historyState.getHistoryList();
         List<HistoryModel> historyModels = HistoryModel.of(historyList);
         DefaultListModel<HistoryModel> defaultListModel = JBList.createDefaultListModel(historyModels);
 
@@ -132,7 +132,6 @@ public class JsonHistoryChooser extends DialogWrapper {
         return true;
     }
 
-
     private void initRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(new RemoveListElementAction(showList));
@@ -161,8 +160,6 @@ public class JsonHistoryChooser extends DialogWrapper {
             }
         });
     }
-
-
 
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryModel> {
