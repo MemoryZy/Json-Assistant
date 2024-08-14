@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui.basic;
 
 import com.intellij.lang.Language;
+import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -50,6 +51,9 @@ public class CustomizedLanguageTextEditor extends LanguageTextField {
         if (!needBorder) {
             editor.setBorder(null);
         }
+
+        EditorSettings editorSettings = editor.getSettings();
+        editorSettings.setWhitespacesShown(true);
 
         return editor;
     }

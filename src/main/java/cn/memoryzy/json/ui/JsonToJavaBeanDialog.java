@@ -19,7 +19,7 @@ import cn.memoryzy.json.utils.Notifications;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.json.json5.Json5Language;
+import com.intellij.json.JsonLanguage;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -86,7 +86,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private void createUIComponents() {
         // 声明 Json 类型编辑器
-        jsonTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", true);
+        jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
     }

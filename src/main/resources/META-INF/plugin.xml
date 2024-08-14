@@ -42,6 +42,7 @@
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.actions.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.actions.JsonMinifyAction"/>
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.actions.JsonStructureAction"/>
+        <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.actions.JsonTextDiffAction"/>
         <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.actions.ShortcutAction"/>
 
         <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.actions.OtherFormatsToJsonAction">

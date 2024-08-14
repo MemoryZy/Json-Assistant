@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +83,7 @@ public class JsonUtil {
         }
 
         // 转义判断
-        String json = StringEscapeUtils.unescapeJava(includeJsonStr);
+        String json = StringEscapeUtils.unescapeJson(includeJsonStr);
         if (isJsonStr(json)) {
             return json;
         }

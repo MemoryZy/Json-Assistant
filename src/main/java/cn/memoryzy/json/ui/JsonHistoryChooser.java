@@ -9,7 +9,7 @@ import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.json.json5.Json5Language;
+import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
@@ -18,10 +18,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.ui.ColoredListCellRenderer;
-import com.intellij.ui.EditorTextField;
-import com.intellij.ui.LanguageTextField;
-import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -45,6 +42,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     private JPanel rootPanel;
     private JList<HistoryModel> showList;
     private EditorTextField showTextField;
+    private JScrollPane scrollPane;
     private final Project project;
     private final JsonViewerWindow window;
 
@@ -52,6 +50,10 @@ public class JsonHistoryChooser extends DialogWrapper {
         super(project);
         this.project = project;
         this.window = window;
+
+        // scrollPane.setBorder(JBUI.Borders.empty());
+        scrollPane.setViewportBorder(JBUI.Borders.empty());
+        scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
 
         setModal(false);
         setTitle(JsonAssistantBundle.message("json.history.window.title"));
@@ -65,7 +67,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     private void createUIComponents() {
-        showTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", true);
+        showTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
         List<String> historyList = JsonViewerHistoryState.getInstance(project).getHistoryList();

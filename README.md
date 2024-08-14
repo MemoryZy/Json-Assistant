@@ -28,6 +28,9 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
  - JavaBean to JSON
  - JSON to JavaBean
  - Kotlin Properties to JSON
+ - JSON History
+ - JSONPath Match
+ - JSON Text Diff
  - Format conversion (XML and JSON are converted to each other)
 
 <br/>

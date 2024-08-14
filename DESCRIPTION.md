@@ -18,6 +18,7 @@
  - Kotlin Properties to JSON
  - JSON History
  - JSONPath Match
+ - JSON Text Diff
  - Format conversion (XML and JSON)
 
 

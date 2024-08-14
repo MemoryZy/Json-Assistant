@@ -6,7 +6,7 @@ import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
-import com.intellij.json.json5.Json5Language;
+import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
@@ -35,7 +35,7 @@ public class JsonViewerWindow {
     }
 
     public JPanel getRootPanel() {
-        this.jsonTextField = new CustomizedLanguageTextEditor(Json5Language.INSTANCE, project, "", false);
+        this.jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", false);
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         this.jsonTextField.addFocusListener(new FocusListenerImpl());

@@ -2,7 +2,7 @@ package cn.memoryzy.json.models.formats;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.utils.JsonUtil;
-import com.intellij.json.json5.Json5FileType;
+import com.intellij.json.JsonFileType;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -114,6 +114,6 @@ public class JsonFormatHandleModel extends BaseFormatModel {
 
     @Override
     public FileType getFileType() {
-        return Json5FileType.INSTANCE;
+        return JsonFileType.INSTANCE;
     }
 }

@@ -24,6 +24,9 @@
 - JavaBean 转换为 JSON
 - JSON 转换为 JavaBean
 - Kotlin 属性转为 JSON
+- JSON 历史记录
+- JSONPath 匹配
+- JSON 文本比对
 - 格式转换 (XML 与 JSON 互相转换)
 
 <br/>
