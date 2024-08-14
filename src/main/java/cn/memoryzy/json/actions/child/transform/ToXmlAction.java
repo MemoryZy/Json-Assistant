@@ -1,5 +1,6 @@
 package cn.memoryzy.json.actions.child.transform;
 
+import cn.memoryzy.json.actions.JsonBeautifyAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
@@ -11,6 +12,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -31,6 +33,7 @@ public class ToXmlAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
         JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
@@ -46,7 +49,7 @@ public class ToXmlAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model, true, false);
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model, true, JsonBeautifyAction.isNotWriteDoc(project, document, model));
     }
 
 }
