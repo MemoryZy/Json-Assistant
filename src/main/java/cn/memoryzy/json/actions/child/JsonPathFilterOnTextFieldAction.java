@@ -42,7 +42,7 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         if (project == null) return;
 
         Component source = (Component) e.getInputEvent().getSource();
-        RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 4), source.getHeight() + 1));
+        RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 4 + 15), source.getHeight() + 1));
 
         JsonPathDialog jsonPathDialog = new JsonPathDialog(project, window.getJsonTextField());
         JPanel rootPanel = jsonPathDialog.getRootPanel();
