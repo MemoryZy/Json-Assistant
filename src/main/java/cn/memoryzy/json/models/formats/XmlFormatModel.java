@@ -1,6 +1,8 @@
 package cn.memoryzy.json.models.formats;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.XmlUtil;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.editor.Caret;
@@ -23,7 +25,8 @@ public class XmlFormatModel extends BaseFormatModel {
 
     @Override
     public String convertToJson() {
-        return XmlUtil.xmlToJson(getContent());
+        String json = XmlUtil.xmlToJson(getContent());
+        return StrUtil.isNotBlank(json) ? JsonUtil.formatJson(json) : "";
     }
 
     @Override

@@ -5,7 +5,7 @@ import cn.memoryzy.json.service.converter.LimitedListConverter;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.xmlb.annotations.OptionTag;
+import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +16,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/7/22
  */
-@State(name = "JsonAssistantViewerHistory")
+@State(name = "JsonAssistantJsonViewerHistory")
 public class JsonViewerHistoryState implements PersistentStateComponent<JsonViewerHistoryState> {
 
     public static final int HISTORY_LIMIT = 20;
@@ -25,7 +25,7 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
         return project.getService(JsonViewerHistoryState.class);
     }
 
-    @OptionTag(converter = LimitedListConverter.class)
+    @Attribute(converter = LimitedListConverter.class)
     public LimitedList<String> historyList;
 
     @Override
@@ -47,5 +47,18 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
         if (Objects.isNull(historyList)) {
             historyList = new LimitedList<>(HISTORY_LIMIT);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JsonViewerHistoryState that = (JsonViewerHistoryState) o;
+        return Objects.equals(historyList, that.historyList);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(historyList);
     }
 }

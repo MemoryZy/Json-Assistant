@@ -8,16 +8,21 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.PluginConstant;
 import cn.memoryzy.json.models.formats.BaseFormatModel;
+import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.models.formats.XmlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import com.intellij.codeInsight.hint.HintManager;
+import com.intellij.ide.highlighter.XmlFileType;
+import com.intellij.json.JsonFileType;
+import com.intellij.json.json5.Json5FileType;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.wm.ToolWindow;
@@ -29,6 +34,7 @@ import com.intellij.ui.LanguageTextField;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -127,7 +133,7 @@ public class JsonAssistantUtil {
         }
     }
 
-    public static Class<?> getClass(String classQualifiedName){
+    public static Class<?> getClass(String classQualifiedName) {
         try {
             return Class.forName(classQualifiedName);
         } catch (ClassNotFoundException e) {
@@ -153,6 +159,43 @@ public class JsonAssistantUtil {
         return Objects.isNull(matchField) ? null : ReflectUtil.getStaticFieldValue(matchField);
     }
 
+    /**
+     * 是否不允许在当前 JSON 文档内写入；true，不写；false：写入
+     */
+    public static boolean isNotWriteJsonDoc(Project project, Document document, JsonFormatHandleModel model) {
+        return isNotWriteDoc(project, document, model, JsonFileType.INSTANCE, Json5FileType.INSTANCE);
+    }
 
+    /**
+     * 是否不允许在当前 XML 文档内写入；true，不写；false：写入
+     */
+    public static boolean isNotWriteXmlDoc(Project project, Document document, JsonFormatHandleModel model) {
+        return isNotWriteDoc(project, document, model, XmlFileType.INSTANCE);
+    }
+
+    /**
+     * 是否不允许在当前文档内写入；true，不写；false：写入
+     */
+    public static boolean isNotWriteDoc(Project project, Document document, JsonFormatHandleModel model, FileType... fileTypes) {
+        // 是否在当前文档内写入；true，不写；false：写入
+        boolean isNotWriteDoc;
+        // 文档若可写入
+        if (document.isWritable()) {
+            // 当前有无选中文本
+            if (model.getSelectedText()) {
+                // 选中了文本，将在选中区域内写入更改后的文本
+                isNotWriteDoc = false;
+            } else {
+                FileType fileType = PlatformUtil.getDocumentFileType(project, document);
+                // 若未选中文本，判断是否符合文件类型，符合的话也可写入（置为false，表示可写入）
+                isNotWriteDoc = !Arrays.asList(fileTypes).contains(fileType);
+            }
+        } else {
+            // 不可写入
+            isNotWriteDoc = true;
+        }
+
+        return isNotWriteDoc;
+    }
 
 }

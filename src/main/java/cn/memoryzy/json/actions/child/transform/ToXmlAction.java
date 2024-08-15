@@ -1,6 +1,5 @@
 package cn.memoryzy.json.actions.child.transform;
 
-import cn.memoryzy.json.actions.JsonBeautifyAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
@@ -49,7 +48,8 @@ public class ToXmlAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr, model, true, JsonBeautifyAction.isNotWriteDoc(project, document, model));
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, document, xmlStr,
+                model, true, JsonAssistantUtil.isNotWriteXmlDoc(project, document, model));
     }
 
 }

@@ -29,8 +29,8 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/14
  */
-public class JsonPathDialog {
-    private static final Logger LOG = Logger.getInstance(JsonPathDialog.class);
+public class JsonPathPanel {
+    private static final Logger LOG = Logger.getInstance(JsonPathPanel.class);
     public static final String TEXT_FIELD_PROPERTY_NAME = "JsonPathTextFieldAction";
     public static final String JSON_PATH_LANGUAGE_CLASS_NAME = "com.intellij.jsonpath.JsonPathLanguage";
     private static final Class<?> JSON_PATH_LANGUAGE_CLASS = JsonAssistantUtil.getClass(JSON_PATH_LANGUAGE_CLASS_NAME);
@@ -39,17 +39,16 @@ public class JsonPathDialog {
     private final CustomizedLanguageTextEditor showTextEditor;
     private final Runnable action;
 
-    public JsonPathDialog(Project project, LanguageTextField jsonTextField) {
+    public JsonPathPanel(Project project, LanguageTextField jsonTextField) {
         this.action = () -> setJsonPathResult(jsonTextField.getText());
         this.jsonPathTextField = createJsonPathTextField(project, action);
-        this.jsonPathTextField.setFont(JBUI.Fonts.create("JetBrains Mono", 13));
         this.showTextEditor = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         this.showTextEditor.setFont(JBUI.Fonts.create("Consolas", 14));
     }
 
     public JPanel getRootPanel() {
         JPanel secondPanel = new JPanel(new BorderLayout());
-        JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.json.path.separate.label.text"));
+        JBLabel label = new JBLabel(" " + JsonAssistantBundle.messageOnSystem("dialog.json.path.separate.label.text"));
         secondPanel.add(label, BorderLayout.NORTH);
         secondPanel.add(showTextEditor, BorderLayout.CENTER);
 
@@ -68,6 +67,7 @@ public class JsonPathDialog {
 
     private @NotNull JComponent createJsonPathTextField(Project project, Runnable action) {
         JComponent jsonPathTextField;
+        Font font = new Font("Microsoft YaHei UI", Font.PLAIN, 13);
 
         if (JSON_PATH_LANGUAGE_CLASS != null) {
             Language language = PlainTextLanguage.INSTANCE;
@@ -76,11 +76,16 @@ public class JsonPathDialog {
                 language = (Language) instance;
             }
 
-            jsonPathTextField = new LanguageTextField(language, project, "");
-            jsonPathTextField.setFont(JBUI.Fonts.create("JetBrains Mono", 13));
+            LanguageTextField languageTextField = new LanguageTextField(language, project, "");
+            languageTextField.setFont(font);
+            languageTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.placeholder"));
+            jsonPathTextField = languageTextField;
         } else {
-            jsonPathTextField = new ExtendableTextField(20);
-            ((ExtendableTextField) jsonPathTextField).addExtension(new SearchExtension(action));
+            ExtendableTextField extendableTextField = new ExtendableTextField(20);
+            extendableTextField.setFont(font);
+            extendableTextField.addExtension(new SearchExtension(action));
+            extendableTextField.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.placeholder"));
+            jsonPathTextField = extendableTextField;
         }
 
         return jsonPathTextField;
@@ -100,7 +105,6 @@ public class JsonPathDialog {
 
         try {
             Object result = JsonPath.read(jsonStr, jsonPath);
-            String name = result.getClass().getName();
             String jsonResult;
             if (result instanceof Map || result instanceof Iterable) {
                 jsonResult = JsonUtil.formatJson(JSONUtil.toJsonStr(result));

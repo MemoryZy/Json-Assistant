@@ -36,7 +36,8 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
         try {
             BaseFormatModel model = JsonAssistantUtil.matchFormats(e.getProject(), editor);
             if (Objects.nonNull(model)) {
-                JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(), model.convertToJson(), model, true, true);
+                JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(),
+                        model.convertToJson(), model, true, true);
             }
         } catch (Exception ignored) {
         }

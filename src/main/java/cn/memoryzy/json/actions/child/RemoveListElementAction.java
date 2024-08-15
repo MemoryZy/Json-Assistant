@@ -10,7 +10,6 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 /**
@@ -26,7 +25,7 @@ public class RemoveListElementAction extends DumbAwareAction {
                 null);
         this.list = list;
 
-        registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke((char) KeyEvent.VK_DELETE)), list);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("DELETE"), list);
     }
 
     @Override
@@ -53,7 +52,5 @@ public class RemoveListElementAction extends DumbAwareAction {
             // 如果还有元素，选中第一个元素
             list.setSelectedIndex(0);
         }
-
-
     }
 }

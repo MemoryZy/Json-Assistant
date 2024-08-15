@@ -6,20 +6,15 @@ import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
-import com.intellij.json.JsonFileType;
-import com.intellij.json.json5.Json5FileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -55,27 +50,8 @@ public class JsonBeautifyAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson, model, true, isNotWriteDoc(project, document, model));
+        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson,
+                model, true, JsonAssistantUtil.isNotWriteJsonDoc(project, document, model));
     }
 
-    /**
-     * 是否在当前文档内写入；true，不写；false：写入
-     */
-    public static boolean isNotWriteDoc(Project project, Document document, JsonFormatHandleModel model) {
-        // 是否在当前文档内写入；true，不写；false：写入
-        boolean isNotWriteDoc;
-        if (document.isWritable()) {
-            if (model.getSelectedText()) {
-                isNotWriteDoc = false;
-            } else {
-                FileType fileType = PlatformUtil.getDocumentFileType(project, document);
-                // 如果选中了，那么在选中内写入
-                isNotWriteDoc = !Objects.equals(fileType, JsonFileType.INSTANCE) && !Objects.equals(fileType, Json5FileType.INSTANCE);
-            }
-        } else {
-            isNotWriteDoc = true;
-        }
-
-        return isNotWriteDoc;
-    }
 }

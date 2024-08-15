@@ -2,7 +2,7 @@ package cn.memoryzy.json.actions.child;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonPathDialog;
+import cn.memoryzy.json.ui.JsonPathPanel;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.icons.AllIcons;
@@ -44,9 +44,9 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         Component source = (Component) e.getInputEvent().getSource();
         RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 4 + 15), source.getHeight() + 1));
 
-        JsonPathDialog jsonPathDialog = new JsonPathDialog(project, window.getJsonTextField());
-        JPanel rootPanel = jsonPathDialog.getRootPanel();
-        JComponent jsonPathTextField = jsonPathDialog.getJsonPathTextField();
+        JsonPathPanel jsonPathPanel = new JsonPathPanel(project, window.getJsonTextField());
+        JPanel rootPanel = jsonPathPanel.getRootPanel();
+        JComponent jsonPathTextField = jsonPathPanel.getJsonPathTextField();
 
         JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(rootPanel, jsonPathTextField)
@@ -67,7 +67,7 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
                 .createPopup();
 
         // 注册回车动作
-        Runnable action = (Runnable) rootPanel.getClientProperty(JsonPathDialog.TEXT_FIELD_PROPERTY_NAME);
+        Runnable action = (Runnable) rootPanel.getClientProperty(JsonPathPanel.TEXT_FIELD_PROPERTY_NAME);
         new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
