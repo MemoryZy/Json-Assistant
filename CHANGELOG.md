@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.5.0] - 2024-08-15
+
 - 增加 JSONPath 匹配 JSON 功能。
 - 增加 JSON 历史记录功能。
 - 增加 JSON 文本比对功能。
@@ -116,7 +119,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.2.1...v1.3.0
