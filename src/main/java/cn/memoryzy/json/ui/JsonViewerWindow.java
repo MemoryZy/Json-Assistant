@@ -1,6 +1,8 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.models.LimitedList;
+import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
@@ -18,7 +20,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Memory
@@ -51,7 +53,7 @@ public class JsonViewerWindow {
         if (StrUtil.isNotBlank(jsonStr)) {
             jsonTextField.setText(jsonStr);
         } else {
-            List<String> historyList = historyState.getHistoryList();
+            LimitedList<String> historyList = historyState.getHistoryList();
             int historySize = historyList.size();
 
             if (historySize > 0) {
@@ -79,17 +81,28 @@ public class JsonViewerWindow {
     private class DocumentListenerImpl implements DocumentListener {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
-            List<String> historyList = historyState.getHistoryList();
-            String text = jsonTextField.getText();
+            LimitedList<String> historyList = historyState.getHistoryList();
+            String text = StrUtil.trim(jsonTextField.getText());
             boolean contains = false;
             for (String history : historyList) {
-                if (StrUtil.equals(StrUtil.trim(text), StrUtil.trim(history))) {
+                if (StrUtil.equals(text, StrUtil.trim(history))) {
                     contains = true;
                 }
             }
 
             if (!contains && JsonUtil.isJsonStr(text)) {
-                historyList.add(text);
+                AsyncHolder.getInstance().executeOnPooledThread(() -> {
+                    try {
+                        TimeUnit.SECONDS.sleep(3);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    String newText = jsonTextField.getText();
+                    if (StrUtil.equals(StrUtil.trim(newText), text)) {
+                        historyList.add(text);
+                    }
+                });
             }
         }
     }
@@ -102,7 +115,10 @@ public class JsonViewerWindow {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
-                    jsonTextField.setText(jsonStr);
+                    if (StrUtil.isNotBlank(jsonStr)) {
+                        jsonStr = JsonUtil.formatJson(jsonStr);
+                        jsonTextField.setText(jsonStr);
+                    }
                 }
             }
         }

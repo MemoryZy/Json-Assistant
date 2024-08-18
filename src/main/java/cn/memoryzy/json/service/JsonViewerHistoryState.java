@@ -9,7 +9,6 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,7 +37,7 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
         this.historyList = state.historyList;
     }
 
-    public List<String> getHistoryList() {
+    public LimitedList<String> getHistoryList() {
         initHistoryList();
         return historyList;
     }
