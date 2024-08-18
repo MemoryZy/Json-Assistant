@@ -1,6 +1,8 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 在 JSON 结构对话框中区分单数与复数术语 ([#21](https://github.com/MemoryZy/Json-Assistant/pull/21))。
+- Distinguish singular or plural terms in the JSON structure dialog ([#21](https://github.com/MemoryZy/Json-Assistant/pull/21)).
 
 ## [1.5.0] - 2024-08-15
 
