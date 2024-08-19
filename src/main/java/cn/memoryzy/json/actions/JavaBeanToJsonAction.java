@@ -2,7 +2,6 @@ package cn.memoryzy.json.actions;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JavaUtil;
@@ -61,12 +60,11 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
             JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap);
         } catch (Error e) {
             LOG.error(e);
-            // 给通知
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
             return;
         }
 
-        String jsonStr = JSONUtil.toJsonStr(jsonMap, JSONConfig.create().setStripTrailingZeros(false));
+        String jsonStr = JSONUtil.toJsonStr(jsonMap, JsonUtil.HUTOOL_JSON_CONFIG);
 
         // 添加至剪贴板
         PlatformUtil.setClipboard(JsonUtil.formatJson(jsonStr));

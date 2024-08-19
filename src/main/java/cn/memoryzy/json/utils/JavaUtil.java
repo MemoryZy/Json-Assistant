@@ -77,9 +77,19 @@ public class JavaUtil {
             // 是否为引用类型
             if (JavaUtil.isApplicationClsType(psiType)) {
                 // 嵌套Map（为了实现嵌套属性）
-                Map<String, Object> nestedJsonMap = new HashMap<>();
-                // 递归
-                recursionAddProperty(project, PsiTypesUtil.getPsiClass(psiType), nestedJsonMap, ignoreMap);
+                Map<String, Object> nestedJsonMap;
+
+                // 获取类型对应的Class
+                PsiClass fieldClz = PsiTypesUtil.getPsiClass(psiType);
+                // 判断属性中是否存在本类类型的嵌套
+                if (Objects.equals(psiClass, fieldClz)) {
+                    nestedJsonMap = null;
+                } else {
+                    nestedJsonMap = new HashMap<>();
+                    // 递归
+                    recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap);
+                }
+
                 // 添加至主Map
                 jsonMap.put(propertyName, nestedJsonMap);
             } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType) {

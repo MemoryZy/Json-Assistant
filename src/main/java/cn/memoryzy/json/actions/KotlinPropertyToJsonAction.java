@@ -1,7 +1,6 @@
 package cn.memoryzy.json.actions;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.*;
@@ -55,7 +54,7 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         }
 
         // 将Map转换为Json
-        String jsonStr = JSONUtil.toJsonStr(jsonMap, JSONConfig.create().setStripTrailingZeros(false));
+        String jsonStr = JSONUtil.toJsonStr(jsonMap, JsonUtil.HUTOOL_JSON_CONFIG);
         // 添加至剪贴板
         PlatformUtil.setClipboard(JsonUtil.formatJson(jsonStr));
 

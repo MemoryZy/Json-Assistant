@@ -3,7 +3,6 @@ package cn.memoryzy.json.utils;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONConfig;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.PluginConstant;
@@ -50,8 +49,7 @@ public class JsonAssistantUtil {
             return;
         }
 
-        JSONConfig jsonConfig = JSONConfig.create().setIgnoreNullValue(false);
-        JsonStructureDialog dialog = new JsonStructureDialog(JSONUtil.parse(jsonStr, jsonConfig));
+        JsonStructureDialog dialog = new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG));
         ApplicationManager.getApplication().invokeLater(dialog::show);
     }
 

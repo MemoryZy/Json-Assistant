@@ -26,6 +26,8 @@ public class JsonUtil {
 
     public static final ObjectMapper MAPPER = new ObjectMapper();
 
+    public static final JSONConfig HUTOOL_JSON_CONFIG = JSONConfig.create().setStripTrailingZeros(false).setIgnoreNullValue(false);
+
     public static boolean isJsonStr(String text) {
         try {
             JSONUtil.parse(text);
@@ -56,7 +58,7 @@ public class JsonUtil {
 
 
     public static String formatJson(String jsonStr) {
-        JSON json = JSONUtil.parse(jsonStr, JSONConfig.create().setStripTrailingZeros(false));
+        JSON json = JSONUtil.parse(jsonStr, HUTOOL_JSON_CONFIG);
         return json.toJSONString(2);
     }
 
@@ -77,6 +79,7 @@ public class JsonUtil {
      * @param includeJsonStr 包含JSON字符串的字符串
      * @return 提取的JSON字符串，如果给定的字符串为空或null，则返回空字符串
      */
+    @SuppressWarnings("deprecation")
     public static String extractJsonStr(String includeJsonStr) {
         if (StrUtil.isBlank(includeJsonStr)) {
             return "";

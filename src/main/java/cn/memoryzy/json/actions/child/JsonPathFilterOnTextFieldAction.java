@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 /**
  * @author Memory
@@ -68,12 +67,19 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
 
         // 注册回车动作
         Runnable action = (Runnable) rootPanel.getClientProperty(JsonPathPanel.TEXT_FIELD_PROPERTY_NAME);
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                action.run();
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke((char) KeyEvent.VK_ENTER)), jsonPathTextField, popup);
+        // Enter
+        DumbAwareAction.create(event -> action.run())
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), jsonPathTextField, popup);
+
+        // Alt+向上箭头
+        DumbAwareAction.create(event -> {
+
+        }).registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), jsonPathTextField, popup);
+
+        // Alt+向下箭头
+        DumbAwareAction.create(event -> {
+
+        }).registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), jsonPathTextField, popup);
 
         // 弹出
         popup.show(relativePoint);
