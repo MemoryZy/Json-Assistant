@@ -143,6 +143,7 @@ public class JsonPathPanel {
         List<String> jsonPathHistoryList = getJsonPathHistoryList(project);
 
 
+
     }
 
     public JComponent getJsonPathTextField() {
