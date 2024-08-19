@@ -4,21 +4,24 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
-import cn.memoryzy.json.ui.extension.SearchExtension;
+import cn.memoryzy.json.ui.basic.jsonpath.JsonPathExtendableComboBoxEditor;
+import cn.memoryzy.json.ui.basic.jsonpath.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.json.JsonLanguage;
-import com.intellij.lang.Language;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.fileTypes.PlainTextLanguage;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.jayway.jsonpath.JsonPath;
 import org.jetbrains.annotations.NotNull;
@@ -37,14 +40,15 @@ import java.util.Objects;
 public class JsonPathPanel {
     private static final Logger LOG = Logger.getInstance(JsonPathPanel.class);
     public static final String TEXT_FIELD_PROPERTY_NAME = "JsonPathTextFieldAction";
-    public static final String JSON_PATH_LANGUAGE_CLASS_NAME = "com.intellij.jsonpath.JsonPathLanguage";
-    private static final Class<?> JSON_PATH_LANGUAGE_CLASS = JsonAssistantUtil.getClass(JSON_PATH_LANGUAGE_CLASS_NAME);
+    public static final String JSON_PATH_FILE_TYPE_CLASS_NAME = "com.intellij.jsonpath.JsonPathFileType";
+    public static final Class<?> JSON_PATH_FILE_TYPE_CLASS = JsonAssistantUtil.getClass(JSON_PATH_FILE_TYPE_CLASS_NAME);
     public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
 
-    private final JComponent jsonPathTextField;
+    private final ComboBox<String> jsonPathTextField;
     private final CustomizedLanguageTextEditor showTextEditor;
     private final Runnable action;
     private final Project project;
+    private ComboBoxEditor editor;
 
     public JsonPathPanel(Project project, LanguageTextField jsonTextField) {
         this.project = project;
@@ -83,39 +87,27 @@ public class JsonPathPanel {
     }
 
 
-    private @NotNull JComponent createJsonPathTextField(Project project, Runnable action) {
-        JComponent jsonPathTextField;
-        Font font = new Font("Microsoft YaHei UI", Font.PLAIN, 13);
+    private @NotNull ComboBox<String> createJsonPathTextField(Project project, Runnable action) {
+        JBFont font = JBUI.Fonts.label(13);
+        editor = JSON_PATH_FILE_TYPE_CLASS != null
+                ? new JsonPathFileTypeComboBoxEditor(project, getJsonPathFileType(), font)
+                : new JsonPathExtendableComboBoxEditor(action, font);
 
-        if (JSON_PATH_LANGUAGE_CLASS != null) {
-            Language language = PlainTextLanguage.INSTANCE;
-            Object instance = JsonAssistantUtil.getStaticFinalFieldValue(JSON_PATH_LANGUAGE_CLASS, "INSTANCE");
-            if (instance instanceof Language) {
-                language = (Language) instance;
-            }
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.setEditor(editor);
+        comboBox.setEditable(true);
 
-            LanguageTextField languageTextField = new LanguageTextField(language, project, "");
-            languageTextField.setFont(font);
-            languageTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.placeholder"));
-            jsonPathTextField = languageTextField;
-        } else {
-            ExtendableTextField extendableTextField = new ExtendableTextField(20);
-            extendableTextField.setFont(font);
-            extendableTextField.addExtension(new SearchExtension(action));
-            extendableTextField.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.placeholder"));
-            jsonPathTextField = extendableTextField;
+        for (String jsonPathHistory : getJsonPathHistoryList()) {
+            comboBox.addItem(jsonPathHistory);
         }
 
-        return jsonPathTextField;
+        return comboBox;
     }
 
     public void setJsonPathResult(String jsonStr) {
-        String jsonPath;
-        if (jsonPathTextField instanceof LanguageTextField) {
-            jsonPath = ((LanguageTextField) jsonPathTextField).getText();
-        } else {
-            jsonPath = ((ExtendableTextField) jsonPathTextField).getText();
-        }
+        String jsonPath = (editor instanceof JsonPathFileTypeComboBoxEditor)
+                ? ((JsonPathFileTypeComboBoxEditor) editor).getEditorText()
+                : ((JsonPathExtendableComboBoxEditor) editor).getEditorText();
 
         if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr) || !JsonUtil.isJsonStr(jsonStr)) {
             return;
@@ -133,15 +125,14 @@ public class JsonPathPanel {
             showTextEditor.setText(jsonResult);
 
             // 添加至历史记录
-            addJsonPathHistory(project, jsonStr);
+            addJsonPathHistory(jsonPath);
         } catch (Exception ex) {
             LOG.warn("JSONPath resolution failed", ex);
         }
     }
 
     public void searchHistory(boolean isDown) {
-        List<String> jsonPathHistoryList = getJsonPathHistoryList(project);
-
+        List<String> jsonPathHistoryList = getJsonPathHistoryList();
 
 
     }
@@ -155,7 +146,7 @@ public class JsonPathPanel {
     }
 
 
-    public static List<String> getJsonPathHistoryList(Project project) {
+    public List<String> getJsonPathHistoryList() {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
         String jsonPathHistoryStr = propertiesComponent.getValue(JSON_PATH_HISTORY_KEY);
         if (StrUtil.isNotBlank(jsonPathHistoryStr)) {
@@ -165,15 +156,39 @@ public class JsonPathPanel {
         return new ArrayList<>();
     }
 
-    public static void addJsonPathHistory(Project project, String jsonPathStr) {
+    public void addJsonPathHistory(String jsonPath) {
+        jsonPath = StrUtil.trim(jsonPath);
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance(project);
         String jsonPathHistoryStr = propertiesComponent.getValue(JSON_PATH_HISTORY_KEY);
         List<String> jsonPathHistoryList = StrUtil.isNotBlank(jsonPathHistoryStr) ? StrUtil.split(jsonPathHistoryStr, '\n') : new ArrayList<>();
 
-        if (!jsonPathHistoryList.contains(jsonPathStr)) {
-            jsonPathHistoryList.add(StrUtil.trim(jsonPathStr));
-            propertiesComponent.setValue(JSON_PATH_HISTORY_KEY, StrUtil.join("\n", jsonPathHistoryStr));
+        if (!jsonPathHistoryList.contains(jsonPath)) {
+            // 限制为20个
+            if (jsonPathHistoryList.size() == JsonViewerHistoryState.HISTORY_LIMIT) {
+                jsonPathHistoryList.remove(0);
+                jsonPathTextField.remove(0);
+            }
+
+            jsonPathHistoryList.add(jsonPath);
+            jsonPathTextField.addItem(jsonPath);
+
+            if (editor instanceof JsonPathFileTypeComboBoxEditor) {
+                ((JsonPathFileTypeComboBoxEditor) editor).setEditorText(jsonPath);
+            } else {
+                ((JsonPathExtendableComboBoxEditor) editor).setEditorText(jsonPath);
+            }
+
+            propertiesComponent.setValue(JSON_PATH_HISTORY_KEY, StrUtil.join("\n", jsonPathHistoryList));
         }
     }
 
+    public static FileType getJsonPathFileType() {
+        FileType fileType = PlainTextFileType.INSTANCE;
+        Object instance = JsonAssistantUtil.getStaticFinalFieldValue(JsonPathPanel.JSON_PATH_FILE_TYPE_CLASS, "INSTANCE");
+        if (instance instanceof FileType) {
+            fileType = (FileType) instance;
+        }
+
+        return fileType;
+    }
 }
