@@ -12,6 +12,7 @@ import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +37,7 @@ public class JsonViewerWindow {
         this.project = project;
     }
 
-    public JPanel getRootPanel() {
+    public JComponent getRootPanel() {
         this.jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", false);
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
@@ -66,8 +67,12 @@ public class JsonViewerWindow {
         centerPanel.add(jsonTextField, BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
 
-        return rootPanel;
+        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, true);
+        simpleToolWindowPanel.setContent(rootPanel);
+        return simpleToolWindowPanel;
     }
+
+
 
     public String getJsonContent() {
         return jsonTextField.getText();

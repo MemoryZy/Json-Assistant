@@ -30,6 +30,13 @@
                     canCloseContents="true"
                     doNotActivateOnStart="true"/>
 
+        <toolWindow id="JsonAssistant.ToolWindow.test"
+                    factoryClass="cn.memoryzy.json.toolwindows.TestTwF"
+                    anchor="right"
+                    secondary="true"
+                    canCloseContents="true"
+                    doNotActivateOnStart="true"/>
+
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
         <postStartupActivity implementation="cn.memoryzy.json.listeners.PluginActivityManager"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.AsyncHolder"/>
