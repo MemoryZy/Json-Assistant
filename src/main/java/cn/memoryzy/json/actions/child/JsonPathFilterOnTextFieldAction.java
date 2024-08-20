@@ -45,10 +45,10 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
 
         JsonPathPanel jsonPathPanel = new JsonPathPanel(project, window.getJsonTextField());
         JPanel rootPanel = jsonPathPanel.getRootPanel();
-        JComponent jsonPathTextField = jsonPathPanel.getJsonPathTextField();
+        JComponent expressionComboBoxTextField = jsonPathPanel.getPathExpressionComboBoxTextField();
 
         JBPopup popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(rootPanel, jsonPathTextField)
+                .createComponentPopupBuilder(rootPanel, expressionComboBoxTextField)
                 .setFocusable(true)
                 .setTitle(JsonAssistantBundle.messageOnSystem("popup.json.path.filter.on.text.field.title"))
                 .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("popup.json.path.filter.cancel.btn.tooltip"), AllIcons.General.HideToolWindow))
@@ -65,21 +65,17 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
                 .setMovable(true)
                 .createPopup();
 
-        // 注册回车动作
-        Runnable action = (Runnable) rootPanel.getClientProperty(JsonPathPanel.TEXT_FIELD_PROPERTY_NAME);
         // Enter
-        DumbAwareAction.create(event -> action.run())
-                .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), jsonPathTextField, popup);
+        DumbAwareAction.create(event -> jsonPathPanel.getAction().run())
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), expressionComboBoxTextField, popup);
 
         // Alt+向上箭头
-        DumbAwareAction.create(event -> {
-
-        }).registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), jsonPathTextField, popup);
+        DumbAwareAction.create(event -> jsonPathPanel.searchHistory(true))
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), expressionComboBoxTextField, popup);
 
         // Alt+向下箭头
-        DumbAwareAction.create(event -> {
-
-        }).registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), jsonPathTextField, popup);
+        DumbAwareAction.create(event -> jsonPathPanel.searchHistory(false))
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), expressionComboBoxTextField, popup);
 
         // 弹出
         popup.show(relativePoint);

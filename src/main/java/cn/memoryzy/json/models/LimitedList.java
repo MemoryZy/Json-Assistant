@@ -1,11 +1,9 @@
 package cn.memoryzy.json.models;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -14,59 +12,44 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class LimitedList<T> extends AbstractList<T> {
 
-    private final List<T> list;
+    private final List<T> history;
     private final int limit;
     private final ReentrantLock lock;
 
     public LimitedList(int limit) {
-        this.list = new ArrayList<>(limit);
+        this.history = new ArrayList<>(limit);
         this.limit = limit;
         this.lock = new ReentrantLock(true);
     }
 
     @Override
     public T get(int index) {
-        return list.get(index);
+        return history.get(index);
     }
 
     @Override
     public int size() {
-        return list.size();
+        return history.size();
     }
 
     @Override
     public boolean add(T element) {
         lock.lock();
         try {
-            if (list.size() == limit) {
-                list.remove(0);
+            if (!history.contains(element)) {
+                history.add(0, element);
+                if (history.size() > limit) {
+                    history.remove(history.size() - 1);
+                }
+            } else {
+                T first = history.get(0);
+                if (!Objects.equals(first, element)) {
+                    history.remove(element);
+                    history.add(0, element);
+                }
             }
 
-            return list.add(element);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
-        lock.lock();
-        try {
-            boolean added = list.addAll(index, c);
-            removeUnnecessaryElement();
-            return added;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public boolean addAll(@NotNull Collection<? extends T> c) {
-        lock.lock();
-        try {
-            boolean added = list.addAll(c);
-            removeUnnecessaryElement();
-            return added;
+            return true;
         } finally {
             lock.unlock();
         }
@@ -74,22 +57,12 @@ public class LimitedList<T> extends AbstractList<T> {
 
     @Override
     public boolean contains(Object element) {
-        return list.contains(element);
+        return history.contains(element);
     }
 
     @Override
     public T remove(int index) {
-        return list.remove(index);
-    }
-
-    private void removeUnnecessaryElement() {
-        if (list.size() > limit) {
-            int removeCount = list.size() - limit;
-            // 去除开头的removeCount个元素
-            for (int i = 0; i < removeCount; i++) {
-                list.remove(0);
-            }
-        }
+        return history.remove(index);
     }
 
 }

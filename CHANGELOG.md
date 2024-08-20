@@ -1,8 +1,16 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 新增 JSONPath 历史记录功能。
+- 解决属性序列化时的无限递归问题。
+- 优化历史记录保存逻辑，避免保存太多临时性JSON。
 - 在 JSON 结构对话框中区分单数与复数术语 ([#21](https://github.com/MemoryZy/Json-Assistant/pull/21))。
+- 用户体验优化。
+- Added the JSONPath history function.
+- Solves the problem of infinite recursion when serializing properties.
+- Optimize the history saving logic to avoid storing too much temporary JSON.
 - Distinguish singular or plural terms in the JSON structure dialog ([#21](https://github.com/MemoryZy/Json-Assistant/pull/21)).
+- User experience optimization.
 
 ## [1.5.0] - 2024-08-15
 

@@ -18,7 +18,7 @@ import java.util.Objects;
 @State(name = "JsonAssistantJsonViewerHistory")
 public class JsonViewerHistoryState implements PersistentStateComponent<JsonViewerHistoryState> {
 
-    public static final int HISTORY_LIMIT = 20;
+    public static final int HISTORY_LIMIT = 25;
 
     public static JsonViewerHistoryState getInstance(Project project) {
         return project.getService(JsonViewerHistoryState.class);
