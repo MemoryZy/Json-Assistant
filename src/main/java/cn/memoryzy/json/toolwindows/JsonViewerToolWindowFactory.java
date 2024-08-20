@@ -56,9 +56,14 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(new FloatingWindowAction(toolWindowEx));
 
+        toolWindowEx.setTabActions(new NewTabAction(contentFactory, toolWindowEx));
         toolWindowEx.setTitleActions(dumbAwareActions);
         toolWindowEx.setAdditionalGearActions(group);
-        Content content = contentFactory.createContent(window.getRootPanel(), null, false);
+
+        // 用 SimpleToolWindowPanel
+
+        Content content = contentFactory.createContent(window.getRootPanel(), "Json", false);
+        content.setCloseable(false);
         contentManager.addContent(content);
 
         // 验证地址可达性

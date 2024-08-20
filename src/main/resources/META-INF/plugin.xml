@@ -27,6 +27,7 @@
                     factoryClass="cn.memoryzy.json.toolwindows.JsonViewerToolWindowFactory"
                     anchor="right"
                     secondary="true"
+                    canCloseContents="true"
                     doNotActivateOnStart="true"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
