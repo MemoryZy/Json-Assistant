@@ -1,10 +1,10 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.actions.child.ClearEditorAction;
-import cn.memoryzy.json.actions.child.JsonPathFilterOnTextFieldAction;
-import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
-import cn.memoryzy.json.actions.child.SaveJsonAction;
+import cn.memoryzy.json.actions.child.toolwindow.ClearEditorAction;
+import cn.memoryzy.json.actions.child.toolwindow.JsonPathFilterOnTextFieldAction;
+import cn.memoryzy.json.actions.child.toolwindow.JsonStructureOnToolWindowAction;
+import cn.memoryzy.json.actions.child.toolwindow.SaveJsonAction;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;

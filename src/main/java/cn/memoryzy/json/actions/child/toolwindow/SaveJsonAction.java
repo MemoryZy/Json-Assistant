@@ -1,4 +1,4 @@
-package cn.memoryzy.json.actions.child;
+package cn.memoryzy.json.actions.child.toolwindow;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;

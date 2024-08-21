@@ -1,4 +1,4 @@
-package cn.memoryzy.json.actions.child;
+package cn.memoryzy.json.actions.child.toolwindow;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonAssistantUtil;

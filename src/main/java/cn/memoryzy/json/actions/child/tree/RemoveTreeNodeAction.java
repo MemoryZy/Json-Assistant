@@ -1,4 +1,4 @@
-package cn.memoryzy.json.actions.child;
+package cn.memoryzy.json.actions.child.tree;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
