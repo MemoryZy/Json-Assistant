@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.5.1] - 2024-08-21
+
 - 新增 JSONPath 历史记录功能。
 - 解决属性序列化时的无限递归问题。
 - 优化历史记录保存逻辑，避免保存太多临时性JSON。
@@ -129,7 +132,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.1...v1.4.0
 [1.3.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.0...v1.3.1
