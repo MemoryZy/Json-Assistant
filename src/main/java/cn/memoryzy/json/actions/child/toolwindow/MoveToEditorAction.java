@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -30,6 +31,8 @@ public class MoveToEditorAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.move.to.editor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.move.to.editor.description"));
+
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt M"), toolWindow.getComponent());
     }
 
     @Override
