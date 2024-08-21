@@ -16,14 +16,14 @@ import org.jetbrains.annotations.NotNull;
 public class JsonStructureOnToolWindowAction extends DumbAwareAction implements UpdateInBackground {
     private final JsonViewerWindow window;
 
-    public JsonStructureOnToolWindowAction(JsonViewerWindow window, ToolWindowEx toolWindowEx) {
+    public JsonStructureOnToolWindowAction(JsonViewerWindow window, ToolWindowEx toolWindow) {
         super(JsonAssistantBundle.messageOnSystem("action.json.structure.text"),
                 JsonAssistantBundle.messageOnSystem("action.json.structure.on.tw.title.description"),
                 JsonAssistantIcons.Structure.STRUCTURE);
 
         this.window = window;
 
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), toolWindowEx.getComponent());
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), toolWindow.getComponent());
     }
 
     @Override

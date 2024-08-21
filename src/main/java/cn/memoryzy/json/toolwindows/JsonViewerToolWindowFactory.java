@@ -3,6 +3,7 @@ package cn.memoryzy.json.toolwindows;
 import cn.memoryzy.json.actions.child.*;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.HyperLinks;
+import cn.memoryzy.json.constants.PluginConstant;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -43,28 +44,29 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ContentManager contentManager = toolWindow.getContentManager();
-
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
-        JsonViewerWindow window = new JsonViewerWindow(project);
-        List<AnAction> dumbAwareActions =
-                List.of(new JsonStructureOnToolWindowAction(window, toolWindowEx),
-                        new JsonPathFilterOnTextFieldAction(window),
-                        Separator.create(),
-                        new JsonHistoryAction(window, toolWindowEx),
-                        new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
 
+        // 主界面
+        JsonViewerWindow window = new JsonViewerWindow(project, toolWindowEx, true);
+        // 选项卡旁
+        AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
+        // 标题行
+        List<AnAction> titleActions = List.of(new JsonHistoryAction(toolWindowEx), new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
+        // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
+        group.add(Separator.create());
+        group.add(new RenameViewAction());
+        group.add(new MoveToEditorAction(toolWindowEx));
         group.add(new FloatingWindowAction(toolWindowEx));
+        group.add(Separator.create());
 
-        toolWindowEx.setTabActions(new NewTabAction(contentFactory, toolWindowEx));
-        toolWindowEx.setTitleActions(dumbAwareActions);
+        toolWindowEx.setTabActions(tabActions);
+        toolWindowEx.setTitleActions(titleActions);
         toolWindowEx.setAdditionalGearActions(group);
 
-        // 用 SimpleToolWindowPanel  CommonActionsManager
-
-        Content content = contentFactory.createContent(window.getRootPanel(), "View", false);
+        Content content = contentFactory.createContent(window.getRootPanel(), PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME, false);
         content.setCloseable(false);
-        contentManager.addContent(content);
+        contentManager.addContent(content, 0);
 
         // 验证地址可达性
         HyperLinks.verifyReachable();

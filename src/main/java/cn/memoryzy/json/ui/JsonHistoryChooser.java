@@ -3,11 +3,11 @@ package cn.memoryzy.json.ui;
 import cn.memoryzy.json.actions.child.RemoveListElementAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.HyperLinks;
-import cn.memoryzy.json.constants.PluginConstant;
 import cn.memoryzy.json.models.HistoryModel;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.json.JsonLanguage;
@@ -18,9 +18,10 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.content.Content;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -45,12 +47,12 @@ public class JsonHistoryChooser extends DialogWrapper {
     private EditorTextField showTextField;
     private JScrollPane scrollPane;
     private final Project project;
-    private final JsonViewerWindow window;
+    private final ToolWindowEx toolWindow;
 
-    public JsonHistoryChooser(Project project, JsonViewerWindow window) {
+    public JsonHistoryChooser(Project project, ToolWindowEx toolWindow) {
         super(project);
         this.project = project;
-        this.window = window;
+        this.toolWindow = toolWindow;
 
         scrollPane.setViewportBorder(JBUI.Borders.empty());
         scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
@@ -120,13 +122,15 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     private boolean executeOkAction() {
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
-        if (toolWindow != null) {
-            HistoryModel selectedValue = showList.getSelectedValue();
-            if (selectedValue != null) {
-                LanguageTextField jsonTextField = window.getJsonTextField();
-                jsonTextField.setText(selectedValue.getWholeContent());
-                toolWindow.show();
+        HistoryModel selectedValue = showList.getSelectedValue();
+        if (selectedValue != null) {
+            Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
+            if (Objects.nonNull(selectedContent)) {
+                LanguageTextField languageTextField = JsonAssistantUtil.getLanguageTextFieldOnContent(selectedContent);
+                Optional.ofNullable(languageTextField).ifPresent(e -> {
+                    e.setText(selectedValue.getWholeContent());
+                    toolWindow.show();
+                });
             }
         }
 

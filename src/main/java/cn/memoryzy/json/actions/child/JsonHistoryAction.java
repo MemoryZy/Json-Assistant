@@ -2,7 +2,6 @@ package cn.memoryzy.json.actions.child;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonHistoryChooser;
-import cn.memoryzy.json.ui.JsonViewerWindow;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.ApplicationManager;
@@ -18,15 +17,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JsonHistoryAction extends DumbAwareAction {
 
-    private final JsonViewerWindow window;
+    private final ToolWindowEx toolWindow;
 
-    public JsonHistoryAction(JsonViewerWindow window, ToolWindowEx toolWindowEx) {
+    public JsonHistoryAction(ToolWindowEx toolWindow) {
         super(JsonAssistantBundle.messageOnSystem("action.json.history.text"),
                 JsonAssistantBundle.messageOnSystem("action.json.history.description"),
                 JsonAssistantIcons.HISTORY);
-        this.window = window;
+        this.toolWindow = toolWindow;
 
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt H"), toolWindowEx.getComponent());
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt H"), toolWindow.getComponent());
     }
 
     @Override
@@ -36,7 +35,7 @@ public class JsonHistoryAction extends DumbAwareAction {
             return;
         }
 
-        JsonHistoryChooser chooser = new JsonHistoryChooser(project, window);
+        JsonHistoryChooser chooser = new JsonHistoryChooser(project, toolWindow);
         ApplicationManager.getApplication().invokeLater(chooser::show);
     }
 

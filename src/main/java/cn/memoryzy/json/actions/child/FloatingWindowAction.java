@@ -16,7 +16,7 @@ public class FloatingWindowAction extends ToggleAction implements DumbAware {
     private final ToolWindowEx toolWindow;
 
     public FloatingWindowAction(ToolWindowEx toolWindow) {
-        super(JsonAssistantBundle.messageOnSystem("action.floating.window.text"),
+        super(JsonAssistantBundle.message("action.floating.window.text"),
                 JsonAssistantBundle.messageOnSystem("action.floating.window.description"),
                 null);
 

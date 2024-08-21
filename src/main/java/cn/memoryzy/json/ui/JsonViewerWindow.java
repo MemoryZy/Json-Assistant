@@ -1,6 +1,10 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.actions.child.ClearEditorAction;
+import cn.memoryzy.json.actions.child.JsonPathFilterOnTextFieldAction;
+import cn.memoryzy.json.actions.child.JsonStructureOnToolWindowAction;
+import cn.memoryzy.json.actions.child.SaveJsonAction;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
@@ -9,12 +13,17 @@ import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.json.JsonLanguage;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.LanguageTextField;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -31,10 +40,14 @@ public class JsonViewerWindow {
 
     private LanguageTextField jsonTextField;
     private final Project project;
+    private final ToolWindowEx toolWindow;
+    private final boolean initWindow;
     private JsonViewerHistoryState historyState;
 
-    public JsonViewerWindow(Project project) {
+    public JsonViewerWindow(Project project, ToolWindowEx toolWindow, boolean initWindow) {
         this.project = project;
+        this.toolWindow = toolWindow;
+        this.initWindow = initWindow;
     }
 
     public JComponent getRootPanel() {
@@ -45,6 +58,33 @@ public class JsonViewerWindow {
         this.historyState = JsonViewerHistoryState.getInstance(project);
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
 
+        if (initWindow) {
+            initJsonText();
+        }
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(jsonTextField, BorderLayout.CENTER);
+        rootPanel.add(centerPanel, BorderLayout.CENTER);
+
+        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
+        simpleToolWindowPanel.setContent(rootPanel);
+        simpleToolWindowPanel.setToolbar(createToolbar());
+        return simpleToolWindowPanel;
+    }
+
+    public JComponent createToolbar() {
+        SimpleActionGroup actionGroup = new SimpleActionGroup();
+        actionGroup.add(new JsonStructureOnToolWindowAction(this, toolWindow));
+        actionGroup.add(new JsonPathFilterOnTextFieldAction(this));
+        actionGroup.add(Separator.create());
+        actionGroup.add(new SaveJsonAction(this));
+        actionGroup.add(new ClearEditorAction(this));
+
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
+        return toolbar.getComponent();
+    }
+
+    private void initJsonText() {
         String jsonStr = "";
         String clipboard = PlatformUtil.getClipboard();
         if (StrUtil.isNotBlank(clipboard)) {
@@ -61,18 +101,7 @@ public class JsonViewerWindow {
                 jsonTextField.setText(historyList.get(historySize - 1));
             }
         }
-
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.setBorder(JBUI.Borders.empty(1, 2));
-        centerPanel.add(jsonTextField, BorderLayout.CENTER);
-        rootPanel.add(centerPanel, BorderLayout.CENTER);
-
-        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, true);
-        simpleToolWindowPanel.setContent(rootPanel);
-        return simpleToolWindowPanel;
     }
-
-
 
     public String getJsonContent() {
         return jsonTextField.getText();

@@ -20,6 +20,8 @@ public class PluginConstant {
     public static final String LOMBOK_LIB = "org.projectlombok:lombok";
     public static final String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
 
+    public static final String JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME = "View";
+
     public static final String[] COLLECTION_FQN = {
             Iterable.class.getName(),
             Collection.class.getName(),

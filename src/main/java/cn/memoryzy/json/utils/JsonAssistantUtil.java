@@ -10,12 +10,16 @@ import cn.memoryzy.json.models.formats.BaseFormatModel;
 import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.models.formats.XmlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
+import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import com.intellij.codeInsight.hint.HintManager;
+import com.intellij.execution.ui.ConsoleView;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.json.JsonFileType;
 import com.intellij.json.json5.Json5FileType;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Caret;
@@ -23,13 +27,18 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.ui.LanguageTextField;
+import com.intellij.ui.content.Content;
+import com.intellij.ui.content.ContentFactory;
+import com.intellij.ui.content.ContentManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -80,20 +89,26 @@ public class JsonAssistantUtil {
                 HintManager.getInstance().showInformationHint(editor, hintText);
             });
         } else {
-            ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
-            JsonViewerPanel panel = (JsonViewerPanel) PlatformUtil.getMainComponentWithOpenToolWindow(toolWindow);
-            if (toolWindow != null && panel != null) {
-                LanguageTextField jsonTextField = panel.getJsonTextField();
-                jsonTextField.setText(processedText);
-                toolWindow.show();
-            } else {
+            try {
+                ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+                ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
+
+                if (Objects.nonNull(toolWindow)) {
+                    Content content = addNewContent(project, toolWindow, contentFactory);
+                    LanguageTextField languageTextField = getLanguageTextFieldOnContent(content);
+                    if (Objects.nonNull(languageTextField)) {
+                        languageTextField.setText(processedText);
+                        toolWindow.show();
+                    }
+                }
+            } catch (Exception e) {
                 PlatformUtil.setClipboard(processedText);
                 Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+            } finally {
+                if (model.getSelectedText()) {
+                    model.getPrimaryCaret().removeSelection();
+                }
             }
-        }
-
-        if (model.getSelectedText()) {
-            model.getPrimaryCaret().removeSelection();
         }
     }
 
@@ -160,25 +175,25 @@ public class JsonAssistantUtil {
     /**
      * 是否不允许在当前 JSON 文档内写入；true，不写；false：写入
      */
-    public static boolean isNotWriteJsonDoc(Project project, Document document, JsonFormatHandleModel model) {
-        return isNotWriteDoc(project, document, model, JsonFileType.INSTANCE, Json5FileType.INSTANCE);
+    public static boolean isNotWriteJsonDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
+        return isNotWriteDoc(e, project, document, model, JsonFileType.INSTANCE, Json5FileType.INSTANCE);
     }
 
     /**
      * 是否不允许在当前 XML 文档内写入；true，不写；false：写入
      */
-    public static boolean isNotWriteXmlDoc(Project project, Document document, JsonFormatHandleModel model) {
-        return isNotWriteDoc(project, document, model, XmlFileType.INSTANCE);
+    public static boolean isNotWriteXmlDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
+        return isNotWriteDoc(e, project, document, model, XmlFileType.INSTANCE);
     }
 
     /**
      * 是否不允许在当前文档内写入；true，不写；false：写入
      */
-    public static boolean isNotWriteDoc(Project project, Document document, JsonFormatHandleModel model, FileType... fileTypes) {
+    public static boolean isNotWriteDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, FileType... fileTypes) {
         // 是否在当前文档内写入；true，不写；false：写入
         boolean isNotWriteDoc;
-        // 文档若可写入
-        if (document.isWritable()) {
+        // 文档若可写入，且不在控制台内
+        if (document.isWritable() && !isOnConsole(e)) {
             // 当前有无选中文本
             if (model.getSelectedText()) {
                 // 选中了文本，将在选中区域内写入更改后的文本
@@ -196,4 +211,49 @@ public class JsonAssistantUtil {
         return isNotWriteDoc;
     }
 
+    /**
+     * true，处于控制台；false反之。
+     */
+    public static boolean isOnConsole(AnActionEvent e) {
+        ConsoleView data = e.getData(LangDataKeys.CONSOLE_VIEW);
+        return data != null;
+    }
+
+    public static ToolWindow getJsonViewToolWindow(Project project) {
+        return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
+    }
+
+    public static Content getSelectedContent(ToolWindow toolWindow) {
+        ContentManager contentManager = toolWindow.getContentManager();
+        Content selectedContent = contentManager.getSelectedContent();
+        if (Objects.isNull(selectedContent)) {
+            selectedContent = contentManager.getContent(0);
+        }
+
+        return selectedContent;
+    }
+
+    public static LanguageTextField getLanguageTextFieldOnContent(Content content) {
+        if (Objects.nonNull(content)) {
+            SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
+            JsonViewerPanel viewerPanel = (JsonViewerPanel) windowPanel.getContent();
+            if (Objects.nonNull(viewerPanel)) {
+                return viewerPanel.getJsonTextField();
+            }
+        }
+
+        return null;
+    }
+
+    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory) {
+        ContentManager contentManager = toolWindow.getContentManager();
+        int contentCount = contentManager.getContentCount();
+        String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
+
+        JsonViewerWindow window = new JsonViewerWindow(project, toolWindow, false);
+        Content content = contentFactory.createContent(window.getRootPanel(), displayName, false);
+        contentManager.addContent(content, contentCount);
+        contentManager.setSelectedContent(content, true);
+        return content;
+    }
 }

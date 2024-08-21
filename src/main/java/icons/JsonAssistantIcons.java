@@ -32,6 +32,8 @@ public class JsonAssistantIcons {
     public static final Icon SEARCH = load("/icons/search.svg");
     public static final Icon HISTORY = load("/icons/history.svg");
     public static final Icon DIFF = load("/icons/diff.svg");
+    public static final Icon DELETE = load("/icons/delete.svg");
+    public static final Icon SAVE = load("/icons/save.svg");
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");

@@ -48,7 +48,7 @@ public class JsonMinifyAction extends DumbAwareAction {
         }
 
         JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson,
-                model, false, JsonAssistantUtil.isNotWriteJsonDoc(project, document, model));
+                model, false, JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
     }
 
 }
