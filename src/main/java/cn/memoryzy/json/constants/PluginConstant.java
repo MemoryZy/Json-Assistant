@@ -22,6 +22,9 @@ public class PluginConstant {
 
     public static final String JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME = "View";
 
+    public static final String OUTLINE_PROPERTY = "JComponent.outline";
+    public static final String ERROR_VALUE = "error";
+
     public static final String[] COLLECTION_FQN = {
             Iterable.class.getName(),
             Collection.class.getName(),

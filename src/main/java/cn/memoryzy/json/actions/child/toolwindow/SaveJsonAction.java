@@ -44,7 +44,7 @@ public class SaveJsonAction extends DumbAwareAction implements UpdateInBackgroun
         FileChooserFactory chooserFactory = FileChooserFactory.getInstance();
         FileSaverDescriptor saverDescriptor = new FileSaverDescriptor(
                 JsonAssistantBundle.messageOnSystem("dialog.file.save.json.title"),
-                JsonAssistantBundle.messageOnSystem("dialog.file.save.json.description"),
+                "",
                 "json");
         FileSaverDialog saverDialog = chooserFactory.createSaveFileDialog(saverDescriptor, project);
         VirtualFileWrapper virtualFileWrapper = saverDialog.save("export.json");

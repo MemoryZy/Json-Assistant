@@ -7,7 +7,7 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.SupportDialog;
-import cn.memoryzy.json.ui.basic.CustomizedUI;
+import cn.memoryzy.json.ui.basic.UIManager;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
@@ -100,7 +100,7 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    new CustomizedUI());
+                    UIManager.getInstance());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
@@ -133,7 +133,7 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    new CustomizedUI());
+                    UIManager.getInstance());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);

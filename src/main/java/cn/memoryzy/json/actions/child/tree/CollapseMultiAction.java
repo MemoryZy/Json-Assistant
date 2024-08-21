@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions.child.tree;
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
-import cn.memoryzy.json.ui.basic.CustomizedUI;
+import cn.memoryzy.json.ui.basic.UIManager;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -29,7 +29,7 @@ public class CollapseMultiAction extends DumbAwareAction implements UpdateInBack
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
-                CustomizedUI.collapseAll(tree, path);
+                UIManager.collapseAll(tree, path);
             }
         }
     }

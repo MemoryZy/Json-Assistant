@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.UIManager;
 import cn.memoryzy.json.ui.basic.jsonpath.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.basic.jsonpath.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
@@ -19,9 +20,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.CollectionComboBoxModel;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.jayway.jsonpath.JsonPath;
@@ -92,9 +95,15 @@ public class JsonPathPanel {
         ComboBox<String> comboBox = new ComboBox<>(comboBoxModel);
         JBFont font = JBUI.Fonts.create("JetBrains Mono", 14);
 
-        jsonPathNestedComboBoxEditor = JSON_PATH_FILE_TYPE_CLASS != null
-                ? new JsonPathFileTypeComboBoxEditor(project, getJsonPathFileType(), font)
-                : new JsonPathExtendableComboBoxEditor(action, font);
+        if (JSON_PATH_FILE_TYPE_CLASS != null) {
+            jsonPathNestedComboBoxEditor = new JsonPathFileTypeComboBoxEditor(project, getJsonPathFileType(), font);
+            EditorTextField editorTextField = ((JsonPathFileTypeComboBoxEditor) jsonPathNestedComboBoxEditor).getEditorComponent();
+            UIManager.addRemoveErrorListener(editorTextField, comboBox);
+        } else {
+            jsonPathNestedComboBoxEditor = new JsonPathExtendableComboBoxEditor(action, font);
+            ExtendableTextField editorTextField = ((JsonPathExtendableComboBoxEditor) jsonPathNestedComboBoxEditor).getEditorTextField();
+            UIManager.addRemoveErrorListener(editorTextField, comboBox);
+        }
 
         comboBox.setEditor(jsonPathNestedComboBoxEditor);
         comboBox.setEditable(true);
@@ -128,9 +137,14 @@ public class JsonPathPanel {
 
             // 添加至历史记录
             addJSONPathToHistory(jsonPath);
-        } catch (PathNotFoundException ex) {
-            showTextEditor.setText(ex.getMessage());
         } catch (Exception ex) {
+            UIManager.addErrorBorder(pathExpressionComboBoxTextField);
+
+            if (ex instanceof PathNotFoundException) {
+                showTextEditor.setText(ex.getMessage());
+                return;
+            }
+
             LOG.warn("JSONPath resolution failed", ex);
         }
     }

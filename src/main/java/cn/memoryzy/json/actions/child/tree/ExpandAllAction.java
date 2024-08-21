@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child.tree;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.ui.basic.CustomizedUI;
+import cn.memoryzy.json.ui.basic.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.ui.DumbAwareActionButton;
@@ -28,6 +28,6 @@ public class ExpandAllAction extends DumbAwareActionButton {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
-        CustomizedUI.expandAll(tree, new TreePath(root));
+        UIManager.expandAll(tree, new TreePath(root));
     }
 }

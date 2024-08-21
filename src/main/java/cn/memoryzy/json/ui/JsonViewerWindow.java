@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -141,7 +141,7 @@ public class JsonViewerWindow {
         }
     }
 
-    private class FocusListenerImpl implements FocusListener {
+    private class FocusListenerImpl extends FocusAdapter {
         @Override
         public void focusGained(FocusEvent e) {
             String text = jsonTextField.getText();
@@ -155,11 +155,6 @@ public class JsonViewerWindow {
                     }
                 }
             }
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-
         }
     }
 
