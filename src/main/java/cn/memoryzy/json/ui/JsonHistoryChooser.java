@@ -20,6 +20,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -38,23 +39,19 @@ import java.util.Optional;
 
 /**
  * @author Memory
- * @since 2024/8/11
+ * @since 2024/8/22
  */
 public class JsonHistoryChooser extends DialogWrapper {
-    private JPanel rootPanel;
+
     private JList<HistoryModel> showList;
     private EditorTextField showTextField;
-    private JScrollPane scrollPane;
     private final Project project;
     private final ToolWindowEx toolWindow;
 
-    public JsonHistoryChooser(Project project, ToolWindowEx toolWindow) {
-        super(project);
+    public JsonHistoryChooser(@Nullable Project project, ToolWindowEx toolWindow) {
+        super(project, true);
         this.project = project;
         this.toolWindow = toolWindow;
-
-        scrollPane.setViewportBorder(JBUI.Borders.empty());
-        scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
 
         setModal(false);
         setTitle(JsonAssistantBundle.message("json.history.window.title"));
@@ -64,10 +61,6 @@ public class JsonHistoryChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        return rootPanel;
-    }
-
-    private void createUIComponents() {
         showTextField = new InsertModeLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
@@ -82,13 +75,40 @@ public class JsonHistoryChooser extends DialogWrapper {
         showList.addListSelectionListener(new ListSelectionListenerImpl());
         showList.setCellRenderer(new IconListCellRenderer());
         ((JBList<?>) showList).setEmptyText(JsonAssistantBundle.messageOnSystem("json.history.window.empty.text"));
-
         initRightMousePopupMenu();
 
         // 选中第一条
         if (!historyModels.isEmpty()) {
             showList.setSelectedIndex(0);
         }
+
+        JBScrollPane scrollPane = new JBScrollPane(showList) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension preferredSize = super.getPreferredSize();
+                if (!isPreferredSizeSet()) {
+                    setPreferredSize(new Dimension(0, preferredSize.height));
+                }
+                return preferredSize;
+            }
+        };
+
+        scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
+        scrollPane.setViewportBorder(JBUI.Borders.empty());
+
+        JPanel firstPanel = new JPanel(new BorderLayout());
+        firstPanel.add(scrollPane, BorderLayout.CENTER);
+        firstPanel.setBorder(JBUI.Borders.empty(3));
+
+        JBSplitter splitter = new JBSplitter(true, 0.3f);
+        splitter.setFirstComponent(firstPanel);
+        splitter.setSecondComponent(showTextField);
+
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.add(splitter, BorderLayout.CENTER);
+        rootPanel.setPreferredSize(new Dimension(480, 530));
+
+        return rootPanel;
     }
 
     @Override
@@ -136,6 +156,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         return true;
     }
 
+
     private void initRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(new RemoveListElementAction(showList));
@@ -164,7 +185,6 @@ public class JsonHistoryChooser extends DialogWrapper {
             }
         });
     }
-
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryModel> {
         @Override
