@@ -3,7 +3,7 @@ package cn.memoryzy.json.actions.child.toolwindow;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.PluginConstant;
-import cn.memoryzy.json.ui.basic.UIManager;
+import cn.memoryzy.json.utils.UIManager;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;

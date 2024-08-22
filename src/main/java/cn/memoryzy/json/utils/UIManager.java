@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.basic;
+package cn.memoryzy.json.utils;
 
 import cn.memoryzy.json.constants.PluginConstant;
 import com.intellij.openapi.Disposable;

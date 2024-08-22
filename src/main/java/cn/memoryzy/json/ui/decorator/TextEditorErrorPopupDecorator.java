@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.decorator;
 
 import cn.memoryzy.json.constants.PluginConstant;
-import cn.memoryzy.json.ui.basic.UIManager;
+import cn.memoryzy.json.utils.UIManager;
 import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;

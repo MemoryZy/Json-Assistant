@@ -1,7 +1,7 @@
 package cn.memoryzy.json.actions.child.tree;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.ui.basic.UIManager;
+import cn.memoryzy.json.utils.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.ui.DumbAwareActionButton;
