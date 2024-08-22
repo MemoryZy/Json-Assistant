@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.actions.child.toolwindow.ClearEditorAction;
 import cn.memoryzy.json.actions.child.toolwindow.JsonPathFilterOnTextFieldAction;
 import cn.memoryzy.json.actions.child.toolwindow.JsonStructureOnToolWindowAction;
-import cn.memoryzy.json.actions.child.toolwindow.SaveJsonAction;
+import cn.memoryzy.json.actions.child.toolwindow.SaveToDiskAction;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
@@ -75,7 +75,7 @@ public class JsonViewerWindow {
         actionGroup.add(new JsonStructureOnToolWindowAction(this, simpleToolWindowPanel));
         actionGroup.add(new JsonPathFilterOnTextFieldAction(this));
         actionGroup.add(Separator.create());
-        actionGroup.add(new SaveJsonAction(this));
+        actionGroup.add(new SaveToDiskAction(this));
         actionGroup.add(new ClearEditorAction(this));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);

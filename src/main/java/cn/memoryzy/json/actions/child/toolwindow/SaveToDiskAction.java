@@ -24,11 +24,11 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/21
  */
-public class SaveJsonAction extends DumbAwareAction implements UpdateInBackground {
+public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackground {
 
     private final JsonViewerWindow window;
 
-    public SaveJsonAction(JsonViewerWindow window) {
+    public SaveToDiskAction(JsonViewerWindow window) {
         super();
         this.window = window;
         setEnabledInModalContext(true);
