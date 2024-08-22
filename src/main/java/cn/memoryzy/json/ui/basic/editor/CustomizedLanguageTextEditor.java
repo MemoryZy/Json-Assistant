@@ -8,7 +8,6 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.HorizontalScrollBarEditorCustomization;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.OneLineEditorCustomization;
 import org.jetbrains.annotations.NotNull;
@@ -59,8 +58,8 @@ public class CustomizedLanguageTextEditor extends LanguageTextField {
         editorSettings.setWhitespacesShown(true);
         // 设置显示的缩进导轨
         editorSettings.setIndentGuidesShown(true);
-        // 显示设置插入符行（光标选中行会变黄）
-        editorSettings.setCaretRowShown(true);
+        // // 显示设置插入符行（光标选中行会变黄）
+        // editorSettings.setCaretRowShown(true);
 
         // // 设置显示的线标记区域
         // editorSettings.setLineMarkerAreaShown(false);
@@ -82,8 +81,6 @@ public class CustomizedLanguageTextEditor extends LanguageTextField {
         EditorGutterComponentEx gutterComponentEx = editor.getGutterComponentEx();
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
-
-        editor.setBackgroundColor(JBColor.white);
 
         return editor;
     }

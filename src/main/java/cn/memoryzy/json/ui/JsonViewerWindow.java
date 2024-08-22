@@ -9,7 +9,7 @@ import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
-import cn.memoryzy.json.ui.basic.editor.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.editor.FoldingLanguageTextEditor;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.json.JsonLanguage;
@@ -23,7 +23,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.LanguageTextField;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -49,11 +48,10 @@ public class JsonViewerWindow {
     }
 
     public JComponent getRootPanel() {
-        this.jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", false);
+        this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "", false);
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
-        this.jsonTextField.setBorder(JBUI.Borders.empty(2, 2, 0, 0));
 
         this.historyState = JsonViewerHistoryState.getInstance(project);
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);

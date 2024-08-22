@@ -6,7 +6,7 @@ import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.models.HistoryModel;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
-import cn.memoryzy.json.ui.basic.editor.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.editor.InsertModeLanguageTextEditor;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
@@ -68,7 +68,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     private void createUIComponents() {
-        showTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
+        showTextField = new InsertModeLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
         JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
