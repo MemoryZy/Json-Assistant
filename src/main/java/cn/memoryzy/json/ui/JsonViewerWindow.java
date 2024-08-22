@@ -8,8 +8,8 @@ import cn.memoryzy.json.actions.child.toolwindow.SaveJsonAction;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
-import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
+import cn.memoryzy.json.ui.basic.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.json.JsonLanguage;
@@ -21,9 +21,9 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.LanguageTextField;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -40,13 +40,11 @@ public class JsonViewerWindow {
 
     private LanguageTextField jsonTextField;
     private final Project project;
-    private final ToolWindowEx toolWindow;
     private final boolean initWindow;
     private JsonViewerHistoryState historyState;
 
-    public JsonViewerWindow(Project project, ToolWindowEx toolWindow, boolean initWindow) {
+    public JsonViewerWindow(Project project, boolean initWindow) {
         this.project = project;
-        this.toolWindow = toolWindow;
         this.initWindow = initWindow;
     }
 
@@ -55,6 +53,8 @@ public class JsonViewerWindow {
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
+        this.jsonTextField.setBorder(JBUI.Borders.empty(2, 2, 0, 0));
+
         this.historyState = JsonViewerHistoryState.getInstance(project);
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
 
@@ -68,13 +68,13 @@ public class JsonViewerWindow {
 
         SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
         simpleToolWindowPanel.setContent(rootPanel);
-        simpleToolWindowPanel.setToolbar(createToolbar());
+        simpleToolWindowPanel.setToolbar(createToolbar(simpleToolWindowPanel));
         return simpleToolWindowPanel;
     }
 
-    public JComponent createToolbar() {
+    public JComponent createToolbar(SimpleToolWindowPanel simpleToolWindowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonStructureOnToolWindowAction(this, toolWindow));
+        actionGroup.add(new JsonStructureOnToolWindowAction(this, simpleToolWindowPanel));
         actionGroup.add(new JsonPathFilterOnTextFieldAction(this));
         actionGroup.add(Separator.create());
         actionGroup.add(new SaveJsonAction(this));
@@ -144,14 +144,16 @@ public class JsonViewerWindow {
     private class FocusListenerImpl extends FocusAdapter {
         @Override
         public void focusGained(FocusEvent e) {
-            String text = jsonTextField.getText();
-            if (StrUtil.isBlank(text)) {
-                String clipboard = PlatformUtil.getClipboard();
-                if (StrUtil.isNotBlank(clipboard)) {
-                    String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
-                    if (StrUtil.isNotBlank(jsonStr)) {
-                        jsonStr = JsonUtil.formatJson(jsonStr);
-                        jsonTextField.setText(jsonStr);
+            if (initWindow) {
+                String text = jsonTextField.getText();
+                if (StrUtil.isBlank(text)) {
+                    String clipboard = PlatformUtil.getClipboard();
+                    if (StrUtil.isNotBlank(clipboard)) {
+                        String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
+                        if (StrUtil.isNotBlank(jsonStr)) {
+                            jsonStr = JsonUtil.formatJson(jsonStr);
+                            jsonTextField.setText(jsonStr);
+                        }
                     }
                 }
             }

@@ -9,21 +9,21 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 public class JsonStructureOnToolWindowAction extends DumbAwareAction implements UpdateInBackground {
     private final JsonViewerWindow window;
 
-    public JsonStructureOnToolWindowAction(JsonViewerWindow window, ToolWindowEx toolWindow) {
+    public JsonStructureOnToolWindowAction(JsonViewerWindow window, SimpleToolWindowPanel simpleToolWindowPanel) {
         super(JsonAssistantBundle.messageOnSystem("action.json.structure.text"),
                 JsonAssistantBundle.messageOnSystem("action.json.structure.on.tw.title.description"),
                 JsonAssistantIcons.Structure.STRUCTURE);
 
         this.window = window;
 
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), toolWindow.getComponent());
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), simpleToolWindowPanel);
     }
 
     @Override

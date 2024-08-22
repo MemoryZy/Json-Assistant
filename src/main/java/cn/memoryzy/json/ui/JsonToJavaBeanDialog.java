@@ -11,7 +11,7 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.constants.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
-import cn.memoryzy.json.ui.basic.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.ui.basic.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.utils.JavaUtil;
 import cn.memoryzy.json.utils.JsonUtil;

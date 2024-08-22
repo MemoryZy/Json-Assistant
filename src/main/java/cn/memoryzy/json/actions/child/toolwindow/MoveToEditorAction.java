@@ -31,7 +31,6 @@ public class MoveToEditorAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.move.to.editor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.move.to.editor.description"));
-
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt M"), toolWindow.getComponent());
     }
 

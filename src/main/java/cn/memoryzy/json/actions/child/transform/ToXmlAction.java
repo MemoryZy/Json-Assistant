@@ -5,6 +5,7 @@ import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
@@ -28,6 +29,7 @@ public class ToXmlAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.xml.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.xml.description"));
+        presentation.setIcon(XmlFileType.INSTANCE.getIcon());
     }
 
     @Override

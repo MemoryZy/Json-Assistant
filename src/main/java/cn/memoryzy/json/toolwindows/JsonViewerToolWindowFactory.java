@@ -21,6 +21,7 @@ import com.intellij.ui.content.ContentManager;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.List;
 
 /**
@@ -48,7 +49,9 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
         // 主界面
-        JsonViewerWindow window = new JsonViewerWindow(project, toolWindowEx, true);
+        JsonViewerWindow window = new JsonViewerWindow(project, true);
+        JComponent rootPanel = window.getRootPanel();
+
         // 选项卡旁
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
         // 标题行
@@ -65,7 +68,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         toolWindowEx.setTitleActions(titleActions);
         toolWindowEx.setAdditionalGearActions(group);
 
-        Content content = contentFactory.createContent(window.getRootPanel(), PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME, false);
+        Content content = contentFactory.createContent(rootPanel, PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME, false);
         content.setCloseable(false);
         contentManager.addContent(content, 0);
 

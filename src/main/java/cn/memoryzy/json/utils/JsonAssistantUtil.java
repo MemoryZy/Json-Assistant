@@ -250,7 +250,7 @@ public class JsonAssistantUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonViewerWindow window = new JsonViewerWindow(project, toolWindow, false);
+        JsonViewerWindow window = new JsonViewerWindow(project, false);
         Content content = contentFactory.createContent(window.getRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
