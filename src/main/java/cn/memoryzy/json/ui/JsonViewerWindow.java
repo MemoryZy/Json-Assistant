@@ -1,10 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.actions.child.toolwindow.ClearEditorAction;
-import cn.memoryzy.json.actions.child.toolwindow.JsonPathFilterOnTextFieldAction;
-import cn.memoryzy.json.actions.child.toolwindow.JsonStructureOnToolWindowAction;
-import cn.memoryzy.json.actions.child.toolwindow.SaveToDiskAction;
+import cn.memoryzy.json.actions.child.toolwindow.*;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
@@ -72,7 +69,9 @@ public class JsonViewerWindow {
 
     public JComponent createToolbar(SimpleToolWindowPanel simpleToolWindowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonStructureOnToolWindowAction(this, simpleToolWindowPanel));
+        actionGroup.add(new JsonBeautifyToolWindowAction(this, simpleToolWindowPanel));
+        actionGroup.add(new JsonMinifyToolWindowAction(this, simpleToolWindowPanel));
+        actionGroup.add(new JsonStructureToolWindowAction(this, simpleToolWindowPanel));
         actionGroup.add(new JsonPathFilterOnTextFieldAction(this));
         actionGroup.add(Separator.create());
         actionGroup.add(new SaveToDiskAction(this));

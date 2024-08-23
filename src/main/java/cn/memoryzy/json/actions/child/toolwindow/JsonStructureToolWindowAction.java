@@ -14,10 +14,11 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
-public class JsonStructureOnToolWindowAction extends DumbAwareAction implements UpdateInBackground {
+public class JsonStructureToolWindowAction extends DumbAwareAction implements UpdateInBackground {
+
     private final JsonViewerWindow window;
 
-    public JsonStructureOnToolWindowAction(JsonViewerWindow window, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonStructureToolWindowAction(JsonViewerWindow window, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
         this.window = window;
         setEnabledInModalContext(true);

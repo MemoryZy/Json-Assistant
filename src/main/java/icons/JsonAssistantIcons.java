@@ -34,6 +34,9 @@ public class JsonAssistantIcons {
     public static final Icon DIFF = load("/icons/diff.svg");
     public static final Icon DELETE = load("/icons/delete.svg");
     public static final Icon SAVE = load("/icons/save.svg");
+    public static final Icon DIZZY_STAR_ORI = load("/icons/dizzy_star_ori.svg");
+    public static final Icon STAR_FALL_MINI = load("/icons/star_fall_mini.svg");
+    public static final Icon MINIMIZE = load("/icons/minimize.svg");
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
