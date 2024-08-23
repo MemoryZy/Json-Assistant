@@ -32,7 +32,7 @@ import java.awt.*;
  */
 public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements UpdateInBackground {
     public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
-    
+
     private final JsonViewerWindow window;
 
     public JsonPathFilterOnTextFieldAction(JsonViewerWindow window) {
@@ -53,9 +53,6 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
     }
 
     private void showComponentPopup(@NotNull AnActionEvent e, Project project) {
-        Component source = (Component) e.getInputEvent().getSource();
-        RelativePoint relativePoint = new RelativePoint(source, new Point(-(source.getWidth() * 4 + 15), source.getHeight() + 1));
-
         JsonPathPanel jsonPathPanel = new JsonPathPanel(project, window.getJsonTextField());
         JPanel rootPanel = jsonPathPanel.getRootPanel();
         JComponent expressionComboBoxTextField = jsonPathPanel.getPathExpressionComboBoxTextField();
@@ -94,10 +91,20 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), expressionComboBoxTextField, popup);
 
         // 弹出
-        popup.show(relativePoint);
+        popup.show(calculatePopupLocation(e));
 
         // 弹出指引
         showGuidePopup(popup, expressionComboBoxTextField);
+    }
+
+
+    private RelativePoint calculatePopupLocation(@NotNull AnActionEvent e) {
+        Component source = (Component) e.getInputEvent().getSource();
+        Container toolbar = source.getParent();
+        Container toolWindowPanel = toolbar.getParent();
+        Component[] components = toolbar.getComponents();
+        Component firstAction = components[0];
+        return new RelativePoint(source, new Point((toolWindowPanel.getWidth() / 2 - 35), firstAction.getY() - firstAction.getHeight()));
     }
 
     private void showGuidePopup(JBPopup popup, JComponent component) {
