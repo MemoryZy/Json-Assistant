@@ -90,6 +90,11 @@ public class JsonStructureDialog extends DialogWrapper {
     }
 
     @Override
+    public @Nullable JComponent getPreferredFocusedComponent() {
+        return tree;
+    }
+
+    @Override
     protected void doHelpAction() {
         BrowserUtil.browse(HyperLinks.TREE_LINK);
     }

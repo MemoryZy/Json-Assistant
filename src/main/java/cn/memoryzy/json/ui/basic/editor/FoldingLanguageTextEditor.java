@@ -5,12 +5,9 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.Gray;
-import com.intellij.ui.JBColor;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.awt.*;
 
 /**
  * @author Memory
@@ -18,8 +15,8 @@ import java.awt.*;
  */
 public class FoldingLanguageTextEditor extends CustomizedLanguageTextEditor {
 
-    public FoldingLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
-        super(language, project, value, needBorder);
+    public FoldingLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value) {
+        super(language, project, value, false);
     }
 
     @Override
@@ -32,9 +29,12 @@ public class FoldingLanguageTextEditor extends CustomizedLanguageTextEditor {
         // 显示设置插入符行（光标选中行会变黄）
         settings.setCaretRowShown(true);
 
-        @SuppressWarnings("UseJBColor") Color dark = PlatformUtil.isNewUi() ? new Color(0xFF1E1F22) : Gray._43;
-        JBColor color = new JBColor(Color.WHITE, dark);
-        editor.setBackgroundColor(color);
+        // 白色背景
+        // editor.setBackgroundColor(EDITOR_COLOR);
+        // new JBColor(Color.WHITE, PlatformUtil.isNewUi() ? new Color(0xFF1E1F22) : Gray._43);
+
+        int left = PlatformUtil.isNewUi() ? 0 : 8;
+        editor.setBorder(JBUI.Borders.empty(5, left, 0,0));
 
         return editor;
     }

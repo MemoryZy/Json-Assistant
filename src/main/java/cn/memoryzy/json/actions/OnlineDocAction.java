@@ -1,9 +1,8 @@
 package cn.memoryzy.json.actions;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
-import cn.memoryzy.json.constants.HyperLinks;
+import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -15,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 2024/8/6
  */
 public class OnlineDocAction extends DumbAwareAction {
+    private final boolean popupAction;
 
     public OnlineDocAction() {
         this(false);
@@ -22,6 +22,7 @@ public class OnlineDocAction extends DumbAwareAction {
 
     public OnlineDocAction(boolean popupAction) {
         super();
+        this.popupAction = popupAction;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(popupAction ? JsonAssistantBundle.message("action.online.doc.override.text") : JsonAssistantBundle.message("action.online.doc.text"));
@@ -31,7 +32,7 @@ public class OnlineDocAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        BrowserUtil.browse(HyperLinks.OVERVIEW);
+        JsonAssistantUtil.openOnlineDoc(e.getProject(), popupAction);
     }
 
 }

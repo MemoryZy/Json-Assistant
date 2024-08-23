@@ -17,6 +17,7 @@ import javax.swing.event.AncestorEvent;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -31,12 +32,22 @@ public class TextEditorErrorPopupDecorator {
 
     public TextEditorErrorPopupDecorator(JRootPane rootPane, JComponent myTextField) {
         this.myTextField = myTextField;
-        // 初始化监听事件
-        initListener(rootPane);
+        if (Objects.nonNull(rootPane)) {
+            initRootPaneListener(rootPane);
+        }
+        initTextFieldListener();
         myErrorShowPoint = new RelativePoint(myTextField, new Point(0, myTextField.getHeight()));
     }
 
-    private void initListener(JRootPane rootPane) {
+    private void initTextFieldListener() {
+        if (myTextField instanceof JTextField) {
+            UIManager.addRemoveErrorListener((JTextField) myTextField);
+        } else if (myTextField instanceof EditorTextField) {
+            UIManager.addRemoveErrorListener((EditorTextField) myTextField);
+        }
+    }
+
+    private void initRootPaneListener(JRootPane rootPane) {
         // 注册组件移动事件
         rootPane.addAncestorListener(new AncestorListenerAdapter() {
             /**
@@ -63,16 +74,10 @@ public class TextEditorErrorPopupDecorator {
                 disposePopup();
             }
         });
-
-        if (myTextField instanceof JTextField) {
-            UIManager.addRemoveErrorListener((JTextField) myTextField);
-        } else if (myTextField instanceof EditorTextField) {
-            UIManager.addRemoveErrorListener((EditorTextField) myTextField);
-        }
     }
 
     public void setError(String error) {
-        setErrorBorder(error);
+        setErrorBorder();
         if (myErrorPopup != null && !myErrorPopup.isDisposed()) Disposer.dispose(myErrorPopup);
         if (error == null) return;
 
@@ -98,9 +103,9 @@ public class TextEditorErrorPopupDecorator {
         if (myErrorPopup != null && !myErrorPopup.isDisposed()) Disposer.dispose(myErrorPopup);
     }
 
-    private void setErrorBorder(String error) {
+    public void setErrorBorder() {
         // 这行的作用是给文本框外部变为红色
-        myTextField.putClientProperty(PluginConstant.OUTLINE_PROPERTY, error != null ? PluginConstant.ERROR_VALUE : null);
+        myTextField.putClientProperty(PluginConstant.OUTLINE_PROPERTY, PluginConstant.ERROR_VALUE);
         // 重新渲染组件
         myTextField.repaint();
     }

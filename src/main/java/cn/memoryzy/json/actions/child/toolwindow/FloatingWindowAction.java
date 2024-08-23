@@ -3,6 +3,7 @@ package cn.memoryzy.json.actions.child.toolwindow;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.wm.ToolWindowType;
@@ -16,11 +17,12 @@ public class FloatingWindowAction extends ToggleAction implements DumbAware {
     private final ToolWindowEx toolWindow;
 
     public FloatingWindowAction(ToolWindowEx toolWindow) {
-        super(JsonAssistantBundle.message("action.floating.window.text"),
-                JsonAssistantBundle.messageOnSystem("action.floating.window.description"),
-                null);
-
+        super();
         this.toolWindow = toolWindow;
+        setEnabledInModalContext(true);
+        Presentation presentation = getTemplatePresentation();
+        presentation.setText(JsonAssistantBundle.message("action.floating.window.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.floating.window.description"));
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt F"), toolWindow.getComponent());
     }
 

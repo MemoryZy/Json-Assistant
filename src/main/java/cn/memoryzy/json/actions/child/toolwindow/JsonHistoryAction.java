@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonHistoryChooser;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -20,11 +21,13 @@ public class JsonHistoryAction extends DumbAwareAction {
     private final ToolWindowEx toolWindow;
 
     public JsonHistoryAction(ToolWindowEx toolWindow) {
-        super(JsonAssistantBundle.messageOnSystem("action.json.history.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.history.description"),
-                JsonAssistantIcons.HISTORY);
+        super();
         this.toolWindow = toolWindow;
-
+        setEnabledInModalContext(true);
+        Presentation presentation = getTemplatePresentation();
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.history.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.history.description"));
+        presentation.setIcon(JsonAssistantIcons.HISTORY);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt H"), toolWindow.getComponent());
     }
 

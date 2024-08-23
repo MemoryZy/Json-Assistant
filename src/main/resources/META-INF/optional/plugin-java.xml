@@ -16,11 +16,8 @@
         </group>
 
         <group id="JsonAssistant.Group.JsonToJavaBean">
-            <separator/>
             <reference ref="JsonAssistant.Action.JsonToJavaBean"/>
-            <separator/>
-
-            <add-to-group group-id="NewGroup" relative-to-action="NewFile" anchor="before"/>
+            <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewGroup1"/>
         </group>
     </actions>
 </idea-plugin>

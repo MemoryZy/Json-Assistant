@@ -10,6 +10,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -35,10 +36,13 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
     private final JsonViewerWindow window;
 
     public JsonPathFilterOnTextFieldAction(JsonViewerWindow window) {
-        super(JsonAssistantBundle.messageOnSystem("action.json.path.filter.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.path.filter.description"),
-                JsonAssistantIcons.SEARCH);
+        super();
         this.window = window;
+        setEnabledInModalContext(true);
+        Presentation presentation = getTemplatePresentation();
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.path.filter.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.path.filter.description"));
+        presentation.setIcon(JsonAssistantIcons.SEARCH);
     }
 
     @Override

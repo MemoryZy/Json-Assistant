@@ -23,6 +23,8 @@ import com.intellij.json.JsonLanguage;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -70,10 +72,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.directory = directory;
         this.module = module;
 
-        setModal(false);
         setTitle(JsonAssistantBundle.message("json.to.javabean.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.ok.button.text"));
         setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.cancel.button.text"));
+        getOKAction().setEnabled(false);
         init();
     }
 
@@ -87,9 +89,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         jsonTextField.setFont(JBUI.Fonts.create("Consolas", 15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
+        jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
 
-        this.classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
-        this.jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
+        classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
+        jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
 
         JBSplitter splitter = new JBSplitter(true, 0.06f);
         splitter.setFirstComponent(firstPanel);
@@ -398,4 +401,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return !StringUtil.isEmptyOrSpaces(inputString) && getErrorText(inputString) == null;
         }
     }
+
+    private class JsonValidatorDocumentListener implements DocumentListener {
+        @Override
+        public void documentChanged(@NotNull DocumentEvent event) {
+            String json = jsonTextField.getText();
+            getOKAction().setEnabled(JsonUtil.isJsonStr(json));
+        }
+    }
+
 }

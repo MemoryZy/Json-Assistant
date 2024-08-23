@@ -48,7 +48,7 @@ public class JsonViewerWindow {
     }
 
     public JComponent getRootPanel() {
-        this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "", false);
+        this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
         this.jsonTextField.addFocusListener(new FocusListenerImpl());

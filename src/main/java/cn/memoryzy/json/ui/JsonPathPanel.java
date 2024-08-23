@@ -8,6 +8,7 @@ import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.basic.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.basic.jsonpath.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.basic.jsonpath.JsonPathFileTypeComboBoxEditor;
+import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import cn.memoryzy.json.utils.UIManager;
@@ -52,10 +53,11 @@ public class JsonPathPanel {
     private final Project project;
     private ComboBoxEditor jsonPathNestedComboBoxEditor;
     private CollectionComboBoxModel<String> comboBoxModel;
+    private TextEditorErrorPopupDecorator pathErrorDecorator;
 
     public JsonPathPanel(Project project, LanguageTextField jsonTextField) {
         this.project = project;
-        this.action = () -> fillJsonPathResult(jsonTextField.getText());
+        this.action = () -> handleJsonPathResult(jsonTextField.getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
         this.showTextEditor = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         this.showTextEditor.setFont(JBUI.Fonts.create("Consolas", 14));
@@ -98,21 +100,24 @@ public class JsonPathPanel {
         if (JSON_PATH_FILE_TYPE_CLASS != null) {
             jsonPathNestedComboBoxEditor = new JsonPathFileTypeComboBoxEditor(project, getJsonPathFileType(), font);
             EditorTextField editorTextField = ((JsonPathFileTypeComboBoxEditor) jsonPathNestedComboBoxEditor).getEditorComponent();
+            pathErrorDecorator = new TextEditorErrorPopupDecorator(null, editorTextField);
             UIManager.addRemoveErrorListener(editorTextField, comboBox);
         } else {
             jsonPathNestedComboBoxEditor = new JsonPathExtendableComboBoxEditor(action, font);
             ExtendableTextField editorTextField = ((JsonPathExtendableComboBoxEditor) jsonPathNestedComboBoxEditor).getEditorTextField();
+            pathErrorDecorator = new TextEditorErrorPopupDecorator(null, editorTextField);
             UIManager.addRemoveErrorListener(editorTextField, comboBox);
         }
 
         comboBox.setEditor(jsonPathNestedComboBoxEditor);
         comboBox.setEditable(true);
+        comboBox.setToolTipText(JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content"));
         jsonPathNestedComboBoxEditor.setItem(null);
 
         return comboBox;
     }
 
-    public void fillJsonPathResult(String jsonStr) {
+    public void handleJsonPathResult(String jsonStr) {
         String jsonPath = getPathExpression();
         if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr) || !JsonUtil.isJsonStr(jsonStr)) {
             return;
@@ -141,7 +146,7 @@ public class JsonPathPanel {
             UIManager.addErrorBorder(pathExpressionComboBoxTextField);
 
             if (ex instanceof PathNotFoundException) {
-                showTextEditor.setText(ex.getMessage());
+                pathErrorDecorator.setError(ex.getMessage());
                 return;
             }
 
