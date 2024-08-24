@@ -59,7 +59,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
-        group.add(new RenameViewAction());
+        group.add(new RenameTabAction());
         group.add(new MoveToEditorAction(toolWindowEx));
         group.add(new FloatingWindowAction(toolWindowEx));
         group.add(Separator.create());

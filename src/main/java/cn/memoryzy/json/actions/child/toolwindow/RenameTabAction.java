@@ -37,9 +37,9 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/21
  */
-public class RenameViewAction extends DumbAwareAction implements UpdateInBackground {
+public class RenameTabAction extends DumbAwareAction implements UpdateInBackground {
 
-    public RenameViewAction() {
+    public RenameTabAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
