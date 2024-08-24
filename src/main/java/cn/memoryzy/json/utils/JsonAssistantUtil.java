@@ -62,6 +62,7 @@ import java.util.Optional;
  * @since 2024/8/3
  */
 public class JsonAssistantUtil {
+
     private static final Logger LOG = Logger.getInstance(JsonAssistantUtil.class);
 
     public static void showJsonStructureDialog(String text) {
@@ -74,8 +75,9 @@ public class JsonAssistantUtil {
         ApplicationManager.getApplication().invokeLater(dialog::show);
     }
 
-    public static void writeOrCopyJsonOnEditor(Project project, Editor editor, Document document, String processedText,
-                                               BaseFormatModel model, boolean noMinify, boolean convertFormat) {
+    public static void applyProcessedTextToDocumentOrClipboard(Project project, Editor editor, Document document,
+                                                               String processedText, BaseFormatModel model,
+                                                               boolean noMinify, boolean convertFormat) {
         // 可写的话就写，不可写就拷贝到剪贴板
         if (document.isWritable() && !convertFormat) {
             // 获取当前文档内的psiFile
@@ -124,8 +126,9 @@ public class JsonAssistantUtil {
         }
     }
 
+
     @SuppressWarnings("DuplicatedCode")
-    public static BaseFormatModel matchFormats(Project project, Editor editor) {
+    public static BaseFormatModel createFormatModelFromEditor(Project project, Editor editor) {
         if (editor == null) {
             return null;
         }
@@ -138,7 +141,7 @@ public class JsonAssistantUtil {
         String documentText = document.getText();
 
         BaseFormatModel model = new XmlFormatModel(startOffset, endOffset, primaryCaret);
-        BaseFormatModel.fillModel(project, document, selectText, documentText, model);
+        BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
 
         if (StrUtil.isBlank(model.getContent())) {
             return null;
@@ -158,7 +161,7 @@ public class JsonAssistantUtil {
         }
     }
 
-    public static Class<?> getClass(String classQualifiedName) {
+    public static Class<?> getClassByName(String classQualifiedName) {
         try {
             return Class.forName(classQualifiedName);
         } catch (ClassNotFoundException e) {
@@ -166,7 +169,7 @@ public class JsonAssistantUtil {
         }
     }
 
-    public static Object getStaticFinalFieldValue(Class<?> clz, String fieldName) {
+    public static Object readStaticFinalFieldValue(Class<?> clz, String fieldName) {
         Field matchField = null;
         try {
             for (Field field : ClassUtil.getDeclaredFields(clz)) {
@@ -188,48 +191,44 @@ public class JsonAssistantUtil {
      * 是否不允许在当前 JSON 文档内写入；true，不写；false：写入
      */
     public static boolean isNotWriteJsonDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
-        return isNotWriteDoc(e, project, document, model, JsonFileType.INSTANCE, Json5FileType.INSTANCE);
+        return isWriteDocForbidden(e, project, document, model, JsonFileType.INSTANCE, Json5FileType.INSTANCE);
     }
 
     /**
      * 是否不允许在当前 XML 文档内写入；true，不写；false：写入
      */
     public static boolean isNotWriteXmlDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
-        return isNotWriteDoc(e, project, document, model, XmlFileType.INSTANCE);
+        return isWriteDocForbidden(e, project, document, model, XmlFileType.INSTANCE);
     }
 
     /**
-     * 是否不允许在当前文档内写入；true，不写；false：写入
+     * 是否不允许在当前文档内写入；true，不允许写入；false：允许写入
      */
-    public static boolean isNotWriteDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, FileType... fileTypes) {
-        // 是否在当前文档内写入；true，不写；false：写入
-        boolean isNotWriteDoc;
-        // 文档若可写入，且不在控制台内
-        if (document.isWritable() && !isOnConsole(e)) {
-            // 当前有无选中文本
-            if (model.getSelectedText()) {
-                // 选中了文本，将在选中区域内写入更改后的文本
-                isNotWriteDoc = false;
-            } else {
-                FileType fileType = PlatformUtil.getDocumentFileType(project, document);
-                // 若未选中文本，判断是否符合文件类型，符合的话也可写入（置为false，表示可写入）
-                isNotWriteDoc = !Arrays.asList(fileTypes).contains(fileType);
-            }
-        } else {
-            // 不可写入
-            isNotWriteDoc = true;
+    public static boolean isWriteDocForbidden(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, FileType... fileTypes) {
+        // 文档不可写入，或在控制台内，返回不允许写
+        if (!document.isWritable() || inConsole(e)) {
+            return true;
         }
 
-        return isNotWriteDoc;
+        // 选中了文本，将在选中区域内写入更改后的文本，返回允许写入
+        if (model.getSelectedText()) {
+            return false;
+        }
+
+        FileType fileType = PlatformUtil.getDocumentFileType(project, document);
+        // 若未选中文本，判断是否符合文件类型，符合的话也可写入（置为false，表示可写入）
+        return !Arrays.asList(fileTypes).contains(fileType);
     }
 
+
     /**
-     * true，处于控制台；false反之。
+     * 是否处于控制台；true，处于控制台；false反之。
      */
-    public static boolean isOnConsole(AnActionEvent e) {
+    public static boolean inConsole(AnActionEvent e) {
         ConsoleView data = e.getData(LangDataKeys.CONSOLE_VIEW);
         return data != null;
     }
+
 
     public static ToolWindow getJsonViewToolWindow(Project project) {
         return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
@@ -297,5 +296,12 @@ public class JsonAssistantUtil {
         }
 
         BrowserUtil.browse(url);
+    }
+
+
+    public static boolean isJsonOrExtract(String text) {
+        text = StrUtil.trim(text);
+        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
+        return StrUtil.isNotBlank(jsonStr);
     }
 }

@@ -92,7 +92,7 @@ public class JsonViewerWindow {
         if (StrUtil.isNotBlank(jsonStr)) {
             jsonTextField.setText(jsonStr);
         } else {
-            LimitedList<String> historyList = historyState.getHistoryList();
+            LimitedList<String> historyList = historyState.getHistory();
             int historySize = historyList.size();
 
             if (historySize > 0) {
@@ -113,7 +113,7 @@ public class JsonViewerWindow {
     private class DocumentListenerImpl implements DocumentListener {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
-            LimitedList<String> historyList = historyState.getHistoryList();
+            LimitedList<String> historyList = historyState.getHistory();
             String text = StrUtil.trim(jsonTextField.getText());
             boolean contains = false;
             for (String history : historyList) {

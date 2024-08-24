@@ -70,7 +70,7 @@ public abstract class BaseFormatModel {
     public abstract FileType getFileType();
 
 
-    public static void fillModel(Project project, @NotNull Document document, String selectText, String documentText, BaseFormatModel model) {
+    public static void prepareModel(Project project, @NotNull Document document, String selectText, String documentText, BaseFormatModel model) {
         String text = null;
         boolean isSelected = false;
 

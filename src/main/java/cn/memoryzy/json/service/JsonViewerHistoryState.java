@@ -37,12 +37,12 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
         this.historyList = state.historyList;
     }
 
-    public LimitedList<String> getHistoryList() {
-        initHistoryList();
+    public LimitedList<String> getHistory() {
+        initHistory();
         return historyList;
     }
 
-    private void initHistoryList() {
+    private void initHistory() {
         if (Objects.isNull(historyList)) {
             historyList = new LimitedList<>(HISTORY_LIMIT);
         }

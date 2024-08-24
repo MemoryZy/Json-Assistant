@@ -1,17 +1,20 @@
 package cn.memoryzy.json.actions.child.toolwindow;
 
+import cn.memoryzy.json.actions.JsonBeautifyAction;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonViewerWindow;
+import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -35,13 +38,13 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         LanguageTextField jsonTextField = window.getJsonTextField();
-        Editor editor = jsonTextField.getEditor();
-
-
+        JsonBeautifyAction.handleJsonBeautify(e, Objects.requireNonNull(jsonTextField.getEditor()));
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-
+        e.getPresentation().setEnabled(null != e.getProject()
+                && null != window.getJsonTextField().getEditor()
+                && JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
     }
 }

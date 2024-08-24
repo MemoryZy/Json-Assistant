@@ -1,11 +1,10 @@
 package cn.memoryzy.json.actions.child.toolwindow;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.JsonPathPanel;
 import cn.memoryzy.json.ui.JsonViewerWindow;
-import cn.memoryzy.json.utils.JsonUtil;
+import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -107,6 +106,7 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         return new RelativePoint(source, new Point((toolWindowPanel.getWidth() / 2 - 35), firstAction.getY() - firstAction.getHeight()));
     }
 
+
     private void showGuidePopup(JBPopup popup, JComponent component) {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         boolean hasShown = propertiesComponent.getBoolean(JSON_PATH_GUIDE_KEY, false);
@@ -131,9 +131,7 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        String text = StrUtil.trim(window.getJsonContent());
-        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
-        e.getPresentation().setEnabled(StrUtil.isNotBlank(jsonStr));
+        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
     }
 
 }

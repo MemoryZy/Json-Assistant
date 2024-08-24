@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
-import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -37,9 +36,7 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        String text = StrUtil.trim(window.getJsonContent());
-        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
-        e.getPresentation().setEnabled(StrUtil.isNotBlank(jsonStr));
+        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
     }
 
 }

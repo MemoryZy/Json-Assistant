@@ -44,7 +44,7 @@ import java.util.*;
 public class JsonPathPanel {
     private static final Logger LOG = Logger.getInstance(JsonPathPanel.class);
     public static final String JSON_PATH_FILE_TYPE_CLASS_NAME = "com.intellij.jsonpath.JsonPathFileType";
-    public static final Class<?> JSON_PATH_FILE_TYPE_CLASS = JsonAssistantUtil.getClass(JSON_PATH_FILE_TYPE_CLASS_NAME);
+    public static final Class<?> JSON_PATH_FILE_TYPE_CLASS = JsonAssistantUtil.getClassByName(JSON_PATH_FILE_TYPE_CLASS_NAME);
     public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
 
     private final ComboBox<String> pathExpressionComboBoxTextField;
@@ -248,7 +248,7 @@ public class JsonPathPanel {
 
     public static FileType getJsonPathFileType() {
         FileType fileType = PlainTextFileType.INSTANCE;
-        Object instance = JsonAssistantUtil.getStaticFinalFieldValue(JsonPathPanel.JSON_PATH_FILE_TYPE_CLASS, "INSTANCE");
+        Object instance = JsonAssistantUtil.readStaticFinalFieldValue(JsonPathPanel.JSON_PATH_FILE_TYPE_CLASS, "INSTANCE");
         if (instance instanceof FileType) {
             fileType = (FileType) instance;
         }

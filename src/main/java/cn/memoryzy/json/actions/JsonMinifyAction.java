@@ -32,8 +32,12 @@ public class JsonMinifyAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
+        handleJsonMinify(e, editor);
+    }
+
+    public static void handleJsonMinify(AnActionEvent e, Editor editor){
+        Project project = e.getProject();
         Document document = editor.getDocument();
         JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
                 JsonAssistantBundle.messageOnSystem("hint.select.json.minify.text"),
@@ -47,8 +51,9 @@ public class JsonMinifyAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, compressedJson,
-                model, false, JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
+        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
+                project, editor, document, compressedJson, model, false,
+                JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
     }
 
 }

@@ -35,8 +35,12 @@ public class JsonBeautifyAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
+        handleJsonBeautify(e, editor);
+    }
+
+    public static void handleJsonBeautify(AnActionEvent e, Editor editor) {
+        Project project = e.getProject();
         Document document = editor.getDocument();
         JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
                 JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
@@ -50,8 +54,9 @@ public class JsonBeautifyAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.writeOrCopyJsonOnEditor(project, editor, document, formattedJson,
-                model, true, JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
+        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
+                project, editor, document, formattedJson, model, true,
+                JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
     }
 
 }

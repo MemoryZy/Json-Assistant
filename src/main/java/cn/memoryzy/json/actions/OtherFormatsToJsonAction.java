@@ -34,9 +34,9 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e);
         try {
-            BaseFormatModel model = JsonAssistantUtil.matchFormats(e.getProject(), editor);
+            BaseFormatModel model = JsonAssistantUtil.createFormatModelFromEditor(e.getProject(), editor);
             if (Objects.nonNull(model)) {
-                JsonAssistantUtil.writeOrCopyJsonOnEditor(e.getProject(), editor, editor.getDocument(),
+                JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(e.getProject(), editor, editor.getDocument(),
                         model.convertToJson(), model, true, true);
             }
         } catch (Exception ignored) {
@@ -51,7 +51,7 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
         Editor editor = PlatformUtil.getEditor(e);
         if (Objects.nonNull(project) && Objects.nonNull(editor)) {
             try {
-                BaseFormatModel model = JsonAssistantUtil.matchFormats(project, editor);
+                BaseFormatModel model = JsonAssistantUtil.createFormatModelFromEditor(project, editor);
                 if (Objects.nonNull(model)) {
                     enabled = true;
                     presentation.setText(model.getActionName());

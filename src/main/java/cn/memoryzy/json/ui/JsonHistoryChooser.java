@@ -65,14 +65,14 @@ public class JsonHistoryChooser extends DialogWrapper {
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
         JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
-        LimitedList<String> historyList = historyState.getHistoryList();
+        LimitedList<String> historyList = historyState.getHistory();
         List<HistoryModel> historyModels = HistoryModel.of(historyList);
         DefaultListModel<HistoryModel> defaultListModel = JBList.createDefaultListModel(historyModels);
 
         showList = new JBList<>(defaultListModel);
         showList.setFont(JBUI.Fonts.create("JetBrains Mono", 13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        showList.addListSelectionListener(new ListSelectionListenerImpl());
+        showList.addListSelectionListener(new SetWholeContentListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());
         ((JBList<?>) showList).setEmptyText(JsonAssistantBundle.messageOnSystem("json.history.window.empty.text"));
         initRightMousePopupMenu();
@@ -195,7 +195,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         }
     }
 
-    public class ListSelectionListenerImpl implements ListSelectionListener {
+    public class SetWholeContentListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             HistoryModel selectedValue = showList.getSelectedValue();

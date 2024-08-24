@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonViewerWindow;
+import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -60,9 +61,6 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        String text = StrUtil.trim(window.getJsonContent());
-        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
-        e.getPresentation().setEnabled(project != null && StrUtil.isNotBlank(jsonStr));
+        e.getPresentation().setEnabled(e.getProject() != null && JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
     }
 }
