@@ -6,8 +6,10 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,6 +34,9 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        LanguageTextField jsonTextField = window.getJsonTextField();
+        Editor editor = jsonTextField.getEditor();
+
 
     }
 

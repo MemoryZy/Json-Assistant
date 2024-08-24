@@ -21,7 +21,7 @@ public class ClearEditorAction extends DumbAwareAction {
         this.window = window;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.clear.editor.text"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.clear.editor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.clear.editor.description"));
         presentation.setIcon(JsonAssistantIcons.DELETE);
     }
