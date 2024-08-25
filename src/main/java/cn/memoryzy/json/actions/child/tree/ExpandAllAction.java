@@ -19,7 +19,7 @@ public class ExpandAllAction extends DumbAwareActionButton {
     public ExpandAllAction(Tree tree, JRootPane rootPane) {
         super(JsonAssistantBundle.message("action.expand.all.text"),
                 JsonAssistantBundle.messageOnSystem("action.expand.all.description"),
-                JsonAssistantIcons.InnerAction.EXPAND_ALL);
+                JsonAssistantIcons.INTELLIJ_EXPAND_ALL);
         this.tree = tree;
 
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), rootPane);

@@ -37,6 +37,8 @@ public class JsonAssistantIcons {
     public static final Icon DIZZY_STAR_ORI = load("/icons/dizzy_star_ori.svg");
     public static final Icon STAR_FALL_MINI = load("/icons/star_fall_mini.svg");
     public static final Icon MINIMIZE = load("/icons/minimize.svg");
+    public static final Icon INTELLIJ_COLLAPSE_ALL = load("/icons/intellij_collapseAll.svg");
+    public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/intellij_expandAll.svg");
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
