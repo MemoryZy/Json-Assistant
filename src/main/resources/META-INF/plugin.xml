@@ -34,7 +34,7 @@
         <postStartupActivity implementation="cn.memoryzy.json.extensions.PluginActivityManager"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.AsyncHolder"/>
         
-        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extensions.JsonViewFloatingToolbarProvider"/>
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider"/>
     </extensions>
 
     <applicationListeners>
@@ -43,11 +43,15 @@
     </applicationListeners>
 
     <actions>
-        <group id="json-assistant.xxx.group">
-            <action id="json-assistant.xxx" class="cn.memoryzy.json.actions.Xxx" text="xxxxxxx" icon="JsonAssistantIcons.CONVERSION">
-            </action>
+        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.actions.PasteHistoryEditorToolbarAction"/>
+        <action id="JsonAssistant.Action.CloseEditorToolbarAction" class="cn.memoryzy.json.actions.HideEditorToolbarAction"/>
+
+        <group id="JsonAssistant.Group.EditorToolbarGroup">
+            <reference ref="JsonAssistant.Action.PasteHistoryEditorToolbarAction"/>
+            <reference ref="JsonAssistant.Action.CloseEditorToolbarAction"/>
         </group>
 
+        <!-- ######################## -->
 
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.actions.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.actions.JsonMinifyAction"/>

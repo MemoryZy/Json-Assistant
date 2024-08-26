@@ -2,6 +2,7 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.actions.child.toolwindow.*;
+import cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
@@ -14,6 +15,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
@@ -47,7 +49,9 @@ public class JsonViewerWindow {
     public JComponent getRootPanel() {
         this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
-        this.jsonTextField.getDocument().addDocumentListener(new DocumentListenerImpl());
+        Document document = this.jsonTextField.getDocument();
+        document.addDocumentListener(new DocumentListenerImpl());
+        document.addDocumentListener(new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
 
         this.historyState = JsonViewerHistoryState.getInstance(project);
