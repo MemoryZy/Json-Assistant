@@ -4,7 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.constants.PluginConstant;
 import cn.memoryzy.json.utils.UIManager;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -49,8 +52,8 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        Component contextComponent = e.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT);
-        BaseLabel tabLabel = contextComponent instanceof BaseLabel ? (BaseLabel) contextComponent: e.getData(ToolWindowContentUi.SELECTED_CONTENT_TAB_LABEL);
+        Component contextComponent = e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        BaseLabel tabLabel = contextComponent instanceof BaseLabel ? (BaseLabel) contextComponent : e.getData(ToolWindowContentUi.SELECTED_CONTENT_TAB_LABEL);
         if (tabLabel == null) return;
         Content content = tabLabel.getContent();
         showContentRenamePopup(tabLabel, Objects.requireNonNull(content));
@@ -84,9 +87,9 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
 
         textField.addKeyListener(new KeyAdapter() {
             @Override
+            @SuppressWarnings("deprecation")
             public void keyPressed(KeyEvent e) {
                 if (e != null && e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    //noinspection deprecation
                     if (!Disposer.isDisposed(content)) {
                         if (StrUtil.isBlank(textField.getText())) {
                             // 将输入框边框红色，以示警告
@@ -130,7 +133,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
     }
 
     private static Content getContextContent(@NotNull AnActionEvent e) {
-        BaseLabel baseLabel = ObjectUtils.tryCast(e.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT), BaseLabel.class);
+        BaseLabel baseLabel = ObjectUtils.tryCast(e.getData(PlatformDataKeys.CONTEXT_COMPONENT), BaseLabel.class);
         return baseLabel != null ? baseLabel.getContent() : null;
     }
 }

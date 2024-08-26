@@ -4,11 +4,12 @@ import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.JsonUtil;
-import com.intellij.codeInsight.folding.impl.actions.ExpandRegionAction;
+import com.intellij.codeInsight.folding.impl.FoldingUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
@@ -39,18 +40,33 @@ public class ExpandAllTextToolWindowAction extends DumbAwareAction implements Up
         LanguageTextField jsonTextField = window.getJsonTextField();
         Editor editor = jsonTextField.getEditor();
         int jsonOutsetOffset = JsonUtil.findJsonOutsetCharacterOffset(jsonTextField.getText());
-
-        ExpandRegionAction.expandRegionAtOffset(
-                Objects.requireNonNull(e.getProject()),
-                Objects.requireNonNull(editor),
-                jsonOutsetOffset);
+        expandRegionAtOffset(Objects.requireNonNull(editor), jsonOutsetOffset);
     }
-
 
     @Override
     public void update(@NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(null != e.getProject()
                 && null != window.getJsonTextField().getEditor()
                 && JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
+    }
+
+    public static void expandRegionAtOffset(Editor editor, final int offset) {
+        final int line = editor.getDocument().getLineNumber(offset);
+        Runnable processor = () -> {
+            FoldRegion region = FoldingUtil.findFoldRegionStartingAtLine(editor, line);
+            if (region != null && !region.isExpanded()) {
+                region.setExpanded(true);
+            } else {
+                FoldRegion[] regions = FoldingUtil.getFoldRegionsAtOffset(editor, offset);
+                for (int i = regions.length - 1; i >= 0; i--) {
+                    region = regions[i];
+                    if (!region.isExpanded()) {
+                        region.setExpanded(true);
+                        break;
+                    }
+                }
+            }
+        };
+        editor.getFoldingModel().runBatchFoldingOperation(processor);
     }
 }

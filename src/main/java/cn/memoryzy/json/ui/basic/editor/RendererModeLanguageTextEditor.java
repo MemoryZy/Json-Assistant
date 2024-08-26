@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/8/22
  */
-public class InsertModeLanguageTextEditor extends CustomizedLanguageTextEditor {
+public class RendererModeLanguageTextEditor extends CustomizedLanguageTextEditor {
 
-    public InsertModeLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
+    public RendererModeLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
         super(language, project, value, needBorder);
     }
 

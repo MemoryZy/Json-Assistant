@@ -11,7 +11,6 @@ import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -41,17 +40,15 @@ public class CollapseAllTextToolWindowAction extends DumbAwareAction implements 
         LanguageTextField jsonTextField = window.getJsonTextField();
         Editor editor = jsonTextField.getEditor();
         int jsonOutsetOffset = JsonUtil.findJsonOutsetCharacterOffset(jsonTextField.getText());
-        collapseRegionAtOffset(Objects.requireNonNull(e.getProject()), Objects.requireNonNull(editor), jsonOutsetOffset);
+        collapseRegionAtOffset(Objects.requireNonNull(editor), jsonOutsetOffset);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(null != e.getProject()
-                && null != window.getJsonTextField().getEditor()
-                && JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
+        e.getPresentation().setEnabled(null != window.getJsonTextField().getEditor() && JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
     }
 
-    public static void collapseRegionAtOffset(@NotNull Project project, @NotNull final Editor editor, final int offset) {
+    public static void collapseRegionAtOffset(@NotNull final Editor editor, final int offset) {
         final int line = editor.getDocument().getLineNumber(offset);
         Runnable processor = () -> {
             FoldRegion region = FoldingUtil.findFoldRegionStartingAtLine(editor, line);

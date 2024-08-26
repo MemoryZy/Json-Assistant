@@ -31,16 +31,24 @@
                     doNotActivateOnStart="true"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
-        <postStartupActivity implementation="cn.memoryzy.json.listeners.PluginActivityManager"/>
+        <postStartupActivity implementation="cn.memoryzy.json.extensions.PluginActivityManager"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.AsyncHolder"/>
+        
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extensions.JsonViewFloatingToolbarProvider"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="cn.memoryzy.json.listeners.PluginActivityManager"
+        <listener class="cn.memoryzy.json.extensions.PluginActivityManager"
                   topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
     <actions>
+        <group id="json-assistant.xxx.group">
+            <action id="json-assistant.xxx" class="cn.memoryzy.json.actions.Xxx" text="xxxxxxx" icon="JsonAssistantIcons.CONVERSION">
+            </action>
+        </group>
+
+
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.actions.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.actions.JsonMinifyAction"/>
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.actions.JsonStructureAction"/>
