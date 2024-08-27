@@ -6,16 +6,21 @@ import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -46,8 +51,14 @@ public class MoveToEditorAction extends DumbAwareAction {
             LanguageTextField languageTextField = JsonAssistantUtil.getLanguageTextFieldOnContent(selectedContent);
             String text = Objects.nonNull(languageTextField) ? languageTextField.getText() : "";
 
-            LightVirtualFile lightVirtualFile = new LightVirtualFile(selectedContent.getDisplayName(), JsonFileType.INSTANCE, text);
-            FileEditorManager.getInstance(project).openFile(lightVirtualFile, true);
+            VirtualFile virtualFile = Optional.ofNullable(languageTextField)
+                    .map(LanguageTextField::getEditor)
+                    .map(Editor::getDocument)
+                    .map(document -> PsiDocumentManager.getInstance(project).getPsiFile(document))
+                    .map(PsiFile::getVirtualFile)
+                    .orElse(new LightVirtualFile(selectedContent.getDisplayName(), JsonFileType.INSTANCE, text));
+
+            FileEditorManager.getInstance(project).openFile(virtualFile, true);
 
             toolWindow.hide();
         }

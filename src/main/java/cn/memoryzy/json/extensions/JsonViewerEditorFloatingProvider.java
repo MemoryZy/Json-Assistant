@@ -1,7 +1,12 @@
 package cn.memoryzy.json.extensions;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.actions.HideEditorToolbarAction;
+import cn.memoryzy.json.constants.ActionHolder;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
+import cn.memoryzy.json.models.LimitedList;
+import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.editor.FoldingLanguageTextEditor;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.openapi.Disposable;
@@ -28,10 +33,10 @@ import java.util.Objects;
  */
 public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarProvider {
 
-    public final DisposableWrapperList<Pair<Content, FloatingToolbarComponent>> toolbarComponents = new DisposableWrapperList<>();
+    private final DisposableWrapperList<Pair<Content, FloatingToolbarComponent>> toolbarComponents = new DisposableWrapperList<>();
 
     public JsonViewerEditorFloatingProvider() {
-        super("JsonAssistant.Group.EditorToolbarGroup");
+        super(ActionHolder.EDITOR_TOOLBAR_GROUP_ID);
     }
 
     public static JsonViewerEditorFloatingProvider getInstance() {
@@ -40,7 +45,13 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
 
     @Override
     public void register(@NotNull DataContext dataContext, @NotNull FloatingToolbarComponent component, @NotNull Disposable parentDisposable) {
-        ToolWindow toolWindow = JsonAssistantUtil.getJsonViewToolWindow(dataContext.getData(CommonDataKeys.PROJECT));
+        Project project = dataContext.getData(CommonDataKeys.PROJECT);
+        if (project == null) return;
+
+        LimitedList<String> history = JsonViewerHistoryState.getInstance(project).getHistory();
+        if (CollUtil.isEmpty(history)) return;
+
+        ToolWindow toolWindow = JsonAssistantUtil.getJsonViewToolWindow(project);
         Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
 
         Editor editor = dataContext.getData(CommonDataKeys.EDITOR);
@@ -48,6 +59,9 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
 
         String userData = editor.getUserData(FoldingLanguageTextEditor.PLUGIN_EDITOR_KEY);
         if (!Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, userData)) return;
+
+        // 判断是否为永久关闭的内容
+        if (isPermanentlyHide(selectedContent)) return;
 
         putToolbarComponent(Pair.pair(selectedContent, component));
 
@@ -66,7 +80,45 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
     }
 
     private void hideToolbarComponent(Content content) {
-        toolbarComponents.stream().filter(el -> Objects.equals(el.getFirst(), content)).findFirst().ifPresent(pair -> pair.getSecond().scheduleHide());
+        for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
+            if (Objects.equals(pair.getFirst(), content)) {
+                pair.getSecond().scheduleHide();
+            }
+        }
+    }
+
+    public void permanentlyHideToolbarComponent(Content content) {
+        for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
+            Content first = pair.getFirst();
+            if (Objects.equals(first, content)) {
+                first.putUserData(HideEditorToolbarAction.PERMANENTLY_HIDE_KEY, true);
+                pair.getSecond().scheduleHide();
+            }
+        }
+    }
+
+    private boolean isPermanentlyHide(Content content) {
+        for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
+            Content first = pair.getFirst();
+            if (Objects.equals(first, content)) {
+                Boolean userData = first.getUserData(HideEditorToolbarAction.PERMANENTLY_HIDE_KEY);
+                return Boolean.TRUE.equals(userData);
+            }
+        }
+
+        return false;
+    }
+
+    private void showToolbarComponent(Content content) {
+        for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
+            Content first = pair.getFirst();
+            if (Objects.equals(first, content)) {
+                Boolean userData = first.getUserData(HideEditorToolbarAction.PERMANENTLY_HIDE_KEY);
+                if (!Boolean.TRUE.equals(userData)) {
+                    pair.getSecond().scheduleShow();
+                }
+            }
+        }
     }
 
     private void removeToolbarComponent(Content content) {
@@ -77,6 +129,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
     public boolean getAutoHideable() {
         return false;
     }
+
 
     public static class ContentDisposable implements Disposable {
         private final Content content;
@@ -105,23 +158,26 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
         @Override
         public void beforeDocumentChange(@NotNull DocumentEvent event) {
             CharSequence newFragment = event.getNewFragment();
-            String documentText = event.getDocument().getText();
+            String oriDocumentText = event.getDocument().getText();
 
-            // 第一次新增文本时才进入取消显示逻辑
-            // 当输入文本时关闭窗口，但是删除全部文本时应该开启
-            if (StrUtil.isBlank(documentText)) {
-
-
+            // 原本的文本为空 && 新增的文本不为空 ==> 第一次添加文本
+            if (StrUtil.isBlank(oriDocumentText) && StrUtil.isNotBlank(newFragment)) {
+                Content selectedContent = JsonAssistantUtil.getSelectedContent(JsonAssistantUtil.getJsonViewToolWindow(project));
+                if (selectedContent != null) {
+                    provider.hideToolbarComponent(selectedContent);
+                }
             }
         }
 
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
-            // 输入字符后，隐藏Toolbar
-            if (StrUtil.isNotBlank(event.getNewFragment())) {
+            String nowDocumentText = event.getDocument().getText();
+
+            // 现在的文本为空 && 原先的文本不为空 ==> 文本全部删除，编辑器为空
+            if (StrUtil.isBlank(nowDocumentText)) {
                 Content selectedContent = JsonAssistantUtil.getSelectedContent(JsonAssistantUtil.getJsonViewToolWindow(project));
                 if (selectedContent != null) {
-                    provider.hideToolbarComponent(selectedContent);
+                    provider.showToolbarComponent(selectedContent);
                 }
             }
         }

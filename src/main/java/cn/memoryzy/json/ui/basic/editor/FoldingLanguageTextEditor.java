@@ -7,9 +7,12 @@ import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.awt.*;
 
 /**
  * @author Memory
@@ -33,11 +36,13 @@ public class FoldingLanguageTextEditor extends CustomizedLanguageTextEditor {
         // 显示设置插入符行（光标选中行会变黄）
         settings.setCaretRowShown(true);
 
-        // 白色背景
-        // editor.setBackgroundColor(EDITOR_COLOR);
-        // new JBColor(Color.WHITE, PlatformUtil.isNewUi() ? new Color(0xFF1E1F22) : Gray._43);
+        int left = 8;
+        if (PlatformUtil.isNewUi()) {
+            left = 0;
+            // 白色背景
+            editor.setBackgroundColor(new JBColor(Color.WHITE, new Color(0xFF1E1F22)));
+        }
 
-        int left = PlatformUtil.isNewUi() ? 0 : 8;
         editor.setBorder(JBUI.Borders.empty(5, left, 0, 0));
         editor.putUserData(PLUGIN_EDITOR_KEY, JsonAssistantPlugin.PLUGIN_ID_NAME);
 

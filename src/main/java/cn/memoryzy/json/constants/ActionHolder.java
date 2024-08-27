@@ -15,6 +15,7 @@ public class ActionHolder {
     public static final String JSON_TEXT_DIFF_ACTION_ID = "JsonAssistant.Action.JsonTextDiffAction";
     public static final String CONVERT_OTHER_FORMATS_GROUP_ID = "JsonAssistant.Group.ConvertOtherFormatsGroup";
     public static final String SHORTCUT_ACTION_ID = "JsonAssistant.Action.ShortcutAction";
+    public static final String EDITOR_TOOLBAR_GROUP_ID = "JsonAssistant.Group.EditorToolbarGroup";
 
     public static final AnAction JSON_BEAUTIFY_ACTION = ActionManager.getInstance().getAction(JSON_BEAUTIFY_ACTION_ID);
     public static final AnAction JSON_MINIFY_ACTION = ActionManager.getInstance().getAction(JSON_MINIFY_ACTION_ID);

@@ -79,9 +79,6 @@ public class JsonViewerWindow {
         actionGroup.add(new JsonStructureToolWindowAction(this, simpleToolWindowPanel));
         actionGroup.add(new JsonPathFilterOnTextFieldAction(this));
         actionGroup.add(Separator.create());
-        actionGroup.add(new ExpandAllTextToolWindowAction(this));
-        actionGroup.add(new CollapseAllTextToolWindowAction(this));
-        actionGroup.add(Separator.create());
         actionGroup.add(new SaveToDiskAction(this));
         actionGroup.add(new ClearEditorAction(this));
 
@@ -98,13 +95,6 @@ public class JsonViewerWindow {
 
         if (StrUtil.isNotBlank(jsonStr)) {
             jsonTextField.setText(jsonStr);
-        } else {
-            LimitedList<String> historyList = historyState.getHistory();
-            int historySize = historyList.size();
-
-            if (historySize > 0) {
-                jsonTextField.setText(historyList.get(historySize - 1));
-            }
         }
     }
 

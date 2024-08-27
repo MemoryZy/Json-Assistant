@@ -236,6 +236,7 @@ public class JsonAssistantUtil {
     }
 
     public static Content getSelectedContent(ToolWindow toolWindow) {
+        if (toolWindow == null) return null;
         ContentManager contentManager = toolWindow.getContentManager();
         Content selectedContent = contentManager.getSelectedContent();
         if (Objects.isNull(selectedContent)) {
