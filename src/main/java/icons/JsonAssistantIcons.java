@@ -16,7 +16,6 @@ public class JsonAssistantIcons {
     public static final Icon GROUP_BY_CLASS = load("/icons/groupByClass.svg");
     public static final Icon HEART = load("/icons/heart.svg");
     public static final Icon DONATE = load("/icons/donate.svg");
-    public static final Icon FLOATING = load("/icons/floating.svg");
     public static final Icon TOOL_WINDOW_JSON_PATH = load("/icons/toolWindowJsonPath.svg");
     public static final Icon WECHAT_PAY = load("/images/wechat_pay.png");
     public static final Icon ALIPAY = load("/images/alipay.png");
@@ -34,13 +33,10 @@ public class JsonAssistantIcons {
     public static final Icon DIFF = load("/icons/diff.svg");
     public static final Icon DELETE = load("/icons/delete.svg");
     public static final Icon SAVE = load("/icons/save.svg");
-    public static final Icon DIZZY_STAR_ORI = load("/icons/dizzy_star_ori.svg");
     public static final Icon STAR_FALL_MINI = load("/icons/star_fall_mini.svg");
-    public static final Icon MINIMIZE = load("/icons/minimize.svg");
-    public static final Icon INTELLIJ_COLLAPSE_ALL = load("/icons/intellij_collapseAll.svg");
-    public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/intellij_expandAll.svg");
-    public static final Icon PASTE = load("/icons/paste.svg");
     public static final Icon FORM_HISTORY = load("/icons/form_history.svg");
+    public static final Icon FORMAT = load("/icons/format.svg");
+    public static final Icon MINIFY = load("/icons/minify.svg");
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
@@ -70,6 +66,9 @@ public class JsonAssistantIcons {
 
         public static final Icon EXPAND_ALL = load("/icons/inner_action/expandAll.svg");
         public static final Icon COLLAPSE_ALL = load("/icons/inner_action/collapseAll.svg");
+
+        public static final Icon INTELLIJ_COLLAPSE_ALL = load("/icons/inner_action/intellij_collapseAll.svg");
+        public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/inner_action/intellij_expandAll.svg");
 
     }
 

@@ -19,7 +19,7 @@ public class CollapseAllAction extends DumbAwareActionButton {
     public CollapseAllAction(Tree tree, JRootPane rootPane) {
         super(JsonAssistantBundle.message("action.collapse.all.text"),
                 JsonAssistantBundle.messageOnSystem("action.collapse.all.description"),
-                JsonAssistantIcons.INTELLIJ_COLLAPSE_ALL);
+                JsonAssistantIcons.InnerAction.INTELLIJ_COLLAPSE_ALL);
 
         this.tree = tree;
 
