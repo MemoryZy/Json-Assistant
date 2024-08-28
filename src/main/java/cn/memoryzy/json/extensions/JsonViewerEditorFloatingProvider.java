@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.toolbar.floating.AbstractFloatingToolbarProvider;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
@@ -145,7 +146,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
         }
     }
 
-    public static class DocumentListenerImpl {
+    public static class DocumentListenerImpl implements DocumentListener {
         private final Project project;
         private final JsonViewerEditorFloatingProvider provider;
 
@@ -154,6 +155,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
             this.provider = getInstance();
         }
 
+        @Override
         public void beforeDocumentChange(@NotNull DocumentEvent event) {
             CharSequence newFragment = event.getNewFragment();
             String oriDocumentText = event.getDocument().getText();
@@ -167,6 +169,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
             }
         }
 
+        @Override
         public void documentChanged(@NotNull DocumentEvent event) {
             String nowDocumentText = event.getDocument().getText();
 

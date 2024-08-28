@@ -32,8 +32,6 @@
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
         <postStartupActivity implementation="cn.memoryzy.json.extensions.PluginActivityManager"/>
-        <applicationService serviceImplementation="cn.memoryzy.json.service.AsyncHolder"/>
-        
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider"/>
     </extensions>
 

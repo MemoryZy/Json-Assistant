@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.actions.child.toolwindow.*;
 import cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.models.LimitedList;
-import cn.memoryzy.json.service.AsyncHolder;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.basic.JsonViewerPanel;
 import cn.memoryzy.json.ui.basic.editor.FoldingLanguageTextEditor;
@@ -16,19 +15,15 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.LanguageTextField;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Memory
@@ -39,28 +34,24 @@ public class JsonViewerWindow {
     private LanguageTextField jsonTextField;
     private final Project project;
     private final boolean initWindow;
-    private JsonViewerHistoryState historyState;
+    private final JsonViewerHistoryState historyState;
 
     public JsonViewerWindow(Project project, boolean initWindow) {
         this.project = project;
         this.initWindow = initWindow;
+        this.historyState = JsonViewerHistoryState.getInstance(project);
     }
 
     public JComponent getRootPanel() {
         this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         Document document = this.jsonTextField.getDocument();
-        JsonViewerEditorFloatingProvider.DocumentListenerImpl listener = new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project);
-        document.addDocumentListener(new DocumentListenerImpl(listener));
+        document.addDocumentListener(new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
 
-        this.historyState = JsonViewerHistoryState.getInstance(project);
+        if (initWindow) initJsonText();
+
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
-
-        if (initWindow) {
-            initJsonText();
-        }
-
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(jsonTextField, BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
@@ -107,50 +98,9 @@ public class JsonViewerWindow {
     }
 
 
-    private class DocumentListenerImpl implements DocumentListener {
-        private final JsonViewerEditorFloatingProvider.DocumentListenerImpl listener;
-        public DocumentListenerImpl(JsonViewerEditorFloatingProvider.DocumentListenerImpl listener) {
-            this.listener = listener;
-        }
-
-        @Override
-        public void beforeDocumentChange(@NotNull DocumentEvent event) {
-            listener.beforeDocumentChange(event);
-        }
-
-        @Override
-        public void documentChanged(@NotNull DocumentEvent event) {
-            LimitedList<String> historyList = historyState.getHistory();
-            String text = StrUtil.trim(jsonTextField.getText());
-            boolean contains = false;
-            for (String history : historyList) {
-                if (StrUtil.equals(text, StrUtil.trim(history))) {
-                    contains = true;
-                }
-            }
-
-            if (!contains && JsonUtil.isJsonStr(text)) {
-                AsyncHolder.getInstance().executeOnPooledThread(() -> {
-                    try {
-                        TimeUnit.SECONDS.sleep(3);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    String newText = jsonTextField.getText();
-                    if (StrUtil.equals(StrUtil.trim(newText), text)) {
-                        historyList.add(text);
-                    }
-                });
-            }
-
-            listener.documentChanged(event);
-        }
-    }
-
     private class FocusListenerImpl extends FocusAdapter {
         @Override
-        public void focusGained(FocusEvent e) {
+        public void focusGained(FocusEvent event) {
             if (initWindow) {
                 String text = jsonTextField.getText();
                 if (StrUtil.isBlank(text)) {
@@ -162,6 +112,26 @@ public class JsonViewerWindow {
                             jsonTextField.setText(jsonStr);
                         }
                     }
+                }
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent event) {
+            LimitedList<String> historyList = historyState.getHistory();
+            String text = StrUtil.trim(jsonTextField.getText());
+
+            if (JsonUtil.isJsonStr(text)) {
+                boolean contains = false;
+                // noinspection ForLoopReplaceableByForEach
+                for (int i = 0; i < historyList.size(); i++) {
+                    if (StrUtil.equals(historyList.get(i), text)) {
+                        contains = true;
+                    }
+                }
+
+                if (!contains) {
+                    historyList.add(text);
                 }
             }
         }
