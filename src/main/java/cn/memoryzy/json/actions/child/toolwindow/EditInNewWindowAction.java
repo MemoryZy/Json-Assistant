@@ -48,7 +48,8 @@ public class EditInNewWindowAction extends DumbAwareAction {
         Project project = e.getRequiredData(CommonDataKeys.PROJECT);
         final FileEditorManager manager = FileEditorManager.getInstance(project);
         VirtualFile virtualFile = getVirtualFile(e);
-        rename(project, virtualFile);
+        Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
+        rename(project, virtualFile, content);
         ((FileEditorManagerImpl) manager).openFileInNewWindow(virtualFile);
     }
 
@@ -72,8 +73,7 @@ public class EditInNewWindowAction extends DumbAwareAction {
     }
 
 
-    public void rename(Project project, VirtualFile virtualFile) {
-        Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
+    public static void rename(Project project, VirtualFile virtualFile, Content content) {
         String displayName = content.getDisplayName();
         String name = virtualFile.getNameWithoutExtension();
         if (Objects.equals(displayName, name)) return;

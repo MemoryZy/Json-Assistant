@@ -58,8 +58,8 @@ public class MoveToEditorAction extends DumbAwareAction {
                     .map(PsiFile::getVirtualFile)
                     .orElse(new LightVirtualFile(selectedContent.getDisplayName(), JsonFileType.INSTANCE, text));
 
+            EditInNewWindowAction.rename(project, virtualFile, selectedContent);
             FileEditorManager.getInstance(project).openFile(virtualFile, true);
-
             toolWindow.hide();
         }
     }

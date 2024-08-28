@@ -50,8 +50,8 @@ public class JsonViewerWindow {
         this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         Document document = this.jsonTextField.getDocument();
-        document.addDocumentListener(new DocumentListenerImpl());
-        document.addDocumentListener(new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project));
+        JsonViewerEditorFloatingProvider.DocumentListenerImpl listener = new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project);
+        document.addDocumentListener(new DocumentListenerImpl(listener));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
 
         this.historyState = JsonViewerHistoryState.getInstance(project);
@@ -108,6 +108,16 @@ public class JsonViewerWindow {
 
 
     private class DocumentListenerImpl implements DocumentListener {
+        private final JsonViewerEditorFloatingProvider.DocumentListenerImpl listener;
+        public DocumentListenerImpl(JsonViewerEditorFloatingProvider.DocumentListenerImpl listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void beforeDocumentChange(@NotNull DocumentEvent event) {
+            listener.beforeDocumentChange(event);
+        }
+
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
             LimitedList<String> historyList = historyState.getHistory();
@@ -133,6 +143,8 @@ public class JsonViewerWindow {
                     }
                 });
             }
+
+            listener.documentChanged(event);
         }
     }
 

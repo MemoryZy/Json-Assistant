@@ -55,7 +55,7 @@ public class CustomizedLanguageTextEditor extends LanguageTextField {
 
         EditorSettings editorSettings = editor.getSettings();
         // 设置空白显示（由.代替空白）
-        editorSettings.setWhitespacesShown(true);
+        // editorSettings.setWhitespacesShown(true);
         // 设置显示的缩进导轨
         editorSettings.setIndentGuidesShown(true);
         // // 显示设置插入符行（光标选中行会变黄）
