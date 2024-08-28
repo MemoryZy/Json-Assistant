@@ -48,7 +48,6 @@ public class JsonViewerWindow {
         Document document = this.jsonTextField.getDocument();
         document.addDocumentListener(new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
-
         if (initWindow) initJsonText();
 
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
@@ -99,6 +98,7 @@ public class JsonViewerWindow {
 
 
     private class FocusListenerImpl extends FocusAdapter {
+
         @Override
         public void focusGained(FocusEvent event) {
             if (initWindow) {
@@ -122,17 +122,7 @@ public class JsonViewerWindow {
             String text = StrUtil.trim(jsonTextField.getText());
 
             if (JsonUtil.isJsonStr(text)) {
-                boolean contains = false;
-                // noinspection ForLoopReplaceableByForEach
-                for (int i = 0; i < historyList.size(); i++) {
-                    if (StrUtil.equals(historyList.get(i), text)) {
-                        contains = true;
-                    }
-                }
-
-                if (!contains) {
-                    historyList.add(text);
-                }
+                historyList.add(text);
             }
         }
     }

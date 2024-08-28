@@ -4,7 +4,6 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Memory
@@ -14,12 +13,10 @@ public class LimitedList<T> extends AbstractList<T> {
 
     private final List<T> history;
     private final int limit;
-    private final ReentrantLock lock;
 
     public LimitedList(int limit) {
         this.history = new ArrayList<>(limit);
         this.limit = limit;
-        this.lock = new ReentrantLock(true);
     }
 
     @Override
@@ -34,25 +31,20 @@ public class LimitedList<T> extends AbstractList<T> {
 
     @Override
     public boolean add(T element) {
-        lock.lock();
-        try {
-            if (!history.contains(element)) {
-                history.add(0, element);
-                if (history.size() > limit) {
-                    history.remove(history.size() - 1);
-                }
-            } else {
-                T first = history.get(0);
-                if (!Objects.equals(first, element)) {
-                    history.remove(element);
-                    history.add(0, element);
-                }
+        if (!history.contains(element)) {
+            history.add(0, element);
+            if (history.size() > limit) {
+                history.remove(history.size() - 1);
             }
-
-            return true;
-        } finally {
-            lock.unlock();
+        } else {
+            T first = history.get(0);
+            if (!Objects.equals(first, element)) {
+                history.remove(element);
+                history.add(0, element);
+            }
         }
+
+        return true;
     }
 
     @Override
