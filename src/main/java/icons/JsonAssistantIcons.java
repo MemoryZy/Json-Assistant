@@ -28,15 +28,10 @@ public class JsonAssistantIcons {
     public static final Icon DIZZY_STAR = load("/icons/dizzy_star.svg");
     public static final Icon ROTATE = load("/icons/rotate.svg");
     public static final Icon BOOK = load("/icons/book.svg");
-    public static final Icon SEARCH = load("/icons/search.svg");
-    public static final Icon HISTORY = load("/icons/history.svg");
     public static final Icon DIFF = load("/icons/diff.svg");
-    public static final Icon DELETE = load("/icons/delete.svg");
-    public static final Icon SAVE = load("/icons/save.svg");
     public static final Icon STAR_FALL_MINI = load("/icons/star_fall_mini.svg");
     public static final Icon FORM_HISTORY = load("/icons/form_history.svg");
-    public static final Icon FORMAT = load("/icons/format.svg");
-    public static final Icon MINIFY = load("/icons/minify.svg");
+    public static final Icon XML = load("/icons/xml.svg");
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
@@ -50,25 +45,29 @@ public class JsonAssistantIcons {
      */
     public static class Structure {
 
-        public static final Icon STRUCTURE = load("/icons/inner_action/structure.svg");
         public static final Icon JSON_KEY = load("/icons/structure/json_key.svg");
         public static final Icon JSON_ARRAY = load("/icons/structure/json_array.svg");
         public static final Icon JSON_ITEM = load("/icons/structure/json_item.svg");
         public static final Icon JSON_OBJECT = load("/icons/structure/json_object.svg");
         public static final Icon JSON_OBJECT_ITEM = load("/icons/structure/json_object_item.svg");
+        public static final Icon INTELLIJ_COLLAPSE_ALL = load("/icons/structure/intellij_collapseAll.svg");
+        public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/structure/intellij_expandAll.svg");
 
     }
 
+
     /**
-     * Inner Action
+     * Toolwindow Action
      */
-    public static class InnerAction {
+    public static class ToolWindow {
 
-        public static final Icon EXPAND_ALL = load("/icons/inner_action/expandAll.svg");
-        public static final Icon COLLAPSE_ALL = load("/icons/inner_action/collapseAll.svg");
-
-        public static final Icon INTELLIJ_COLLAPSE_ALL = load("/icons/inner_action/intellij_collapseAll.svg");
-        public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/inner_action/intellij_expandAll.svg");
+        public static final Icon DELETE = load("/icons/toolwindow/delete.svg");
+        public static final Icon FORMAT = load("/icons/toolwindow/format.svg");
+        public static final Icon HISTORY = load("/icons/toolwindow/history.svg");
+        public static final Icon MINIFY = load("/icons/toolwindow/minify.svg");
+        public static final Icon SEARCH = load("/icons/toolwindow/search.svg");
+        public static final Icon STRUCTURE = load("/icons/toolwindow/structure.svg");
+        public static final Icon SAVE = load("/icons/toolwindow/save.svg");
 
     }
 

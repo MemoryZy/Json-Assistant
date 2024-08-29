@@ -8,6 +8,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.Objects;
 
 /**
@@ -62,6 +63,8 @@ public abstract class BaseFormatModel {
     public abstract String getActionName();
 
     public abstract String getActionDescription();
+
+    public abstract Icon getActionIcon();
 
     public abstract String getSelectHint();
 

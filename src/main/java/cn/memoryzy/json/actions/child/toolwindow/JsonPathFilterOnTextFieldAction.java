@@ -1,24 +1,29 @@
 package cn.memoryzy.json.actions.child.toolwindow;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.JsonPathPanel;
 import cn.memoryzy.json.ui.JsonViewerWindow;
+import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.HelpTooltip;
+import com.intellij.ide.IdeBundle;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,7 +34,7 @@ import java.awt.*;
  * @author Memory
  * @since 2024/8/9
  */
-public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements UpdateInBackground {
+public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
     public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
     private final JsonViewerWindow window;
@@ -41,7 +46,35 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.path.filter.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.path.filter.description"));
-        presentation.setIcon(JsonAssistantIcons.SEARCH);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
+    }
+
+    @Override
+    public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+
+        // todo 再来个 learn more
+        String s = "JSONPath 是一种用于查询 JSON 文档的语言<br/>数据提取、数据验证、数据转换、数据操作";
+
+        ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
+            @Override
+            protected void updateToolTipText() {
+                if (Registry.is("ide.helptooltip.enabled")) {
+                    HelpTooltip.dispose(this);
+                    new HelpTooltip()
+                            .setTitle(getTemplatePresentation().getText())
+                            .setDescription(s)
+                            .installOn(this);
+                } else {
+                    setToolTipText(IdeBundle.message("search.everywhere.action.tooltip.text", "", "classesTabName"));
+                }
+            }
+        };
+
+        // SearchEverywhereAction
+
+        button.setBorder(JBUI.Borders.empty());
+
+        return button;
     }
 
     @Override
@@ -111,9 +144,10 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         boolean hasShown = propertiesComponent.getBoolean(JSON_PATH_GUIDE_KEY, false);
         if (!hasShown) {
-            String message = JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content");
+            String message = JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content", HyperLinks.JSONPATH_EXPRESS_DESCRIPTION);
+
             JBPopupFactory.getInstance()
-                    .createHtmlTextBalloonBuilder(message, null, JBColor.white, null)
+                    .createHtmlTextBalloonBuilder(message, null, JBColor.white, new HyperLinkListenerImpl())
                     .setShadow(true)
                     .setDisposable(popup)
                     .setHideOnAction(false)

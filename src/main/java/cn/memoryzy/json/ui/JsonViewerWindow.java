@@ -48,7 +48,7 @@ public class JsonViewerWindow {
         Document document = this.jsonTextField.getDocument();
         document.addDocumentListener(new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
-        if (initWindow) initJsonText();
+        this.initJsonText();
 
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -72,19 +72,21 @@ public class JsonViewerWindow {
         actionGroup.add(new SaveToDiskAction(this));
         actionGroup.add(new ClearEditorAction(this));
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_TOOLBAR_BAR, actionGroup, false);
         return toolbar.getComponent();
     }
 
     private void initJsonText() {
-        String jsonStr = "";
-        String clipboard = PlatformUtil.getClipboard();
-        if (StrUtil.isNotBlank(clipboard)) {
-            jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
-        }
+        if (initWindow) {
+            String jsonStr = "";
+            String clipboard = PlatformUtil.getClipboard();
+            if (StrUtil.isNotBlank(clipboard)) {
+                jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
+            }
 
-        if (StrUtil.isNotBlank(jsonStr)) {
-            jsonTextField.setText(jsonStr);
+            if (StrUtil.isNotBlank(jsonStr)) {
+                jsonTextField.setText(jsonStr);
+            }
         }
     }
 

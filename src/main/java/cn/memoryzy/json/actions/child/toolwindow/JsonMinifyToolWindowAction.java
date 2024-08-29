@@ -31,7 +31,7 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.minify.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.minify.description"));
-        presentation.setIcon(JsonAssistantIcons.MINIFY);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.MINIFY);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt C"), simpleToolWindowPanel);
     }
 

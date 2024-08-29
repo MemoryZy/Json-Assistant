@@ -7,6 +7,9 @@ import cn.memoryzy.json.utils.XmlUtil;
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.fileTypes.FileType;
+import icons.JsonAssistantIcons;
+
+import javax.swing.*;
 
 /**
  * @author Memory
@@ -37,6 +40,11 @@ public class XmlFormatModel extends BaseFormatModel {
     @Override
     public String getActionDescription() {
         return JsonAssistantBundle.messageOnSystem("action.xml.to.json.description");
+    }
+
+    @Override
+    public Icon getActionIcon() {
+        return JsonAssistantIcons.XML;
     }
 
     @Override

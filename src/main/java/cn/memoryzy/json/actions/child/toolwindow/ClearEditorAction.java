@@ -23,7 +23,7 @@ public class ClearEditorAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.clear.editor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.clear.editor.description"));
-        presentation.setIcon(JsonAssistantIcons.DELETE);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.DELETE);
     }
 
     @Override

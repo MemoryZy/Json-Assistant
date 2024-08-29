@@ -9,6 +9,8 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.util.TextRange;
 
+import javax.swing.*;
+
 /**
  * @author Memory
  * @since 2024/8/3
@@ -99,6 +101,11 @@ public class JsonFormatHandleModel extends BaseFormatModel {
 
     @Override
     public String getActionDescription() {
+        return null;
+    }
+
+    @Override
+    public Icon getActionIcon() {
         return null;
     }
 

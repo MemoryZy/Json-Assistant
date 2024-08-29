@@ -28,6 +28,7 @@ public class HyperLinks {
     public static final String PLUGIN_SPONSOR_LINK = "#PLGUIN_SPONSOR";
     public static final String PLUGIN_EMAIL_LINK = "#PLGUIN_MAIL";
 
+    public static final String JSONPATH_EXPRESS_DESCRIPTION = "https://goessner.net/articles/JsonPath/index.html#e2";
 
     public static void verifyReachable() {
         new Thread(() -> reachableAtomic.getAndSet(isReachable(OVERVIEW))).start();

@@ -24,7 +24,7 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.structure.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.structure.on.tw.title.description"));
-        presentation.setIcon(JsonAssistantIcons.Structure.STRUCTURE);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), simpleToolWindowPanel);
     }
 

@@ -27,7 +27,7 @@ public class JsonHistoryAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.history.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.history.description"));
-        presentation.setIcon(JsonAssistantIcons.HISTORY);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.HISTORY);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt H"), toolWindow.getComponent());
     }
 

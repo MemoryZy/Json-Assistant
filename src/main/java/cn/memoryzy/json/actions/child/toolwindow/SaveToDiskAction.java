@@ -36,7 +36,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.save.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.save.json.description"));
-        presentation.setIcon(JsonAssistantIcons.SAVE);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.SAVE);
     }
 
     @Override
