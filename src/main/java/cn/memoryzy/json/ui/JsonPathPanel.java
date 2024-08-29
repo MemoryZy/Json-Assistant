@@ -111,6 +111,7 @@ public class JsonPathPanel {
 
         comboBox.setEditor(jsonPathNestedComboBoxEditor);
         comboBox.setEditable(true);
+        comboBox.setToolTipText(JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content"));
         jsonPathNestedComboBoxEditor.setItem(null);
 
         return comboBox;

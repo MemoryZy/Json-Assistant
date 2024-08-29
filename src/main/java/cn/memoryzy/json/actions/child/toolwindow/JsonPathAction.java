@@ -5,75 +5,81 @@ import cn.memoryzy.json.constants.HyperLinks;
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.JsonPathPanel;
 import cn.memoryzy.json.ui.JsonViewerWindow;
-import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
-import com.intellij.ide.IdeBundle;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.openapi.keymap.KeymapUtil;
+import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
+import com.intellij.util.FontUtil;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Objects;
 
 /**
  * @author Memory
  * @since 2024/8/9
  */
-public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
+public class JsonPathAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
     public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
     private final JsonViewerWindow window;
+    private final SimpleToolWindowPanel simpleToolWindowPanel;
 
-    public JsonPathFilterOnTextFieldAction(JsonViewerWindow window) {
+    public JsonPathAction(JsonViewerWindow window, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
         this.window = window;
+        this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.path.filter.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.path.filter.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt P"), simpleToolWindowPanel);
     }
 
     @Override
     public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
-
-        // todo 再来个 learn more
-        String s = "JSONPath 是一种用于查询 JSON 文档的语言<br/>数据提取、数据验证、数据转换、数据操作";
-
         ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
             @Override
             protected void updateToolTipText() {
                 if (Registry.is("ide.helptooltip.enabled")) {
                     HelpTooltip.dispose(this);
-                    new HelpTooltip()
+                    // noinspection DialogTitleCapitalization
+                    HelpTooltip helpTooltip = new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
-                            .setDescription(s)
-                            .installOn(this);
+                            .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"))
+                            .setShortcut(getShortcut());
+
+                    addBrowserLink(helpTooltip);
+                    helpTooltip.installOn(this);
                 } else {
-                    setToolTipText(IdeBundle.message("search.everywhere.action.tooltip.text", "", "classesTabName"));
+                    setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"));
                 }
             }
         };
 
-        // SearchEverywhereAction
-
-        button.setBorder(JBUI.Borders.empty());
-
+        button.setBorder(JBUI.Borders.empty(1, 2));
         return button;
     }
 
@@ -82,6 +88,22 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         Project project = e.getProject();
         if (project == null) return;
         showComponentPopup(e, project);
+    }
+
+    private void addBrowserLink(HelpTooltip helpTooltip) {
+        try {
+            URL url = new URL(HyperLinks.JSONPATH_EXPRESS_DESCRIPTION);
+            helpTooltip.setBrowserLink("Learn more", url);
+        } catch (MalformedURLException ignored) {
+        }
+    }
+
+    private String getShortcut() {
+        Shortcut[] shortcuts = getShortcutSet().getShortcuts();
+        if (shortcuts.length == 0) {
+            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + FontUtil.thinSpace() + "+" + FontUtil.thinSpace() + "P";
+        }
+        return KeymapUtil.getShortcutsText(shortcuts);
     }
 
     private void showComponentPopup(@NotNull AnActionEvent e, Project project) {
@@ -129,25 +151,20 @@ public class JsonPathFilterOnTextFieldAction extends DumbAwareAction implements 
         showGuidePopup(popup, expressionComboBoxTextField);
     }
 
-
     private RelativePoint calculatePopupLocation(@NotNull AnActionEvent e) {
-        Component source = (Component) e.getInputEvent().getSource();
-        Container toolbar = source.getParent();
-        Container toolWindowPanel = toolbar.getParent();
-        Component[] components = toolbar.getComponents();
+        JComponent toolbar = simpleToolWindowPanel.getToolbar();
+        Component[] components = Objects.requireNonNull(toolbar).getComponents();
         Component firstAction = components[0];
-        return new RelativePoint(source, new Point((toolWindowPanel.getWidth() / 2 - 35), firstAction.getY() - firstAction.getHeight()));
+        return new RelativePoint(toolbar, new Point((simpleToolWindowPanel.getWidth() / 2 - 35), firstAction.getY()));
     }
-
 
     private void showGuidePopup(JBPopup popup, JComponent component) {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         boolean hasShown = propertiesComponent.getBoolean(JSON_PATH_GUIDE_KEY, false);
         if (!hasShown) {
-            String message = JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content", HyperLinks.JSONPATH_EXPRESS_DESCRIPTION);
-
+            String message = JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content");
             JBPopupFactory.getInstance()
-                    .createHtmlTextBalloonBuilder(message, null, JBColor.white, new HyperLinkListenerImpl())
+                    .createHtmlTextBalloonBuilder(message, null, JBColor.white, null)
                     .setShadow(true)
                     .setDisposable(popup)
                     .setHideOnAction(false)

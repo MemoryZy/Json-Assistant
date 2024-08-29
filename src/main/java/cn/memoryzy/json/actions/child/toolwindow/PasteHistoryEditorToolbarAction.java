@@ -1,4 +1,4 @@
-package cn.memoryzy.json.actions;
+package cn.memoryzy.json.actions.child.toolwindow;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
@@ -26,7 +26,7 @@ public class PasteHistoryEditorToolbarAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.description"));
-        presentation.setIcon(JsonAssistantIcons.FORM_HISTORY);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.FORM_HISTORY);
     }
 
     @Override
