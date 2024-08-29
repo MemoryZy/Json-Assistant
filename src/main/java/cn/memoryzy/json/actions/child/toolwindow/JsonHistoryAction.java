@@ -2,21 +2,30 @@ package cn.memoryzy.json.actions.child.toolwindow;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonHistoryChooser;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.keymap.KeymapUtil;
+import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.util.FontUtil;
+import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
 
 /**
  * @author Memory
  * @since 2024/8/9
  */
-public class JsonHistoryAction extends DumbAwareAction {
+public class JsonHistoryAction extends DumbAwareAction implements CustomComponentAction {
 
     private final ToolWindowEx toolWindow;
 
@@ -32,6 +41,29 @@ public class JsonHistoryAction extends DumbAwareAction {
     }
 
     @Override
+    public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+        ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
+            @Override
+            protected void updateToolTipText() {
+                if (Registry.is("ide.helptooltip.enabled")) {
+                    HelpTooltip.dispose(this);
+                    // noinspection DialogTitleCapitalization
+                    new HelpTooltip()
+                            .setTitle(getTemplatePresentation().getText())
+                            .setShortcut(getShortcut())
+                            .setDescription(JsonAssistantBundle.message("help.tooltip.json.history.action.description"))
+                            .installOn(this);
+                } else {
+                    setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.history.action.description"));
+                }
+            }
+        };
+
+        button.setBorder(JBUI.Borders.empty(1, 2));
+        return button;
+    }
+
+    @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) {
@@ -40,6 +72,14 @@ public class JsonHistoryAction extends DumbAwareAction {
 
         JsonHistoryChooser chooser = new JsonHistoryChooser(project, toolWindow);
         ApplicationManager.getApplication().invokeLater(chooser::show);
+    }
+
+    private String getShortcut() {
+        Shortcut[] shortcuts = getShortcutSet().getShortcuts();
+        if (shortcuts.length == 0) {
+            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + FontUtil.thinSpace() + "+" + FontUtil.thinSpace() + "H";
+        }
+        return KeymapUtil.getShortcutsText(shortcuts);
     }
 
 }

@@ -7,6 +7,7 @@ import cn.memoryzy.json.ui.JsonPathPanel;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
@@ -32,8 +33,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Objects;
 
 /**
@@ -66,13 +65,12 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 if (Registry.is("ide.helptooltip.enabled")) {
                     HelpTooltip.dispose(this);
                     // noinspection DialogTitleCapitalization
-                    HelpTooltip helpTooltip = new HelpTooltip()
+                    new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
+                            .setShortcut(getShortcut())
                             .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"))
-                            .setShortcut(getShortcut());
-
-                    addBrowserLink(helpTooltip);
-                    helpTooltip.installOn(this);
+                            .setLink("Learn more", () -> BrowserUtil.browse(HyperLinks.JSONPATH_EXPRESS_DESCRIPTION))
+                            .installOn(this);
                 } else {
                     setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"));
                 }
@@ -88,14 +86,6 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         Project project = e.getProject();
         if (project == null) return;
         showComponentPopup(e, project);
-    }
-
-    private void addBrowserLink(HelpTooltip helpTooltip) {
-        try {
-            URL url = new URL(HyperLinks.JSONPATH_EXPRESS_DESCRIPTION);
-            helpTooltip.setBrowserLink("Learn more", url);
-        } catch (MalformedURLException ignored) {
-        }
     }
 
     private String getShortcut() {

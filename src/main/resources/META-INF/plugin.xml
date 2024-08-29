@@ -41,7 +41,9 @@
     </applicationListeners>
 
     <actions>
-        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.actions.child.toolwindow.PasteHistoryEditorToolbarAction"/>
+        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.actions.child.toolwindow.PasteHistoryEditorToolbarAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt H"/>
+        </action>
         <action id="JsonAssistant.Action.CloseEditorToolbarAction" class="cn.memoryzy.json.actions.child.toolwindow.HideEditorToolbarAction"/>
 
         <group id="JsonAssistant.Group.EditorToolbarGroup">
