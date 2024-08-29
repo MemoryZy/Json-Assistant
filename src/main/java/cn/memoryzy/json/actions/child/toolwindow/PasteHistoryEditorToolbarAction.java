@@ -49,8 +49,19 @@ public class PasteHistoryEditorToolbarAction extends DumbAwareAction implements 
 
     @Override
     public void update(@NotNull AnActionEvent e) {
+        boolean enabled = false;
+
+
+
+
+        // todo 这里如果没满足，顺便hide掉toolbar
+
+
+    }
+
+    private boolean validateActionEnabled(AnActionEvent e) {
         Project project = getEventProject(e);
-        if (project == null) return;
+        if (project == null) return false;
 
         LimitedList<String> history = JsonViewerHistoryState.getInstance(project).getHistory();
         if (CollUtil.isEmpty(history)) return;
@@ -62,8 +73,6 @@ public class PasteHistoryEditorToolbarAction extends DumbAwareAction implements 
         if (editor == null || selectedContent == null) return;
 
 
-        // todo 这里如果没满足，顺便hide掉toolbar
-
-
     }
+
 }
