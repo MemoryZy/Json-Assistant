@@ -1,9 +1,12 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 解决后台保存历史记录的问题。
 - 将 Json 展示窗口由单窗口切换为多选项卡多窗口。
 - 优化输入框警告（弹出警告后，继续输入可取消警告）。
-- 新增多个操作项，优化旧操作项逻辑。
+- 优化旧操作项逻辑。
+- 新增多个操作项
+  - xx
 - 用户体验优化。
 - Switch the Json display window from single window to multi-window.
 - Optimize input box warnings (After a warning pops up, continue typing to cancel the warning).

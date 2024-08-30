@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -19,13 +20,14 @@ import java.util.List;
  */
 public class RemoveListElementAction extends DumbAwareAction {
     private final JList<HistoryModel> list;
+    private final EditorTextField showTextField;
+    private final Runnable task;
 
-    public RemoveListElementAction(JList<HistoryModel> list) {
-        super(JsonAssistantBundle.message("action.json.history.window.remove.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.history.window.remove.description"),
-                null);
+    public RemoveListElementAction(JList<HistoryModel> list, EditorTextField showTextField, Runnable task) {
+        super(JsonAssistantBundle.message("action.json.history.window.remove.text"), JsonAssistantBundle.messageOnSystem("action.json.history.window.remove.description"), null);
         this.list = list;
-
+        this.showTextField = showTextField;
+        this.task = task;
         registerCustomShortcutSet(CustomShortcutSet.fromString("DELETE"), list);
     }
 
@@ -46,10 +48,16 @@ public class RemoveListElementAction extends DumbAwareAction {
         listModel.clear();
         listModel.addAll(historyModels);
 
+        int size = listModel.getSize();
+        if (size == 0) {
+            showTextField.setText("");
+            task.run();
+        }
+
         // 选中被删除元素的前一个元素
         if (selectedIndex > 0) {
             list.setSelectedIndex(selectedIndex - 1);
-        } else if (listModel.getSize() > 0) {
+        } else if (size > 0) {
             // 如果还有元素，选中第一个元素
             list.setSelectedIndex(0);
         }

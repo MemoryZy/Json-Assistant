@@ -14,7 +14,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.util.FontUtil;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +50,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
                     new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
                             .setShortcut(getShortcut())
-                            .setDescription(JsonAssistantBundle.message("help.tooltip.json.history.action.description"))
+                            .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.json.history.action.description"))
                             .installOn(this);
                 } else {
                     setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.history.action.description"));
@@ -77,7 +76,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
     private String getShortcut() {
         Shortcut[] shortcuts = getShortcutSet().getShortcuts();
         if (shortcuts.length == 0) {
-            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + FontUtil.thinSpace() + "+" + FontUtil.thinSpace() + "H";
+            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + "+H";
         }
         return KeymapUtil.getShortcutsText(shortcuts);
     }

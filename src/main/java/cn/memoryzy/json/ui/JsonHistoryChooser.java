@@ -54,8 +54,10 @@ public class JsonHistoryChooser extends DialogWrapper {
         this.toolWindow = toolWindow;
 
         setModal(false);
-        setTitle(JsonAssistantBundle.message("json.history.window.title"));
-        setOKButtonText(JsonAssistantBundle.message("ok.button.text"));
+        setTitle(JsonAssistantBundle.messageOnSystem("json.history.window.title"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("json.history.window.ok.button.text"));
+        setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.history.window.cancel.button.text"));
+        disabledOkAction();
         init();
     }
 
@@ -80,6 +82,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         // 选中第一条
         if (!historyModels.isEmpty()) {
             showList.setSelectedIndex(0);
+            enabledOkAction();
         }
 
         JBScrollPane scrollPane = new JBScrollPane(showList) {
@@ -159,7 +162,7 @@ public class JsonHistoryChooser extends DialogWrapper {
 
     private void initRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new RemoveListElementAction(showList));
+        group.add(new RemoveListElementAction(showList, showTextField, this::disabledOkAction));
 
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
         JPopupMenu popupMenu = actionPopupMenu.getComponent();
@@ -184,6 +187,14 @@ public class JsonHistoryChooser extends DialogWrapper {
                 }
             }
         });
+    }
+
+    public void disabledOkAction() {
+        getOKAction().setEnabled(false);
+    }
+
+    public void enabledOkAction() {
+        getOKAction().setEnabled(true);
     }
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryModel> {

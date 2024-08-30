@@ -26,7 +26,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
-import com.intellij.util.FontUtil;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -69,7 +68,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                             .setTitle(getTemplatePresentation().getText())
                             .setShortcut(getShortcut())
                             .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"))
-                            .setLink("Learn more", () -> BrowserUtil.browse(HyperLinks.JSONPATH_EXPRESS_DESCRIPTION))
+                            .setLink(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.link"), () -> BrowserUtil.browse(HyperLinks.JSONPATH_EXPRESS_DESCRIPTION), true)
                             .installOn(this);
                 } else {
                     setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"));
@@ -91,7 +90,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     private String getShortcut() {
         Shortcut[] shortcuts = getShortcutSet().getShortcuts();
         if (shortcuts.length == 0) {
-            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + FontUtil.thinSpace() + "+" + FontUtil.thinSpace() + "P";
+            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + "+P";
         }
         return KeymapUtil.getShortcutsText(shortcuts);
     }

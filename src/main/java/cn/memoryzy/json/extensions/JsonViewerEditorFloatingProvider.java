@@ -46,22 +46,37 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
     @Override
     public void register(@NotNull DataContext dataContext, @NotNull FloatingToolbarComponent component, @NotNull Disposable parentDisposable) {
         Project project = dataContext.getData(CommonDataKeys.PROJECT);
-        if (project == null) return;
+        if (project == null) {
+            component.scheduleHide();
+            return;
+        }
 
         LimitedList<String> history = JsonViewerHistoryState.getInstance(project).getHistory();
-        if (CollUtil.isEmpty(history)) return;
+        if (CollUtil.isEmpty(history)) {
+            component.scheduleHide();
+            return;
+        }
 
         ToolWindow toolWindow = JsonAssistantUtil.getJsonViewToolWindow(project);
         Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
 
         Editor editor = dataContext.getData(CommonDataKeys.EDITOR);
-        if (editor == null || selectedContent == null) return;
+        if (editor == null || selectedContent == null) {
+            component.scheduleHide();
+            return;
+        }
 
         String userData = editor.getUserData(FoldingLanguageTextEditor.PLUGIN_EDITOR_KEY);
-        if (!Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, userData)) return;
+        if (!Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, userData)) {
+            component.scheduleHide();
+            return;
+        }
 
         // 判断是否为永久关闭的内容
-        if (isPermanentlyHide(selectedContent)) return;
+        if (isPermanentlyHide(selectedContent)) {
+            component.scheduleHide();
+            return;
+        }
 
         putToolbarComponent(Pair.pair(selectedContent, component));
 
@@ -79,7 +94,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
         }
     }
 
-    private void hideToolbarComponent(Content content) {
+    public void hideToolbarComponent(Content content) {
         for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
             if (Objects.equals(pair.getFirst(), content)) {
                 pair.getSecond().scheduleHide();
@@ -97,7 +112,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
         }
     }
 
-    private boolean isPermanentlyHide(Content content) {
+    public boolean isPermanentlyHide(Content content) {
         for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
             Content first = pair.getFirst();
             if (Objects.equals(first, content)) {
@@ -109,7 +124,7 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
         return false;
     }
 
-    private void showToolbarComponent(Content content) {
+    public void showToolbarComponent(Content content) {
         for (Pair<Content, FloatingToolbarComponent> pair : toolbarComponents) {
             Content first = pair.getFirst();
             if (Objects.equals(first, content)) {
