@@ -1,6 +1,6 @@
 <idea-plugin>
     <actions>
-        <action id="JsonAssistant.Action.KtClassPropertyToJson" class="cn.memoryzy.json.actions.KotlinPropertyToJsonAction">
+        <action id="JsonAssistant.Action.KtClassPropertyToJson" class="cn.memoryzy.json.action.KotlinPropertyToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>

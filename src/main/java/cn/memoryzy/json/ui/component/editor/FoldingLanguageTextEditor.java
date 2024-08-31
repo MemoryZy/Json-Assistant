@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.component.editor;
 
-import cn.memoryzy.json.constants.JsonAssistantPlugin;
-import cn.memoryzy.json.utils.PlatformUtil;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.ex.EditorEx;

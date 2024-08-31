@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
-import cn.memoryzy.json.models.LimitedList;
+import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.Converter;

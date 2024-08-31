@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.component.editor.extension;
 
-import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.scale.JBUIScale;

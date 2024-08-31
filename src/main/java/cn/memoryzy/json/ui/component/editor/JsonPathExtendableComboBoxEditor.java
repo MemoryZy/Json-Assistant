@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.component.editor;
 
-import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.component.editor.extension.SearchExtension;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;

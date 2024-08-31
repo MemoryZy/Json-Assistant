@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.component.editor;
 
-import cn.memoryzy.json.bundles.JsonAssistantBundle;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;

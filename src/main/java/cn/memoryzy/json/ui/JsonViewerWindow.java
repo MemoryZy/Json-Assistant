@@ -1,14 +1,14 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.actions.child.toolwindow.*;
-import cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider;
-import cn.memoryzy.json.models.LimitedList;
+import cn.memoryzy.json.action.child.toolwindow.*;
+import cn.memoryzy.json.extension.JsonViewerEditorFloatingProvider;
+import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import cn.memoryzy.json.ui.component.editor.FoldingLanguageTextEditor;
-import cn.memoryzy.json.utils.JsonUtil;
-import cn.memoryzy.json.utils.PlatformUtil;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;

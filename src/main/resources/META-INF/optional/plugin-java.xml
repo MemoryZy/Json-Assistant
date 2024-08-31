@@ -1,11 +1,11 @@
 <idea-plugin>
     <actions>
-        <action id="JsonAssistant.Action.JavaBeanToJson" class="cn.memoryzy.json.actions.JavaBeanToJsonAction">
+        <action id="JsonAssistant.Action.JavaBeanToJson" class="cn.memoryzy.json.action.JavaBeanToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <action id="JsonAssistant.Action.JsonToJavaBean" class="cn.memoryzy.json.actions.JsonToJavaBeanAction"/>
+        <action id="JsonAssistant.Action.JsonToJavaBean" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
 
         <group id="JsonAssistant.Group.JavaBeanToJson">
             <separator/>

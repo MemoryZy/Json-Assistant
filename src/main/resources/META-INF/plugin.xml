@@ -24,27 +24,27 @@
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
         <toolWindow id="JsonAssistant.ToolWindow.JsonViewer"
-                    factoryClass="cn.memoryzy.json.toolwindows.JsonViewerToolWindowFactory"
+                    factoryClass="cn.memoryzy.json.toolwindow.JsonViewerToolWindowFactory"
                     anchor="right"
                     secondary="true"
                     canCloseContents="true"
                     doNotActivateOnStart="true"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
-        <postStartupActivity implementation="cn.memoryzy.json.extensions.PluginActivityManager"/>
-        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider"/>
+        <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.JsonViewerEditorFloatingProvider"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="cn.memoryzy.json.extensions.PluginActivityManager"
+        <listener class="cn.memoryzy.json.extension.PluginActivityManager"
                   topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
     <actions>
-        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.actions.child.toolwindow.PasteHistoryEditorToolbarAction">
+        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.action.child.toolwindow.PasteHistoryEditorToolbarAction">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt H"/>
         </action>
-        <action id="JsonAssistant.Action.CloseEditorToolbarAction" class="cn.memoryzy.json.actions.child.toolwindow.HideEditorToolbarAction"/>
+        <action id="JsonAssistant.Action.CloseEditorToolbarAction" class="cn.memoryzy.json.action.child.toolwindow.HideEditorToolbarAction"/>
 
         <group id="JsonAssistant.Group.EditorToolbarGroup">
             <reference ref="JsonAssistant.Action.PasteHistoryEditorToolbarAction"/>
@@ -53,28 +53,28 @@
 
         <!-- ######################## -->
 
-        <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.actions.JsonBeautifyAction"/>
-        <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.actions.JsonMinifyAction"/>
-        <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.actions.JsonStructureAction"/>
-        <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.actions.JsonTextDiffAction"/>
-        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.actions.ShortcutAction"/>
+        <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.action.JsonBeautifyAction"/>
+        <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.action.JsonMinifyAction"/>
+        <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
+        <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.action.JsonTextDiffAction"/>
+        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
 
-        <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.actions.OtherFormatsToJsonAction">
+        <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.action.OtherFormatsToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
         </action>
 
-        <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.actions.OnlineDocAction">
+        <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction">
             <add-to-group group-id="HelpMenu" relative-to-action="OnlineDocAction" anchor="after"/>
         </action>
 
-        <action id="JsonAssistant.Action.Main" class="cn.memoryzy.json.actions.JsonAssistantAction">
+        <action id="JsonAssistant.Action.Main" class="cn.memoryzy.json.action.JsonAssistantAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.groups.JsonAssistantPopupGroup"/>
-        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.groups.ConvertOtherFormatsGroup"/>
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.group.JsonAssistantPopupGroup"/>
+        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.group.ConvertOtherFormatsGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
