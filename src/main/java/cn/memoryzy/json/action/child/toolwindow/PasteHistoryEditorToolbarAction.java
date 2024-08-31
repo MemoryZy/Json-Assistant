@@ -14,6 +14,7 @@ import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -117,30 +118,37 @@ public class PasteHistoryEditorToolbarAction extends DumbAwareAction implements 
 
         LimitedList<String> history = JsonViewerHistoryState.getInstance(project).getHistory();
         if (CollUtil.isEmpty(history)) {
-            provider.hideToolbarComponent(selectedContent);
+            hideToolbarComponent(selectedContent);
             return false;
         }
 
         String userData = editor.getUserData(FoldingLanguageTextEditor.PLUGIN_EDITOR_KEY);
         if (!Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, userData)) {
-            provider.hideToolbarComponent(selectedContent);
+            hideToolbarComponent(selectedContent);
             return false;
         }
 
         if (provider.isPermanentlyHide(selectedContent)) {
-            provider.hideToolbarComponent(selectedContent);
+            hideToolbarComponent(selectedContent);
             return false;
         }
 
         String text = editor.getDocument().getText();
         if (StrUtil.isNotBlank(text)) {
-            provider.hideToolbarComponent(selectedContent);
+            hideToolbarComponent(selectedContent);
             return false;
         } else {
-            provider.showToolbarComponent(selectedContent);
+            showToolbarComponent(selectedContent);
+            return true;
         }
-
-        return true;
     }
 
+    private void hideToolbarComponent(Content selectedContent) {
+        // UI组件必须在EDT运行
+        ApplicationManager.getApplication().invokeLater(() -> provider.hideToolbarComponent(selectedContent));
+    }
+
+    private void showToolbarComponent(Content selectedContent) {
+        ApplicationManager.getApplication().invokeLater(() -> provider.showToolbarComponent(selectedContent));
+    }
 }
