@@ -17,17 +17,24 @@
 <br/>
 
 ## 功能 
-- JSON 展示窗口
-- JSON 格式化
+- JSON 展示窗口（多选项卡）
+  - 新增选项卡
+  - 更名选项卡
+  - 移动至主编辑器
+  - 用新窗口打开选项卡
+  - JSONPath　查询
+  - JSON 历史记录
+  - JSON 导出
+- JSON 美化
 - JSON 压缩
 - JSON 结构化（树视图）
 - JavaBean 转换为 JSON
 - JSON 转换为 JavaBean
 - Kotlin 属性转为 JSON
-- JSON 历史记录
-- JSONPath 匹配
-- JSON 文本比对
-- 格式转换 (XML 与 JSON 互相转换)
+- JSON 比对
+- 格式转换
+  - JSON 转为 XML
+  - XML 转为 JSON
 
 <br/>
 

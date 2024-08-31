@@ -21,17 +21,24 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 
 ## Key Features
- - JSON Viewer
- - JSON Beautifier
- - JSON Minifier
- - JSON Tree View
- - JavaBean to JSON
- - JSON to JavaBean
- - Kotlin Properties to JSON
- - JSON History
- - JSONPath Match
- - JSON Text Diff
- - Format conversion (XML and JSON are converted to each other)
+- JSON Viewer (Multi-Tab)
+  - Add Tab
+  - Rename Tab
+  - Move Tab to Editor
+  - Move Tab to New Window
+  - JSONPath Evaluator
+  - JSON History Log
+  - Export JSON
+- JSON Beautifier
+- JSON Minifier
+- JSON Tree View
+- JavaBean to JSON
+- JSON to JavaBean
+- Kotlin Properties to JSON
+- JSON Diff
+- Format Converters
+  - JSON to XML Converter
+  - XML to JSON Converter
 
 <br/>
 

@@ -9,7 +9,7 @@
 <br/>
 
 ## Key Features
-- JSON Viewer (Tabbed)
+- JSON Viewer (Multi-Tab)
    - Add Tab
    - Rename Tab
    - Move Tab to Editor
@@ -23,8 +23,10 @@
  - JavaBean to JSON
  - JSON to JavaBean
  - Kotlin Properties to JSON
- - JSON Text Diff
- - Format conversion (XML and JSON)
+ - JSON Diff
+ - Format Converters
+   - JSON to XML Converter
+   - XML to JSON Converter
 
 
 <br/>

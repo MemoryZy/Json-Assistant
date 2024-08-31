@@ -2,15 +2,23 @@
 
 ## [Unreleased]
 - 解决后台保存历史记录的问题。
-- 将 Json 展示窗口由单窗口切换为多选项卡多窗口。
+- 将 Json 展示窗口由单窗口切换为多选项卡多窗口，并新增多个操作项。
+  - 侧边栏快捷操作项
+  - 新增选项卡
+  - 选项卡更名
+  - 移动选项卡到主编辑器
+  - 将选项卡到新窗口打开
 - 优化输入框警告（弹出警告后，继续输入可取消警告）。
 - 优化旧操作项逻辑。
-- 新增多个操作项
-  - xx
 - 用户体验优化。
-- Switch the Json display window from single window to multi-window.
+- Switch the Json display window from single window to multi-tabbed multi-window and add multiple action items.
+  - Sidebar shortcut action items
+  - Add Tab
+  - Rename Tab
+  - Move Tab to Editor
+  - Move Tab to New Window
 - Optimize input box warnings (After a warning pops up, continue typing to cancel the warning).
-- Added multiple operation items to optimize the logic of old operation items.
+- Optimize old action item logic.
 - User experience optimization.
 
 ## [1.5.1] - 2024-08-21
