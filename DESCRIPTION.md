@@ -9,15 +9,20 @@
 <br/>
 
 ## Key Features
- - JSON Viewer
+- JSON Viewer (Tabbed)
+   - Add Tab
+   - Rename Tab
+   - Move Tab to Editor
+   - Move Tab to New Window
+   - JSONPath Evaluator
+   - JSON History Log
+   - Export JSON
  - JSON Beautifier
  - JSON Minifier
  - JSON Tree View
  - JavaBean to JSON
  - JSON to JavaBean
  - Kotlin Properties to JSON
- - JSON History
- - JSONPath Match
  - JSON Text Diff
  - Format conversion (XML and JSON)
 
