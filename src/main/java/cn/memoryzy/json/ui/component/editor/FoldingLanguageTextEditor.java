@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.basic.editor;
+package cn.memoryzy.json.ui.component.editor;
 
 import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.utils.PlatformUtil;

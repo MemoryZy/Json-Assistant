@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.basic.editor;
+package cn.memoryzy.json.ui.component.editor;
 
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.EditorSettings;

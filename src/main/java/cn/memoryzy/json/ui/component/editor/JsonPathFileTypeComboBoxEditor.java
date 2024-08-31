@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.basic.jsonpath;
+package cn.memoryzy.json.ui.component.editor;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.openapi.command.WriteCommandAction;

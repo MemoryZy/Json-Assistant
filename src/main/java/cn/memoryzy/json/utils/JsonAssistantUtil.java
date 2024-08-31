@@ -13,7 +13,7 @@ import cn.memoryzy.json.models.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.models.formats.XmlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
 import cn.memoryzy.json.ui.JsonViewerWindow;
-import cn.memoryzy.json.ui.basic.JsonViewerPanel;
+import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.ide.BrowserUtil;

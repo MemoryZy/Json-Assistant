@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.extension;
+package cn.memoryzy.json.ui.component.editor.extension;
 
 import cn.memoryzy.json.bundles.JsonAssistantBundle;
 import com.intellij.icons.AllIcons;

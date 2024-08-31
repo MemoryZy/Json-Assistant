@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.basic;
+package cn.memoryzy.json.ui.component;
 
 import com.intellij.ui.LanguageTextField;
 

@@ -7,7 +7,7 @@ import cn.memoryzy.json.constants.JsonAssistantPlugin;
 import cn.memoryzy.json.extensions.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.models.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
-import cn.memoryzy.json.ui.basic.editor.FoldingLanguageTextEditor;
+import cn.memoryzy.json.ui.component.editor.FoldingLanguageTextEditor;
 import cn.memoryzy.json.utils.JsonAssistantUtil;
 import cn.memoryzy.json.utils.PlatformUtil;
 import com.intellij.ide.HelpTooltip;
