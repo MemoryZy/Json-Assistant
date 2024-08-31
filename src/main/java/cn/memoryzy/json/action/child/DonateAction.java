@@ -1,9 +1,7 @@
 package cn.memoryzy.json.action.child;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.ui.SupportDialog;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -40,7 +38,6 @@ public class DonateAction extends DumbAwareAction implements CustomComponentActi
                     new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
                             .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.donate.action.description"))
-                            .setLink(JsonAssistantBundle.messageOnSystem("help.tooltip.donate.action.link"), () -> BrowserUtil.browse(HyperLinks.SPONSOR_LINK), true)
                             .installOn(this);
                 } else {
                     setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.donate.action.description"));

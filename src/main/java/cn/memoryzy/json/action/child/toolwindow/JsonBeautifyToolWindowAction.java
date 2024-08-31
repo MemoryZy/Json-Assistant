@@ -31,7 +31,7 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.beautify.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.beautify.description"));
-        presentation.setIcon(JsonAssistantIcons.ToolWindow.FORMAT);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.PENCIL_STAR);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt B"), simpleToolWindowPanel);
     }
 

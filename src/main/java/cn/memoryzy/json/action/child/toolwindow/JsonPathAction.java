@@ -52,7 +52,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.path.filter.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.path.filter.description"));
-        presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.QUERY);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt P"), simpleToolWindowPanel);
     }
 
