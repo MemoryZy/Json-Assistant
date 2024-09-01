@@ -195,8 +195,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JavaDirectoryService directoryService = JavaDirectoryService.getInstance();
         PsiClass newClass = directoryService.createClass(directory, className);
 
-        // 判断是否存在lombok依赖
-        boolean hasLibrary = JavaUtil.hasLibrary(module, PluginConstant.LOMBOK_LIB);
         WriteCommandAction.runWriteCommandAction(project, () -> {
             try {
                 Set<String> needImportList = new HashSet<>();
@@ -204,10 +202,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
                 // 递归添加Json字段
                 recursionAddProperty(jsonObject, newClass, factory, needImportList);
-                // 添加lombok注解，给内部类也加上
-                if (hasLibrary) {
-                    // 增加导入
-                    this.importClass(project, newClass, factory);
+                // 判断是否存在lombok依赖
+                if (JavaUtil.hasLibrary(module, PluginConstant.LOMBOK_LIB)) {
+                    // 添加lombok注解，递归给内部类也加上
+                    importClass(project, newClass, factory);
                 }
 
                 // 导入
