@@ -10,7 +10,6 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.fileEditor.impl.FileEditorManagerImpl;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -50,7 +49,7 @@ public class EditInNewWindowAction extends DumbAwareAction {
         VirtualFile virtualFile = getVirtualFile(e);
         Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
         rename(project, virtualFile, content);
-        ((FileEditorManagerImpl) manager).openFileInNewWindow(virtualFile);
+        JsonAssistantUtil.invokeMethod(manager, "openFileInNewWindow", virtualFile);
     }
 
     @Override

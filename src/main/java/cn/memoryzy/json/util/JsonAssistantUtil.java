@@ -51,6 +51,7 @@ import com.intellij.util.ui.UIUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -186,6 +187,22 @@ public class JsonAssistantUtil {
         }
 
         return Objects.isNull(matchField) ? null : ReflectUtil.getStaticFieldValue(matchField);
+    }
+
+
+    public static Object invokeMethod(Object obj, String methodName, Object... params) {
+        Class<?> clazz = obj.getClass();
+        Class<?>[] paramTypes = new Class[params.length];
+        for (int i = 0; i < params.length; i++) {
+            paramTypes[i] = params[i].getClass();
+        }
+
+        Method method = ReflectUtil.getMethod(clazz, methodName, paramTypes);
+        if (Objects.nonNull(method)) {
+            return ReflectUtil.invoke(obj, method, params);
+        }
+
+        return null;
     }
 
     /**
