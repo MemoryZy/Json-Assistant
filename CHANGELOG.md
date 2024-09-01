@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.5.4] - 2024-09-01
+
 - 解决后台保存历史记录的问题。
 - 将 Json 展示窗口由单窗口切换为多选项卡多窗口，并新增多个操作项。
   - 侧边栏快捷操作项
@@ -151,7 +154,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.4...HEAD
+[1.5.4]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.1...v1.5.4
 [1.5.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.3.1...v1.4.0
