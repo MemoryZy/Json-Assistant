@@ -88,6 +88,11 @@ public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarPro
         }
     }
 
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
     private void putToolbarComponent(Pair<Content, FloatingToolbarComponent> pair) {
         if (toolbarComponents.stream().noneMatch(el -> Objects.equals(el.getFirst(), pair.getFirst()))) {
             toolbarComponents.add(pair);
