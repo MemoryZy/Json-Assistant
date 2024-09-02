@@ -1,8 +1,8 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.child.DonateAction;
-import cn.memoryzy.json.action.child.QuickStartAction;
+import cn.memoryzy.json.action.DonateAction;
+import cn.memoryzy.json.action.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;

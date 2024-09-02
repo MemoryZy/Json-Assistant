@@ -1,4 +1,14 @@
-<!-- Copyright 2000-2022 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license. -->
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M5.5 3V5.5H10.5V3M4.5 13V9.5H11.5V13M2.5 13.5V2.5H11.5L13.5 4.5V13.5H2.5Z" stroke="#6C707E" stroke-linejoin="round"/>
+<svg width="19.000000" height="19.000000" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip114_60">
+			<rect id="save" width="19.000000" height="19.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip114_60)">
+		<path id="path" d="M4.2 15.7L4.2 3L14.59 3L16.9 5.3L16.9 15.7L4.2 15.7Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M7.66 3.57L7.66 6.46L13.43 6.46L13.43 3.57M6.5 15.12L6.5 11.08L14.59 11.08L14.59 15.12M4.2 3L14.59 3L16.9 5.3L16.9 15.7L4.2 15.7L4.2 3Z" stroke="#6C707E" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round"/>
+	</g>
 </svg>

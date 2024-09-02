@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.child.toolwindow.*;
+import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.extension.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
@@ -69,10 +69,11 @@ public class JsonViewerWindow {
         actionGroup.add(new JsonStructureToolWindowAction(this, simpleToolWindowPanel));
         actionGroup.add(new JsonPathAction(this, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
+        actionGroup.add(new ImportHistoryAction(this));
         actionGroup.add(new SaveToDiskAction(this));
         actionGroup.add(new ClearEditorAction(this));
 
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLWINDOW_TOOLBAR_BAR, actionGroup, false);
+        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         return toolbar.getComponent();
     }
 

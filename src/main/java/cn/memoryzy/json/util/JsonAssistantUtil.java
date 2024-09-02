@@ -109,14 +109,10 @@ public class JsonAssistantUtil {
                 ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
                 ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
 
-                if (Objects.nonNull(toolWindow)) {
-                    Content content = addNewContent(project, toolWindow, contentFactory);
-                    LanguageTextField languageTextField = getLanguageTextFieldOnContent(content);
-                    if (Objects.nonNull(languageTextField)) {
-                        languageTextField.setText(processedText);
-                        toolWindow.show();
-                    }
-                }
+                Content content = addNewContent(project, toolWindow, contentFactory);
+                LanguageTextField languageTextField = getLanguageTextFieldOnContent(content);
+                languageTextField.setText(processedText);
+                toolWindow.show();
             } catch (Exception e) {
                 PlatformUtil.setClipboard(processedText);
                 Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
@@ -189,15 +185,19 @@ public class JsonAssistantUtil {
         return Objects.isNull(matchField) ? null : ReflectUtil.getStaticFieldValue(matchField);
     }
 
-
-    public static Object invokeMethod(Object obj, String methodName, Object... params) {
+    public static Method getMethod(Object obj, String methodName, Object... params) {
         Class<?> clazz = obj.getClass();
         Class<?>[] paramTypes = new Class[params.length];
         for (int i = 0; i < params.length; i++) {
             paramTypes[i] = params[i].getClass();
         }
 
-        Method method = ReflectUtil.getMethod(clazz, methodName, paramTypes);
+        return ReflectUtil.getMethod(clazz, methodName, paramTypes);
+    }
+
+
+    public static Object invokeMethod(Object obj, String methodName, Object... params) {
+        Method method = getMethod(obj, methodName, params);
         if (Objects.nonNull(method)) {
             return ReflectUtil.invoke(obj, method, params);
         }

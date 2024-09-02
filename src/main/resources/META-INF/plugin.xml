@@ -41,10 +41,10 @@
     </applicationListeners>
 
     <actions>
-        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.action.child.toolwindow.PasteHistoryEditorToolbarAction">
+        <action id="JsonAssistant.Action.PasteHistoryEditorToolbarAction" class="cn.memoryzy.json.action.toolwindow.PasteHistoryEditorToolbarAction">
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt H"/>
         </action>
-        <action id="JsonAssistant.Action.CloseEditorToolbarAction" class="cn.memoryzy.json.action.child.toolwindow.HideEditorToolbarAction"/>
+        <action id="JsonAssistant.Action.CloseEditorToolbarAction" class="cn.memoryzy.json.action.toolwindow.HideEditorToolbarAction"/>
 
         <group id="JsonAssistant.Group.EditorToolbarGroup">
             <reference ref="JsonAssistant.Action.PasteHistoryEditorToolbarAction"/>
@@ -73,8 +73,8 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
 
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.group.JsonAssistantPopupGroup"/>
-        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.group.ConvertOtherFormatsGroup"/>
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
+        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>

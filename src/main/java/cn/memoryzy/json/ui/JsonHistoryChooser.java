@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui;
 
-import cn.memoryzy.json.action.child.RemoveListElementAction;
+import cn.memoryzy.json.action.RemoveListElementAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.model.HistoryModel;

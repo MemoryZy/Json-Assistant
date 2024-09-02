@@ -1,7 +1,7 @@
 package cn.memoryzy.json.toolwindow;
 
-import cn.memoryzy.json.action.child.DonateAction;
-import cn.memoryzy.json.action.child.toolwindow.*;
+import cn.memoryzy.json.action.DonateAction;
+import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;

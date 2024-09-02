@@ -2,7 +2,7 @@ package cn.memoryzy.json.extension;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.child.toolwindow.HideEditorToolbarAction;
+import cn.memoryzy.json.action.toolwindow.HideEditorToolbarAction;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.model.LimitedList;
