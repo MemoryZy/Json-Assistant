@@ -2,7 +2,6 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.ui.JsonViewerWindow;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -25,16 +24,19 @@ import javax.swing.*;
  */
 public class ImportLastRecordAction extends ToggleAction implements CustomComponentAction, DumbAware {
 
-    private final JsonViewerWindow window;
+    public static final String IMPORT_RECORD_ENABLED_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + "Import.Last.Record";
 
-    public ImportLastRecordAction(JsonViewerWindow window) {
+    public ImportLastRecordAction() {
         super();
-        this.window = window;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.IMPORT_HISTORY);
+
+        PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
+        String value = propertiesComponent.getValue(IMPORT_RECORD_ENABLED_KEY);
+        if (value == null) propertiesComponent.setValue(IMPORT_RECORD_ENABLED_KEY, Boolean.TRUE.toString());
     }
 
     @Override
@@ -61,11 +63,11 @@ public class ImportLastRecordAction extends ToggleAction implements CustomCompon
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return PropertiesComponent.getInstance().getBoolean(JsonAssistantPlugin.PLUGIN_ID_NAME + "Import.Last.Record");
+        return Boolean.TRUE.toString().equals(PropertiesComponent.getInstance().getValue(IMPORT_RECORD_ENABLED_KEY));
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        PropertiesComponent.getInstance().setValue(JsonAssistantPlugin.PLUGIN_ID_NAME + "Import.Last.Record", state);
+        PropertiesComponent.getInstance().setValue(IMPORT_RECORD_ENABLED_KEY, Boolean.valueOf(state).toString());
     }
 }

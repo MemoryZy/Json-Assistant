@@ -65,7 +65,9 @@ public class JsonViewerWindow {
         actionGroup.add(new JsonStructureToolWindowAction(this, simpleToolWindowPanel));
         actionGroup.add(new JsonPathAction(this, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new ImportLastRecordAction(this));
+        actionGroup.add(new ImportLastRecordAction());
+        actionGroup.add(new DisplayLineNumberAction(this));
+        actionGroup.add(Separator.create());
         actionGroup.add(new SaveToDiskAction(this));
         actionGroup.add(new ClearEditorAction(this));
 
