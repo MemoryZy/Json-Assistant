@@ -2,7 +2,6 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
-import cn.memoryzy.json.extension.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
@@ -14,7 +13,6 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
@@ -45,8 +43,6 @@ public class JsonViewerWindow {
     public JComponent getRootPanel() {
         this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
-        Document document = this.jsonTextField.getDocument();
-        document.addDocumentListener(new JsonViewerEditorFloatingProvider.DocumentListenerImpl(project));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
         this.initJsonText();
 

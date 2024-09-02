@@ -1,14 +1,14 @@
-<svg width="19.000000" height="19.000000" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="18.000000" height="18.000000" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
 	<desc>
 			Created with Pixso.
 	</desc>
 	<defs>
 		<clipPath id="clip114_60">
-			<rect id="save" width="19.000000" height="19.000000" fill="white" fill-opacity="0"/>
+			<rect id="save" width="18.000000" height="18.000000" fill="white" fill-opacity="0"/>
 		</clipPath>
 	</defs>
 	<g clip-path="url(#clip114_60)">
-		<path id="path" d="M4.2 15.7L4.2 3L14.59 3L16.9 5.3L16.9 15.7L4.2 15.7Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
-		<path id="path" d="M7.66 3.57L7.66 6.46L13.43 6.46L13.43 3.57M6.5 15.12L6.5 11.08L14.59 11.08L14.59 15.12M4.2 3L14.59 3L16.9 5.3L16.9 15.7L4.2 15.7L4.2 3Z" stroke="#6C707E" stroke-opacity="1.000000" stroke-width="1.000000" stroke-linejoin="round"/>
+		<path id="path" d="M4.02 14.99L4.02 2.96L13.86 2.96L16.05 5.15L16.05 14.99L4.02 14.99Z" fill="#000000" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path" d="M7.3 3.51L7.3 6.24L12.77 6.24L12.77 3.51M6.21 14.44L6.21 10.62L13.86 10.62L13.86 14.44M4.02 2.96L13.86 2.96L16.05 5.15L16.05 14.99L4.02 14.99L4.02 2.96Z" stroke="#6C707E" stroke-opacity="1.000000" stroke-width="1.100000" stroke-linejoin="round"/>
 	</g>
 </svg>

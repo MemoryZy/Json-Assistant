@@ -7,7 +7,6 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.extension.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.model.formats.BaseFormatModel;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.model.formats.XmlFormatModel;
@@ -283,7 +282,6 @@ public class JsonAssistantUtil {
         JsonViewerWindow window = new JsonViewerWindow(project, false);
         Content content = contentFactory.createContent(window.getRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
-        content.setDisposer(new JsonViewerEditorFloatingProvider.ContentDisposable(content));
         contentManager.setSelectedContent(content, true);
         return content;
     }

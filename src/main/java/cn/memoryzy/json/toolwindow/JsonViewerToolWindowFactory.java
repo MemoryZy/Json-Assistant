@@ -5,7 +5,6 @@ import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.extension.JsonViewerEditorFloatingProvider;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -73,7 +72,6 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
 
         Content content = contentFactory.createContent(rootPanel, PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME, false);
         content.setCloseable(false);
-        content.setDisposer(new JsonViewerEditorFloatingProvider.ContentDisposable(content));
         contentManager.addContent(content, 0);
 
         // 验证地址可达性
