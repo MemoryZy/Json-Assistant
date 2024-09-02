@@ -67,7 +67,7 @@ public class JsonAssistantIcons {
         public static final Icon SEARCH = load("/icons/toolwindow/search.svg");
         public static final Icon STRUCTURE = load("/icons/toolwindow/structure.svg");
         public static final Icon SAVE = load("/icons/toolwindow/save.svg");
-        public static final Icon FORM_HISTORY = load("/icons/toolwindow/form_history.svg");
+        public static final Icon IMPORT_HISTORY = load("/icons/toolwindow/import_history.svg");
         public static final Icon PENCIL = load("/icons/toolwindow/pencil.svg");
         public static final Icon PENCIL_STAR = load("/icons/toolwindow/pencil_star.svg");
         public static final Icon QUERY = load("/icons/toolwindow/query.svg");

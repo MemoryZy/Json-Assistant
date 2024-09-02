@@ -33,6 +33,8 @@ import java.util.Objects;
  */
 public class JsonViewerEditorFloatingProvider extends AbstractFloatingToolbarProvider {
 
+    // todo 加个显示行数的按钮action，点击之后，选中，外加重新加载组件
+
     private final DisposableWrapperList<Pair<Content, FloatingToolbarComponent>> toolbarComponents = new DisposableWrapperList<>();
 
     public JsonViewerEditorFloatingProvider() {

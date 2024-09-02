@@ -1,8 +1,10 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.JsonViewerWindow;
 import com.intellij.ide.HelpTooltip;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -21,18 +23,18 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/9/2
  */
-public class ImportHistoryAction extends ToggleAction implements CustomComponentAction, DumbAware {
+public class ImportLastRecordAction extends ToggleAction implements CustomComponentAction, DumbAware {
 
     private final JsonViewerWindow window;
 
-    public ImportHistoryAction(JsonViewerWindow window) {
+    public ImportLastRecordAction(JsonViewerWindow window) {
         super();
         this.window = window;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.description"));
-        presentation.setIcon(JsonAssistantIcons.ToolWindow.FORM_HISTORY);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.IMPORT_HISTORY);
     }
 
     @Override
@@ -59,11 +61,11 @@ public class ImportHistoryAction extends ToggleAction implements CustomComponent
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return false;
+        return PropertiesComponent.getInstance().getBoolean(JsonAssistantPlugin.PLUGIN_ID_NAME + "Import.Last.Record");
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-
+        PropertiesComponent.getInstance().setValue(JsonAssistantPlugin.PLUGIN_ID_NAME + "Import.Last.Record", state);
     }
 }

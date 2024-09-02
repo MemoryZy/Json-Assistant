@@ -48,7 +48,7 @@ public class PasteHistoryEditorToolbarAction extends DumbAwareAction implements 
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.editor.toolbar.paste.history.description"));
-        presentation.setIcon(JsonAssistantIcons.ToolWindow.FORM_HISTORY);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.IMPORT_HISTORY);
     }
 
     @Override
