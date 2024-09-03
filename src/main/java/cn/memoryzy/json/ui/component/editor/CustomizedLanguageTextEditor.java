@@ -1,9 +1,12 @@
 package cn.memoryzy.json.ui.component.editor;
 
+import com.intellij.execution.impl.ConsoleViewUtil;
+import com.intellij.ide.ui.UISettings;
 import com.intellij.lang.Language;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.LogicalPosition;
 import com.intellij.openapi.editor.ScrollType;
+import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
@@ -81,6 +84,12 @@ public class CustomizedLanguageTextEditor extends LanguageTextField {
         EditorGutterComponentEx gutterComponentEx = editor.getGutterComponentEx();
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
+
+        DelegateColorScheme scheme = ConsoleViewUtil.updateConsoleColorScheme(editor.getColorsScheme());
+        if (UISettings.getInstance().getPresentationMode()) {
+            scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
+        }
+        editor.setColorsScheme(scheme);
 
         return editor;
     }

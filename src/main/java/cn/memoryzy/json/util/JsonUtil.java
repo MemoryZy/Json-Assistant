@@ -86,20 +86,24 @@ public class JsonUtil {
             return "";
         }
 
-        // 转义判断
-        String json = StringEscapeUtils.unescapeJson(includeJsonStr);
-        if (isJsonStr(json)) {
-            return json;
-        }
+        try {
+            // 转义判断
+            String json = StringEscapeUtils.unescapeJson(includeJsonStr);
+            if (isJsonStr(json)) {
+                return json;
+            }
 
-        json = extractJsonStringOnRegular(includeJsonStr);
-        if (StrUtil.isNotBlank(json)) {
-            return json;
-        }
+            json = extractJsonStringOnRegular(includeJsonStr);
+            if (StrUtil.isNotBlank(json)) {
+                return json;
+            }
 
-        json = extractJsonString(includeJsonStr);
-        // 判断是否是JSON字符串
-        return isJsonStr(json) ? json : "";
+            json = extractJsonString(includeJsonStr);
+            // 判断是否是JSON字符串
+            return isJsonStr(json) ? json : "";
+        } catch (Exception e) {
+            return "";
+        }
     }
 
 

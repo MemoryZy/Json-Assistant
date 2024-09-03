@@ -2,11 +2,11 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonViewerWindow;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,11 +16,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ClearEditorAction extends DumbAwareAction implements UpdateInBackground {
 
-    private final JsonViewerWindow window;
+    private final LanguageTextField languageTextField;
 
-    public ClearEditorAction(JsonViewerWindow window) {
+    public ClearEditorAction(LanguageTextField languageTextField) {
         super();
-        this.window = window;
+        this.languageTextField = languageTextField;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.clear.editor.text"));
@@ -30,11 +30,11 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        window.getJsonTextField().setText("");
+        languageTextField.setText("");
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(StrUtil.isNotBlank(window.getJsonContent()));
+        e.getPresentation().setEnabled(StrUtil.isNotBlank(languageTextField.getText()));
     }
 }

@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.model.LimitedList;
@@ -13,6 +14,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
@@ -22,6 +24,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -44,7 +47,7 @@ public class JsonViewerWindow {
         this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
-        this.initJsonText();
+        this.initEditorText();
 
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
         JPanel centerPanel = new JPanel(new BorderLayout());
@@ -59,23 +62,20 @@ public class JsonViewerWindow {
 
     public JComponent createToolbar(SimpleToolWindowPanel simpleToolWindowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonBeautifyToolWindowAction(this, simpleToolWindowPanel));
-        actionGroup.add(new JsonMinifyToolWindowAction(this, simpleToolWindowPanel));
+        actionGroup.add(new JsonBeautifyToolWindowAction(jsonTextField, simpleToolWindowPanel));
+        actionGroup.add(new JsonMinifyToolWindowAction(jsonTextField, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new JsonStructureToolWindowAction(this, simpleToolWindowPanel));
-        actionGroup.add(new JsonPathAction(this, simpleToolWindowPanel));
+        actionGroup.add(new JsonStructureToolWindowAction(jsonTextField, simpleToolWindowPanel));
+        actionGroup.add(new JsonPathAction(jsonTextField, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new ImportLastRecordAction());
-        actionGroup.add(new DisplayLineNumberAction(this));
-        actionGroup.add(Separator.create());
-        actionGroup.add(new SaveToDiskAction(this));
-        actionGroup.add(new ClearEditorAction(this));
+        actionGroup.add(new SaveToDiskAction(jsonTextField));
+        actionGroup.add(new ClearEditorAction(jsonTextField));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         return toolbar.getComponent();
     }
 
-    private void initJsonText() {
+    private void initEditorText() {
         if (initWindow) {
             String jsonStr = "";
             String clipboard = PlatformUtil.getClipboard();
@@ -83,18 +83,18 @@ public class JsonViewerWindow {
                 jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
             }
 
+            if (StrUtil.isBlank(jsonStr) && DisplayLineNumberAction.isShownLineNumbers()) {
+                JsonViewerHistoryState state = JsonViewerHistoryState.getInstance(project);
+                LimitedList<String> history = state.getHistory();
+                if (CollUtil.isNotEmpty(history)) {
+                    jsonStr = history.get(0);
+                }
+            }
+
             if (StrUtil.isNotBlank(jsonStr)) {
                 jsonTextField.setText(jsonStr);
             }
         }
-    }
-
-    public String getJsonContent() {
-        return jsonTextField.getText();
-    }
-
-    public LanguageTextField getJsonTextField() {
-        return jsonTextField;
     }
 
 
@@ -115,6 +115,10 @@ public class JsonViewerWindow {
                     }
                 }
             }
+
+            // 行号显示
+            EditorImpl editor = (EditorImpl) Objects.requireNonNull(jsonTextField.getEditor());
+            DisplayLineNumberAction.showLineNumber(editor, DisplayLineNumberAction.isShownLineNumbers());
         }
 
         @Override

@@ -2,7 +2,6 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.action.JsonBeautifyAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -22,11 +21,11 @@ import java.util.Objects;
  */
 public class JsonBeautifyToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
-    private final JsonViewerWindow window;
+    private final LanguageTextField languageTextField;
 
-    public JsonBeautifyToolWindowAction(JsonViewerWindow window, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonBeautifyToolWindowAction(LanguageTextField languageTextField, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
-        this.window = window;
+        this.languageTextField = languageTextField;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.beautify.text"));
@@ -37,14 +36,13 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        LanguageTextField jsonTextField = window.getJsonTextField();
-        JsonBeautifyAction.handleJsonBeautify(e, Objects.requireNonNull(jsonTextField.getEditor()));
+        JsonBeautifyAction.handleJsonBeautify(e, Objects.requireNonNull(languageTextField.getEditor()));
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(null != e.getProject()
-                && null != window.getJsonTextField().getEditor()
-                && JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
+                && null != languageTextField.getEditor()
+                && JsonAssistantUtil.isJsonOrExtract(languageTextField.getText()));
     }
 }

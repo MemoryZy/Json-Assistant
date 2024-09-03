@@ -5,7 +5,6 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.ui.JsonPathPanel;
-import cn.memoryzy.json.ui.JsonViewerWindow;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
@@ -26,6 +25,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -43,12 +43,12 @@ import java.util.Objects;
 public class JsonPathAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
     public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
-    private final JsonViewerWindow window;
+    private final LanguageTextField languageTextField;
     private final SimpleToolWindowPanel simpleToolWindowPanel;
 
-    public JsonPathAction(JsonViewerWindow window, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonPathAction(LanguageTextField languageTextField, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
-        this.window = window;
+        this.languageTextField = languageTextField;
         this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
@@ -117,7 +117,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     }
 
     private void showComponentPopup(@NotNull AnActionEvent e, Project project) {
-        JsonPathPanel jsonPathPanel = new JsonPathPanel(project, window.getJsonTextField());
+        JsonPathPanel jsonPathPanel = new JsonPathPanel(project, languageTextField);
         JPanel rootPanel = jsonPathPanel.getRootPanel();
         JComponent expressionComboBoxTextField = jsonPathPanel.getPathExpressionComboBoxTextField();
 
@@ -192,7 +192,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(window.getJsonContent()));
+        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(languageTextField.getText()));
     }
 
 }

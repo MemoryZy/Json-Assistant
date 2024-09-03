@@ -3,6 +3,7 @@ package cn.memoryzy.json.model.formats;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.json.JsonFileType;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -16,6 +17,8 @@ import javax.swing.*;
  * @since 2024/8/3
  */
 public class JsonFormatHandleModel extends BaseFormatModel {
+
+    private static final Logger LOG = Logger.getInstance(JsonFormatHandleModel.class);
 
     /**
      * 是否为 JSON 格式文本
@@ -49,18 +52,26 @@ public class JsonFormatHandleModel extends BaseFormatModel {
             return null;
         }
 
-        Document document = editor.getDocument();
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int startOffset = primaryCaret.getSelectionStart();
-        int endOffset = primaryCaret.getSelectionEnd();
-        String selectText = document.getText(new TextRange(startOffset, endOffset));
-        String jsonContent = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
+        Caret primaryCaret = null;
+        int startOffset = 0;
+        int endOffset = 0;
+        String jsonContent = null;
+        boolean isSelectedText = false;
+        try {
+            Document document = editor.getDocument();
+            primaryCaret = editor.getCaretModel().getPrimaryCaret();
+            startOffset = primaryCaret.getSelectionStart();
+            endOffset = primaryCaret.getSelectionEnd();
+            String selectText = document.getText(new TextRange(startOffset, endOffset));
+            jsonContent = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
 
-        boolean isSelectedText = true;
-        if (StrUtil.isBlank(jsonContent)) {
-            isSelectedText = false;
-            String documentText = document.getText();
-            jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+            isSelectedText = true;
+            if (StrUtil.isBlank(jsonContent)) {
+                isSelectedText = false;
+                String documentText = document.getText();
+                jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+            }
+        } catch (Exception ignored) {
         }
 
         return new JsonFormatHandleModel(isSelectedText, startOffset, endOffset,
