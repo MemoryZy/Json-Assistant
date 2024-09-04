@@ -42,7 +42,7 @@ public class LoadLastRecordAction extends ToggleAction implements DumbAware {
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return Boolean.TRUE.toString().equals(PropertiesComponent.getInstance().getValue(IMPORT_RECORD_ENABLED_KEY));
+        return isLoadLastRecord();
     }
 
     @Override
@@ -65,4 +65,10 @@ public class LoadLastRecordAction extends ToggleAction implements DumbAware {
 
         PropertiesComponent.getInstance().setValue(IMPORT_RECORD_ENABLED_KEY, Boolean.valueOf(state).toString());
     }
+
+    public static boolean isLoadLastRecord() {
+        return Boolean.TRUE.toString().equals(PropertiesComponent.getInstance().getValue(IMPORT_RECORD_ENABLED_KEY));
+    }
+
+
 }

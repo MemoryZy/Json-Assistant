@@ -89,7 +89,7 @@ public class JsonViewerWindow {
                 jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
             }
 
-            if (StrUtil.isBlank(jsonStr) && DisplayLineNumberAction.isShownLineNumbers()) {
+            if (StrUtil.isBlank(jsonStr) && LoadLastRecordAction.isLoadLastRecord()) {
                 JsonViewerHistoryState state = JsonViewerHistoryState.getInstance(project);
                 LimitedList<String> history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
