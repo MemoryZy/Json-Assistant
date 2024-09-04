@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
@@ -14,9 +15,12 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.util.Key;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.LanguageTextField;
 
@@ -31,6 +35,8 @@ import java.util.Objects;
  * @since 2024/8/6
  */
 public class JsonViewerWindow {
+
+    private static final Key<Integer> EDITOR_CARET_OFFSET_KEY = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EDITOR_CARET_OFFSET");
 
     private LanguageTextField jsonTextField;
     private final Project project;
@@ -98,37 +104,78 @@ public class JsonViewerWindow {
     }
 
 
+    private void pasteJsonToEditor() {
+        if (initWindow) {
+            String text = jsonTextField.getText();
+            if (StrUtil.isBlank(text)) {
+                String clipboard = PlatformUtil.getClipboard();
+                if (StrUtil.isNotBlank(clipboard)) {
+                    String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
+                    if (StrUtil.isNotBlank(jsonStr)) {
+                        jsonStr = JsonUtil.formatJson(jsonStr);
+                        jsonTextField.setText(jsonStr);
+                    }
+                }
+            }
+        }
+    }
+
+    private void toggleLineNumbers() {
+        EditorImpl editor = (EditorImpl) Objects.requireNonNull(jsonTextField.getEditor());
+        DisplayLineNumberAction.showLineNumber(editor, DisplayLineNumberAction.isShownLineNumbers());
+    }
+
+    private void addJsonToHistory() {
+        LimitedList<String> historyList = historyState.getHistory();
+        String text = StrUtil.trim(jsonTextField.getText());
+
+        if (JsonUtil.isJsonStr(text)) {
+            historyList.add(text);
+        }
+    }
+
+    private void storeCaretOffset() {
+        Editor editor = jsonTextField.getEditor();
+        if (editor == null) return;
+        if (StrUtil.isBlank(jsonTextField.getText())) return;
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int offset = primaryCaret.getOffset();
+        editor.putUserData(EDITOR_CARET_OFFSET_KEY, offset);
+
+        System.out.println("put offset: " + offset);
+    }
+
+    private void moveToOffset() {
+        Editor editor = jsonTextField.getEditor();
+        if (editor == null) return;
+        if (StrUtil.isBlank(jsonTextField.getText())) return;
+        Integer offset = editor.getUserData(EDITOR_CARET_OFFSET_KEY);
+        if (offset != null) {
+            editor.getCaretModel().getPrimaryCaret().moveToOffset(offset);
+            System.out.println("move offset: " + offset);
+        }
+    }
+
     private class FocusListenerImpl extends FocusAdapter {
 
         @Override
         public void focusGained(FocusEvent event) {
-            if (initWindow) {
-                String text = jsonTextField.getText();
-                if (StrUtil.isBlank(text)) {
-                    String clipboard = PlatformUtil.getClipboard();
-                    if (StrUtil.isNotBlank(clipboard)) {
-                        String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
-                        if (StrUtil.isNotBlank(jsonStr)) {
-                            jsonStr = JsonUtil.formatJson(jsonStr);
-                            jsonTextField.setText(jsonStr);
-                        }
-                    }
-                }
-            }
-
+            // --------------------------- 获取焦点时
+            // 获取剪贴板的 JSON 并设置到编辑器内
+            pasteJsonToEditor();
             // 行号显示
-            EditorImpl editor = (EditorImpl) Objects.requireNonNull(jsonTextField.getEditor());
-            DisplayLineNumberAction.showLineNumber(editor, DisplayLineNumberAction.isShownLineNumbers());
+            toggleLineNumbers();
+            // 切换回光标位置
+            // moveToOffset();
         }
 
         @Override
         public void focusLost(FocusEvent event) {
-            LimitedList<String> historyList = historyState.getHistory();
-            String text = StrUtil.trim(jsonTextField.getText());
-
-            if (JsonUtil.isJsonStr(text)) {
-                historyList.add(text);
-            }
+            // --------------------------- 失去焦点时
+            // 添加当前编辑器的 JSON 至历史记录
+            addJsonToHistory();
+            // 焦点丢失时记录当前编辑器内的光标位置，待下次重新获取焦点时，切换到该光标位置
+            // storeCaretOffset();
         }
     }
 
