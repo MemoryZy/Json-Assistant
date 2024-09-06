@@ -1,22 +1,25 @@
 <idea-plugin>
     <actions>
-        <action id="JsonAssistant.Action.JavaBeanToJson" class="cn.memoryzy.json.action.JavaBeanToJsonAction">
+        <action id="JsonAssistant.Action.JavaBeanToJsonAction" class="cn.memoryzy.json.action.JavaBeanToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
-        <action id="JsonAssistant.Action.JsonToJavaBean" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
+        <action id="JsonAssistant.Action.JsonToJavaBeanAction" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
+        <action id="JsonAssistant.Action.JsonExtractorAction" class="cn.memoryzy.json.action.JsonExtractorAction"/>
 
-        <group id="JsonAssistant.Group.JavaBeanToJson">
+        <group id="JsonAssistant.Group.JavaBeanToJsonGroup">
             <separator/>
-            <reference ref="JsonAssistant.Action.JavaBeanToJson"/>
+            <reference ref="JsonAssistant.Action.JavaBeanToJsonAction"/>
+            <separator/>
+            <reference ref="JsonAssistant.Action.JsonExtractorAction"/>
             <separator/>
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </group>
 
-        <group id="JsonAssistant.Group.JsonToJavaBean">
-            <reference ref="JsonAssistant.Action.JsonToJavaBean"/>
+        <group id="JsonAssistant.Group.JsonToJavaBeanGroup">
+            <reference ref="JsonAssistant.Action.JsonToJavaBeanAction"/>
             <add-to-group group-id="NewGroup" anchor="after" relative-to-action="NewGroup1"/>
         </group>
     </actions>

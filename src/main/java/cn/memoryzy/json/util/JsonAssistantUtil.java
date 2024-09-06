@@ -105,13 +105,7 @@ public class JsonAssistantUtil {
             });
         } else {
             try {
-                ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-                ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
-
-                Content content = addNewContent(project, toolWindow, contentFactory);
-                LanguageTextField languageTextField = getLanguageTextFieldOnContent(content);
-                languageTextField.setText(processedText);
-                toolWindow.show();
+                addNewContentWithEditorContentIfNeeded(project, processedText);
             } catch (Exception e) {
                 PlatformUtil.setClipboard(processedText);
                 Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
@@ -121,6 +115,26 @@ public class JsonAssistantUtil {
                 }
             }
         }
+    }
+
+
+    public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText) {
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
+
+        Content mainContent = getMainContent(toolWindow);
+        LanguageTextField languageTextFieldOnContent = getLanguageTextFieldOnContent(mainContent);
+        // noinspection DataFlowIssue
+        if (StrUtil.isBlank(languageTextFieldOnContent.getText())) {
+            languageTextFieldOnContent.setText(processedText);
+        } else {
+            Content content = addNewContent(project, toolWindow, contentFactory);
+            LanguageTextField languageTextField = getLanguageTextFieldOnContent(content);
+            // noinspection DataFlowIssue
+            languageTextField.setText(processedText);
+        }
+
+        toolWindow.show();
     }
 
 
@@ -260,6 +274,12 @@ public class JsonAssistantUtil {
         }
 
         return selectedContent;
+    }
+
+    public static Content getMainContent(ToolWindow toolWindow) {
+        if (toolWindow == null) return null;
+        ContentManager contentManager = toolWindow.getContentManager();
+        return contentManager.getContent(0);
     }
 
     public static LanguageTextField getLanguageTextFieldOnContent(Content content) {

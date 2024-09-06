@@ -56,6 +56,18 @@ public class PlatformUtil {
         return psiFile.findElementAt(editor.getCaretModel().getOffset());
     }
 
+    /**
+     * 通过当前光标的偏移量获取当前所在的Psi元素
+     * <p>亦可配合 PsiTreeUtil.getParentOfType(element, PsiClass.class)方法来获取该PsiElement所处的区域</p>
+     *
+     * @return Psi元素
+     */
+    public static PsiElement getPsiElementByOffset(AnActionEvent e) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(e);
+        Editor editor = PlatformUtil.getEditor(e);
+        return (psiFile != null && editor != null) ? getPsiElementByOffset(editor, psiFile) : null;
+    }
+
 
     /**
      * 获取编辑器
