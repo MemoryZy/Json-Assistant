@@ -72,5 +72,6 @@ public class JsonPathFileTypeComboBoxEditor extends EditorComboBoxEditor {
         EditorTextField editorTextField = getEditorComponent();
         editorTextField.setFont(font);
         editorTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.placeholder"));
+        editorTextField.setShowPlaceholderWhenFocused(true);
     }
 }

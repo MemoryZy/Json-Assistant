@@ -89,6 +89,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         jsonTextField.setFont(JBUI.Fonts.create("Consolas", 15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
+        jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
 
         classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);

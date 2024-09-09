@@ -1,9 +1,10 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
@@ -17,10 +18,10 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.FoldRegion;
 import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.util.Key;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.LanguageTextField;
 
@@ -28,6 +29,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -36,12 +39,20 @@ import java.util.Objects;
  */
 public class JsonViewerWindow {
 
-    private static final Key<Integer> EDITOR_CARET_OFFSET_KEY = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EDITOR_CARET_OFFSET");
-
     private LanguageTextField jsonTextField;
     private final Project project;
     private final boolean initWindow;
     private final JsonViewerHistoryState historyState;
+
+    /**
+     * 上次光标所在记录
+     */
+    private int lastOffset = 0;
+
+    /**
+     * 编辑器折叠区域
+     */
+    private final List<FoldRegion> lastRegions = new ArrayList<>();
 
     public JsonViewerWindow(Project project, boolean initWindow) {
         this.project = project;
@@ -53,6 +64,8 @@ public class JsonViewerWindow {
         this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
         this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
         this.jsonTextField.addFocusListener(new FocusListenerImpl());
+        this.jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
+        this.jsonTextField.setShowPlaceholderWhenFocused(true);
         this.initEditorText();
 
         JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
@@ -139,20 +152,38 @@ public class JsonViewerWindow {
         if (editor == null) return;
         if (StrUtil.isBlank(jsonTextField.getText())) return;
         Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int offset = primaryCaret.getOffset();
-        editor.putUserData(EDITOR_CARET_OFFSET_KEY, offset);
-
-        System.out.println("put offset: " + offset);
+        this.lastOffset = primaryCaret.getOffset();
     }
 
     private void moveToOffset() {
         Editor editor = jsonTextField.getEditor();
         if (editor == null) return;
         if (StrUtil.isBlank(jsonTextField.getText())) return;
-        Integer offset = editor.getUserData(EDITOR_CARET_OFFSET_KEY);
-        if (offset != null) {
-            editor.getCaretModel().getPrimaryCaret().moveToOffset(offset);
-            System.out.println("move offset: " + offset);
+        editor.getCaretModel().getPrimaryCaret().moveToOffset(this.lastOffset);
+    }
+
+    private void storeFoldRegion() {
+        this.lastRegions.clear();
+        Editor editor = jsonTextField.getEditor();
+        if (editor == null) return;
+        FoldRegion[] allRegions = editor.getFoldingModel().getAllFoldRegions();
+        if (ArrayUtil.isEmpty(allRegions)) return;
+        for (FoldRegion region : allRegions) {
+            if (!region.isExpanded()) {
+                // 记录折叠区域
+                this.lastRegions.add(region);
+            }
+        }
+    }
+
+    private void recoverFoldRegion() {
+        if (CollUtil.isEmpty(this.lastRegions)) return;
+        try {
+            for (FoldRegion region : this.lastRegions) {
+                if (region.isExpanded())
+                    region.setExpanded(false);
+            }
+        } catch (Exception ignored) {
         }
     }
 
@@ -166,7 +197,9 @@ public class JsonViewerWindow {
             // 行号显示
             toggleLineNumbers();
             // 切换回光标位置
-            // moveToOffset();
+            moveToOffset();
+            recoverFoldRegion();
+
         }
 
         @Override
@@ -175,7 +208,9 @@ public class JsonViewerWindow {
             // 添加当前编辑器的 JSON 至历史记录
             addJsonToHistory();
             // 焦点丢失时记录当前编辑器内的光标位置，待下次重新获取焦点时，切换到该光标位置
-            // storeCaretOffset();
+            storeCaretOffset();
+            storeFoldRegion();
+
         }
     }
 
