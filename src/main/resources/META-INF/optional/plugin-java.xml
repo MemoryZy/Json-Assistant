@@ -6,7 +6,7 @@
         </action>
 
         <action id="JsonAssistant.Action.JsonToJavaBeanAction" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
-        <action id="JsonAssistant.Action.JsonExtractorAction" class="cn.memoryzy.json.action.JsonExtractorAction"/>
+        <action id="JsonAssistant.Action.JsonExtractorAction" class="cn.memoryzy.json.action.JavaConstantExtractToJsonAction"/>
 
         <group id="JsonAssistant.Group.JavaBeanToJsonGroup">
             <separator/>

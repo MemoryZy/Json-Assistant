@@ -1,6 +1,14 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 修复工具窗口 JSON 编辑器无法保存状态问题。
+- 新增将 Java 字符串常量提取为 JSON 功能。
+- 修复加载最新历史记录功能的问题。
+- 用户体验优化。
+- Fixed an issue where tool window JSON editor could not save state.
+- Added the ability to extract Java string constants into JSON.
+- Fixed an issue with loading the latest history feature.
+- User experience optimization.
 
 ## [1.6.0] - 2024-09-03
 

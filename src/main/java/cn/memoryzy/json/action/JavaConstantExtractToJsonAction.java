@@ -23,9 +23,9 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/9/6
  */
-public class JsonExtractorAction extends AnAction {
+public class JavaConstantExtractToJsonAction extends AnAction {
 
-    public JsonExtractorAction() {
+    public JavaConstantExtractToJsonAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();

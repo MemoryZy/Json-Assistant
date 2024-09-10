@@ -24,6 +24,7 @@
  - JSON to JavaBean
  - Kotlin Properties to JSON
  - JSON Diff
+ - Extracting Java constants to JSON
  - Format Converters
    - JSON to XML Converter
    - XML to JSON Converter
