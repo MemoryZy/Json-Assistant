@@ -8,13 +8,13 @@ import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileChooser.FileChooserFactory;
 import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.fileChooser.FileSaverDialog;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
-import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,11 +27,11 @@ import java.util.Objects;
  */
 public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackground {
 
-    private final LanguageTextField languageTextField;
+    private final EditorEx editor;
 
-    public SaveToDiskAction(LanguageTextField languageTextField) {
+    public SaveToDiskAction(EditorEx editor) {
         super();
-        this.languageTextField = languageTextField;
+        this.editor = editor;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.save.json.text"));
@@ -51,7 +51,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
         VirtualFileWrapper virtualFileWrapper = saverDialog.save("export.json");
 
         if (Objects.nonNull(virtualFileWrapper)) {
-            String text = StrUtil.trim(languageTextField.getText());
+            String text = StrUtil.trim(editor.getDocument().getText());
             String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
 
             File file = virtualFileWrapper.getFile();
@@ -61,6 +61,6 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(e.getProject() != null && JsonAssistantUtil.isJsonOrExtract(languageTextField.getText()));
+        e.getPresentation().setEnabled(e.getProject() != null && JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
     }
 }

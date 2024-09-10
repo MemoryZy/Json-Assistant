@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/8/22
  */
-public class RendererModeLanguageTextEditor extends CustomizedLanguageTextEditor {
+public class ViewerModeLanguageTextEditor extends CustomizedLanguageTextEditor {
 
-    public RendererModeLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
+    public ViewerModeLanguageTextEditor(Language language, @Nullable Project project, @NotNull String value, boolean needBorder) {
         super(language, project, value, needBorder);
     }
 
@@ -23,7 +23,8 @@ public class RendererModeLanguageTextEditor extends CustomizedLanguageTextEditor
         EditorSettings settings = editor.getSettings();
         // 显示设置插入符行（光标选中行会变黄）
         settings.setCaretRowShown(true);
-        editor.setRendererMode(true);
+        // 编辑器设为-只读
+        editor.setViewer(true);
         return editor;
     }
 }

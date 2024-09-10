@@ -7,19 +7,19 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 public class JsonStructureToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
-    private final LanguageTextField languageTextField;
+    private final EditorEx editor;
 
-    public JsonStructureToolWindowAction(LanguageTextField languageTextField, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonStructureToolWindowAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
-        this.languageTextField = languageTextField;
+        this.editor = editor;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.structure.text"));
@@ -30,13 +30,13 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        String text = StrUtil.trim(languageTextField.getText());
+        String text = StrUtil.trim(editor.getDocument().getText());
         JsonAssistantUtil.showJsonStructureDialog(text);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(languageTextField.getText()));
+        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
     }
 
 }

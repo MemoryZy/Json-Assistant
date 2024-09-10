@@ -13,6 +13,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -25,7 +26,6 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -43,12 +43,12 @@ import java.util.Objects;
 public class JsonPathAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
     public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
-    private final LanguageTextField languageTextField;
+    private final EditorEx editor;
     private final SimpleToolWindowPanel simpleToolWindowPanel;
 
-    public JsonPathAction(LanguageTextField languageTextField, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonPathAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
-        this.languageTextField = languageTextField;
+        this.editor = editor;
         this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
@@ -117,7 +117,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     }
 
     private void showComponentPopup(@NotNull AnActionEvent e, Project project) {
-        JsonPathPanel jsonPathPanel = new JsonPathPanel(project, languageTextField);
+        JsonPathPanel jsonPathPanel = new JsonPathPanel(project, editor);
         JPanel rootPanel = jsonPathPanel.getRootPanel();
         JComponent expressionComboBoxTextField = jsonPathPanel.getPathExpressionComboBoxTextField();
 
@@ -192,7 +192,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(languageTextField.getText()));
+        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
     }
 
 }

@@ -15,6 +15,7 @@ import cn.memoryzy.json.util.UIManager;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
@@ -23,7 +24,6 @@ import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
@@ -55,9 +55,9 @@ public class JsonPathPanel {
     private CollectionComboBoxModel<String> comboBoxModel;
     private TextEditorErrorPopupDecorator pathErrorDecorator;
 
-    public JsonPathPanel(Project project, LanguageTextField jsonTextField) {
+    public JsonPathPanel(Project project, EditorEx editor) {
         this.project = project;
-        this.action = () -> handleJsonPathResult(jsonTextField.getText());
+        this.action = () -> handleJsonPathResult(editor.getDocument().getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
         this.showTextEditor = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         this.showTextEditor.setFont(JBUI.Fonts.create("Consolas", 14));

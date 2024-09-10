@@ -3,6 +3,11 @@ package cn.memoryzy.json.util;
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
+import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.treeStructure.Tree;
@@ -30,9 +35,17 @@ public class UIManager implements Disposable {
 
     @Override
     public void dispose() {
-
     }
 
+    /**
+     * 生成 IDE 默认编辑器组件
+     *
+     * @return 编辑器
+     */
+    public static TextEditor createDefaultTextEditor(Project project, FileType fileType, String text) {
+        LightVirtualFile lightVirtualFile = new LightVirtualFile("Dummy." + fileType.getDefaultExtension(), fileType, text);
+        return (TextEditor) TextEditorProvider.getInstance().createEditor(project, lightVirtualFile);
+    }
 
     public static void expandAll(Tree tree, TreePath parent) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();

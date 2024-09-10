@@ -11,10 +11,12 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.ex.DocumentEx;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,13 +53,16 @@ public class LoadLastRecordAction extends ToggleAction implements DumbAware {
             Project project = getEventProject(e);
             if (project == null) return;
             Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
-            LanguageTextField languageTextField = JsonAssistantUtil.getLanguageTextFieldOnContent(content);
-            if (languageTextField != null) {
-                if (StrUtil.isBlank(languageTextField.getText())) {
+            EditorEx editor = JsonAssistantUtil.getEditorOnContent(content);
+            if (editor != null) {
+                DocumentEx document = editor.getDocument();
+                if (StrUtil.isBlank(document.getText())) {
                     JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
                     LimitedList<String> history = historyState.getHistory();
                     if (CollUtil.isNotEmpty(history)) {
-                        languageTextField.setText(history.get(0));
+                        WriteCommandAction.runWriteCommandAction(project, () -> {
+                            document.setText(history.get(0));
+                        });
                     }
                 }
             }

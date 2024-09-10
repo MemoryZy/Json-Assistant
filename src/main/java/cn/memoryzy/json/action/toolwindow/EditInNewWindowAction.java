@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -17,7 +18,6 @@ import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.content.Content;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,10 +61,9 @@ public class EditInNewWindowAction extends DumbAwareAction {
     public VirtualFile getVirtualFile(@NotNull AnActionEvent e) {
         Project project = getEventProject(e);
         Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
-        LanguageTextField languageTextField = Optional.ofNullable(content).map(JsonAssistantUtil::getLanguageTextFieldOnContent).orElse(null);
-        String text = languageTextField == null ? "" : languageTextField.getText();
-        return Optional.ofNullable(languageTextField)
-                .map(LanguageTextField::getEditor)
+        EditorEx editor = Optional.ofNullable(content).map(JsonAssistantUtil::getEditorOnContent).orElse(null);
+        String text = editor == null ? "" : editor.getDocument().getText();
+        return Optional.ofNullable(editor)
                 .map(Editor::getDocument)
                 .map(document -> PsiDocumentManager.getInstance(project).getPsiFile(document))
                 .map(PsiFile::getVirtualFile)

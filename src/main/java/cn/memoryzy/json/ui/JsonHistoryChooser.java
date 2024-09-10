@@ -6,7 +6,7 @@ import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
-import cn.memoryzy.json.ui.component.editor.RendererModeLanguageTextEditor;
+import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
@@ -15,6 +15,8 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -35,7 +37,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Memory
@@ -63,7 +64,7 @@ public class JsonHistoryChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        showTextField = new RendererModeLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
+        showTextField = new ViewerModeLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
         JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
@@ -148,11 +149,11 @@ public class JsonHistoryChooser extends DialogWrapper {
         if (selectedValue != null) {
             Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
             if (Objects.nonNull(selectedContent)) {
-                LanguageTextField languageTextField = JsonAssistantUtil.getLanguageTextFieldOnContent(selectedContent);
-                Optional.ofNullable(languageTextField).ifPresent(e -> {
-                    e.setText(selectedValue.getWholeContent());
+                EditorEx editor = JsonAssistantUtil.getEditorOnContent(selectedContent);
+                if (Objects.nonNull(editor)) {
+                    WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(selectedValue.getWholeContent()));
                     toolWindow.show();
-                });
+                }
             }
         }
 

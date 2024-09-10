@@ -5,8 +5,9 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,11 +17,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ClearEditorAction extends DumbAwareAction implements UpdateInBackground {
 
-    private final LanguageTextField languageTextField;
+    private final EditorEx editor;
 
-    public ClearEditorAction(LanguageTextField languageTextField) {
+    public ClearEditorAction(EditorEx editor) {
         super();
-        this.languageTextField = languageTextField;
+        this.editor = editor;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.clear.editor.text"));
@@ -30,11 +31,11 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        languageTextField.setText("");
+        WriteCommandAction.runWriteCommandAction(e.getProject(), () -> editor.getDocument().setText(""));
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(StrUtil.isNotBlank(languageTextField.getText()));
+        e.getPresentation().setEnabled(StrUtil.isNotBlank(editor.getDocument().getText()));
     }
 }

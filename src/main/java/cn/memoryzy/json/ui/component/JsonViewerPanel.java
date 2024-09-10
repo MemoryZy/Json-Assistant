@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui.component;
 
-import com.intellij.ui.LanguageTextField;
+import com.intellij.openapi.editor.ex.EditorEx;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,14 +12,15 @@ import java.awt.*;
  */
 public class JsonViewerPanel extends JPanel {
 
-    private final LanguageTextField jsonTextField;
+    private final EditorEx editor;
 
-    public JsonViewerPanel(LayoutManager layout, LanguageTextField jsonTextField) {
+    public JsonViewerPanel(LayoutManager layout, EditorEx editor) {
         super(layout);
-        this.jsonTextField = jsonTextField;
+        this.editor = editor;
     }
 
-    public LanguageTextField getJsonTextField() {
-        return jsonTextField;
+    @NotNull
+    public EditorEx getEditor() {
+        return editor;
     }
 }

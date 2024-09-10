@@ -7,13 +7,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.ui.LanguageTextField;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -21,11 +19,11 @@ import java.util.Objects;
  */
 public class JsonBeautifyToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
-    private final LanguageTextField languageTextField;
+    private final EditorEx editor;
 
-    public JsonBeautifyToolWindowAction(LanguageTextField languageTextField, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonBeautifyToolWindowAction(@NotNull EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
-        this.languageTextField = languageTextField;
+        this.editor = editor;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.beautify.text"));
@@ -36,13 +34,12 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        JsonBeautifyAction.handleJsonBeautify(e, Objects.requireNonNull(languageTextField.getEditor()));
+        JsonBeautifyAction.handleJsonBeautify(e, editor);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(null != e.getProject()
-                && null != languageTextField.getEditor()
-                && JsonAssistantUtil.isJsonOrExtract(languageTextField.getText()));
+        e.getPresentation().setEnabled(null != e.getProject() && JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
     }
+
 }

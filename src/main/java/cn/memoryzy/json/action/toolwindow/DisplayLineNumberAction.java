@@ -11,10 +11,9 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.impl.EditorImpl;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.content.Content;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -52,17 +51,14 @@ public class DisplayLineNumberAction extends ToggleAction implements DumbAware {
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
         Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
-        LanguageTextField languageTextField = JsonAssistantUtil.getLanguageTextFieldOnContent(content);
+        EditorEx editor = JsonAssistantUtil.getEditorOnContent(content);
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        if (languageTextField != null) {
-            EditorImpl editor = (EditorImpl) languageTextField.getEditor();
-            if (editor == null) {
-                LOG.error("[Display Line Number] Editor is null");
-                propertiesComponent.setValue(DISPLAY_LINE_NUMBER_ENABLED_KEY, Boolean.FALSE.toString());
-                return;
-            }
-
+        if (editor != null) {
             showLineNumber(editor, state);
+        } else {
+            LOG.error("[Display Line Number] Editor is null");
+            propertiesComponent.setValue(DISPLAY_LINE_NUMBER_ENABLED_KEY, Boolean.FALSE.toString());
+            return;
         }
 
         if (state) propertiesComponent.setValue(DISPLAY_LINE_NUMBER_ENABLED_KEY, Boolean.TRUE.toString());
@@ -73,7 +69,7 @@ public class DisplayLineNumberAction extends ToggleAction implements DumbAware {
         return Boolean.TRUE.toString().equals(PropertiesComponent.getInstance().getValue(DISPLAY_LINE_NUMBER_ENABLED_KEY));
     }
 
-    public static void showLineNumber(EditorImpl editor, boolean shown) {
+    public static void showLineNumber(EditorEx editor, boolean shown) {
         Border border;
         EditorSettings settings = editor.getSettings();
         // 如果需要显示行号，而编辑器正好是展示状态

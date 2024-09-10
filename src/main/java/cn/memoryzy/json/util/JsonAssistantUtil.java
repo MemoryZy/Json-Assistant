@@ -28,6 +28,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
@@ -40,7 +41,6 @@ import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.ui.LanguageTextField;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -121,17 +121,15 @@ public class JsonAssistantUtil {
     public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
-
         Content mainContent = getMainContent(toolWindow);
-        LanguageTextField languageTextFieldOnContent = getLanguageTextFieldOnContent(mainContent);
-        // noinspection DataFlowIssue
-        if (StrUtil.isBlank(languageTextFieldOnContent.getText())) {
-            languageTextFieldOnContent.setText(processedText);
+        EditorEx editor = getEditorOnContent(mainContent);
+
+        if (StrUtil.isBlank(Objects.requireNonNull(editor).getDocument().getText())) {
+            WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(processedText));
         } else {
             Content content = addNewContent(project, toolWindow, contentFactory);
-            LanguageTextField languageTextField = getLanguageTextFieldOnContent(content);
-            // noinspection DataFlowIssue
-            languageTextField.setText(processedText);
+            EditorEx editorEx = getEditorOnContent(content);
+            WriteCommandAction.runWriteCommandAction(project, () -> Objects.requireNonNull(editorEx).getDocument().setText(processedText));
         }
 
         toolWindow.show();
@@ -282,12 +280,12 @@ public class JsonAssistantUtil {
         return contentManager.getContent(0);
     }
 
-    public static LanguageTextField getLanguageTextFieldOnContent(Content content) {
+    public static EditorEx getEditorOnContent(Content content) {
         if (Objects.nonNull(content)) {
             SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
             JsonViewerPanel viewerPanel = (JsonViewerPanel) windowPanel.getContent();
             if (Objects.nonNull(viewerPanel)) {
-                return viewerPanel.getJsonTextField();
+                return viewerPanel.getEditor();
             }
         }
 
@@ -299,7 +297,7 @@ public class JsonAssistantUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonViewerWindow window = new JsonViewerWindow(project, false);
+        JsonViewerWindow window = new JsonViewerWindow(project, false, false);
         Content content = contentFactory.createContent(window.getRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);

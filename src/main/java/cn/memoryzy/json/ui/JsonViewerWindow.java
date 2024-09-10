@@ -1,37 +1,38 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
-import cn.memoryzy.json.ui.component.editor.FoldingLanguageTextEditor;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.json.JsonLanguage;
+import cn.memoryzy.json.util.UIManager;
+import com.intellij.execution.impl.ConsoleViewUtil;
+import com.intellij.ide.ui.UISettings;
+import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
-import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.FoldRegion;
-import com.intellij.openapi.editor.impl.EditorImpl;
+import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
+import com.intellij.openapi.editor.ex.FocusChangeListener;
+import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
-import com.intellij.ui.LanguageTextField;
+import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -39,38 +40,26 @@ import java.util.Objects;
  */
 public class JsonViewerWindow {
 
-    private LanguageTextField jsonTextField;
     private final Project project;
+    private final boolean firstContent;
     private final boolean initWindow;
     private final JsonViewerHistoryState historyState;
+    private EditorEx editor;
 
-    /**
-     * 上次光标所在记录
-     */
-    private int lastOffset = 0;
-
-    /**
-     * 编辑器折叠区域
-     */
-    private final List<FoldRegion> lastRegions = new ArrayList<>();
-
-    public JsonViewerWindow(Project project, boolean initWindow) {
+    public JsonViewerWindow(Project project, boolean firstContent, boolean initWindow) {
         this.project = project;
+        this.firstContent = firstContent;
         this.initWindow = initWindow;
         this.historyState = JsonViewerHistoryState.getInstance(project);
     }
 
     public JComponent getRootPanel() {
-        this.jsonTextField = new FoldingLanguageTextEditor(JsonLanguage.INSTANCE, project, "");
-        this.jsonTextField.setFont(new Font("Consolas", Font.PLAIN, 15));
-        this.jsonTextField.addFocusListener(new FocusListenerImpl());
-        this.jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
-        this.jsonTextField.setShowPlaceholderWhenFocused(true);
-        this.initEditorText();
+        TextEditor textEditor = createEditorComponent();
+        this.editor = (EditorEx) textEditor.getEditor();
 
-        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.jsonTextField);
+        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.editor);
         JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(jsonTextField, BorderLayout.CENTER);
+        centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
 
         SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
@@ -79,22 +68,63 @@ public class JsonViewerWindow {
         return simpleToolWindowPanel;
     }
 
+    private TextEditor createEditorComponent() {
+        TextEditor textEditor = UIManager.createDefaultTextEditor(project, JsonFileType.INSTANCE, getInitText());
+        EditorEx editor = (EditorEx) textEditor.getEditor();
+
+        EditorSettings settings = editor.getSettings();
+        // 行号显示
+        toggleLineNumbers(editor);
+        // 设置显示的缩进导轨
+        settings.setIndentGuidesShown(true);
+        // 折叠块显示
+        settings.setFoldingOutlineShown(PlatformUtil.isNewUi());
+        // 折叠块、行号所展示的区域
+        settings.setLineMarkerAreaShown(false);
+        // 显示设置插入符行（光标选中行会变黄）
+        settings.setCaretRowShown(true);
+
+        EditorGutterComponentEx gutterComponentEx = editor.getGutterComponentEx();
+        // 设置绘画背景
+        gutterComponentEx.setPaintBackground(false);
+
+        DelegateColorScheme scheme = ConsoleViewUtil.updateConsoleColorScheme(editor.getColorsScheme());
+        if (UISettings.getInstance().getPresentationMode()) {
+            scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
+        }
+        editor.setColorsScheme(scheme);
+
+        if (firstContent) {
+            editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
+            editor.setShowPlaceholderWhenFocused(true);
+        }
+
+        editor.setBorder(JBUI.Borders.empty());
+
+        editor.addFocusListener(new FocusListenerImpl());
+
+        JComponent component = textEditor.getComponent();
+        component.setFont(new Font("Consolas", Font.PLAIN, 15));
+
+        return textEditor;
+    }
+
     public JComponent createToolbar(SimpleToolWindowPanel simpleToolWindowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonBeautifyToolWindowAction(jsonTextField, simpleToolWindowPanel));
-        actionGroup.add(new JsonMinifyToolWindowAction(jsonTextField, simpleToolWindowPanel));
+        actionGroup.add(new JsonBeautifyToolWindowAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new JsonMinifyToolWindowAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new JsonStructureToolWindowAction(jsonTextField, simpleToolWindowPanel));
-        actionGroup.add(new JsonPathAction(jsonTextField, simpleToolWindowPanel));
+        actionGroup.add(new JsonStructureToolWindowAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new JsonPathAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new SaveToDiskAction(jsonTextField));
-        actionGroup.add(new ClearEditorAction(jsonTextField));
+        actionGroup.add(new SaveToDiskAction(editor));
+        actionGroup.add(new ClearEditorAction(editor));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         return toolbar.getComponent();
     }
 
-    private void initEditorText() {
+    private String getInitText() {
         if (initWindow) {
             String jsonStr = "";
             String clipboard = PlatformUtil.getClipboard();
@@ -110,107 +140,60 @@ public class JsonViewerWindow {
                 }
             }
 
-            if (StrUtil.isNotBlank(jsonStr)) {
-                jsonTextField.setText(jsonStr);
-            }
+            return StrUtil.isNotBlank(jsonStr) ? jsonStr : "";
         }
+
+        return "";
     }
 
 
     private void pasteJsonToEditor() {
         if (initWindow) {
-            String text = jsonTextField.getText();
+            String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);
-                        jsonTextField.setText(jsonStr);
+                        String finalJsonStr = jsonStr;
+                        WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(finalJsonStr));
                     }
                 }
             }
         }
     }
 
-    private void toggleLineNumbers() {
-        EditorImpl editor = (EditorImpl) Objects.requireNonNull(jsonTextField.getEditor());
+    private void toggleLineNumbers(EditorEx editor) {
         DisplayLineNumberAction.showLineNumber(editor, DisplayLineNumberAction.isShownLineNumbers());
     }
 
     private void addJsonToHistory() {
         LimitedList<String> historyList = historyState.getHistory();
-        String text = StrUtil.trim(jsonTextField.getText());
+        String text = StrUtil.trim(editor.getDocument().getText());
 
         if (JsonUtil.isJsonStr(text)) {
             historyList.add(text);
         }
     }
 
-    private void storeCaretOffset() {
-        Editor editor = jsonTextField.getEditor();
-        if (editor == null) return;
-        if (StrUtil.isBlank(jsonTextField.getText())) return;
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        this.lastOffset = primaryCaret.getOffset();
-    }
 
-    private void moveToOffset() {
-        Editor editor = jsonTextField.getEditor();
-        if (editor == null) return;
-        if (StrUtil.isBlank(jsonTextField.getText())) return;
-        editor.getCaretModel().getPrimaryCaret().moveToOffset(this.lastOffset);
-    }
-
-    private void storeFoldRegion() {
-        this.lastRegions.clear();
-        Editor editor = jsonTextField.getEditor();
-        if (editor == null) return;
-        FoldRegion[] allRegions = editor.getFoldingModel().getAllFoldRegions();
-        if (ArrayUtil.isEmpty(allRegions)) return;
-        for (FoldRegion region : allRegions) {
-            if (!region.isExpanded()) {
-                // 记录折叠区域
-                this.lastRegions.add(region);
-            }
-        }
-    }
-
-    private void recoverFoldRegion() {
-        if (CollUtil.isEmpty(this.lastRegions)) return;
-        try {
-            for (FoldRegion region : this.lastRegions) {
-                if (region.isExpanded())
-                    region.setExpanded(false);
-            }
-        } catch (Exception ignored) {
-        }
-    }
-
-    private class FocusListenerImpl extends FocusAdapter {
+    private class FocusListenerImpl implements FocusChangeListener {
 
         @Override
-        public void focusGained(FocusEvent event) {
+        public void focusGained(@NotNull Editor e) {
             // --------------------------- 获取焦点时
             // 获取剪贴板的 JSON 并设置到编辑器内
             pasteJsonToEditor();
             // 行号显示
-            toggleLineNumbers();
-            // 切换回光标位置
-            moveToOffset();
-            recoverFoldRegion();
-
+            toggleLineNumbers(editor);
         }
 
         @Override
-        public void focusLost(FocusEvent event) {
+        public void focusLost(@NotNull Editor editor) {
             // --------------------------- 失去焦点时
             // 添加当前编辑器的 JSON 至历史记录
             addJsonToHistory();
-            // 焦点丢失时记录当前编辑器内的光标位置，待下次重新获取焦点时，切换到该光标位置
-            storeCaretOffset();
-            storeFoldRegion();
-
         }
     }
 
