@@ -3,7 +3,6 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -15,10 +14,7 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.content.Content;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.border.Border;
 
 /**
  * @author Memory
@@ -70,7 +66,6 @@ public class DisplayLineNumberAction extends ToggleAction implements DumbAware {
     }
 
     public static void showLineNumber(EditorEx editor, boolean shown) {
-        Border border;
         EditorSettings settings = editor.getSettings();
         // 如果需要显示行号，而编辑器正好是展示状态
         boolean shownLineNumbersStatus = settings.isLineNumbersShown();
@@ -78,21 +73,14 @@ public class DisplayLineNumberAction extends ToggleAction implements DumbAware {
             if (shownLineNumbersStatus) {
                 return;
             }
-
-            // 需要显示，而编辑器为非展示状态
-            border = JBUI.Borders.emptyTop(2);
         } else {
             if (!shownLineNumbersStatus) {
                 return;
             }
-
-            // 不需要显示，而编辑器为显示状态
-            border = JBUI.Borders.empty(2, PlatformUtil.isNewUi() ? 0 : 3, 0, 0);
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {
             settings.setLineNumbersShown(shown);
-            editor.setBorder(border);
             editor.reinitSettings();
         });
     }

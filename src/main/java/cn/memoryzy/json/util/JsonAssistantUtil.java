@@ -280,13 +280,19 @@ public class JsonAssistantUtil {
         return contentManager.getContent(0);
     }
 
-    public static EditorEx getEditorOnContent(Content content) {
+    public static JsonViewerPanel getPanelOnContent(Content content) {
         if (Objects.nonNull(content)) {
             SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
-            JsonViewerPanel viewerPanel = (JsonViewerPanel) windowPanel.getContent();
-            if (Objects.nonNull(viewerPanel)) {
-                return viewerPanel.getEditor();
-            }
+            return (JsonViewerPanel) windowPanel.getContent();
+        }
+
+        return null;
+    }
+
+    public static EditorEx getEditorOnContent(Content content) {
+        JsonViewerPanel viewerPanel = getPanelOnContent(content);
+        if (Objects.nonNull(viewerPanel)) {
+            return viewerPanel.getEditor();
         }
 
         return null;

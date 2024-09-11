@@ -10,8 +10,6 @@ import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.execution.impl.ConsoleViewUtil;
-import com.intellij.ide.ui.UISettings;
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -20,7 +18,9 @@ import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorSettings;
-import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.editor.ex.FocusChangeListener;
@@ -28,7 +28,6 @@ import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -45,6 +44,7 @@ public class JsonViewerWindow {
     private final boolean initWindow;
     private final JsonViewerHistoryState historyState;
     private EditorEx editor;
+    private EditorColorsScheme defaultColorsScheme;
 
     public JsonViewerWindow(Project project, boolean firstContent, boolean initWindow) {
         this.project = project;
@@ -57,7 +57,7 @@ public class JsonViewerWindow {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
-        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.editor);
+        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.editor, this.defaultColorsScheme);
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
@@ -69,7 +69,8 @@ public class JsonViewerWindow {
     }
 
     private TextEditor createEditorComponent() {
-        TextEditor textEditor = UIManager.createDefaultTextEditor(project, JsonFileType.INSTANCE, getInitText());
+        String initText = getInitText();
+        TextEditor textEditor = UIManager.createDefaultTextEditor(project, JsonFileType.INSTANCE, initText);
         EditorEx editor = (EditorEx) textEditor.getEditor();
 
         EditorSettings settings = editor.getSettings();
@@ -78,30 +79,26 @@ public class JsonViewerWindow {
         // 设置显示的缩进导轨
         settings.setIndentGuidesShown(true);
         // 折叠块显示
-        settings.setFoldingOutlineShown(PlatformUtil.isNewUi());
+        settings.setFoldingOutlineShown(true);
         // 折叠块、行号所展示的区域
         settings.setLineMarkerAreaShown(false);
         // 显示设置插入符行（光标选中行会变黄）
-        settings.setCaretRowShown(true);
+        settings.setCaretRowShown(StrUtil.isNotBlank(initText));
 
         EditorGutterComponentEx gutterComponentEx = editor.getGutterComponentEx();
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
 
-        DelegateColorScheme scheme = ConsoleViewUtil.updateConsoleColorScheme(editor.getColorsScheme());
-        if (UISettings.getInstance().getPresentationMode()) {
-            scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
-        }
-        editor.setColorsScheme(scheme);
+        this.defaultColorsScheme = editor.getColorsScheme();
+        FollowEditorThemeAction.changeColorSchema(editor, defaultColorsScheme, FollowEditorThemeAction.isFollowEditorTheme());
 
         if (firstContent) {
             editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
             editor.setShowPlaceholderWhenFocused(true);
         }
 
-        editor.setBorder(JBUI.Borders.empty());
-
         editor.addFocusListener(new FocusListenerImpl());
+        editor.getDocument().addDocumentListener(new DocumentListenerImpl(editor));
 
         JComponent component = textEditor.getComponent();
         component.setFont(new Font("Consolas", Font.PLAIN, 15));
@@ -194,6 +191,29 @@ public class JsonViewerWindow {
             // --------------------------- 失去焦点时
             // 添加当前编辑器的 JSON 至历史记录
             addJsonToHistory();
+        }
+    }
+
+    private static class DocumentListenerImpl implements DocumentListener {
+        private final EditorEx editor;
+        public DocumentListenerImpl(EditorEx editor) {
+            this.editor = editor;
+        }
+
+        @Override
+        public void documentChanged(@NotNull DocumentEvent event) {
+            EditorSettings settings = editor.getSettings();
+            // 编辑器原来为空，新增不为空，表示新增
+            if (StrUtil.isBlank(event.getOldFragment()) && StrUtil.isNotBlank(event.getNewFragment())) {
+                if (!settings.isCaretRowShown()) {
+                    settings.setCaretRowShown(true);
+                }
+            } else if (StrUtil.isNotBlank(event.getOldFragment()) && StrUtil.isBlank(event.getNewFragment())) {
+                // 编辑器原来不为空，新增为空，表示全部删除
+                if (settings.isCaretRowShown()) {
+                    settings.setCaretRowShown(false);
+                }
+            }
         }
     }
 

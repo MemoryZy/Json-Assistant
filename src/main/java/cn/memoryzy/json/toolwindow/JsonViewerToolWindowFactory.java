@@ -63,6 +63,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         group.add(Separator.create());
         group.add(new LoadLastRecordAction(toolWindowEx));
         group.add(new DisplayLineNumberAction(toolWindowEx));
+        group.add(new FollowEditorThemeAction(toolWindowEx));
         group.add(Separator.create());
         group.add(new EditInNewWindowAction(toolWindowEx));
         group.add(Separator.create());
