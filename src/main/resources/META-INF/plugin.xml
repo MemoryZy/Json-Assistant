@@ -30,7 +30,14 @@
                     canCloseContents="true"
                     doNotActivateOnStart="true"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryState"/>
+        <applicationConfigurable
+                parentId="tools"
+                instance="cn.memoryzy.json.extension.EditorOptionsConfigurable"
+                id="JsonAssistant.Configurable.EditorOptionsConfigurable"
+                displayName="Json Assistant"/>
+
+        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryPersistentState"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.EditorOptionsPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>
     </extensions>
 

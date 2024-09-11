@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryState;
+import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -37,20 +37,20 @@ import java.awt.*;
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonViewerWindow {
+public class JsonViewerComponentProvider {
 
     private final Project project;
     private final boolean firstContent;
     private final boolean initWindow;
-    private final JsonViewerHistoryState historyState;
+    private final JsonViewerHistoryPersistentState historyState;
     private EditorEx editor;
     private EditorColorsScheme defaultColorsScheme;
 
-    public JsonViewerWindow(Project project, boolean firstContent, boolean initWindow) {
+    public JsonViewerComponentProvider(Project project, boolean firstContent, boolean initWindow) {
         this.project = project;
         this.firstContent = firstContent;
         this.initWindow = initWindow;
-        this.historyState = JsonViewerHistoryState.getInstance(project);
+        this.historyState = JsonViewerHistoryPersistentState.getInstance(project);
     }
 
     public JComponent getRootPanel() {
@@ -130,7 +130,7 @@ public class JsonViewerWindow {
             }
 
             if (StrUtil.isBlank(jsonStr) && LoadLastRecordAction.isLoadLastRecord()) {
-                JsonViewerHistoryState state = JsonViewerHistoryState.getInstance(project);
+                JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
                 LimitedList<String> history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
                     jsonStr = history.get(0);

@@ -5,7 +5,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryState;
+import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
@@ -67,7 +67,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         showTextField = new ViewerModeLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
-        JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
+        JsonViewerHistoryPersistentState historyState = JsonViewerHistoryPersistentState.getInstance(project);
         LimitedList<String> historyList = historyState.getHistory();
         List<HistoryModel> historyModels = HistoryModel.of(historyList);
         DefaultListModel<HistoryModel> defaultListModel = JBList.createDefaultListModel(historyModels);

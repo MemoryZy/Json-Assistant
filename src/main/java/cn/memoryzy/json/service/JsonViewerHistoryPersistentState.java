@@ -16,24 +16,24 @@ import java.util.Objects;
  * @since 2024/7/22
  */
 @State(name = "JsonAssistantJsonViewerHistory")
-public class JsonViewerHistoryState implements PersistentStateComponent<JsonViewerHistoryState> {
+public class JsonViewerHistoryPersistentState implements PersistentStateComponent<JsonViewerHistoryPersistentState> {
 
     public static final int HISTORY_LIMIT = 25;
 
-    public static JsonViewerHistoryState getInstance(Project project) {
-        return project.getService(JsonViewerHistoryState.class);
+    public static JsonViewerHistoryPersistentState getInstance(Project project) {
+        return project.getService(JsonViewerHistoryPersistentState.class);
     }
 
     @Attribute(converter = LimitedListConverter.class)
     public LimitedList<String> historyList;
 
     @Override
-    public @Nullable JsonViewerHistoryState getState() {
+    public @Nullable JsonViewerHistoryPersistentState getState() {
         return this;
     }
 
     @Override
-    public void loadState(@NotNull JsonViewerHistoryState state) {
+    public void loadState(@NotNull JsonViewerHistoryPersistentState state) {
         this.historyList = state.historyList;
     }
 
@@ -52,7 +52,7 @@ public class JsonViewerHistoryState implements PersistentStateComponent<JsonView
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        JsonViewerHistoryState that = (JsonViewerHistoryState) o;
+        JsonViewerHistoryPersistentState that = (JsonViewerHistoryPersistentState) o;
         return Objects.equals(historyList, that.historyList);
     }
 

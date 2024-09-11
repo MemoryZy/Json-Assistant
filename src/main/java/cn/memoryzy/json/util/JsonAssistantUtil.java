@@ -11,7 +11,7 @@ import cn.memoryzy.json.model.formats.BaseFormatModel;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.model.formats.XmlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
-import cn.memoryzy.json.ui.JsonViewerWindow;
+import cn.memoryzy.json.ui.JsonViewerComponentProvider;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.execution.ui.ConsoleView;
@@ -303,7 +303,7 @@ public class JsonAssistantUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonViewerWindow window = new JsonViewerWindow(project, false, false);
+        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, false, false);
         Content content = contentFactory.createContent(window.getRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);

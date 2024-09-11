@@ -3,7 +3,7 @@ package cn.memoryzy.json.action;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryState;
+import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -39,7 +39,7 @@ public class RemoveListElementAction extends DumbAwareAction {
         HistoryModel selectedValue = list.getSelectedValue();
         if (selectedValue == null) return;
 
-        JsonViewerHistoryState state = JsonViewerHistoryState.getInstance(project);
+        JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
         LimitedList<String> historyList = state.getHistory();
         historyList.remove(selectedValue.getIndex());
 

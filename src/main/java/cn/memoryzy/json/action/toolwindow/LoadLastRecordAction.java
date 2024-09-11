@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryState;
+import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -57,7 +57,7 @@ public class LoadLastRecordAction extends ToggleAction implements DumbAware {
             if (editor != null) {
                 DocumentEx document = editor.getDocument();
                 if (StrUtil.isBlank(document.getText())) {
-                    JsonViewerHistoryState historyState = JsonViewerHistoryState.getInstance(project);
+                    JsonViewerHistoryPersistentState historyState = JsonViewerHistoryPersistentState.getInstance(project);
                     LimitedList<String> history = historyState.getHistory();
                     if (CollUtil.isNotEmpty(history)) {
                         WriteCommandAction.runWriteCommandAction(project, () -> {

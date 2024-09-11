@@ -5,7 +5,7 @@ import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.ui.JsonViewerWindow;
+import cn.memoryzy.json.ui.JsonViewerComponentProvider;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
@@ -48,7 +48,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
         // 主界面
-        JsonViewerWindow window = new JsonViewerWindow(project, true, true);
+        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, true, true);
 
         // 选项卡旁
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
@@ -61,6 +61,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         group.add(new MoveToEditorAction(toolWindowEx));
         group.add(new FloatingWindowAction(toolWindowEx));
         group.add(Separator.create());
+        group.add(new ConfigureEditorOptionsAction());
         group.add(new LoadLastRecordAction(toolWindowEx));
         group.add(new DisplayLineNumberAction(toolWindowEx));
         group.add(new FollowEditorThemeAction(toolWindowEx));
