@@ -4,7 +4,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.ui.JsonPathPanel;
+import cn.memoryzy.json.ui.JsonPathComponentProvider;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
@@ -117,9 +117,9 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     }
 
     private void showComponentPopup(@NotNull AnActionEvent e, Project project) {
-        JsonPathPanel jsonPathPanel = new JsonPathPanel(project, editor);
-        JPanel rootPanel = jsonPathPanel.createRootPanel();
-        JComponent expressionComboBoxTextField = jsonPathPanel.getPathExpressionComboBoxTextField();
+        JsonPathComponentProvider jsonPathComponentProvider = new JsonPathComponentProvider(project, editor);
+        JPanel rootPanel = jsonPathComponentProvider.createRootPanel();
+        JComponent expressionComboBoxTextField = jsonPathComponentProvider.getPathExpressionComboBoxTextField();
 
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         boolean hasShown = propertiesComponent.getBoolean(JSON_PATH_GUIDE_KEY, false);
@@ -143,15 +143,15 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .createPopup();
 
         // Enter
-        DumbAwareAction.create(event -> jsonPathPanel.getAction().run())
+        DumbAwareAction.create(event -> jsonPathComponentProvider.getAction().run())
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), expressionComboBoxTextField, popup);
 
         // Alt+向上箭头
-        DumbAwareAction.create(event -> jsonPathPanel.searchHistory(true))
+        DumbAwareAction.create(event -> jsonPathComponentProvider.searchHistory(true))
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), expressionComboBoxTextField, popup);
 
         // Alt+向下箭头
-        DumbAwareAction.create(event -> jsonPathPanel.searchHistory(false))
+        DumbAwareAction.create(event -> jsonPathComponentProvider.searchHistory(false))
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), expressionComboBoxTextField, popup);
 
         // 弹出

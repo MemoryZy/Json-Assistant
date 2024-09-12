@@ -41,8 +41,8 @@ import java.util.*;
  * @author Memory
  * @since 2024/8/14
  */
-public class JsonPathPanel {
-    private static final Logger LOG = Logger.getInstance(JsonPathPanel.class);
+public class JsonPathComponentProvider {
+    private static final Logger LOG = Logger.getInstance(JsonPathComponentProvider.class);
     public static final String JSON_PATH_FILE_TYPE_CLASS_NAME = "com.intellij.jsonpath.JsonPathFileType";
     public static final Class<?> JSON_PATH_FILE_TYPE_CLASS = JsonAssistantUtil.getClassByName(JSON_PATH_FILE_TYPE_CLASS_NAME);
     public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
@@ -55,7 +55,7 @@ public class JsonPathPanel {
     private CollectionComboBoxModel<String> comboBoxModel;
     private TextEditorErrorPopupDecorator pathErrorDecorator;
 
-    public JsonPathPanel(Project project, EditorEx editor) {
+    public JsonPathComponentProvider(Project project, EditorEx editor) {
         this.project = project;
         this.action = () -> handleJsonPathResult(editor.getDocument().getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
@@ -248,7 +248,7 @@ public class JsonPathPanel {
 
     public static FileType getJsonPathFileType() {
         FileType fileType = PlainTextFileType.INSTANCE;
-        Object instance = JsonAssistantUtil.readStaticFinalFieldValue(JsonPathPanel.JSON_PATH_FILE_TYPE_CLASS, "INSTANCE");
+        Object instance = JsonAssistantUtil.readStaticFinalFieldValue(JsonPathComponentProvider.JSON_PATH_FILE_TYPE_CLASS, "INSTANCE");
         if (instance instanceof FileType) {
             fileType = (FileType) instance;
         }
