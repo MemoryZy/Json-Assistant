@@ -73,7 +73,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         toolWindowEx.setTitleActions(titleActions);
         toolWindowEx.setAdditionalGearActions(group);
 
-        Content content = contentFactory.createContent(window.getRootPanel(), PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME, false);
+        Content content = contentFactory.createContent(window.createRootPanel(), PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME, false);
         content.setCloseable(false);
         contentManager.addContent(content, 0);
 

@@ -53,7 +53,7 @@ public class JsonViewerComponentProvider {
         this.historyState = JsonViewerHistoryPersistentState.getInstance(project);
     }
 
-    public JComponent getRootPanel() {
+    public JComponent createRootPanel() {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 

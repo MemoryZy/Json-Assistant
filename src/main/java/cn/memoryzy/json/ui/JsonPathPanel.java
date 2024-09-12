@@ -63,7 +63,7 @@ public class JsonPathPanel {
         this.showTextEditor.setFont(JBUI.Fonts.create("Consolas", 14));
     }
 
-    public JPanel getRootPanel() {
+    public JPanel createRootPanel() {
         JBLabel tipLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.history.tip"));
         tipLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         tipLabel.setForeground(JBColor.GRAY);

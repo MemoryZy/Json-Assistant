@@ -1,8 +1,8 @@
 package cn.memoryzy.json.extension;
 
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.service.EditorOptionsPersistentState;
+import cn.memoryzy.json.ui.EditorOptionsComponentProvider;
 import com.intellij.openapi.options.Configurable;
-import com.intellij.openapi.options.ConfigurationException;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -13,23 +13,39 @@ import javax.swing.*;
  */
 public class EditorOptionsConfigurable implements Configurable {
 
+    private EditorOptionsPersistentState persistentState;
+    private EditorOptionsComponentProvider componentProvider;
+
     @Override
     public String getDisplayName() {
-        return JsonAssistantPlugin.PLUGIN_NAME;
+        return "Json Viewer";
     }
 
     @Override
     public @Nullable JComponent createComponent() {
-        return null;
+        if (persistentState == null) persistentState = EditorOptionsPersistentState.getInstance();
+        if (componentProvider == null) componentProvider = new EditorOptionsComponentProvider(persistentState);
+        return componentProvider.createRootPanel();
+    }
+
+    @Override
+    public void reset() {
+        if (componentProvider != null) componentProvider.reset();
     }
 
     @Override
     public boolean isModified() {
-        return false;
+        return componentProvider != null && componentProvider.isModified();
     }
 
     @Override
-    public void apply() throws ConfigurationException {
+    public void apply() {
+        if (componentProvider != null) componentProvider.apply();
+    }
 
+    @Override
+    public void disposeUIResources() {
+        persistentState = null;
+        componentProvider = null;
     }
 }
