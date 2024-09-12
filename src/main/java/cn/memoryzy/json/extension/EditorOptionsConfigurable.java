@@ -1,6 +1,5 @@
 package cn.memoryzy.json.extension;
 
-import cn.memoryzy.json.service.EditorOptionsPersistentState;
 import cn.memoryzy.json.ui.EditorOptionsComponentProvider;
 import com.intellij.openapi.options.Configurable;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +12,6 @@ import javax.swing.*;
  */
 public class EditorOptionsConfigurable implements Configurable {
 
-    private EditorOptionsPersistentState persistentState;
     private EditorOptionsComponentProvider componentProvider;
 
     @Override
@@ -23,8 +21,7 @@ public class EditorOptionsConfigurable implements Configurable {
 
     @Override
     public @Nullable JComponent createComponent() {
-        if (persistentState == null) persistentState = EditorOptionsPersistentState.getInstance();
-        if (componentProvider == null) componentProvider = new EditorOptionsComponentProvider(persistentState);
+        if (componentProvider == null) componentProvider = new EditorOptionsComponentProvider();
         return componentProvider.createRootPanel();
     }
 
@@ -45,7 +42,6 @@ public class EditorOptionsConfigurable implements Configurable {
 
     @Override
     public void disposeUIResources() {
-        persistentState = null;
         componentProvider = null;
     }
 }

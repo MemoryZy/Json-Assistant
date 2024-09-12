@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -28,10 +29,9 @@ public class EditorOptionsComponentProvider {
     private JBLabel foldingOutlineTextLabel;
     private JBLabel loadLastRecordTipLabel;
 
-    private final EditorOptionsPersistentState persistentState;
+    private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
-    public EditorOptionsComponentProvider(EditorOptionsPersistentState persistentState) {
-        this.persistentState = persistentState;
+    public EditorOptionsComponentProvider() {
         generalLabel.setText(JsonAssistantBundle.messageOnSystem("editor.options.configurable.component.general.text"));
         loadLastRecordCb.setSelected(persistentState.loadLastRecord);
         loadLastRecordTextLabel.setText(JsonAssistantBundle.messageOnSystem("editor.options.configurable.component.load.last.record.cb.text"));
@@ -50,23 +50,35 @@ public class EditorOptionsComponentProvider {
 
         foldingOutlineCb.setSelected(persistentState.foldingOutline);
         foldingOutlineTextLabel.setText(JsonAssistantBundle.messageOnSystem("editor.options.configurable.component.folding.outline.cb.text"));
-
-
     }
 
     public JComponent createRootPanel() {
-
         return rootPanel;
     }
 
     public void reset() {
-
+        // 恢复为初始状态
+        loadLastRecordCb.setSelected(persistentState.loadLastRecord);
+        followEditorThemeCb.setSelected(persistentState.followEditorTheme);
+        displayLineNumbersCb.setSelected(persistentState.displayLineNumbers);
+        foldingOutlineCb.setSelected(persistentState.foldingOutline);
     }
 
     public boolean isModified() {
+        boolean oldLoadLastRecord = persistentState.loadLastRecord;
+        boolean oldFollowEditorTheme = persistentState.followEditorTheme;
+        boolean oldDisplayLineNumbers = persistentState.displayLineNumbers;
+        boolean oldFoldingOutline = persistentState.foldingOutline;
 
+        boolean loadLastRecord = loadLastRecordCb.isSelected();
+        boolean followEditorTheme = followEditorThemeCb.isSelected();
+        boolean displayLineNumbers = displayLineNumbersCb.isSelected();
+        boolean foldingOutline = foldingOutlineCb.isSelected();
 
-        return false;
+        return !Objects.equals(oldLoadLastRecord, loadLastRecord)
+                || !Objects.equals(oldFollowEditorTheme, followEditorTheme)
+                || !Objects.equals(oldDisplayLineNumbers, displayLineNumbers)
+                || !Objects.equals(oldFoldingOutline, foldingOutline);
     }
 
     public void apply() {
