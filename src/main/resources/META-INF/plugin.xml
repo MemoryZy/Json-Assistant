@@ -30,17 +30,20 @@
                     canCloseContents="true"
                     doNotActivateOnStart="true"/>
 
-        <groupConfigurable id="JsonAssistant.Configurable.JsonAssistantMainGroupConfigurable"
-                           parentId="tools"
-                           displayNameKey="plugin.group.configurable.displayName.key"
-                           descriptionKey="plugin.group.configurable.description.key"
-                           bundle="messages.JsonAssistantBundle"/>
-        
         <applicationConfigurable
-                groupId="JsonAssistant.Configurable.JsonAssistantMainGroupConfigurable"
-                instance="cn.memoryzy.json.extension.EditorOptionsConfigurable"
+                id="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
+                parentId="tools"
+                instance="cn.memoryzy.json.extension.JsonAssistantMainConfigurable"
+                groupWeight="999"
+                bundle="messages.JsonAssistantBundle"
+                key="plugin.main.configurable.displayName"/>
+
+        <applicationConfigurable
                 id="JsonAssistant.Configurable.EditorOptionsConfigurable"
-                displayName="Json Viewer"/>
+                parentId="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
+                instance="cn.memoryzy.json.extension.EditorOptionsConfigurable"
+                bundle="messages.JsonAssistantBundle"
+                key="plugin.editor.options.configurable.displayName"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.EditorOptionsPersistentState"/>

@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/9/12
  */
-public class EditorOptionsComponentProvider {
+public class EditorOptionsConfigurableComponentProvider {
 
     private JPanel rootPanel;
     private JLabel generalLabel;
@@ -31,7 +31,7 @@ public class EditorOptionsComponentProvider {
 
     private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
-    public EditorOptionsComponentProvider() {
+    public EditorOptionsConfigurableComponentProvider() {
         generalLabel.setText(JsonAssistantBundle.messageOnSystem("editor.options.configurable.component.general.text"));
         loadLastRecordCb.setSelected(persistentState.loadLastRecord);
         loadLastRecordTextLabel.setText(JsonAssistantBundle.messageOnSystem("editor.options.configurable.component.load.last.record.cb.text"));
@@ -82,6 +82,15 @@ public class EditorOptionsComponentProvider {
     }
 
     public void apply() {
+        boolean loadLastRecord = loadLastRecordCb.isSelected();
+        boolean followEditorTheme = followEditorThemeCb.isSelected();
+        boolean displayLineNumbers = displayLineNumbersCb.isSelected();
+        boolean foldingOutline = foldingOutlineCb.isSelected();
 
+        // 导入历史记录
+        persistentState.loadLastRecord = loadLastRecord;
+        persistentState.followEditorTheme = followEditorTheme;
+        persistentState.displayLineNumbers = displayLineNumbers;
+        persistentState.foldingOutline = foldingOutline;
     }
 }

@@ -1,6 +1,5 @@
 package cn.memoryzy.json.ui.component;
 
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.EditorEx;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,12 +13,10 @@ import java.awt.*;
 public class JsonViewerPanel extends JPanel {
 
     private final EditorEx editor;
-    private final EditorColorsScheme defaultColorsScheme;
 
-    public JsonViewerPanel(LayoutManager layout, EditorEx editor, EditorColorsScheme defaultColorsScheme) {
+    public JsonViewerPanel(LayoutManager layout, EditorEx editor) {
         super(layout);
         this.editor = editor;
-        this.defaultColorsScheme = defaultColorsScheme;
     }
 
     @NotNull
@@ -27,7 +24,4 @@ public class JsonViewerPanel extends JPanel {
         return editor;
     }
 
-    public EditorColorsScheme getDefaultColorsScheme() {
-        return defaultColorsScheme;
-    }
 }

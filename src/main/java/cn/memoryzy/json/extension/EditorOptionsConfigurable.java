@@ -1,6 +1,7 @@
 package cn.memoryzy.json.extension;
 
-import cn.memoryzy.json.ui.EditorOptionsComponentProvider;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.ui.EditorOptionsConfigurableComponentProvider;
 import com.intellij.openapi.options.Configurable;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,16 +13,16 @@ import javax.swing.*;
  */
 public class EditorOptionsConfigurable implements Configurable {
 
-    private EditorOptionsComponentProvider componentProvider;
+    private EditorOptionsConfigurableComponentProvider componentProvider;
 
     @Override
     public String getDisplayName() {
-        return "Json Viewer";
+        return JsonAssistantBundle.message("plugin.editor.options.configurable.displayName");
     }
 
     @Override
     public @Nullable JComponent createComponent() {
-        if (componentProvider == null) componentProvider = new EditorOptionsComponentProvider();
+        if (componentProvider == null) componentProvider = new EditorOptionsConfigurableComponentProvider();
         return componentProvider.createRootPanel();
     }
 

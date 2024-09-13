@@ -5,20 +5,25 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.LimitedList;
+import cn.memoryzy.json.service.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
+import com.intellij.execution.impl.ConsoleViewUtil;
+import com.intellij.ide.ui.UISettings;
 import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -46,6 +51,8 @@ public class JsonViewerComponentProvider {
     private EditorEx editor;
     private EditorColorsScheme defaultColorsScheme;
 
+    private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
+
     public JsonViewerComponentProvider(Project project, boolean firstContent, boolean initWindow) {
         this.project = project;
         this.firstContent = firstContent;
@@ -57,7 +64,7 @@ public class JsonViewerComponentProvider {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
-        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.editor, this.defaultColorsScheme);
+        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.editor);
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
@@ -75,11 +82,11 @@ public class JsonViewerComponentProvider {
 
         EditorSettings settings = editor.getSettings();
         // 行号显示
-        toggleLineNumbers(editor);
+        settings.setLineNumbersShown(persistentState.displayLineNumbers);
         // 设置显示的缩进导轨
         settings.setIndentGuidesShown(true);
         // 折叠块显示
-        settings.setFoldingOutlineShown(true);
+        settings.setFoldingOutlineShown(persistentState.foldingOutline);
         // 折叠块、行号所展示的区域
         settings.setLineMarkerAreaShown(false);
         // 显示设置插入符行（光标选中行会变黄）
@@ -90,7 +97,7 @@ public class JsonViewerComponentProvider {
         gutterComponentEx.setPaintBackground(false);
 
         this.defaultColorsScheme = editor.getColorsScheme();
-        FollowEditorThemeAction.changeColorSchema(editor, defaultColorsScheme, FollowEditorThemeAction.isFollowEditorTheme());
+        toggleColorSchema(editor, defaultColorsScheme, persistentState.followEditorTheme);
 
         if (firstContent) {
             editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
@@ -129,7 +136,7 @@ public class JsonViewerComponentProvider {
                 jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
             }
 
-            if (StrUtil.isBlank(jsonStr) && LoadLastRecordAction.isLoadLastRecord()) {
+            if (StrUtil.isBlank(jsonStr) && persistentState.loadLastRecord) {
                 JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
                 LimitedList<String> history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
@@ -161,10 +168,6 @@ public class JsonViewerComponentProvider {
         }
     }
 
-    private void toggleLineNumbers(EditorEx editor) {
-        DisplayLineNumberAction.showLineNumber(editor, DisplayLineNumberAction.isShownLineNumbers());
-    }
-
     private void addJsonToHistory() {
         LimitedList<String> historyList = historyState.getHistory();
         String text = StrUtil.trim(editor.getDocument().getText());
@@ -174,6 +177,50 @@ public class JsonViewerComponentProvider {
         }
     }
 
+    public static void toggleLineNumbers(EditorEx editor, boolean display) {
+        EditorSettings settings = editor.getSettings();
+        // 如果需要显示行号，而编辑器正好是展示状态
+        boolean shownLineNumbersStatus = settings.isLineNumbersShown();
+
+        if (display) {
+            if (shownLineNumbersStatus) return;
+        } else {
+            if (!shownLineNumbersStatus) return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            settings.setLineNumbersShown(display);
+            editor.reinitSettings();
+        });
+    }
+
+    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, boolean followEditorColor) {
+        // true：跟随IDE配色；false：改为新配色
+        if (followEditorColor) {
+            editor.setColorsScheme(defaultColorsScheme);
+        } else {
+            DelegateColorScheme scheme = ConsoleViewUtil.updateConsoleColorScheme(defaultColorsScheme);
+            if (UISettings.getInstance().getPresentationMode()) {
+                scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
+            }
+            editor.setColorsScheme(scheme);
+        }
+    }
+
+    public static void toggleFoldingOutline(EditorEx editor, boolean show) {
+        EditorSettings settings = editor.getSettings();
+        boolean foldingOutlineShown = settings.isFoldingOutlineShown();
+        if (show) {
+            if (foldingOutlineShown) return;
+        } else {
+            if (!foldingOutlineShown) return;
+        }
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            settings.setFoldingOutlineShown(show);
+            editor.reinitSettings();
+        });
+    }
 
     private class FocusListenerImpl implements FocusChangeListener {
 
@@ -183,7 +230,11 @@ public class JsonViewerComponentProvider {
             // 获取剪贴板的 JSON 并设置到编辑器内
             pasteJsonToEditor();
             // 行号显示
-            toggleLineNumbers(editor);
+            toggleLineNumbers(editor, persistentState.displayLineNumbers);
+            // 配色切换
+            toggleColorSchema(editor, defaultColorsScheme, persistentState.followEditorTheme);
+            // 切换展示折叠区域
+            toggleFoldingOutline(editor, persistentState.foldingOutline);
         }
 
         @Override
@@ -196,6 +247,7 @@ public class JsonViewerComponentProvider {
 
     private static class DocumentListenerImpl implements DocumentListener {
         private final EditorEx editor;
+
         public DocumentListenerImpl(EditorEx editor) {
             this.editor = editor;
         }
