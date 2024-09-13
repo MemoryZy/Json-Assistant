@@ -81,6 +81,9 @@ public class JsonViewerComponentProvider {
 
     private TextEditor createEditorComponent() {
         String initText = getInitText();
+
+
+        // TODO 在这个方法里创建 ScratchFile，参考 com.intellij.ide.scratch.ScratchFileActions.doCreateNewScratch 和 actionPerformed
         TextEditor textEditor = UIManager.createDefaultTextEditor(project, JsonFileType.INSTANCE, initText);
         EditorEx editor = (EditorEx) textEditor.getEditor();
 
