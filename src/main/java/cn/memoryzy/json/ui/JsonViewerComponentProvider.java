@@ -22,6 +22,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
@@ -33,10 +34,13 @@ import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
+import com.intellij.ui.ErrorStripeEditorCustomization;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -92,6 +96,9 @@ public class JsonViewerComponentProvider {
         // 显示设置插入符行（光标选中行会变黄）
         settings.setCaretRowShown(StrUtil.isNotBlank(initText));
 
+        ErrorStripeEditorCustomization.DISABLED.customize(editor);
+        Objects.requireNonNull(SpellCheckingEditorCustomizationProvider.getInstance().getDisabledCustomization()).customize(editor);
+
         EditorGutterComponentEx gutterComponentEx = editor.getGutterComponentEx();
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
@@ -103,6 +110,8 @@ public class JsonViewerComponentProvider {
             editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
             editor.setShowPlaceholderWhenFocused(true);
         }
+
+        editor.setBorder(JBUI.Borders.empty());
 
         editor.addFocusListener(new FocusListenerImpl());
         editor.getDocument().addDocumentListener(new DocumentListenerImpl(editor));
