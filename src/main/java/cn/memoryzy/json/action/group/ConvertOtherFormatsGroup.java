@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.group;
 
 import cn.memoryzy.json.action.transform.ToXmlAction;
+import cn.memoryzy.json.action.transform.ToYamlAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,7 +31,8 @@ public class ConvertOtherFormatsGroup extends DefaultActionGroup implements Dumb
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         return new AnAction[]{
-                new ToXmlAction()
+                new ToXmlAction(),
+                new ToYamlAction()
         };
     }
 

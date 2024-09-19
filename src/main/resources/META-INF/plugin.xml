@@ -48,11 +48,11 @@
         <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.EditorOptionsPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>
+        <errorHandler implementation="cn.memoryzy.json.extension.ErrorReporter"/>
     </extensions>
 
     <applicationListeners>
-        <listener class="cn.memoryzy.json.extension.PluginActivityManager"
-                  topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+        <listener class="cn.memoryzy.json.extension.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
     <actions>

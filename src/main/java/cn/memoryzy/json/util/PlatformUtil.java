@@ -1,14 +1,21 @@
 package cn.memoryzy.json.util;
 
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import com.intellij.ide.scratch.ScratchFileService;
+import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiDocumentManager;
@@ -22,6 +29,9 @@ import com.intellij.util.ui.TextTransferable;
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 /**
@@ -29,6 +39,7 @@ import java.util.Objects;
  * @since 2024/6/20
  */
 public class PlatformUtil {
+    private static final Logger LOG = Logger.getInstance(PlatformUtil.class);
 
     /**
      * 获取结构化文件
@@ -144,5 +155,41 @@ public class PlatformUtil {
         PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
         return psiFile == null ? null : psiFile.getFileType();
     }
+
+    public static String computeScratchDirectory() {
+        ScratchRootType rootType = ScratchRootType.getInstance();
+        ScratchFileService scratchFileService = ScratchFileService.getInstance();
+        String scratchRootPath = scratchFileService.getRootPath(rootType);
+        String directoryName = JsonAssistantPlugin.PLUGIN_NAME.replace(" ", "-");
+        return scratchRootPath + File.separator + directoryName;
+    }
+
+    public static String computeScratchProjectDirectory(Project project) {
+        ScratchRootType rootType = ScratchRootType.getInstance();
+        ScratchFileService scratchFileService = ScratchFileService.getInstance();
+        String scratchRootPath = scratchFileService.getRootPath(rootType);
+        String directoryName = JsonAssistantPlugin.PLUGIN_NAME.replace(" ", "-");
+        String projectName = project.getName().replace(" ", "-");
+        return scratchRootPath + File.separator + directoryName + File.separator + projectName;
+    }
+
+    public static VirtualFile findFileByPath(String filePath) {
+        String path = FileUtil.toSystemIndependentName(filePath);
+        return VirtualFileManager.getInstance().findFileByNioPath(Paths.get(path));
+    }
+
+    public static void deleteDirectory(Project project, String directoryPath) {
+        WriteCommandAction.runWriteCommandAction(project, () -> {
+            VirtualFile dir = findFileByPath(directoryPath);
+            if (dir != null) {
+                try {
+                    dir.delete(dir);
+                } catch (IOException e) {
+                    LOG.error(e.getMessage(), e);
+                }
+            }
+        });
+    }
+
 
 }

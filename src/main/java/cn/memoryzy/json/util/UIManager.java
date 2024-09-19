@@ -43,6 +43,7 @@ public class UIManager implements Disposable {
      * @return 编辑器
      */
     public static TextEditor createDefaultTextEditor(Project project, FileType fileType, String text) {
+        // TODO 是否需要创建物理文件，以供其他插件功能使用，例如 Json To Table
         LightVirtualFile lightVirtualFile = new LightVirtualFile("Dummy." + fileType.getDefaultExtension(), fileType, text);
         return (TextEditor) TextEditorProvider.getInstance().createEditor(project, lightVirtualFile);
     }

@@ -74,6 +74,23 @@ public class JsonUtil {
         return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
     }
 
+    public static String objectToJson(Object obj) {
+        try {
+            return MAPPER.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    public static Object jsonToObject(String jsonStr) {
+        try {
+            JsonNode jsonNode = MAPPER.readTree(jsonStr);
+            return MAPPER.convertValue(jsonNode, Object.class);
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
     /**
      * 从给定的字符串中提取JSON字符串
      *
