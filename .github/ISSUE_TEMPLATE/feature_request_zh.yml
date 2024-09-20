@@ -1,0 +1,32 @@
+name: "💡 功能需求/建议"
+description: 提出新的功能需求或建议.
+labels: ["feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请限制每个议题只包含一个需求或建议。
+  - type: textarea
+    id: description
+    attributes:
+      label: 需求/建议描述
+      placeholder: |
+        新功能/建议的预期行为是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: 建议的解决方案
+      placeholder: |
+        请以清晰简洁的方式描述您建议的解决方案。
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: 附加信息
+      placeholder: |
+        请在此处添加有关该功能需求的其他信息。
+    validations:
+      required: false

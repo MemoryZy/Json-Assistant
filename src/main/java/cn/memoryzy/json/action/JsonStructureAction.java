@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,8 +29,9 @@ public class JsonStructureAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = getEventProject(event);
         Editor editor = PlatformUtil.getEditor(event);
-        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor);
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor);
         JsonAssistantUtil.showJsonStructureDialog(model.getContent());
     }
 

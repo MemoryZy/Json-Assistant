@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,19 +35,20 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
 
     @Override
     public void update(@NotNull AnActionEvent e) {
+        Project project = getEventProject(e);
         boolean isHasJsonStr = false;
         Editor editor = PlatformUtil.getEditor(e);
         Presentation presentation = e.getPresentation();
         presentation.setVisible(false);
-        if (editor != null) {
-            isHasJsonStr = isOrHasJsonStr(editor);
+        if (project != null && editor != null) {
+            isHasJsonStr = isOrHasJsonStr(project, editor);
         }
 
         presentation.setEnabled(isHasJsonStr);
     }
 
-    public static boolean isOrHasJsonStr(Editor editor) {
-        return JsonFormatHandleModel.of(editor).isJsonStr();
+    public static boolean isOrHasJsonStr(Project project, Editor editor) {
+        return JsonFormatHandleModel.of(project, editor).isJsonStr();
     }
 
 }

@@ -36,6 +36,6 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(StrUtil.isNotBlank(editor.getDocument().getText()));
+        e.getPresentation().setEnabled(getEventProject(e) != null && StrUtil.isNotBlank(editor.getDocument().getText()));
     }
 }

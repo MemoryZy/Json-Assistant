@@ -39,7 +39,7 @@ public class JsonTextDiffAction extends DumbAwareAction {
         Project project = e.getProject();
         if (project == null) return;
         Editor editor = PlatformUtil.getEditor(e);
-        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor);
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor);
 
         String leftJsonStr;
         try {

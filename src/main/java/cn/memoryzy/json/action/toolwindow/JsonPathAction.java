@@ -192,7 +192,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
+        e.getPresentation().setEnabled(getEventProject(e) != null && JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
     }
 
 }

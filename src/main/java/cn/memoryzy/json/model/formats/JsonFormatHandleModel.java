@@ -2,15 +2,17 @@ package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.json.JsonFileType;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 
 import javax.swing.*;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -18,7 +20,7 @@ import javax.swing.*;
  */
 public class JsonFormatHandleModel extends BaseFormatModel {
 
-    private static final Logger LOG = Logger.getInstance(JsonFormatHandleModel.class);
+    public static final int LINE_COUNT_LIMIT = 500;
 
     /**
      * 是否为 JSON 格式文本
@@ -42,12 +44,12 @@ public class JsonFormatHandleModel extends BaseFormatModel {
         this.defaultHint = defaultHint;
     }
 
-    public static JsonFormatHandleModel of(Editor editor) {
-        return of(editor, null, null);
+    public static JsonFormatHandleModel of(Project project, Editor editor) {
+        return of(project, editor, null, null);
     }
 
     @SuppressWarnings("DuplicatedCode")
-    public static JsonFormatHandleModel of(Editor editor, String selectHint, String defaultHint) {
+    public static JsonFormatHandleModel of(Project project, Editor editor, String selectHint, String defaultHint) {
         if (editor == null) {
             return null;
         }
@@ -64,12 +66,17 @@ public class JsonFormatHandleModel extends BaseFormatModel {
             endOffset = primaryCaret.getSelectionEnd();
             String selectText = document.getText(new TextRange(startOffset, endOffset));
             jsonContent = (JsonUtil.isJsonStr(selectText)) ? selectText : JsonUtil.extractJsonStr(selectText);
-
             isSelectedText = true;
+
             if (StrUtil.isBlank(jsonContent)) {
                 isSelectedText = false;
-                String documentText = document.getText();
-                jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+                int lineCount = document.getLineCount();
+                // 超过 500 行，且不为 Json 类型
+                FileType fileType = PlatformUtil.getDocumentFileType(project, document);
+                if (lineCount < LINE_COUNT_LIMIT || Objects.equals(JsonFileType.INSTANCE, fileType)) {
+                    String documentText = document.getText();
+                    jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+                }
             }
         } catch (Exception ignored) {
         }

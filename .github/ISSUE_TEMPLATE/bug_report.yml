@@ -1,0 +1,52 @@
+name: "🐛 Bug report"
+description: Report errors or unexpected behavior.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please make sure to [search for existing issues](https://github.com/MemoryZy/Json-Assistant/issues) before filing a new one.
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 Issue Description
+      description: "Please describe the problem in detail. Be sure to include: steps to reproduce the problem, what happened, what you think the correct behavior should be. If applicable, add screenshots to help explain your problem."
+      placeholder: |
+        For example:
+        1. Open the tool window
+        2. The tool window fails to load
+        3. The expected behavior is for the tool window to load properly
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 🏷 Plugin Version
+      description: What version of translation plugin are you running?
+      placeholder: e.g. 1.6.0
+    validations:
+      required: true
+  - type: textarea
+    id: runtime_env
+    attributes:
+      label: 💻 IDE and Operating Environment
+      description: What version of OS and IDE are you using? (IDE main menu > Help > About > Click "Copy" button to copy to clipboard)
+      placeholder: |
+        IntelliJ IDEA 2023.2.4 (Ultimate Edition)
+        Build #IU-232.10203.10, built on October 25, 2023
+        Licensed to gurgles tumbles
+        You have a perpetual fallback license for this version.
+        Subscription is active until September 14, 2026.
+        Runtime version: 17.0.8.1+7-b1000.32 amd64
+        VM: OpenJDK 64-Bit Server VM by JetBrains s.r.o.
+        Windows 11.0
+        ...
+      render: plain text
+    validations:
+      required: true
+  - type: textarea
+    id: stacktrace
+    attributes:
+      label: 📋 Stacktrace
+      description: If the plugin crashes and you can get the stack trace, paste it here. If you don't know how to get the stack trace, please ignore this item.
+      render: plain text

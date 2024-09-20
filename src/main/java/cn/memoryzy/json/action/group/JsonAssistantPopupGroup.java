@@ -81,7 +81,8 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
     @Override
     public void update(@NotNull AnActionEvent e) {
+        Project project = getEventProject(e);
         Editor editor = PlatformUtil.getEditor(e);
-        e.getPresentation().setEnabledAndVisible(editor != null && JsonAssistantAction.isOrHasJsonStr(editor));
+        e.getPresentation().setEnabledAndVisible(project != null && editor != null && JsonAssistantAction.isOrHasJsonStr(project, editor));
     }
 }

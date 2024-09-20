@@ -42,7 +42,7 @@ public class JsonBeautifyAction extends DumbAwareAction {
     public static void handleJsonBeautify(AnActionEvent e, Editor editor) {
         Project project = e.getProject();
         Document document = editor.getDocument();
-        JsonFormatHandleModel model = JsonFormatHandleModel.of(editor,
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor,
                 JsonAssistantBundle.messageOnSystem("hint.select.json.beautify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.all.json.beautify.text"));
 

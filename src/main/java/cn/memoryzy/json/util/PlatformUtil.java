@@ -1,10 +1,12 @@
 package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -26,7 +28,9 @@ import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
 
+import javax.annotation.Nullable;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
@@ -137,6 +141,16 @@ public class PlatformUtil {
         return JBCefApp.isSupported();
     }
 
+    /**
+     * 通过组件获取当前项目
+     *
+     * @param component 组件
+     * @return 项目
+     */
+    public static @Nullable Project getProject(Component component) {
+        DataContext dataContext = DataManager.getInstance().getDataContext(component);
+        return CommonDataKeys.PROJECT.getData(dataContext);
+    }
 
     public static JComponent getMainComponentWithOpenToolWindow(ToolWindow toolWindow) {
         if (Objects.nonNull(toolWindow)) {

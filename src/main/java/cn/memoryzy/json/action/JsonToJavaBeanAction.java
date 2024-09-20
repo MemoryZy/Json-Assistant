@@ -51,7 +51,6 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-
         // 鼠标右键选择的路径
         IdeView ideView = event.getRequiredData(LangDataKeys.IDE_VIEW);
         // 文件夹(包)
@@ -69,6 +68,11 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
 
     @Override
     public void update(@NotNull AnActionEvent e) {
+        if (getEventProject(e) == null) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
+
         try {
             Object action = clz.getDeclaredConstructor().newInstance();
             ReflectUtil.invoke(action, updateMethod, e);

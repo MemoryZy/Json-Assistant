@@ -1,9 +1,11 @@
 package cn.memoryzy.json.extension;
 
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
 import com.intellij.openapi.diagnostic.IdeaLoggingEvent;
 import com.intellij.openapi.diagnostic.SubmittedReportInfo;
 import com.intellij.openapi.util.NlsActions;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,8 +20,7 @@ public class ErrorReporter extends ErrorReportSubmitter {
 
     @Override
     public @NlsActions.ActionText @NotNull String getReportActionText() {
-
-        return "Report to Memory";
+        return JsonAssistantBundle.messageOnSystem("report.to.vendor");
     }
 
     /**
@@ -29,7 +30,11 @@ public class ErrorReporter extends ErrorReportSubmitter {
      */
     @Override
     public boolean submit(IdeaLoggingEvent @NotNull [] events, @Nullable String additionalInfo, @NotNull Component parentComponent, @NotNull Consumer<? super SubmittedReportInfo> consumer) {
-
+        IdeaLoggingEvent event = ArrayUtil.getFirstElement(events);
+        Object data = event.getData();
+        String message = event.getMessage();
+        Throwable throwable = event.getThrowable();
+        String throwableText = event.getThrowableText();
 
         return true;
     }

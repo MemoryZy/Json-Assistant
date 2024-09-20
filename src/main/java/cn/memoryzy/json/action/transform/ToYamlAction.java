@@ -1,9 +1,17 @@
 package cn.memoryzy.json.action.transform;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
+import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.YamlUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,6 +19,8 @@ import org.jetbrains.annotations.NotNull;
  * @since 2024/9/19
  */
 public class ToYamlAction extends DumbAwareAction {
+
+    private static final Logger LOG = Logger.getInstance(ToYamlAction.class);
 
     public ToYamlAction() {
         super();
@@ -23,6 +33,21 @@ public class ToYamlAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        throw new RuntimeException();
+        Project project = e.getProject();
+        Editor editor = PlatformUtil.getEditor(e);
+        Document document = editor.getDocument();
+        JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor,
+                JsonAssistantBundle.messageOnSystem("hint.select.json.to.yaml.text"),
+                JsonAssistantBundle.messageOnSystem("hint.all.json.to.yaml.text"));
+
+        String yamlStr;
+        try {
+            yamlStr = YamlUtil.jsonToYaml(model.getContent());
+        } catch (Exception ex) {
+            LOG.error("Yaml conversion failure", ex);
+            return;
+        }
+
+        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(e.getProject(), editor, document, yamlStr, model, true, true);
     }
 }

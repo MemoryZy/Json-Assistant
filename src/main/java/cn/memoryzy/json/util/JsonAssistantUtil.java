@@ -105,6 +105,7 @@ public class JsonAssistantUtil {
             });
         } else {
             try {
+                // TODO 加个类型，可以指定编辑器类型
                 addNewContentWithEditorContentIfNeeded(project, processedText);
             } catch (Exception e) {
                 PlatformUtil.setClipboard(processedText);
@@ -152,13 +153,15 @@ public class JsonAssistantUtil {
         BaseFormatModel model = new XmlFormatModel(startOffset, endOffset, primaryCaret);
         BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
 
-        if (StrUtil.isBlank(model.getContent())) {
-            return null;
+        if (StrUtil.isNotBlank(model.getContent())) {
+            return model;
         }
+
+
 
         // 其他格式 .........
 
-        return model;
+        return null;
     }
 
 
