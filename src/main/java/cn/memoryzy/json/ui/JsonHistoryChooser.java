@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui;
 import cn.memoryzy.json.action.RemoveListElementAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
@@ -10,7 +11,6 @@ import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
@@ -64,7 +64,7 @@ public class JsonHistoryChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        showTextField = new ViewerModeLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
+        showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON, project, "", true);
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
         JsonViewerHistoryPersistentState historyState = JsonViewerHistoryPersistentState.getInstance(project);

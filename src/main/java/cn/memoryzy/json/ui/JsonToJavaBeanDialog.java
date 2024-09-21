@@ -9,6 +9,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
@@ -19,7 +20,6 @@ import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.json.JsonLanguage;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -86,7 +86,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
-        jsonTextField = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
+        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
         jsonTextField.setFont(JBUI.Fonts.create("Consolas", 15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);

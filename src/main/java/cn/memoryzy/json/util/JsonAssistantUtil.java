@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.model.formats.BaseFormatModel;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.model.formats.XmlFormatModel;
@@ -16,9 +17,6 @@ import cn.memoryzy.json.ui.component.JsonViewerPanel;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.json.JsonFileType;
-import com.intellij.json.json5.Json5FileType;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
@@ -158,7 +156,6 @@ public class JsonAssistantUtil {
         }
 
 
-
         // 其他格式 .........
 
         return null;
@@ -223,20 +220,20 @@ public class JsonAssistantUtil {
      * 是否不允许在当前 JSON 文档内写入；true，不写；false：写入
      */
     public static boolean isNotWriteJsonDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
-        return isWriteDocForbidden(e, project, document, model, JsonFileType.INSTANCE, Json5FileType.INSTANCE);
+        return isWriteDocForbidden(e, project, document, model, FileTypeEnum.JSON.getFileTypeQualifiedName(), FileTypeEnum.JSON5.getFileTypeQualifiedName());
     }
 
     /**
      * 是否不允许在当前 XML 文档内写入；true，不写；false：写入
      */
     public static boolean isNotWriteXmlDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
-        return isWriteDocForbidden(e, project, document, model, XmlFileType.INSTANCE);
+        return isWriteDocForbidden(e, project, document, model, FileTypeEnum.XML.getFileTypeQualifiedName());
     }
 
     /**
      * 是否不允许在当前文档内写入；true，不允许写入；false：允许写入
      */
-    public static boolean isWriteDocForbidden(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, FileType... fileTypes) {
+    public static boolean isWriteDocForbidden(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, String... fileTypeQualifiedNames) {
         // 文档不可写入，或在控制台内，返回不允许写
         if (!document.isWritable() || inConsole(e)) {
             return true;
@@ -248,8 +245,12 @@ public class JsonAssistantUtil {
         }
 
         FileType fileType = PlatformUtil.getDocumentFileType(project, document);
+        if (fileType == null) {
+            return true;
+        }
+
         // 若未选中文本，判断是否符合文件类型，符合的话也可写入（置为false，表示可写入）
-        return !Arrays.asList(fileTypes).contains(fileType);
+        return !Arrays.asList(fileTypeQualifiedNames).contains(fileType.getClass().getName());
     }
 
 
@@ -349,4 +350,10 @@ public class JsonAssistantUtil {
         String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
         return StrUtil.isNotBlank(jsonStr);
     }
+
+    public static boolean isJsonFileType(FileType fileType) {
+        if (fileType == null) return false;
+        return FileTypeEnum.JSON.getFileTypeQualifiedName().equals(fileType.getClass().getName());
+    }
+
 }

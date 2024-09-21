@@ -1,8 +1,8 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -55,7 +55,7 @@ public class MoveToEditorAction extends DumbAwareAction {
                     .map(Editor::getDocument)
                     .map(document -> PsiDocumentManager.getInstance(project).getPsiFile(document))
                     .map(PsiFile::getVirtualFile)
-                    .orElse(new LightVirtualFile(selectedContent.getDisplayName(), JsonFileType.INSTANCE, text));
+                    .orElse(new LightVirtualFile(selectedContent.getDisplayName(), FileTypeHolder.JSON, text));
 
             EditInNewWindowAction.rename(project, virtualFile, selectedContent);
             FileEditorManager.getInstance(project).openFile(virtualFile, true);

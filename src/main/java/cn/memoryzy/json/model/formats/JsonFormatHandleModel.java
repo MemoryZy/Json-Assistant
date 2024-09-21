@@ -1,9 +1,10 @@
 package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.constant.FileTypeHolder;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.json.JsonFileType;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -38,7 +39,7 @@ public class JsonFormatHandleModel extends BaseFormatModel {
     private String defaultHint;
 
     public JsonFormatHandleModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, boolean isJsonStr, String selectHint, String defaultHint) {
-        super(isSelected, startOffset, endOffset, primaryCaret, content);
+        super(isSelected, startOffset, endOffset, primaryCaret, content, FileTypeHolder.JSON);
         this.isJsonStr = isJsonStr;
         this.selectHint = selectHint;
         this.defaultHint = defaultHint;
@@ -73,7 +74,9 @@ public class JsonFormatHandleModel extends BaseFormatModel {
                 int lineCount = document.getLineCount();
                 // 超过 500 行，且不为 Json 类型
                 FileType fileType = PlatformUtil.getDocumentFileType(project, document);
-                if (lineCount < LINE_COUNT_LIMIT || Objects.equals(JsonFileType.INSTANCE, fileType)) {
+                FileType jsonFileType = FileTypeHolder.JSON;
+
+                if (lineCount < LINE_COUNT_LIMIT || (JsonAssistantUtil.isJsonFileType(jsonFileType) && Objects.equals(jsonFileType, fileType))) {
                     String documentText = document.getText();
                     jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
                 }
@@ -137,8 +140,4 @@ public class JsonFormatHandleModel extends BaseFormatModel {
         return defaultHint;
     }
 
-    @Override
-    public FileType getFileType() {
-        return JsonFileType.INSTANCE;
-    }
 }

@@ -42,18 +42,25 @@ public abstract class BaseFormatModel {
      */
     private String content;
 
-    public BaseFormatModel(int startOffset, int endOffset, Caret primaryCaret) {
+    /**
+     * 文件类型
+     */
+    private FileType fileType;
+
+    public BaseFormatModel(int startOffset, int endOffset, Caret primaryCaret, FileType fileType) {
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.primaryCaret = primaryCaret;
+        this.fileType = fileType;
     }
 
-    public BaseFormatModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content) {
+    public BaseFormatModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, FileType fileType) {
         this.isSelected = isSelected;
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.primaryCaret = primaryCaret;
         this.content = content;
+        this.fileType = fileType;
     }
 
     public abstract boolean isConformFormat(String text);
@@ -69,8 +76,6 @@ public abstract class BaseFormatModel {
     public abstract String getSelectHint();
 
     public abstract String getDefaultHint();
-
-    public abstract FileType getFileType();
 
 
     public static void prepareModel(Project project, @NotNull Document document, String selectText, String documentText, BaseFormatModel model) {
@@ -149,4 +154,19 @@ public abstract class BaseFormatModel {
         return this;
     }
 
+    public Boolean getSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(Boolean selected) {
+        isSelected = selected;
+    }
+
+    public FileType getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(FileType fileType) {
+        this.fileType = fileType;
+    }
 }

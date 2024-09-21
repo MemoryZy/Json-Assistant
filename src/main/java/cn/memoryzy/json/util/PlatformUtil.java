@@ -1,9 +1,11 @@
 package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.enums.FileTypeEnum;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
+import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -13,6 +15,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
+import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
@@ -150,6 +154,34 @@ public class PlatformUtil {
     public static @Nullable Project getProject(Component component) {
         DataContext dataContext = DataManager.getInstance().getDataContext(component);
         return CommonDataKeys.PROJECT.getData(dataContext);
+    }
+
+    public static FileType getFileType(FileTypeEnum fileTypeEnum) {
+        FileType fileType = PlainTextFileType.INSTANCE;
+        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypeEnum.getFileTypeQualifiedName());
+
+        if (clz != null) {
+            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypeEnum.getFileTypeInstanceFieldName());
+            if (instance instanceof FileType) {
+                fileType = (FileType) instance;
+            }
+        }
+
+        return fileType;
+    }
+
+    public static Language getLanguage(FileTypeEnum fileTypeEnum) {
+        Language language = PlainTextLanguage.INSTANCE;
+        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypeEnum.getLanguageQualifiedName());
+
+        if (clz != null) {
+            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypeEnum.getLanguageInstanceFieldName());
+            if (instance instanceof Language) {
+                language = (Language) instance;
+            }
+        }
+
+        return language;
     }
 
     public static JComponent getMainComponentWithOpenToolWindow(ToolWindow toolWindow) {

@@ -2,6 +2,7 @@ package cn.memoryzy.json.action;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -10,10 +11,10 @@ import com.intellij.diff.DiffDialogHints;
 import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
@@ -48,8 +49,9 @@ public class JsonTextDiffAction extends DumbAwareAction {
             leftJsonStr = "";
         }
 
-        DocumentContent leftDocumentContent = DiffContentFactory.getInstance().createEditable(project, leftJsonStr, JsonFileType.INSTANCE);
-        DocumentContent rightDocumentContent = DiffContentFactory.getInstance().createEditable(project, "", JsonFileType.INSTANCE);
+        FileType fileType = FileTypeHolder.JSON;
+        DocumentContent leftDocumentContent = DiffContentFactory.getInstance().createEditable(project, leftJsonStr, fileType);
+        DocumentContent rightDocumentContent = DiffContentFactory.getInstance().createEditable(project, "", fileType);
 
         SimpleDiffRequest simpleDiffRequest = new SimpleDiffRequest(
                 JsonAssistantBundle.messageOnSystem("dialog.json.text.diff.main.title"),

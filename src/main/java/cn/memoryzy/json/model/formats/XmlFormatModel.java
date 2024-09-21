@@ -2,11 +2,10 @@ package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.XmlUtil;
-import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.fileTypes.FileType;
 import icons.JsonAssistantIcons;
 
 import javax.swing.*;
@@ -18,7 +17,7 @@ import javax.swing.*;
 public class XmlFormatModel extends BaseFormatModel {
 
     public XmlFormatModel(int startOffset, int endOffset, Caret primaryCaret) {
-        super(startOffset, endOffset, primaryCaret);
+        super(startOffset, endOffset, primaryCaret, FileTypeHolder.XML);
     }
 
     @Override
@@ -57,8 +56,4 @@ public class XmlFormatModel extends BaseFormatModel {
         return JsonAssistantBundle.messageOnSystem("hint.all.xml.to.json.text");
     }
 
-    @Override
-    public FileType getFileType() {
-        return XmlFileType.INSTANCE;
-    }
 }

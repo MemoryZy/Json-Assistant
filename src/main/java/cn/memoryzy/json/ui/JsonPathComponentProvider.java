@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathFileTypeComboBoxEditor;
@@ -13,7 +14,6 @@ import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.json.JsonLanguage;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
@@ -59,7 +59,7 @@ public class JsonPathComponentProvider {
         this.project = project;
         this.action = () -> handleJsonPathResult(editor.getDocument().getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
-        this.showTextEditor = new CustomizedLanguageTextEditor(JsonLanguage.INSTANCE, project, "", true);
+        this.showTextEditor = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
         this.showTextEditor.setFont(JBUI.Fonts.create("Consolas", 14));
     }
 

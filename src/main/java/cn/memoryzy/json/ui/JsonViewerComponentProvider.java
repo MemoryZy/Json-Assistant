@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
@@ -13,7 +14,6 @@ import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.execution.impl.ConsoleViewUtil;
 import com.intellij.ide.ui.UISettings;
-import com.intellij.json.JsonFileType;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -84,7 +84,7 @@ public class JsonViewerComponentProvider {
 
 
         // TODO 在这个方法里创建 ScratchFile，参考 com.intellij.ide.scratch.ScratchFileActions.doCreateNewScratch 和 actionPerformed
-        TextEditor textEditor = UIManager.createDefaultTextEditor(project, JsonFileType.INSTANCE, initText);
+        TextEditor textEditor = UIManager.createDefaultTextEditor(project, FileTypeHolder.JSON, initText);
         EditorEx editor = (EditorEx) textEditor.getEditor();
 
         EditorSettings settings = editor.getSettings();
