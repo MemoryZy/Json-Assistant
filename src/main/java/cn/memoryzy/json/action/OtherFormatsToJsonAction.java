@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.BaseFormatModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -35,8 +36,10 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
         try {
             BaseFormatModel model = JsonAssistantUtil.createFormatModelFromEditor(e.getProject(), editor);
             if (Objects.nonNull(model)) {
-                JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(e.getProject(), editor, editor.getDocument(),
-                        model.convertToJson(), model, true, true);
+                JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
+                        e.getProject(), editor, editor.getDocument(),
+                        model.convertToJson(), model, true, true,
+                        FileTypeHolder.JSON);
             }
         } catch (Exception ignored) {
         }

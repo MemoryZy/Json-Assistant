@@ -76,7 +76,8 @@ public class JsonAssistantUtil {
 
     public static void applyProcessedTextToDocumentOrClipboard(Project project, Editor editor, Document document,
                                                                String processedText, BaseFormatModel model,
-                                                               boolean noMinify, boolean convertFormat) {
+                                                               boolean noMinify, boolean convertFormat,
+                                                               FileType editorFileType) {
         // 可写的话就写，不可写就拷贝到剪贴板
         if (document.isWritable() && !convertFormat) {
             // 获取当前文档内的psiFile
@@ -103,8 +104,7 @@ public class JsonAssistantUtil {
             });
         } else {
             try {
-                // TODO 加个类型，可以指定编辑器类型
-                addNewContentWithEditorContentIfNeeded(project, processedText);
+                addNewContentWithEditorContentIfNeeded(project, processedText, editorFileType);
             } catch (Exception e) {
                 PlatformUtil.setClipboard(processedText);
                 Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
@@ -117,7 +117,7 @@ public class JsonAssistantUtil {
     }
 
 
-    public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText) {
+    public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
         Content mainContent = getMainContent(toolWindow);
@@ -126,7 +126,7 @@ public class JsonAssistantUtil {
         if (StrUtil.isBlank(Objects.requireNonNull(editor).getDocument().getText())) {
             WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(processedText));
         } else {
-            Content content = addNewContent(project, toolWindow, contentFactory);
+            Content content = addNewContent(project, toolWindow, contentFactory, editorFileType);
             EditorEx editorEx = getEditorOnContent(content);
             WriteCommandAction.runWriteCommandAction(project, () -> Objects.requireNonNull(editorEx).getDocument().setText(processedText));
         }
@@ -172,7 +172,7 @@ public class JsonAssistantUtil {
 
     public static Class<?> getClassByName(String classQualifiedName) {
         try {
-            return Class.forName(classQualifiedName);
+            return Thread.currentThread().getContextClassLoader().loadClass(classQualifiedName);
         } catch (ClassNotFoundException e) {
             return null;
         }
@@ -302,12 +302,12 @@ public class JsonAssistantUtil {
         return null;
     }
 
-    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory) {
+    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType) {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, false, false);
+        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, editorFileType, false, false);
         Content content = contentFactory.createContent(window.createRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);

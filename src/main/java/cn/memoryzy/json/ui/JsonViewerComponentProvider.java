@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
@@ -31,6 +30,7 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileEditor.TextEditor;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
@@ -49,6 +49,7 @@ import java.util.Objects;
 public class JsonViewerComponentProvider {
 
     private final Project project;
+    private final FileType editorFileType;
     private final boolean firstContent;
     private final boolean initWindow;
     private final JsonViewerHistoryPersistentState historyState;
@@ -57,8 +58,9 @@ public class JsonViewerComponentProvider {
 
     private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
-    public JsonViewerComponentProvider(Project project, boolean firstContent, boolean initWindow) {
+    public JsonViewerComponentProvider(Project project, FileType editorFileType, boolean firstContent, boolean initWindow) {
         this.project = project;
+        this.editorFileType = editorFileType;
         this.firstContent = firstContent;
         this.initWindow = initWindow;
         this.historyState = JsonViewerHistoryPersistentState.getInstance(project);
@@ -81,10 +83,7 @@ public class JsonViewerComponentProvider {
 
     private TextEditor createEditorComponent() {
         String initText = getInitText();
-
-
-        // TODO 在这个方法里创建 ScratchFile，参考 com.intellij.ide.scratch.ScratchFileActions.doCreateNewScratch 和 actionPerformed
-        TextEditor textEditor = UIManager.createDefaultTextEditor(project, FileTypeHolder.JSON, initText);
+        TextEditor textEditor = UIManager.createDefaultTextEditor(project, editorFileType, initText);
         EditorEx editor = (EditorEx) textEditor.getEditor();
 
         EditorSettings settings = editor.getSettings();

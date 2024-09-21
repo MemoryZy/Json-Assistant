@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.transform;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -48,6 +49,7 @@ public class ToYamlAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(e.getProject(), editor, document, yamlStr, model, true, true);
+        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
+                e.getProject(), editor, document, yamlStr, model, true, true, FileTypeHolder.YAML);
     }
 }

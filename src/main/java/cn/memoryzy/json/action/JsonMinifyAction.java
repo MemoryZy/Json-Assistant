@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -53,7 +54,8 @@ public class JsonMinifyAction extends DumbAwareAction {
 
         JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
                 project, editor, document, compressedJson, model, false,
-                JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
+                JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model),
+                FileTypeHolder.JSON);
     }
 
 }

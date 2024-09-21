@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.transform;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -50,8 +51,10 @@ public class ToXmlAction extends DumbAwareAction {
             return;
         }
 
-        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(e.getProject(), editor, document, xmlStr,
-                model, true, JsonAssistantUtil.isNotWriteXmlDoc(e, project, document, model));
+        JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
+                e.getProject(), editor, document, xmlStr,
+                model, true, JsonAssistantUtil.isNotWriteXmlDoc(e, project, document, model),
+                FileTypeHolder.XML);
     }
 
 }

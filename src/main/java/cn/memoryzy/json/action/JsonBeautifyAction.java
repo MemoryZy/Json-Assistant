@@ -2,6 +2,7 @@ package cn.memoryzy.json.action;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -56,7 +57,8 @@ public class JsonBeautifyAction extends DumbAwareAction {
 
         JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
                 project, editor, document, formattedJson, model, true,
-                JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model));
+                JsonAssistantUtil.isNotWriteJsonDoc(e, project, document, model),
+                FileTypeHolder.JSON);
     }
 
 }

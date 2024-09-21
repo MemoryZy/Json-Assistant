@@ -3,6 +3,7 @@ package cn.memoryzy.json.toolwindow;
 import cn.memoryzy.json.action.DonateAction;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.JsonViewerComponentProvider;
@@ -48,7 +49,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
         // 主界面
-        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, true, true);
+        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, FileTypeHolder.JSON, true, true);
 
         // 选项卡旁
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};

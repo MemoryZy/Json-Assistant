@@ -79,10 +79,13 @@
         <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
         <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
 
+        <action class="cn.memoryzy.json.action.GetFileTypeAction" id="JsonAssistant.GetFileTypeAction" text="Get Type"/>
+
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
             <reference ref="JsonAssistant.Action.Main"/>
             <reference ref="JsonAssistant.Group.Main"/>
+            <reference ref="JsonAssistant.GetFileTypeAction"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>

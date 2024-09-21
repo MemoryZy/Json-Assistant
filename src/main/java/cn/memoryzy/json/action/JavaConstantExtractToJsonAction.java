@@ -2,6 +2,7 @@ package cn.memoryzy.json.action;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -58,7 +59,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
         if (!JsonUtil.isJsonStr(jsonStr)) return;
 
         try {
-            JsonAssistantUtil.addNewContentWithEditorContentIfNeeded(project, jsonStr);
+            JsonAssistantUtil.addNewContentWithEditorContentIfNeeded(project, jsonStr, FileTypeHolder.JSON);
         } catch (Exception ex) {
             PlatformUtil.setClipboard(jsonStr);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
