@@ -16,6 +16,7 @@ public class HyperLinks {
     public static final AtomicBoolean reachableAtomic = new AtomicBoolean(false);
 
     public static final String GITHUB_LINK = "https://github.com/MemoryZy/Json-Assistant";
+    public static final String GITHUB_ISSUE_LINK = "https://github.com/MemoryZy/Json-Assistant/issues/new";
     public static final String SUPPORT_LINK = "https://json.memoryzy.cn/support";
     public static final String SPONSOR_LINK = "https://json.memoryzy.cn/support#sponsor";
     public static final String TREE_LINK = "https://json.memoryzy.cn/tree";

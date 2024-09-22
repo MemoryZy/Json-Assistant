@@ -40,6 +40,7 @@ import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -237,5 +238,7 @@ public class PlatformUtil {
         });
     }
 
-
+    public static boolean isChineseLocale() {
+        return Locale.CHINESE.getLanguage().equals(Locale.getDefault().getLanguage());
+    }
 }
