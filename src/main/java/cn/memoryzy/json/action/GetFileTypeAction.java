@@ -26,6 +26,8 @@ public class GetFileTypeAction extends DumbAwareAction {
         FileType fileType = PlatformUtil.getDocumentFileType(project, document);
 
         FileType yaml = FileTypeHolder.YAML;
+        FileType toml = FileTypeHolder.TOML;
+        FileType xml = FileTypeHolder.XML;
 
         Messages.showInfoMessage("类型：" + fileType, "");
     }

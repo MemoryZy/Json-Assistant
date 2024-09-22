@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 - 修复工具窗口 JSON 编辑器无法保存状态问题。
+- 兼容 IDEA 2024.3 eap版本。
+- 支持 Yaml 与 Json 互相转换。
 - 新增将 Java 字符串常量提取为 JSON 功能。
 - 修复加载最新历史记录功能的问题。
 - 用户体验优化。
 - Fixed an issue where tool window JSON editor could not save state.
+- Compatible with IDEA 2024.3 eap version.
+- Supports conversion between Yaml and Json.
 - Added the ability to extract Java string constants into JSON.
 - Fixed an issue with loading the latest history feature.
 - User experience optimization.

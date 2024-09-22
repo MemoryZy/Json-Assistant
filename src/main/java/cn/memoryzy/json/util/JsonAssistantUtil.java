@@ -172,7 +172,7 @@ public class JsonAssistantUtil {
 
     public static Class<?> getClassByName(String classQualifiedName) {
         try {
-            return Thread.currentThread().getContextClassLoader().loadClass(classQualifiedName);
+            return Class.forName(classQualifiedName);
         } catch (ClassNotFoundException e) {
             return null;
         }
