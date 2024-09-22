@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathFileTypeComboBoxEditor;
@@ -43,8 +44,7 @@ import java.util.*;
  */
 public class JsonPathComponentProvider {
     private static final Logger LOG = Logger.getInstance(JsonPathComponentProvider.class);
-    public static final String JSON_PATH_FILE_TYPE_CLASS_NAME = "com.intellij.jsonpath.JsonPathFileType";
-    public static final Class<?> JSON_PATH_FILE_TYPE_CLASS = JsonAssistantUtil.getClassByName(JSON_PATH_FILE_TYPE_CLASS_NAME);
+    public static final Class<?> JSON_PATH_FILE_TYPE_CLASS = JsonAssistantUtil.getClassByName(FileTypeEnum.JSONPATH.getFileTypeInstanceFieldName());
     public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
 
     private final ComboBox<String> pathExpressionComboBoxTextField;
@@ -248,7 +248,7 @@ public class JsonPathComponentProvider {
 
     public static FileType getJsonPathFileType() {
         FileType fileType = PlainTextFileType.INSTANCE;
-        Object instance = JsonAssistantUtil.readStaticFinalFieldValue(JsonPathComponentProvider.JSON_PATH_FILE_TYPE_CLASS, "INSTANCE");
+        Object instance = JsonAssistantUtil.readStaticFinalFieldValue(JsonPathComponentProvider.JSON_PATH_FILE_TYPE_CLASS, FileTypeEnum.JSONPATH.getFileTypeInstanceFieldName());
         if (instance instanceof FileType) {
             fileType = (FileType) instance;
         }

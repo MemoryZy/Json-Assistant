@@ -8,6 +8,7 @@ public enum FileTypeEnum {
 
     JSON("com.intellij.json.JsonFileType", "INSTANCE", "com.intellij.json.JsonLanguage", "INSTANCE"),
     JSON5("com.intellij.json.json5.Json5FileType", "INSTANCE", "com.intellij.json.json5.Json5Language", "INSTANCE"),
+    JSONPATH("com.intellij.jsonpath.JsonPathFileType", "INSTANCE", "com.intellij.jsonpath.JsonPathLanguage", "INSTANCE"),
     XML("com.intellij.ide.highlighter.XmlFileType", "INSTANCE", "com.intellij.lang.xml.XMLLanguage", "INSTANCE"),
     YAML("org.jetbrains.yaml.YAMLFileType", "YML", "org.jetbrains.yaml.YAMLLanguage", "INSTANCE"),
     TOML("org.toml.lang.psi.TomlFileType", "INSTANCE", "org.toml.lang.TomlLanguage", "INSTANCE");
