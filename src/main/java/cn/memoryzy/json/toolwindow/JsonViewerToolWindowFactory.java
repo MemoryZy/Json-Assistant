@@ -54,7 +54,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         // 选项卡旁
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
         // 标题行
-        List<AnAction> titleActions = List.of(new JsonHistoryAction(toolWindowEx), new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
+        List<AnAction> titleActions = List.of(new JsonHistoryAction(toolWindowEx), new ConfigureEditorOptionsAction(toolWindowEx), new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
@@ -63,8 +63,6 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         group.add(new FloatingWindowAction(toolWindowEx));
         group.add(Separator.create());
         group.add(new EditInNewWindowAction(toolWindowEx));
-        group.add(Separator.create());
-        group.add(new ConfigureEditorOptionsAction(toolWindowEx));
         group.add(Separator.create());
 
         toolWindowEx.setTabActions(tabActions);
