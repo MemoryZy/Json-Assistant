@@ -33,10 +33,10 @@ public class JsonAssistantIcons {
     public static final Icon XML = load("/icons/xml.svg");
 
     public static class ExpUi {
-        public static final Icon NEW_JSON = load("/icons/expui/common/json.svg");
-        public static final Icon NEW_GROUP_BY_CLASS = load("/icons/expui/common/groupByClass.svg");
-        public static final Icon NEW_TOOL_WINDOW_JSON_PATH = load("/icons/expui/common/toolWindowJsonPath.svg");
-        public static final Icon NEW_ROTATE = load("/icons/expui/common/rotate.svg");
+        public static final Icon NEW_JSON = load("/icons/expui/json.svg");
+        public static final Icon NEW_GROUP_BY_CLASS = load("/icons/expui/groupByClass.svg");
+        public static final Icon NEW_TOOL_WINDOW_JSON_PATH = load("/icons/expui/toolWindowJsonPath.svg");
+        public static final Icon NEW_ROTATE = load("/icons/expui/rotate.svg");
     }
 
     /**

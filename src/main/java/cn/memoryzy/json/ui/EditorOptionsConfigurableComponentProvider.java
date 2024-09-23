@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.service.EditorOptionsPersistentState;
+import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;

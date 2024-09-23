@@ -224,13 +224,6 @@ public class JsonAssistantUtil {
     }
 
     /**
-     * 是否不允许在当前 XML 文档内写入；true，不写；false：写入
-     */
-    public static boolean isNotWriteXmlDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
-        return isWriteDocForbidden(e, project, document, model, FileTypeEnum.XML.getFileTypeQualifiedName());
-    }
-
-    /**
      * 是否不允许在当前文档内写入；true，不允许写入；false：允许写入
      */
     public static boolean isWriteDocForbidden(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, String... fileTypeQualifiedNames) {
@@ -352,8 +345,7 @@ public class JsonAssistantUtil {
     }
 
     public static boolean isJsonFileType(FileType fileType) {
-        if (fileType == null) return false;
-        return FileTypeEnum.JSON.getFileTypeQualifiedName().equals(fileType.getClass().getName());
+        return fileType != null && FileTypeEnum.JSON.getFileTypeQualifiedName().equals(fileType.getClass().getName());
     }
 
 }

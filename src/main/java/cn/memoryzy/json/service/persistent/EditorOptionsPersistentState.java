@@ -1,4 +1,4 @@
-package cn.memoryzy.json.service;
+package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.application.ApplicationManager;

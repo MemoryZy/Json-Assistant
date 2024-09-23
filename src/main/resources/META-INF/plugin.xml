@@ -37,7 +37,7 @@
         <applicationConfigurable
                 id="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
                 parentId="tools"
-                instance="cn.memoryzy.json.extension.JsonAssistantMainConfigurable"
+                instance="cn.memoryzy.json.extension.configurable.JsonAssistantMainConfigurable"
                 groupWeight="999"
                 bundle="messages.JsonAssistantBundle"
                 key="plugin.main.configurable.displayName"/>
@@ -45,14 +45,14 @@
         <applicationConfigurable
                 id="JsonAssistant.Configurable.EditorOptionsConfigurable"
                 parentId="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
-                instance="cn.memoryzy.json.extension.EditorOptionsConfigurable"
+                instance="cn.memoryzy.json.extension.configurable.EditorOptionsConfigurable"
                 bundle="messages.JsonAssistantBundle"
                 key="plugin.editor.options.configurable.displayName"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.JsonViewerHistoryPersistentState"/>
-        <applicationService serviceImplementation="cn.memoryzy.json.service.EditorOptionsPersistentState"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.EditorOptionsPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>
-        <errorHandler implementation="cn.memoryzy.json.extension.ErrorReporter"/>
+        <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
     </extensions>
 
     <applicationListeners>

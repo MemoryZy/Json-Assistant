@@ -3,7 +3,7 @@ package cn.memoryzy.json.action;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
+import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;

@@ -1,7 +1,7 @@
-package cn.memoryzy.json.service;
+package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.converter.LimitedListConverter;
+import cn.memoryzy.json.service.persistent.converter.LimitedListConverter;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.project.Project;

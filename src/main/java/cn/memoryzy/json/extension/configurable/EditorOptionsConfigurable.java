@@ -1,4 +1,4 @@
-package cn.memoryzy.json.extension;
+package cn.memoryzy.json.extension.configurable;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.EditorOptionsConfigurableComponentProvider;

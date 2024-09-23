@@ -1,11 +1,11 @@
-package cn.memoryzy.json.service.converter;
+package cn.memoryzy.json.service.persistent.converter;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
+import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.Converter;
 import org.jetbrains.annotations.NotNull;

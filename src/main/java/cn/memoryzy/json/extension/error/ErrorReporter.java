@@ -1,4 +1,4 @@
-package cn.memoryzy.json.extension;
+package cn.memoryzy.json.extension.error;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
@@ -63,13 +63,6 @@ public class ErrorReporter extends ErrorReportSubmitter {
 
         BrowserUtil.browse(url);
         consumer.consume(new SubmittedReportInfo(null, "GitHub issue", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE));
-
-        // TODO 是否需要发通知
-        // NotificationGroupManager.getInstance().getNotificationGroup("Error Report")
-        //         .createNotification(title, content, NotificationType.INFORMATION)
-        //         .setListener(NotificationListener.URL_OPENING_LISTENER)
-        //         .setImportant(false)
-        //         .notify(project)
 
         return true;
     }

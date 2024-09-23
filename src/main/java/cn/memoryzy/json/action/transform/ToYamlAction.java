@@ -6,6 +6,7 @@ import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.YamlUtil;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.diagnostic.Logger;
@@ -29,7 +30,7 @@ public class ToYamlAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.yaml.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.yaml.description"));
-        // presentation.setIcon();
+        presentation.setIcon(AllIcons.FileTypes.Yaml);
     }
 
     @Override
@@ -50,6 +51,7 @@ public class ToYamlAction extends DumbAwareAction {
         }
 
         JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
-                e.getProject(), editor, document, yamlStr, model, true, true, FileTypeHolder.YAML);
+                e.getProject(), editor, document, yamlStr,
+                model, true, true, FileTypeHolder.YAML);
     }
 }

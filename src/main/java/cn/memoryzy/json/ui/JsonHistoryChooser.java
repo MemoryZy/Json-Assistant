@@ -6,7 +6,7 @@ import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.JsonViewerHistoryPersistentState;
+import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;

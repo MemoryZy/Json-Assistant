@@ -13,7 +13,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 
 import javax.swing.*;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -21,7 +20,7 @@ import java.util.Objects;
  */
 public class JsonFormatHandleModel extends BaseFormatModel {
 
-    public static final int LINE_COUNT_LIMIT = 500;
+    public static final int LINE_COUNT_LIMIT = 300;
 
     /**
      * 是否为 JSON 格式文本
@@ -71,14 +70,19 @@ public class JsonFormatHandleModel extends BaseFormatModel {
 
             if (StrUtil.isBlank(jsonContent)) {
                 isSelectedText = false;
-                int lineCount = document.getLineCount();
-                // 超过 500 行，且不为 Json 类型
-                FileType fileType = PlatformUtil.getDocumentFileType(project, document);
-                FileType jsonFileType = FileTypeHolder.JSON;
+                String documentText = document.getText();
 
-                if (lineCount < LINE_COUNT_LIMIT || (JsonAssistantUtil.isJsonFileType(jsonFileType) && Objects.equals(jsonFileType, fileType))) {
-                    String documentText = document.getText();
-                    jsonContent = (JsonUtil.isJsonStr(documentText)) ? documentText : JsonUtil.extractJsonStr(documentText);
+                // 效率优化
+                if (JsonUtil.isJsonStr(documentText)) {
+                    jsonContent = documentText;
+                } else {
+                    int lineCount = document.getLineCount();
+                    FileType fileType = PlatformUtil.getDocumentFileType(project, document);
+
+                    // 超过 300 行，且不为 Json 类型，不做判断
+                    if (lineCount < LINE_COUNT_LIMIT || JsonAssistantUtil.isJsonFileType(fileType)) {
+                        jsonContent = JsonUtil.extractJsonStr(documentText);
+                    }
                 }
             }
         } catch (Exception ignored) {
