@@ -9,15 +9,15 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class YamlUtil {
 
-    public static String yamlToJson(String yamlStr) {
+    public static String toJson(String yamlStr) {
         Yaml yaml = yaml();
         Object load = yaml.load(yamlStr);
-        return JsonUtil.objectToJson(load);
+        return JsonUtil.toJsonStr(load);
     }
 
-    public static String jsonToYaml(String jsonStr) {
+    public static String toYaml(String jsonStr) {
         Yaml yaml = yaml();
-        Object obj = JsonUtil.jsonToObject(jsonStr);
+        Object obj = JsonUtil.toBean(jsonStr);
         return yaml.dump(obj);
     }
 

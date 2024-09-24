@@ -40,7 +40,7 @@ public class RemoveListElementAction extends DumbAwareAction {
         if (selectedValue == null) return;
 
         JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
-        LimitedList<String> historyList = state.getHistory();
+        LimitedList historyList = state.getHistory();
         historyList.remove(selectedValue.getIndex());
 
         List<HistoryModel> historyModels = HistoryModel.of(historyList);

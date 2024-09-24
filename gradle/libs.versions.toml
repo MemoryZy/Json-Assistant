@@ -5,6 +5,7 @@ hutool-all = "5.8.28"
 jackson-dataformat-xml = "2.16.1"
 json-path = "2.9.0"
 commons-lang3 = "3.16.0"
+toml4j = "0.7.2"
 
 # plugins
 dokka = "1.8.10"
@@ -20,6 +21,7 @@ hutool = { group = "cn.hutool", name = "hutool-all", version.ref = "hutool-all" 
 dataformat = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson-dataformat-xml" }
 jsonpath = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "json-path" }
 commonlang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons-lang3" }
+toml4j = { group = "com.moandjiezana.toml", name = "toml4j", version.ref = "toml4j" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

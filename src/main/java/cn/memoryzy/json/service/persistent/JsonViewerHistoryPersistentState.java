@@ -25,7 +25,7 @@ public class JsonViewerHistoryPersistentState implements PersistentStateComponen
     }
 
     @Attribute(converter = LimitedListConverter.class)
-    public LimitedList<String> historyList;
+    public LimitedList historyList;
 
     @Override
     public @Nullable JsonViewerHistoryPersistentState getState() {
@@ -37,14 +37,14 @@ public class JsonViewerHistoryPersistentState implements PersistentStateComponen
         this.historyList = state.historyList;
     }
 
-    public LimitedList<String> getHistory() {
+    public LimitedList getHistory() {
         initHistory();
         return historyList;
     }
 
     private void initHistory() {
         if (Objects.isNull(historyList)) {
-            historyList = new LimitedList<>(HISTORY_LIMIT);
+            historyList = new LimitedList(HISTORY_LIMIT);
         }
     }
 

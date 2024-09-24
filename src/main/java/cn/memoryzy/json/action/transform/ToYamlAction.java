@@ -44,7 +44,7 @@ public class ToYamlAction extends DumbAwareAction {
 
         String yamlStr;
         try {
-            yamlStr = YamlUtil.jsonToYaml(model.getContent());
+            yamlStr = YamlUtil.toYaml(model.getContent());
         } catch (Exception ex) {
             LOG.error("Yaml conversion failure", ex);
             return;

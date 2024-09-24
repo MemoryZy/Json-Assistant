@@ -17,13 +17,13 @@ import java.util.Collections;
  * @author Memory
  * @since 2024/8/15
  */
-public class LimitedListConverter extends Converter<LimitedList<String>> {
+public class LimitedListConverter extends Converter<LimitedList> {
 
     private static final Logger LOG = Logger.getInstance(LimitedListConverter.class);
 
     @Override
-    public @Nullable LimitedList<String> fromString(@NotNull String value) {
-        LimitedList<String> limitedList = new LimitedList<>(JsonViewerHistoryPersistentState.HISTORY_LIMIT);
+    public @Nullable LimitedList fromString(@NotNull String value) {
+        LimitedList limitedList = new LimitedList(JsonViewerHistoryPersistentState.HISTORY_LIMIT);
         if (StrUtil.isBlank(value)) {
             return limitedList;
         }
@@ -44,7 +44,7 @@ public class LimitedListConverter extends Converter<LimitedList<String>> {
     }
 
     @Override
-    public @Nullable String toString(@NotNull LimitedList<String> value) {
+    public @Nullable String toString(@NotNull LimitedList value) {
         return CollUtil.isNotEmpty(value) ? JSONUtil.toJsonStr(value) : "";
     }
 }

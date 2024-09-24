@@ -23,7 +23,6 @@ public class ConfigureEditorOptionsAction extends DumbAwareAction {
         presentation.setText(JsonAssistantBundle.message("action.configure.editor.options.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.configure.editor.options.description"));
         presentation.setIcon(AllIcons.General.GearPlain);
-        // AllIcons.General.ExternalTools
         registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl alt O"), toolWindow.getComponent());
     }
 

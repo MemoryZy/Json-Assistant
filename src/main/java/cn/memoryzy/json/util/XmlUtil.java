@@ -28,10 +28,18 @@ public class XmlUtil {
         }
     }
 
-    public static String xmlToJson(String xml) {
+    public static String toXml(String jsonStr) throws Exception {
+        JsonNode jsonNode = JsonUtil.MAPPER.readTree(jsonStr.getBytes());
+        XmlMapper xmlMapper = new XmlMapper();
+        return xmlMapper.writerWithDefaultPrettyPrinter()
+                .withRootName("root")
+                .writeValueAsString(jsonNode);
+    }
+
+    public static String toJson(String xmlStr) {
         try {
             ObjectMapper xmlMapper = new XmlMapper();
-            JsonNode jsonNode = xmlMapper.readTree(xml.getBytes());
+            JsonNode jsonNode = xmlMapper.readTree(xmlStr.getBytes());
             return JsonUtil.MAPPER.writeValueAsString(jsonNode);
         } catch (Exception e) {
             return null;

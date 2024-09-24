@@ -10,7 +10,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
@@ -74,7 +73,7 @@ public class JsonUtil {
         return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
     }
 
-    public static String objectToJson(Object obj) {
+    public static String toJsonStr(Object obj) {
         try {
             return MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
@@ -82,7 +81,7 @@ public class JsonUtil {
         }
     }
 
-    public static Object jsonToObject(String jsonStr) {
+    public static Object toBean(String jsonStr) {
         try {
             JsonNode jsonNode = MAPPER.readTree(jsonStr);
             return MAPPER.convertValue(jsonNode, Object.class);
@@ -191,15 +190,6 @@ public class JsonUtil {
 
         return includeJsonStr.substring(startIndex, endIndex + 1);
     }
-
-    public static String jsonToXml(String json) throws Exception {
-        JsonNode jsonNode = MAPPER.readTree(json.getBytes());
-        XmlMapper xmlMapper = new XmlMapper();
-        return xmlMapper.writerWithDefaultPrettyPrinter()
-                .withRootName("root")
-                .writeValueAsString(jsonNode);
-    }
-
 
     public static int findJsonOutsetCharacterOffset(String text) {
         if (text == null || text.isEmpty()) {

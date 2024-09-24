@@ -68,7 +68,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
 
         JsonViewerHistoryPersistentState historyState = JsonViewerHistoryPersistentState.getInstance(project);
-        LimitedList<String> historyList = historyState.getHistory();
+        LimitedList historyList = historyState.getHistory();
         List<HistoryModel> historyModels = HistoryModel.of(historyList);
         DefaultListModel<HistoryModel> defaultListModel = JBList.createDefaultListModel(historyModels);
 

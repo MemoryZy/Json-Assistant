@@ -27,7 +27,7 @@ public class XmlFormatModel extends BaseFormatModel {
 
     @Override
     public String convertToJson() {
-        String json = XmlUtil.xmlToJson(getContent());
+        String json = XmlUtil.toJson(getContent());
         return StrUtil.isNotBlank(json) ? JsonUtil.formatJson(json) : "";
     }
 

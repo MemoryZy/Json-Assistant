@@ -4,8 +4,8 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.XmlUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -44,7 +44,7 @@ public class ToXmlAction extends DumbAwareAction {
 
         String xmlStr;
         try {
-            xmlStr = JsonUtil.jsonToXml(model.getContent());
+            xmlStr = XmlUtil.toXml(model.getContent());
             xmlStr = xmlStr.replaceAll("\r\n", "\n");
         } catch (Exception ex) {
             LOG.error("xml conversion failure", ex);

@@ -2,8 +2,10 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
-import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
@@ -108,10 +110,10 @@ public class JsonViewerComponentProvider {
         this.defaultColorsScheme = editor.getColorsScheme();
         toggleColorSchema(editor, defaultColorsScheme, persistentState.followEditorTheme);
 
-        if (firstContent) {
-            editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
-            editor.setShowPlaceholderWhenFocused(true);
-        }
+        // if (firstContent) {
+        //     editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
+        //     editor.setShowPlaceholderWhenFocused(true);
+        // }
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -149,7 +151,7 @@ public class JsonViewerComponentProvider {
 
             if (StrUtil.isBlank(jsonStr) && persistentState.loadLastRecord) {
                 JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
-                LimitedList<String> history = state.getHistory();
+                LimitedList history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
                     jsonStr = history.get(0);
                 }
@@ -180,12 +182,23 @@ public class JsonViewerComponentProvider {
     }
 
     private void addJsonToHistory() {
-        LimitedList<String> historyList = historyState.getHistory();
+        LimitedList historyList = historyState.getHistory();
         String text = StrUtil.trim(editor.getDocument().getText());
 
-        if (JsonUtil.isJsonStr(text)) {
-            historyList.add(text);
-        }
+        ApplicationManager.getApplication().invokeLater(()-> {
+            if (JsonUtil.isJsonStr(text)) {
+                // 无元素，不添加
+                if (JsonUtil.isJsonArray(text)) {
+                    JSONArray jsonArray = JSONUtil.parseArray(text);
+                    if (jsonArray.isEmpty()) return;
+                } else if (JsonUtil.isJsonObject(text)) {
+                    JSONObject jsonObject = JSONUtil.parseObj(text);
+                    if (jsonObject.isEmpty()) return;
+                }
+
+                historyList.add(text);
+            }
+        });
     }
 
     public static void toggleLineNumbers(EditorEx editor, boolean display) {
