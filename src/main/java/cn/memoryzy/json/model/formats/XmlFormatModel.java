@@ -5,8 +5,8 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.XmlUtil;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.Caret;
-import icons.JsonAssistantIcons;
 
 import javax.swing.*;
 
@@ -43,7 +43,7 @@ public class XmlFormatModel extends BaseFormatModel {
 
     @Override
     public Icon getActionIcon() {
-        return JsonAssistantIcons.XML;
+        return AllIcons.FileTypes.Xml;
     }
 
     @Override
