@@ -1,7 +1,7 @@
 package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.constant.FileTypeHolder;
+import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -38,7 +38,7 @@ public class JsonFormatHandleModel extends BaseFormatModel {
     private String defaultHint;
 
     public JsonFormatHandleModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, boolean isJsonStr, String selectHint, String defaultHint) {
-        super(isSelected, startOffset, endOffset, primaryCaret, content, FileTypeHolder.JSON);
+        super(isSelected, startOffset, endOffset, primaryCaret, content, FileTypeEnum.JSON.getFileTypeQualifiedName());
         this.isJsonStr = isJsonStr;
         this.selectHint = selectHint;
         this.defaultHint = defaultHint;

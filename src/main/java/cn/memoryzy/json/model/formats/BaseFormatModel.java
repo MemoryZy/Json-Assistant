@@ -1,15 +1,12 @@
 package cn.memoryzy.json.model.formats;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -45,22 +42,22 @@ public abstract class BaseFormatModel {
     /**
      * 文件类型
      */
-    private FileType fileType;
+    private String fileTypeClassName;
 
-    public BaseFormatModel(int startOffset, int endOffset, Caret primaryCaret, FileType fileType) {
+    public BaseFormatModel(int startOffset, int endOffset, Caret primaryCaret, String fileTypeClassName) {
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.primaryCaret = primaryCaret;
-        this.fileType = fileType;
+        this.fileTypeClassName = fileTypeClassName;
     }
 
-    public BaseFormatModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, FileType fileType) {
+    public BaseFormatModel(Boolean isSelected, int startOffset, int endOffset, Caret primaryCaret, String content, String fileTypeClassName) {
         this.isSelected = isSelected;
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.primaryCaret = primaryCaret;
         this.content = content;
-        this.fileType = fileType;
+        this.fileTypeClassName = fileTypeClassName;
     }
 
     public abstract boolean isConformFormat(String text);
@@ -91,14 +88,12 @@ public abstract class BaseFormatModel {
                 throw new RuntimeException();
             }
         } else {
-            // 没选择文本，那就判断是否为指定文件类型，如果不是就不显示
-            FileType fileType = PlatformUtil.getDocumentFileType(project, document);
-            if (Objects.equals(fileType, model.getFileType())) {
-                text = model.isConformFormat(documentText) ? documentText : null;
+            if (model.isConformFormat(documentText)){
+                text = documentText;
             }
 
             if (StrUtil.isBlank(text)) {
-                throw new RuntimeException();
+                return;
             }
         }
 
@@ -162,11 +157,11 @@ public abstract class BaseFormatModel {
         isSelected = selected;
     }
 
-    public FileType getFileType() {
-        return fileType;
+    public String getFileTypeClassName() {
+        return fileTypeClassName;
     }
 
-    public void setFileType(FileType fileType) {
-        this.fileType = fileType;
+    public void setFileTypeClassName(String fileTypeClassName) {
+        this.fileTypeClassName = fileTypeClassName;
     }
 }

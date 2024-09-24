@@ -11,6 +11,7 @@ import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.model.formats.BaseFormatModel;
 import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.model.formats.XmlFormatModel;
+import cn.memoryzy.json.model.formats.YamlFormatModel;
 import cn.memoryzy.json.ui.JsonStructureDialog;
 import cn.memoryzy.json.ui.JsonViewerComponentProvider;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
@@ -155,6 +156,12 @@ public class JsonAssistantUtil {
             return model;
         }
 
+        model = new YamlFormatModel(startOffset, endOffset, primaryCaret);
+        BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
+
+        if (StrUtil.isNotBlank(model.getContent())) {
+            return model;
+        }
 
         // 其他格式 .........
 
@@ -345,7 +352,11 @@ public class JsonAssistantUtil {
     }
 
     public static boolean isJsonFileType(FileType fileType) {
-        return fileType != null && FileTypeEnum.JSON.getFileTypeQualifiedName().equals(fileType.getClass().getName());
+        return isAssignFileType(fileType, FileTypeEnum.JSON.getFileTypeQualifiedName());
+    }
+
+    public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
+        return fileType != null && Objects.equals(fileTypeClassName, fileType.getClass().getName());
     }
 
 }

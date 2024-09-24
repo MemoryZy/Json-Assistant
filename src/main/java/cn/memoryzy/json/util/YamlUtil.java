@@ -9,6 +9,16 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class YamlUtil {
 
+    public static boolean isYaml(String text) {
+        Yaml yaml = yaml();
+        try {
+            yaml.load(text);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public static String toJson(String yamlStr) {
         Yaml yaml = yaml();
         Object load = yaml.load(yamlStr);
