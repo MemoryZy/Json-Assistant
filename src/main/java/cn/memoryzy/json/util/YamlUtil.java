@@ -10,6 +10,11 @@ import org.yaml.snakeyaml.Yaml;
 public class YamlUtil {
 
     public static boolean isYaml(String text) {
+        // yaml.load(text) 也可以解析 Json 格式数据，所以在此先判断是否为 Json
+        if (JsonUtil.isJsonStr(text)) {
+            return false;
+        }
+
         Yaml yaml = yaml();
         try {
             yaml.load(text);
