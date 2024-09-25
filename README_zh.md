@@ -34,8 +34,9 @@
 - JSON 比对
 - Java 常量提取为 JSON
 - 格式转换
-  - JSON 转为 XML
-  - XML 转为 JSON
+  - JSON <-> XML
+  - JSON <-> YAML
+  - JSON <-> Toml
 
 <br/>
 

@@ -28,6 +28,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/9/25
  */
+@SuppressWarnings("DuplicatedCode")
 public class MultiYamlDocumentChooser extends DialogWrapper {
 
     private JList<YamlDocumentModel> showList;
@@ -81,6 +82,8 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         // label.setFont();
         label.setIcon(AllIcons.Actions.IntentionBulb);
         label.setBorder(JBUI.Borders.emptyBottom(8));
+        label.setForeground(JBColor.GRAY);
+        label.withFont(JBUI.Fonts.label().asBold());
 
         JPanel firstPanel = new JPanel(new BorderLayout());
         firstPanel.add(label, BorderLayout.NORTH);

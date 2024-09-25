@@ -26,8 +26,9 @@
  - JSON Diff
  - Extracting Java constants to JSON
  - Format Converters
-   - JSON to XML Converter
-   - XML to JSON Converter
+   - JSON <-> XML
+   - JSON <-> YAML
+   - JSON <-> Toml
 
 
 <br/>
