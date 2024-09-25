@@ -43,4 +43,7 @@ public class PluginConstant {
 
     public static final String[] TIME_FQN = {LocalTime.class.getName(), Time.class.getName()};
 
+    public static final String htmlWrapper = "<html><body>{}</body></html>";
+    public static final String htmlBoldWrapper = "<html><body><b>{}</b></body></html>";
+
 }

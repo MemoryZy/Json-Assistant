@@ -1,8 +1,10 @@
 package cn.memoryzy.json.ui;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.YamlDocumentModel;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import com.intellij.icons.AllIcons;
@@ -78,12 +80,9 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
         scrollPane.setViewportBorder(JBUI.Borders.empty());
 
-        JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.tip"));
-        // label.setFont();
+        JBLabel label = new JBLabel(StrUtil.format(PluginConstant.htmlBoldWrapper, JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.tip")));
         label.setIcon(AllIcons.Actions.IntentionBulb);
         label.setBorder(JBUI.Borders.emptyBottom(8));
-        label.setForeground(JBColor.GRAY);
-        label.withFont(JBUI.Fonts.label().asBold());
 
         JPanel firstPanel = new JPanel(new BorderLayout());
         firstPanel.add(label, BorderLayout.NORTH);
