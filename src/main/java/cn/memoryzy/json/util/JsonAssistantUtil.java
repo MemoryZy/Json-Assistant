@@ -8,10 +8,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.FileTypeEnum;
-import cn.memoryzy.json.model.formats.BaseFormatModel;
-import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
-import cn.memoryzy.json.model.formats.XmlFormatModel;
-import cn.memoryzy.json.model.formats.YamlFormatModel;
+import cn.memoryzy.json.model.formats.*;
 import cn.memoryzy.json.ui.JsonStructureDialog;
 import cn.memoryzy.json.ui.JsonViewerComponentProvider;
 import cn.memoryzy.json.ui.component.JsonViewerPanel;
@@ -157,6 +154,13 @@ public class JsonAssistantUtil {
         }
 
         model = new YamlFormatModel(startOffset, endOffset, primaryCaret);
+        BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
+
+        if (StrUtil.isNotBlank(model.getContent())) {
+            return model;
+        }
+
+        model = new TomlFormatModel(startOffset, endOffset, primaryCaret);
         BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
 
         if (StrUtil.isNotBlank(model.getContent())) {

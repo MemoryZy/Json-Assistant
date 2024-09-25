@@ -74,6 +74,11 @@ public abstract class BaseFormatModel {
 
     public abstract String getDefaultHint();
 
+    /**
+     * 执行转换前的处理，若要更改转换的文本，则调用setContent()方法
+     */
+    public abstract void preprocessing();
+
 
     public static void prepareModel(Project project, @NotNull Document document, String selectText, String documentText, BaseFormatModel model) {
         String text = null;

@@ -54,7 +54,6 @@ public class JsonHistoryChooser extends DialogWrapper {
         this.project = project;
         this.toolWindow = toolWindow;
 
-        setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("json.history.window.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("json.history.window.ok.button.text"));
         setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.history.window.cancel.button.text"));

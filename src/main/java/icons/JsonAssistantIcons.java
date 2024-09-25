@@ -31,12 +31,22 @@ public class JsonAssistantIcons {
     public static final Icon DIFF = load("/icons/diff.svg");
     public static final Icon STAR_FALL_MINI = load("/icons/star_fall_mini.svg");
     public static final Icon XML = load("/icons/xml.svg");
+    public static final Icon EXTRACT = load("/icons/extract.svg");
+
+    public static class FileTypes {
+        public static final Icon TOML = load("/icons/fileTypes/toml-file.svg");
+    }
+
+    public static class ExpUiFileTypes {
+        public static final Icon TOML = load("/icons/expui/fileTypes/toml.svg");
+    }
 
     public static class ExpUi {
         public static final Icon NEW_JSON = load("/icons/expui/json.svg");
         public static final Icon NEW_GROUP_BY_CLASS = load("/icons/expui/groupByClass.svg");
         public static final Icon NEW_TOOL_WINDOW_JSON_PATH = load("/icons/expui/toolWindowJsonPath.svg");
         public static final Icon NEW_ROTATE = load("/icons/expui/rotate.svg");
+        public static final Icon NEW_EXTRACT = load("/icons/expui/extract.svg");
     }
 
     /**

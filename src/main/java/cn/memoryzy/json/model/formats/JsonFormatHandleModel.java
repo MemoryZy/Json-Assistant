@@ -144,4 +144,7 @@ public class JsonFormatHandleModel extends BaseFormatModel {
         return defaultHint;
     }
 
+    @Override
+    public void preprocessing() {
+    }
 }

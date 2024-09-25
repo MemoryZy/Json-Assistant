@@ -56,4 +56,7 @@ public class XmlFormatModel extends BaseFormatModel {
         return JsonAssistantBundle.messageOnSystem("hint.all.xml.to.json.text");
     }
 
+    @Override
+    public void preprocessing() {
+    }
 }

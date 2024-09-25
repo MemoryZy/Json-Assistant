@@ -13,6 +13,7 @@ import com.intellij.psi.*;
 import com.intellij.psi.impl.ConstantExpressionEvaluator;
 import com.intellij.psi.impl.LanguageConstantExpressionEvaluator;
 import com.intellij.psi.util.PsiTreeUtil;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.extractor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.extractor.description"));
+        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_EXTRACT : JsonAssistantIcons.EXTRACT);
     }
 
     @Override
