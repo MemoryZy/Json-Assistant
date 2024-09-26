@@ -14,10 +14,8 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
-import cn.memoryzy.json.util.JavaUtil;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.Notifications;
-import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationType;
@@ -87,7 +85,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
-        jsonTextField.setFont(JBUI.Fonts.create("Consolas", 15));
+        jsonTextField.setFont(UIManager.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());

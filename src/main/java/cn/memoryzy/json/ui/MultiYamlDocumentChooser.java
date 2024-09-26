@@ -1,20 +1,23 @@
 package cn.memoryzy.json.ui;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.LanguageHolder;
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.YamlDocumentModel;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.speedSearch.ListWithFilter;
+import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +26,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,53 +55,49 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
-        showTextField.setFont(JBUI.Fonts.create("Consolas", 14));
+        showTextField.setFont(UIManager.consolasFont(14));
 
-        List<YamlDocumentModel> models = YamlDocumentModel.of(values);
-        DefaultListModel<YamlDocumentModel> defaultListModel = JBList.createDefaultListModel(models);
-        showList = new JBList<>(defaultListModel);
-        showList.setFont(JBUI.Fonts.create("JetBrains Mono", 13));
+        showList = new JBList<>(fillHistoryListModel());
+        showList.setFont(UIManager.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        showList.addListSelectionListener(new SetWholeContentListSelectionListener());
+        showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());
 
-        // 选中第一条
-        if (!models.isEmpty()) {
-            showList.setSelectedIndex(0);
-        }
+        // 初始化鼠标左键双击事件
+        initLeftMouseDoubleClickListener();
+        // 初始化回车事件
+        initEnterListener();
+        // 默认选中第一条
+        selectFirstItemInList();
 
-        JBScrollPane scrollPane = new JBScrollPane(showList) {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension preferredSize = super.getPreferredSize();
-                if (!isPreferredSizeSet()) {
-                    setPreferredSize(new Dimension(0, preferredSize.height));
-                }
-                return preferredSize;
-            }
-        };
+        UIManager.updateListColorsScheme(showList);
+        UIManager.updateEditorTextFieldColorsScheme(showTextField);
 
-        scrollPane.setBorder(IdeBorderFactory.createBorder(SideBorder.ALL));
-        scrollPane.setViewportBorder(JBUI.Borders.empty());
-
-        JBLabel label = new JBLabel(StrUtil.format(PluginConstant.htmlBoldWrapper, JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.tip")));
+        JBLabel label = new JBLabel();
+        label.setForeground(JBColor.GRAY);
+        label.setFont(JBFont.label().deriveFont(12F));
+        label.setText(JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.tip"));
         label.setIcon(AllIcons.Actions.IntentionBulb);
         label.setBorder(JBUI.Borders.emptyBottom(8));
 
+        JComponent wrapComponent = UIManager.wrapListWithFilter(showList, YamlDocumentModel::getShortText, true);
+        rebuildListWithFilter();
+
         JPanel firstPanel = new JPanel(new BorderLayout());
         firstPanel.add(label, BorderLayout.NORTH);
-        firstPanel.add(scrollPane, BorderLayout.CENTER);
+        firstPanel.add(wrapComponent, BorderLayout.CENTER);
         firstPanel.setBorder(JBUI.Borders.empty(3));
 
         JBSplitter splitter = new JBSplitter(true, 0.3f);
         splitter.setFirstComponent(firstPanel);
         splitter.setSecondComponent(showTextField);
 
-        JPanel rootPanel = new JPanel(new BorderLayout());
-        rootPanel.add(splitter, BorderLayout.CENTER);
-        rootPanel.setPreferredSize(new Dimension(450, 500));
+        ScrollingUtil.installActions(showList);
+        ScrollingUtil.ensureSelectionExists(showList);
 
-        return rootPanel;
+        splitter.setPreferredSize(JBUI.size(450, 500));
+
+        return splitter;
     }
 
     @Override
@@ -134,26 +134,62 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         return selectedValue != null;
     }
 
+    private void rebuildListWithFilter() {
+        ListWithFilter<?> listWithFilter = ComponentUtil.getParentOfType(ListWithFilter.class, showList);
+        if (listWithFilter != null) {
+            listWithFilter.getSpeedSearch().update();
+            if (showList.getModel().getSize() == 0) listWithFilter.resetFilter();
+        }
+    }
+
+    private void initEnterListener() {
+        DumbAwareAction.create(event -> close(OK_EXIT_CODE))
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), showList, getDisposable());
+    }
+
+    private void initLeftMouseDoubleClickListener() {
+        new DoubleClickListener() {
+            @Override
+            protected boolean onDoubleClick(@NotNull MouseEvent e) {
+                close(OK_EXIT_CODE);
+                return true;
+            }
+        }.installOn(showList);
+    }
+
+    private DefaultListModel<YamlDocumentModel> fillHistoryListModel() {
+        List<YamlDocumentModel> models = YamlDocumentModel.of(values);
+        return JBList.createDefaultListModel(models);
+    }
+
+    private void selectFirstItemInList() {
+        if (showList.getModel().getSize() > 0) {
+            showList.setSelectedIndex(0);
+        }
+    }
+
     public YamlDocumentModel getSelectValue() {
         return showList.getSelectedValue();
     }
+
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<YamlDocumentModel> {
         @Override
         protected void customizeCellRenderer(@NotNull JList<? extends YamlDocumentModel> list, YamlDocumentModel value,
                                              int index, boolean selected, boolean hasFocus) {
-            append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES);
-            append(" " + value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+            append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
+            append(" " + value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
             setIcon(AllIcons.FileTypes.Yaml);
+            SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
         }
     }
 
-    public class SetWholeContentListSelectionListener implements ListSelectionListener {
+    public class UpdateEditorListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             YamlDocumentModel selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
-                showTextField.setText(selectedValue.getWholeContent());
+                showTextField.setText(selectedValue.getLongText());
             }
         }
     }

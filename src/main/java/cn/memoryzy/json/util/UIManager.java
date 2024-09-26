@@ -2,7 +2,10 @@ package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
@@ -10,15 +13,26 @@ import com.intellij.openapi.project.Project;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.ScrollPaneFactory;
+import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.Function;
+import com.intellij.util.ObjectUtils;
+import com.intellij.util.ui.JBFont;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.util.Enumeration;
 import java.util.Objects;
+
 
 /**
  * @author Memory
@@ -114,4 +128,60 @@ public class UIManager implements Disposable {
             }
         });
     }
+
+    @SuppressWarnings("DuplicatedCode")
+    public static void updateListColorsScheme(JList<?> list) {
+        EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
+        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), JBColor.lazy(UIUtil::getListForeground));
+        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), JBColor.lazy(UIUtil::getListBackground));
+        list.setForeground(fg);
+        list.setBackground(bg);
+    }
+
+    public static void updateEditorColorsScheme(EditorEx editor) {
+        editor.setColorsScheme(EditorColorsManager.getInstance().getGlobalScheme());
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    public static void updateEditorTextFieldColorsScheme(EditorTextField editorTextField) {
+        EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
+        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), JBColor.lazy(UIUtil::getTextFieldForeground));
+        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), JBColor.lazy(UIUtil::getTextFieldBackground));
+        editorTextField.setForeground(fg);
+        editorTextField.setBackground(bg);
+    }
+
+    public static <T> JComponent wrapListWithFilter(@NotNull JList<? extends T> list,
+                                                    @Nullable Function<? super T, String> namer,
+                                                    boolean highlightAllOccurrences) {
+        // ListWithFilter 用于文本检索
+        return ListWithFilter.wrap(list, ScrollPaneFactory.createScrollPane(list), namer, highlightAllOccurrences);
+    }
+
+    public static JBFont consolasFont(int size) {
+        return JBUI.Fonts.create("Consolas", size);
+    }
+
+    public static JBFont jetBrainsMonoFont(int size) {
+        return JBUI.Fonts.create("JetBrains Mono", size);
+    }
+
+    public static JBFont microsoftYaHeiUIFont(int size) {
+        return JBUI.Fonts.create("Microsoft YaHei UI", size);
+    }
+
+    public static JBFont microsoftYaHeiUIFont(int size, int style) {
+        JBFont font = JBUI.Fonts.create("Microsoft YaHei UI", size);
+        switch (style) {
+            case Font.BOLD:
+                font = font.asBold();
+                break;
+            case Font.ITALIC:
+                font = font.asItalic();
+                break;
+        }
+
+        return font;
+    }
+
 }

@@ -60,7 +60,7 @@ public class JsonPathComponentProvider {
         this.action = () -> handleJsonPathResult(editor.getDocument().getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
         this.showTextEditor = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
-        this.showTextEditor.setFont(JBUI.Fonts.create("Consolas", 14));
+        this.showTextEditor.setFont(UIManager.consolasFont(14));
     }
 
     public JPanel createRootPanel() {
@@ -95,7 +95,7 @@ public class JsonPathComponentProvider {
         List<String> jsonPathHistoryList = getExpressionHistory();
         comboBoxModel = new CollectionComboBoxModel<>(jsonPathHistoryList);
         ComboBox<String> comboBox = new ComboBox<>(comboBoxModel);
-        JBFont font = JBUI.Fonts.create("JetBrains Mono", 14);
+        JBFont font = UIManager.jetBrainsMonoFont(14);
 
         if (JSON_PATH_FILE_TYPE_CLASS != null) {
             jsonPathNestedComboBoxEditor = new JsonPathFileTypeComboBoxEditor(project, getJsonPathFileType(), font);

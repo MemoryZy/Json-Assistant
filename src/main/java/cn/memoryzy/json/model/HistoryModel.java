@@ -1,6 +1,8 @@
 package cn.memoryzy.json.model;
 
 import cn.memoryzy.json.util.JsonAssistantUtil;
+import com.intellij.openapi.editor.actions.ContentChooser;
+import com.intellij.openapi.util.text.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,37 +14,39 @@ import java.util.List;
 public class HistoryModel {
 
     private final int index;
-    private final String abbreviatedContent;
-    private final String wholeContent;
+    private final String shortText;
+    private final String longText;
 
-    public HistoryModel(int index, String abbreviatedContent, String wholeContent) {
+    public HistoryModel(int index, String shortText, String longText) {
         this.index = index;
-        this.abbreviatedContent = abbreviatedContent;
-        this.wholeContent = wholeContent;
+        this.shortText = shortText;
+        this.longText = longText;
     }
 
     public int getIndex() {
         return index;
     }
 
-    public String getAbbreviatedContent() {
-        return abbreviatedContent;
+    public String getShortText() {
+        return shortText;
     }
 
-    public String getWholeContent() {
-        return wholeContent;
+    public String getLongText() {
+        return longText;
     }
 
     @Override
     public String toString() {
-        return abbreviatedContent;
+        return shortText;
     }
 
     public static List<HistoryModel> of(List<String> historyList){
         List<HistoryModel> models = new ArrayList<>();
         for (int i = 0; i < historyList.size(); i++) {
-            String element = historyList.get(i);
-            models.add(new HistoryModel(i, JsonAssistantUtil.truncateText(element, 45, "..."), element));
+            String jsonStr = historyList.get(i);
+            String truncatedText = JsonAssistantUtil.truncateText(jsonStr, 80, "...");
+            truncatedText = StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);
+            models.add(new HistoryModel(i, truncatedText, jsonStr));
         }
 
         return models;

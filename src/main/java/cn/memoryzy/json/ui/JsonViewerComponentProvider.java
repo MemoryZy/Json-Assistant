@@ -24,6 +24,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
@@ -56,7 +57,6 @@ public class JsonViewerComponentProvider {
     private final boolean initWindow;
     private final JsonViewerHistoryPersistentState historyState;
     private EditorEx editor;
-    private EditorColorsScheme defaultColorsScheme;
 
     private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
@@ -107,8 +107,7 @@ public class JsonViewerComponentProvider {
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
 
-        this.defaultColorsScheme = editor.getColorsScheme();
-        toggleColorSchema(editor, defaultColorsScheme, persistentState.followEditorTheme);
+        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.followEditorTheme);
 
         // if (firstContent) {
         //     editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
@@ -121,7 +120,7 @@ public class JsonViewerComponentProvider {
         editor.getDocument().addDocumentListener(new DocumentListenerImpl(editor));
 
         JComponent component = textEditor.getComponent();
-        component.setFont(new Font("Consolas", Font.PLAIN, 15));
+        component.setFont(UIManager.consolasFont(15));
 
         return textEditor;
     }
@@ -256,7 +255,7 @@ public class JsonViewerComponentProvider {
             // 行号显示
             toggleLineNumbers(editor, persistentState.displayLineNumbers);
             // 配色切换
-            toggleColorSchema(editor, defaultColorsScheme, persistentState.followEditorTheme);
+            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.followEditorTheme);
             // 切换展示折叠区域
             toggleFoldingOutline(editor, persistentState.foldingOutline);
         }

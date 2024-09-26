@@ -11,6 +11,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -63,7 +64,7 @@ public class JsonStructureDialog extends DialogWrapper {
         tree = new Tree(model);
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
-        tree.setFont(new Font("JetBrains Mono", Font.PLAIN, 12));
+        tree.setFont(UIManager.jetBrainsMonoFont(12));
 
         initCellRenderer();
         initRightMousePopupMenu();

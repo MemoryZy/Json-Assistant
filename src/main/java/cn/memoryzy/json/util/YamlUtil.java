@@ -51,7 +51,8 @@ public class YamlUtil {
             return false;
         }
 
-        return resultList.stream().allMatch(el -> el);
+        // 只要有，那就表示是正常存在文档，哪怕存在空文档
+        return resultList.stream().anyMatch(el -> el);
     }
 
     public static List<Object> loadAll(String yamlStr) {

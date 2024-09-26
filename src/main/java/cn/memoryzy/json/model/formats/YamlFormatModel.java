@@ -12,6 +12,8 @@ import com.intellij.openapi.editor.Caret;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Memory
@@ -69,10 +71,17 @@ public class YamlFormatModel extends BaseFormatModel {
         }
 
         List<Object> values = YamlUtil.loadAll(content);
-        MultiYamlDocumentChooser chooser = new MultiYamlDocumentChooser(values);
-        if (chooser.showAndGet()) {
-            YamlDocumentModel selectValue = chooser.getSelectValue();
-            setContent(JsonUtil.toJsonStr(selectValue.getValue()));
+        List<Object> collect = values.stream().filter(el -> el instanceof List || el instanceof Map).collect(Collectors.toList());
+        // 若有效文档只有一个，则默认将其作转换的文档
+        if (collect.size() == 1) {
+            Object obj = collect.get(0);
+            setContent(JsonUtil.toJsonStr(obj));
+        } else {
+            MultiYamlDocumentChooser chooser = new MultiYamlDocumentChooser(collect);
+            if (chooser.showAndGet()) {
+                YamlDocumentModel selectValue = chooser.getSelectValue();
+                setContent(JsonUtil.toJsonStr(selectValue.getValue()));
+            }
         }
     }
 }
