@@ -146,6 +146,9 @@ public class JsonViewerComponentProvider {
             String clipboard = PlatformUtil.getClipboard();
             if (StrUtil.isNotBlank(clipboard)) {
                 jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
+                if (StrUtil.isNotBlank(jsonStr)) {
+                    jsonStr = JsonUtil.formatJson(jsonStr);
+                }
             }
 
             if (StrUtil.isBlank(jsonStr) && persistentState.loadLastRecord) {
