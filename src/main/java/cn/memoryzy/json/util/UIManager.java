@@ -132,8 +132,8 @@ public class UIManager implements Disposable {
     @SuppressWarnings("DuplicatedCode")
     public static void updateListColorsScheme(JList<?> list) {
         EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), JBColor.lazy(UIUtil::getListForeground));
-        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), JBColor.lazy(UIUtil::getListBackground));
+        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), new JBColor(UIUtil::getListForeground));
+        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), new JBColor(UIUtil::getListBackground));
         list.setForeground(fg);
         list.setBackground(bg);
     }
@@ -145,8 +145,8 @@ public class UIManager implements Disposable {
     @SuppressWarnings("DuplicatedCode")
     public static void updateEditorTextFieldColorsScheme(EditorTextField editorTextField) {
         EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), JBColor.lazy(UIUtil::getTextFieldForeground));
-        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), JBColor.lazy(UIUtil::getTextFieldBackground));
+        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), new JBColor(UIUtil::getTextFieldForeground));
+        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), new JBColor(UIUtil::getTextFieldBackground));
         editorTextField.setForeground(fg);
         editorTextField.setBackground(bg);
     }
