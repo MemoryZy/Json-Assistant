@@ -18,7 +18,7 @@
     <depends optional="true" config-file="optional/plugin-java.xml">com.intellij.java</depends>
     <depends optional="true" config-file="optional/plugin-kotlin.xml">org.jetbrains.kotlin</depends>
     <!-- 低版本的 IDE 无法加载 org.toml.lang，如 2020.3.1 -->
-    <!-- <depends optional="true" config-file="optional/plugin-toml.xml">org.toml.lang</depends> -->
+    <depends optional="true" config-file="optional/plugin-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="optional/plugin-yaml.xml">org.jetbrains.plugins.yaml</depends>
 
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
@@ -38,22 +38,19 @@
         <applicationConfigurable
                 id="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
                 parentId="tools"
+                groupWeight="-100"
                 instance="cn.memoryzy.json.extension.configurable.JsonAssistantMainConfigurable"
-                groupWeight="999"
                 bundle="messages.JsonAssistantBundle"
                 key="plugin.main.configurable.displayName"/>
 
-        <applicationConfigurable
-                id="JsonAssistant.Configurable.EditorOptionsConfigurable"
-                parentId="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
-                instance="cn.memoryzy.json.extension.configurable.EditorOptionsConfigurable"
-                bundle="messages.JsonAssistantBundle"
-                key="plugin.editor.options.configurable.displayName"/>
-
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.EditorOptionsPersistentState"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
+        <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
+        
+        <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
 
     <applicationListeners>

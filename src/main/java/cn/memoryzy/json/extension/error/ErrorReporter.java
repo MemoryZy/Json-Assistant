@@ -2,8 +2,8 @@ package cn.memoryzy.json.extension.error;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.diagnostic.AbstractMessage;
 import com.intellij.ide.BrowserUtil;
@@ -18,7 +18,6 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.util.ArrayUtil;
 import com.intellij.util.Consumer;
-import com.intellij.util.Urls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +58,7 @@ public class ErrorReporter extends ErrorReportSubmitter {
 
         String title = getTitle(event.getData());
         Map<String, String> parameters = getParameterMap(event, title, additionalInfo);
-        String url = Urls.newFromEncoded(HyperLinks.GITHUB_ISSUE_LINK).addParameters(parameters).toExternalForm();
+        String url = com.intellij.util.Urls.newFromEncoded(Urls.GITHUB_ISSUE_LINK).addParameters(parameters).toExternalForm();
 
         BrowserUtil.browse(url);
         consumer.consume(new SubmittedReportInfo(null, "GitHub issue", SubmittedReportInfo.SubmissionStatus.NEW_ISSUE));

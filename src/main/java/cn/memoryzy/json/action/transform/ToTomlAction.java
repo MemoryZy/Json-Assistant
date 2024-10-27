@@ -31,7 +31,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.toml.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.toml.description"));
-        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUiFileTypes.TOML : JsonAssistantIcons.FileTypes.TOML);
+        presentation.setIcon(JsonAssistantIcons.FileTypes.TOML);
     }
 
     @Override

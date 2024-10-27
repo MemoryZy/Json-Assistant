@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author Memory
  * @since 2024/7/25
  */
-public class HyperLinks {
+public class Urls {
 
     public static final AtomicBoolean reachableAtomic = new AtomicBoolean(false);
 
@@ -25,9 +25,6 @@ public class HyperLinks {
     public static final String MARKETPLACE_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant";
     public static final String MARKETPLACE_REVIEWS_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews";
     public static final String EMAIL_LINK = "memoryzk@outlook.com";
-    public static final String PLUGIN_SHARE_LINK = "#PLGUIN_SHARE";
-    public static final String PLUGIN_SPONSOR_LINK = "#PLGUIN_SPONSOR";
-    public static final String PLUGIN_EMAIL_LINK = "#PLGUIN_MAIL";
 
     public static final String JSONPATH_EXPRESS_DESCRIPTION = "https://goessner.net/articles/JsonPath/index.html#e2";
 

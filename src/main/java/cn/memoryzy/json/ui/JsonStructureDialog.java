@@ -8,20 +8,21 @@ import cn.hutool.json.JSONNull;
 import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.*;
 import com.intellij.ui.treeStructure.Tree;
 import icons.JsonAssistantIcons;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -96,8 +97,13 @@ public class JsonStructureDialog extends DialogWrapper {
     }
 
     @Override
-    protected void doHelpAction() {
-        BrowserUtil.browse(HyperLinks.TREE_LINK);
+    protected @NonNls @Nullable String getHelpId() {
+        return UrlEnum.SITE_TREE.getId();
+    }
+
+    @Override
+    public void show() {
+        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     public void convertToTreeNode(JSON json, JsonCollectInfoMutableTreeNode node) {

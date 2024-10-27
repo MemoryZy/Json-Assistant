@@ -1,7 +1,7 @@
 package cn.memoryzy.json.extension;
 
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.util.Notifications;
 import com.intellij.ide.plugins.DynamicPluginListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
@@ -24,7 +24,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     @Override
     public void runActivity(@NotNull Project project) {
         // 验证地址可达性
-        HyperLinks.verifyReachable();
+        Urls.verifyReachable();
 
         // 获取版本
         String currentVersion = JsonAssistantPlugin.getVersion();

@@ -28,6 +28,6 @@ public class ConfigureEditorOptionsAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), JsonAssistantBundle.message("plugin.editor.options.configurable.displayName"));
+        ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), JsonAssistantBundle.message("plugin.main.configurable.displayName"));
     }
 }

@@ -11,22 +11,21 @@ import java.util.*;
  * @author Memory
  * @since 2024/7/12
  */
-public class PluginConstant {
+public interface PluginConstant {
 
-    public static final String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
-    public static final String JSON_VIEWER_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonViewer";
-    public static final String JSON_VIEWER_CONFIGURABLE_ID = "JsonAssistant.Configurable.EditorOptionsConfigurable";
+    String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
+    String JSON_VIEWER_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonViewer";
 
-    public static final String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
-    public static final String LOMBOK_LIB = "org.projectlombok:lombok";
-    public static final String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
+    String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
+    String LOMBOK_LIB = "org.projectlombok:lombok";
+    String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
 
-    public static final String JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME = "View";
+    String JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME = "View";
 
-    public static final String OUTLINE_PROPERTY = "JComponent.outline";
-    public static final String ERROR_VALUE = "error";
+    String OUTLINE_PROPERTY = "JComponent.outline";
+    String ERROR_VALUE = "error";
 
-    public static final String[] COLLECTION_FQN = {
+    String[] COLLECTION_FQN = {
             Iterable.class.getName(),
             Collection.class.getName(),
             List.class.getName(),
@@ -35,15 +34,12 @@ public class PluginConstant {
             LinkedList.class.getName()
     };
 
-    public static final String[] BIGDECIMAL_FQN = {BigDecimal.class.getName()};
+    String[] BIGDECIMAL_FQN = {BigDecimal.class.getName()};
 
-    public static final String[] DATE_TIME_FQN = {Date.class.getName(), LocalDateTime.class.getName()};
+    String[] DATE_TIME_FQN = {Date.class.getName(), LocalDateTime.class.getName()};
 
-    public static final String[] DATE_FQN = {LocalDate.class.getName()};
+    String[] DATE_FQN = {LocalDate.class.getName()};
 
-    public static final String[] TIME_FQN = {LocalTime.class.getName(), Time.class.getName()};
-
-    public static final String htmlWrapper = "<html><body>{}</body></html>";
-    public static final String htmlBoldWrapper = "<html><body><b>{}</b></body></html>";
+    String[] TIME_FQN = {LocalTime.class.getName(), Time.class.getName()};
 
 }

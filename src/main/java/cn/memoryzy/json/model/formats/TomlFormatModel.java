@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TomlUtil;
 import com.intellij.openapi.editor.Caret;
 import icons.JsonAssistantIcons;
@@ -44,7 +43,7 @@ public class TomlFormatModel extends BaseFormatModel {
 
     @Override
     public Icon getActionIcon() {
-        return PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUiFileTypes.TOML : JsonAssistantIcons.FileTypes.TOML;
+        return JsonAssistantIcons.FileTypes.TOML;
     }
 
     @Override

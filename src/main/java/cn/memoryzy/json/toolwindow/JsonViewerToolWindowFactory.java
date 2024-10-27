@@ -4,10 +4,9 @@ import cn.memoryzy.json.action.DonateAction;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.ui.JsonViewerComponentProvider;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.DumbAware;
@@ -34,12 +33,10 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {
-        String title = JsonAssistantBundle.message("json.window.title");
+        String title = JsonAssistantBundle.message("plugin.main.configurable.displayName");
         toolWindow.setTitle(title);
         toolWindow.setStripeTitle(title);
-        toolWindow.setIcon(PlatformUtil.isNewUi()
-                ? JsonAssistantIcons.ExpUi.NEW_TOOL_WINDOW_JSON_PATH
-                : JsonAssistantIcons.TOOL_WINDOW_JSON_PATH);
+        toolWindow.setIcon(JsonAssistantIcons.ToolWindow.LOGO);
     }
 
     @Override
@@ -76,7 +73,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         contentManager.addContent(content, 0);
 
         // 验证地址可达性
-        HyperLinks.verifyReachable();
+        Urls.verifyReachable();
     }
 
 }

@@ -1,8 +1,14 @@
 {
   "icons": {
     "expui": {
-      "common": {
-        "groupByClass.svg": "icons/groupByClass.svg"
+      "groupByClass.svg": "icons/groupByClass.svg",
+      "json.svg": "icons/json.svg",
+      "extract.svg": "icons/extract.svg",
+      "fileTypes": {
+        "toml.svg": "icons/fileTypes/toml-file.svg"
+      },
+      "toolwindow": {
+        "logo.svg": "icons/toolwindow/logo.svg"
       }
     }
   }

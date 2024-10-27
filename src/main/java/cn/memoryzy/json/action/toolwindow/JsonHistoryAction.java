@@ -6,7 +6,6 @@ import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -69,8 +68,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
             return;
         }
 
-        JsonHistoryChooser chooser = new JsonHistoryChooser(project, toolWindow);
-        ApplicationManager.getApplication().invokeLater(chooser::show);
+        new JsonHistoryChooser(project, toolWindow).show();
     }
 
     private String getShortcut() {

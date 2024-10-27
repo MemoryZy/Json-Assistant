@@ -3,10 +3,8 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.JsonToJavaBeanDialog;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
@@ -45,7 +43,7 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.javabean.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.javabean.description"));
-        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_GROUP_BY_CLASS : JsonAssistantIcons.GROUP_BY_CLASS);
+        presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
     }
 
     @Override
@@ -62,8 +60,7 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
         // 当前 module
         Module module = ModuleUtil.findModuleForPsiElement(directory);
         // 窗口
-        JsonToJavaBeanDialog dialog = new JsonToJavaBeanDialog(project, directory, module);
-        ApplicationManager.getApplication().invokeLater(dialog::show);
+        new JsonToJavaBeanDialog(project, directory, module).show();
     }
 
     @Override

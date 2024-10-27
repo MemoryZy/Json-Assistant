@@ -4,14 +4,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.DonateAction;
 import cn.memoryzy.json.action.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.ui.SupportDialog;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
 import com.intellij.notification.impl.NotificationsManagerImpl;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.wm.IdeFrame;
@@ -25,6 +25,7 @@ import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -82,9 +83,10 @@ public class Notifications {
     @SuppressWarnings({"deprecation", "DuplicatedCode"})
     public static void showWelcomeNotification(Project project) {
         Notification notification = Notifications.BALLOON_LOG_GROUP
-                .createNotification(
-                        JsonAssistantBundle.messageOnSystem("notify.welcome.content",
-                                HyperLinks.GITHUB_LINK, HyperLinks.PLUGIN_SPONSOR_LINK) + "<br/>",
+                .createNotification(JsonAssistantBundle.messageOnSystem("notify.welcome.content",
+                                Urls.GITHUB_LINK,
+                                UrlEnum.SPONSOR.getId()
+                        ) + "<br/>",
                         NotificationType.INFORMATION)
                 .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
                 .setImportant(true)
@@ -114,7 +116,7 @@ public class Notifications {
             changeNotes = "<ul></ul>";
         }
 
-        String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", HyperLinks.GITHUB_LINK, HyperLinks.PLUGIN_SPONSOR_LINK);
+        String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", Urls.GITHUB_LINK, UrlEnum.SPONSOR.getId());
         content += "<br/>" + JsonAssistantBundle.messageOnSystem("notify.update.content", changeNotes);
 
         Notification notification = Notifications.BALLOON_LOG_GROUP
@@ -178,12 +180,11 @@ public class Notifications {
         protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
             String url = e.getDescription();
 
-            if (url.equals(HyperLinks.PLUGIN_SPONSOR_LINK)) {
-                if (HyperLinks.isReachable()) {
-                    BrowserUtil.browse(HyperLinks.SPONSOR_LINK);
+            if (Objects.equals(UrlEnum.SPONSOR.getId(), url)) {
+                if (Urls.isReachable()) {
+                    BrowserUtil.browse(UrlEnum.SPONSOR.getUrl());
                 } else {
-                    SupportDialog dialog = new SupportDialog();
-                    ApplicationManager.getApplication().invokeLater(dialog::show);
+                    new SupportDialog().show();
                 }
             } else {
                 BrowserUtil.browse(url);

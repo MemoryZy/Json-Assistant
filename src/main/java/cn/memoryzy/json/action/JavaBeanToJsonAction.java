@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import cn.memoryzy.json.util.JavaUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.Notifications;
@@ -36,7 +37,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.javabean.to.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.javabean.to.json.description"));
-        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_JSON : JsonAssistantIcons.JSON);
+        presentation.setIcon(JsonAssistantIcons.JSON);
     }
 
 
@@ -54,10 +55,12 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         Map<String, Object> jsonMap = new TreeMap<>();
         // 忽略的属性
         Map<String, List<String>> ignoreMap = new HashMap<>();
+        // 相关配置
+        AttributeSerializationPersistentState persistentState = AttributeSerializationPersistentState.getInstance();
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap);
+            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, persistentState);
         } catch (Error e) {
             LOG.error(e);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);

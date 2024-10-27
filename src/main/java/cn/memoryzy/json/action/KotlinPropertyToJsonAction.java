@@ -3,6 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -31,7 +32,7 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.kt.class.property.to.json.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.kt.class.property.to.json.description"));
-        presentation.setIcon(PlatformUtil.isNewUi() ? JsonAssistantIcons.ExpUi.NEW_JSON : JsonAssistantIcons.JSON);
+        presentation.setIcon(JsonAssistantIcons.JSON);
     }
 
     @Override
@@ -42,10 +43,12 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         Map<String, Object> jsonMap = new TreeMap<>();
         // 忽略的属性
         Map<String, List<String>> ignoreMap = new HashMap<>();
+        // 相关配置
+        AttributeSerializationPersistentState persistentState = AttributeSerializationPersistentState.getInstance();
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(project, currentPsiClass, jsonMap, ignoreMap);
+            JavaUtil.recursionAddProperty(project, currentPsiClass, jsonMap, ignoreMap, persistentState);
         } catch (Error e) {
             LOG.error(e);
             // 给通知

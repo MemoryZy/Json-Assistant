@@ -2,8 +2,8 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.ui.JsonPathComponentProvider;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
@@ -80,7 +80,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
             private void setExternalLink(HelpTooltip helpTooltip) {
                 String name = JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.link");
-                Runnable action = () -> BrowserUtil.browse(HyperLinks.JSONPATH_EXPRESS_DESCRIPTION);
+                Runnable action = () -> BrowserUtil.browse(Urls.JSONPATH_EXPRESS_DESCRIPTION);
                 boolean external = true;
 
                 // 带有 boolean external 的方法

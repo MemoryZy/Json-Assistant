@@ -1,8 +1,8 @@
 package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
@@ -10,8 +10,8 @@ import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -26,6 +26,7 @@ import com.intellij.ui.speedSearch.NameFilteringListModel;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +36,6 @@ import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -110,17 +110,13 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     @Override
-    protected Action @NotNull [] createActions() {
-        List<Action> actions = new ArrayList<>();
-        actions.add(getOKAction());
-        actions.add(getCancelAction());
-        actions.add(getHelpAction());
-        return actions.toArray(new Action[0]);
+    protected @NonNls @Nullable String getHelpId() {
+        return UrlEnum.DEFAULT.getId();
     }
 
     @Override
-    protected void doHelpAction() {
-        BrowserUtil.browse(HyperLinks.OVERVIEW);
+    public void show() {
+        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override

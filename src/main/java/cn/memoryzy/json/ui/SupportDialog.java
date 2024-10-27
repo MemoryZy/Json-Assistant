@@ -2,10 +2,12 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.HtmlConstant;
+import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.ui.component.HyperLinkJBLabel;
 import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -53,19 +55,22 @@ public class SupportDialog extends DialogWrapper {
         initLinkListener();
 
         supportHeader.setIcon(JsonAssistantIcons.DONATE);
-        supportHeader.setText(StrUtil.format(PluginConstant.htmlBoldWrapper, JsonAssistantBundle.messageOnSystem("dialog.support.support.header")));
-        supportContent.setText(StrUtil.format(PluginConstant.htmlWrapper, JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
-                HyperLinks.GITHUB_LINK, HyperLinks.MARKETPLACE_REVIEWS_LINK, HyperLinks.PLUGIN_SHARE_LINK)));
+        supportHeader.setText(StrUtil.format(HtmlConstant.HTML_BOLD_WRAPPER, JsonAssistantBundle.messageOnSystem("dialog.support.support.header")));
+        supportContent.setText(StrUtil.format(HtmlConstant.HTML_WRAPPER,
+                JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
+                        Urls.GITHUB_LINK,
+                        Urls.MARKETPLACE_REVIEWS_LINK,
+                        UrlEnum.SHARE.getId())));
 
         donateHeader.setIcon(JsonAssistantIcons.HEART);
-        donateHeader.setText(StrUtil.format(PluginConstant.htmlBoldWrapper, JsonAssistantBundle.messageOnSystem("dialog.support.donate.header")));
-        donateContent.setText(StrUtil.format(PluginConstant.htmlWrapper, JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
+        donateHeader.setText(StrUtil.format(HtmlConstant.HTML_BOLD_WRAPPER, JsonAssistantBundle.messageOnSystem("dialog.support.donate.header")));
+        donateContent.setText(StrUtil.format(HtmlConstant.HTML_WRAPPER, JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
 
         wechatLabel.setIcon(JsonAssistantIcons.WECHAT_PAY);
-        wechatLabel.setText(StrUtil.format(PluginConstant.htmlBoldWrapper, JsonAssistantBundle.messageOnSystem("dialog.support.wechat.pay.text")));
+        wechatLabel.setText(StrUtil.format(HtmlConstant.HTML_BOLD_WRAPPER, JsonAssistantBundle.messageOnSystem("dialog.support.wechat.pay.text")));
 
         alipayLabel.setIcon(JsonAssistantIcons.ALIPAY);
-        alipayLabel.setText(StrUtil.format(PluginConstant.htmlBoldWrapper, JsonAssistantBundle.messageOnSystem("dialog.support.alipay.text")));
+        alipayLabel.setText(StrUtil.format(HtmlConstant.HTML_BOLD_WRAPPER, JsonAssistantBundle.messageOnSystem("dialog.support.alipay.text")));
 
         donateNote.setIcon(JsonAssistantIcons.LABEL);
         donateNote.setText(JsonAssistantBundle.messageOnSystem("dialog.support.donate.link.text"));
@@ -84,7 +89,7 @@ public class SupportDialog extends DialogWrapper {
                 JBPopupFactory.getInstance()
                         .createHtmlTextBalloonBuilder(
                                 JsonAssistantBundle.messageOnSystem("dialog.support.donate.note.text",
-                                        HyperLinks.PLUGIN_EMAIL_LINK, HyperLinks.EMAIL_LINK),
+                                        UrlEnum.MAIL.getId(), Urls.EMAIL_LINK),
                                 null,
                                 JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
                                 new HyperLinkListenerImpl())
@@ -117,5 +122,10 @@ public class SupportDialog extends DialogWrapper {
         List<Action> actions = new ArrayList<>();
         actions.add(getOKAction());
         return actions.toArray(new Action[0]);
+    }
+
+    @Override
+    public void show() {
+        ApplicationManager.getApplication().invokeLater(super::show);
     }
 }

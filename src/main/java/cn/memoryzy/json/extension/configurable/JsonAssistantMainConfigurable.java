@@ -1,8 +1,10 @@
 package cn.memoryzy.json.extension.configurable;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.ui.JsonAssistantMainConfigurableComponentProvider;
 import com.intellij.openapi.options.Configurable;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -26,16 +28,27 @@ public class JsonAssistantMainConfigurable implements Configurable {
     }
 
     @Override
+    public void reset() {
+        if (componentProvider != null) componentProvider.reset();
+    }
+
+    @Override
     public boolean isModified() {
-        return false;
+        return componentProvider != null && componentProvider.isModified();
     }
 
     @Override
     public void apply() {
+        if (componentProvider != null) componentProvider.apply();
     }
 
     @Override
     public void disposeUIResources() {
         componentProvider = null;
+    }
+
+    @Override
+    public @Nullable @NonNls String getHelpTopic() {
+        return UrlEnum.DEFAULT.getId();
     }
 }

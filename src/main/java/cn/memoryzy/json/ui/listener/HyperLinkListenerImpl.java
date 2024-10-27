@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.listener;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
@@ -14,6 +14,7 @@ import com.intellij.util.ui.JBUI;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.net.URI;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -26,31 +27,26 @@ public class HyperLinkListenerImpl extends HyperlinkAdapter {
     @Override
     protected void hyperlinkActivated(HyperlinkEvent e) {
         String url = e.getDescription();
-        switch (url) {
-            case HyperLinks.PLUGIN_SHARE_LINK:
-                execShareLinkAction(e);
-                break;
-            case HyperLinks.PLUGIN_EMAIL_LINK:
-                execEmailLinkAction(e);
-                break;
-            default:
-                BrowserUtil.browse(url);
-                break;
+        if (Objects.equals(UrlEnum.SHARE.getId(), url)) {
+            execShareLinkAction(e, UrlEnum.SHARE.getUrl());
+        } else if (Objects.equals(UrlEnum.MAIL.getId(), url)) {
+            execEmailLinkAction(UrlEnum.MAIL.getUrl());
+        } else {
+            BrowserUtil.browse(url);
         }
     }
 
 
-    private void execEmailLinkAction(HyperlinkEvent e) {
-        String uri = "mailto:" + HyperLinks.EMAIL_LINK;
+    private void execEmailLinkAction(String url) {
         try {
-            Desktop.getDesktop().mail(new URI(uri));
+            Desktop.getDesktop().mail(new URI(url));
         } catch (Exception ex) {
             LOG.error(ex);
         }
     }
 
-    private void execShareLinkAction(HyperlinkEvent e) {
-        PlatformUtil.setClipboard(HyperLinks.MARKETPLACE_LINK);
+    private void execShareLinkAction(HyperlinkEvent e, String url) {
+        PlatformUtil.setClipboard(url);
         Component component = e.getInputEvent().getComponent();
         JBPopupFactory.getInstance()
                 .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.support.share.text"),

@@ -5,8 +5,9 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
+import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.model.formats.*;
 import cn.memoryzy.json.ui.JsonStructureDialog;
@@ -18,7 +19,6 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Caret;
@@ -30,7 +30,6 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.util.io.StreamUtil;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -40,15 +39,11 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
-import com.intellij.util.Urls;
 import com.intellij.util.ui.UIUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -68,8 +63,7 @@ public class JsonAssistantUtil {
             return;
         }
 
-        JsonStructureDialog dialog = new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG));
-        ApplicationManager.getApplication().invokeLater(dialog::show);
+        new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG)).show();
     }
 
     public static void applyProcessedTextToDocumentOrClipboard(Project project, Editor editor, Document document,
@@ -320,26 +314,19 @@ public class JsonAssistantUtil {
 
 
     public static void openOnlineDoc(Project project, boolean useHtmlEditor) {
-        String url = HyperLinks.OVERVIEW;
+        String url = Urls.OVERVIEW;
         boolean darkTheme = UIUtil.isUnderDarcula();
         Map<String, String> parameters = darkTheme ? Map.of("theme", "dark") : Map.of("theme", "light");
-        url = Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();
+        url = com.intellij.util.Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();
 
         if (PlatformUtil.canBrowseInHTMLEditor() && useHtmlEditor) {
-            String timeoutContent = null;
-            try (InputStream html = JsonAssistantUtil.class.getResourceAsStream("timeout.html")) {
-                if (html != null) {
-                    timeoutContent = new String(StreamUtil.readBytes(html), StandardCharsets.UTF_8)
-                            .replace("__THEME__", darkTheme ? "theme-dark" : "")
-                            .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.title"))
-                            .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.message"))
-                            .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.action", url));
-                }
-            } catch (IOException ex) {
-                LOG.error(ex);
-            }
+            String timeoutContent = HtmlConstant.TIMEOUT_HTML
+                    .replace("__THEME__", darkTheme ? "theme-dark" : "")
+                    .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.title"))
+                    .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.message"))
+                    .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.action", url));
 
-            if (HyperLinks.isReachable()) {
+            if (Urls.isReachable()) {
                 HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("html.editor.quick.start.title"), url, timeoutContent);
                 return;
             }

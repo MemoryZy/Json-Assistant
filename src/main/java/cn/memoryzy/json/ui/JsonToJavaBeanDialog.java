@@ -8,17 +8,17 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HyperLinks;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotationEnum;
+import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.event.DocumentEvent;
@@ -40,6 +40,7 @@ import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.SwingHelper;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,22 +105,18 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     }
 
     @Override
-    protected Action @NotNull [] createActions() {
-        List<Action> actions = new ArrayList<>();
-        actions.add(getOKAction());
-        actions.add(getCancelAction());
-        actions.add(getHelpAction());
-        return actions.toArray(new Action[0]);
-    }
-
-    @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
         return classNameTextField;
     }
 
     @Override
-    protected void doHelpAction() {
-        BrowserUtil.browse(HyperLinks.JSON_TO_JAVA_BEAN_LINK);
+    protected @NonNls @Nullable String getHelpId() {
+        return UrlEnum.SITE_TO_JAVA_BEAN.getId();
+    }
+
+    @Override
+    public void show() {
+        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override

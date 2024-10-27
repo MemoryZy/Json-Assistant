@@ -8,7 +8,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.util.ui.JBUI;
@@ -51,8 +50,7 @@ public class DonateAction extends DumbAwareAction implements CustomComponentActi
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        SupportDialog dialog = new SupportDialog();
-        ApplicationManager.getApplication().invokeLater(dialog::show);
+        new SupportDialog().show();
     }
 
 }
