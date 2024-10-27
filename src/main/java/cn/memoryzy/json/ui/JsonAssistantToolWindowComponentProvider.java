@@ -8,8 +8,8 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
-import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
-import cn.memoryzy.json.ui.component.JsonViewerPanel;
+import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
+import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -49,30 +49,31 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonViewerComponentProvider {
+public class JsonAssistantToolWindowComponentProvider {
 
     private final Project project;
     private final FileType editorFileType;
+    @SuppressWarnings("FieldCanBeLocal")
     private final boolean firstContent;
     private final boolean initWindow;
-    private final JsonViewerHistoryPersistentState historyState;
+    private final JsonHistoryPersistentState historyState;
     private EditorEx editor;
 
     private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
-    public JsonViewerComponentProvider(Project project, FileType editorFileType, boolean firstContent, boolean initWindow) {
+    public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean firstContent, boolean initWindow) {
         this.project = project;
         this.editorFileType = editorFileType;
         this.firstContent = firstContent;
         this.initWindow = initWindow;
-        this.historyState = JsonViewerHistoryPersistentState.getInstance(project);
+        this.historyState = JsonHistoryPersistentState.getInstance(project);
     }
 
     public JComponent createRootPanel() {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
-        JsonViewerPanel rootPanel = new JsonViewerPanel(new BorderLayout(), this.editor);
+        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout(), this.editor);
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
@@ -152,7 +153,7 @@ public class JsonViewerComponentProvider {
             }
 
             if (StrUtil.isBlank(jsonStr) && persistentState.loadLastRecord) {
-                JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
+                JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
                 LimitedList history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
                     jsonStr = history.get(0);

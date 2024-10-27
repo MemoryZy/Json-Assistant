@@ -5,7 +5,7 @@ import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
+import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -169,7 +169,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     private DefaultListModel<HistoryModel> fillHistoryListModel() {
-        JsonViewerHistoryPersistentState historyState = JsonViewerHistoryPersistentState.getInstance(project);
+        JsonHistoryPersistentState historyState = JsonHistoryPersistentState.getInstance(project);
         LimitedList historyList = historyState.getHistory();
         List<HistoryModel> historyModels = HistoryModel.of(historyList);
         return JBList.createDefaultListModel(historyModels);
@@ -236,7 +236,7 @@ public class JsonHistoryChooser extends DialogWrapper {
             HistoryModel selectedValue = showList.getSelectedValue();
             if (selectedValue == null) return;
 
-            JsonViewerHistoryPersistentState state = JsonViewerHistoryPersistentState.getInstance(project);
+            JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
             LimitedList historyList = state.getHistory();
             historyList.remove(selectedValue.getIndex());
 

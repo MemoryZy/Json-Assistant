@@ -6,7 +6,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.ui.JsonViewerComponentProvider;
+import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.DumbAware;
@@ -29,7 +29,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/6/20
  */
-public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware {
+public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {
@@ -46,7 +46,7 @@ public class JsonViewerToolWindowFactory implements ToolWindowFactory, DumbAware
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
         // 主界面
-        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, FileTypeHolder.JSON, true, true);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON, true, true);
 
         // 选项卡旁
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};

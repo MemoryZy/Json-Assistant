@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/10/24
  */
-@State(name = "JsonAssistantAttributeSerializationPersistentState", storages = {@Storage(value = "JsonAssistantAttributeSerializationPersistentState.xml")})
+@State(name = "JsonAssistantAttributeSerialization", storages = {@Storage(value = "JsonAssistantAttributeSerialization.xml")})
 public class AttributeSerializationPersistentState implements PersistentStateComponent<AttributeSerializationPersistentState> {
 
     public static AttributeSerializationPersistentState getInstance() {

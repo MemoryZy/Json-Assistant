@@ -1,6 +1,18 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 优化插件配置项，新增以下开关配置（属性序列化时）
+  - 序列化时是否包含随机值 ([#28](https://github.com/MemoryZy/Json-Assistant/issues/28))。
+  - 序列化时是否识别 FastJson 相关注解。
+  - 序列化时是否识别 Jackson 相关注解。
+- 更改侧边栏工具窗口名称及图标为插件的名称与图标。
+- 用户体验优化。
+- Optimize plug-in configuration items, add the following switch configuration (when serializing properties)
+  - Whether random values are included in serialization ([#28](https://github.com/MemoryZy/Json-Assistant/issues/28)).
+  - Whether FastJSON related annotations are recognized during serialization.
+  - Whether to recognize Jackson related annotations during serialization.
+- Change the sidebar tool window name and icon to the plugin name and icon.
+- User experience optimization.
 
 ## [1.6.5] - 2024-09-30
 

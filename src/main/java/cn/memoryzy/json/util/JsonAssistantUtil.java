@@ -10,9 +10,9 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.model.formats.*;
+import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.JsonStructureDialog;
-import cn.memoryzy.json.ui.JsonViewerComponentProvider;
-import cn.memoryzy.json.ui.component.JsonViewerPanel;
+import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.ide.BrowserUtil;
@@ -282,17 +282,17 @@ public class JsonAssistantUtil {
         return contentManager.getContent(0);
     }
 
-    public static JsonViewerPanel getPanelOnContent(Content content) {
+    public static JsonAssistantToolWindowPanel getPanelOnContent(Content content) {
         if (Objects.nonNull(content)) {
             SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
-            return (JsonViewerPanel) windowPanel.getContent();
+            return (JsonAssistantToolWindowPanel) windowPanel.getContent();
         }
 
         return null;
     }
 
     public static EditorEx getEditorOnContent(Content content) {
-        JsonViewerPanel viewerPanel = getPanelOnContent(content);
+        JsonAssistantToolWindowPanel viewerPanel = getPanelOnContent(content);
         if (Objects.nonNull(viewerPanel)) {
             return viewerPanel.getEditor();
         }
@@ -305,7 +305,7 @@ public class JsonAssistantUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonViewerComponentProvider window = new JsonViewerComponentProvider(project, editorFileType, false, false);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false, false);
         Content content = contentFactory.createContent(window.createRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);

@@ -29,7 +29,7 @@
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
         <toolWindow id="JsonAssistant.ToolWindow.JsonViewer"
-                    factoryClass="cn.memoryzy.json.toolwindow.JsonViewerToolWindowFactory"
+                    factoryClass="cn.memoryzy.json.toolwindow.JsonAssistantToolWindowFactory"
                     anchor="right"
                     secondary="true"
                     canCloseContents="true"
@@ -43,7 +43,7 @@
                 bundle="messages.JsonAssistantBundle"
                 key="plugin.main.configurable.displayName"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.EditorOptionsPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>

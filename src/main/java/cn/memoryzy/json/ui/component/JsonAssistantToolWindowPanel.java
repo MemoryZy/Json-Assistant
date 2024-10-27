@@ -10,11 +10,11 @@ import java.awt.*;
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonViewerPanel extends JPanel {
+public class JsonAssistantToolWindowPanel extends JPanel {
 
     private final EditorEx editor;
 
-    public JsonViewerPanel(LayoutManager layout, EditorEx editor) {
+    public JsonAssistantToolWindowPanel(LayoutManager layout, EditorEx editor) {
         super(layout);
         this.editor = editor;
     }

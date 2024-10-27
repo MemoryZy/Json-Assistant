@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.persistent.JsonViewerHistoryPersistentState;
+import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.Converter;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public class LimitedListConverter extends Converter<LimitedList> {
 
     @Override
     public @Nullable LimitedList fromString(@NotNull String value) {
-        LimitedList limitedList = new LimitedList(JsonViewerHistoryPersistentState.HISTORY_LIMIT);
+        LimitedList limitedList = new LimitedList(JsonHistoryPersistentState.HISTORY_LIMIT);
         if (StrUtil.isBlank(value)) {
             return limitedList;
         }
