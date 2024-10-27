@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.6.7] - 2024-10-27
+
 - 优化插件配置项，新增以下开关配置（属性序列化时）
   - 序列化时是否包含随机值 ([#28](https://github.com/MemoryZy/Json-Assistant/issues/28))。
   - 序列化时是否识别 FastJson 相关注解。
@@ -185,7 +188,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.5...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.7...HEAD
+[1.6.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.5...v1.6.7
 [1.6.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.0...v1.6.5
 [1.6.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.0...v1.5.1
