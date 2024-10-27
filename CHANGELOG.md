@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.6.5] - 2024-09-30
+
 - 修复工具窗口 JSON 编辑器无法保存状态问题。
 - 兼容 IDEA 2024.3 eap版本。
 - 支持 Yaml 与 Json 互相转换，并支持多文档 Yaml 转换。
@@ -170,7 +173,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.5...HEAD
+[1.6.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.0...v1.6.5
 [1.6.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.4.0...v1.5.0
