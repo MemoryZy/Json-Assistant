@@ -41,7 +41,7 @@
                 groupWeight="-100"
                 instance="cn.memoryzy.json.extension.configurable.JsonAssistantMainConfigurable"
                 bundle="messages.JsonAssistantBundle"
-                key="plugin.main.configurable.displayName"/>
+                key="setting.display.name"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.EditorOptionsPersistentState"/>

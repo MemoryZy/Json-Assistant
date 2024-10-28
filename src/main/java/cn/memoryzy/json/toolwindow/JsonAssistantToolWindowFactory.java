@@ -33,7 +33,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
 
     @Override
     public void init(@NotNull ToolWindow toolWindow) {
-        String title = JsonAssistantBundle.message("plugin.main.configurable.displayName");
+        String title = JsonAssistantBundle.message("setting.display.name");
         toolWindow.setTitle(title);
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.LOGO);

@@ -51,39 +51,39 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
     private void initAttributeSerializationComponent() {
         // ---------------- 属性序列化
-        attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.attribute.serialization.text"));
+        attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
         // ---------- 包含随机值
-        includeRandomValuesLabel.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.random.value.label.text"));
+        includeRandomValuesLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.label.text"));
         includeRandomValuesCb.setSelected(attributeSerializationPersistentState.includeRandomValues);
 
         includeRandomValuesDesc.setCopyable(true);
         includeRandomValuesDesc.setForeground(JBColor.GRAY);
         includeRandomValuesDesc.setFont(JBUI.Fonts.smallFont());
-        includeRandomValuesDesc.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.random.value.desc"));
+        includeRandomValuesDesc.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
 
         // ---------- 识别 FastJson 注解
-        fastJsonLabel.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.fastjson.label.text"));
+        fastJsonLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.label.text"));
         fastJsonCb.setSelected(attributeSerializationPersistentState.recognitionFastJsonAnnotation);
 
         fastJsonDesc.setCopyable(true);
         fastJsonDesc.setForeground(JBColor.GRAY);
         fastJsonDesc.setFont(JBUI.Fonts.smallFont());
-        fastJsonDesc.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.fastjson.desc"));
+        fastJsonDesc.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
 
-        jacksonLabel.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.jackson.label.text"));
+        jacksonLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.label.text"));
         jacksonCb.setSelected(attributeSerializationPersistentState.recognitionJacksonAnnotation);
 
         jacksonDesc.setCopyable(true);
         jacksonDesc.setForeground(JBColor.GRAY);
         jacksonDesc.setFont(JBUI.Fonts.smallFont());
-        jacksonDesc.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.jackson.desc"));
+        jacksonDesc.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
 
         addAttributeSerializationComponentClickListener();
     }
 
     private void initToolWindowComponent() {
         // ---------------- 工具窗口
-        toolWindowLabel.setText(JsonAssistantBundle.messageOnSystem("plugin.main.configurable.component.tool.window.text"));
+        toolWindowLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.tool.window.text"));
         // ---------- 导入最新 JSON 记录
         loadLastRecordCb.setSelected(editorOptionsPersistentState.loadLastRecord);
         loadLastRecordLabel.setText(JsonAssistantBundle.messageOnSystem("editor.options.configurable.component.load.last.record.cb.text"));

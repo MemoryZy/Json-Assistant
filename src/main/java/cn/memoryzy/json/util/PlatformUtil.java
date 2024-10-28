@@ -239,6 +239,8 @@ public class PlatformUtil {
     }
 
     public static boolean isChineseLocale() {
-        return Locale.CHINESE.getLanguage().equals(Locale.getDefault().getLanguage());
+        Locale locale = Locale.getDefault();
+        return Locale.CHINESE.getLanguage().equals(locale.getLanguage())
+                && (Objects.equals(locale.getCountry(), "") || Objects.equals(locale.getCountry(), "CN"));
     }
 }

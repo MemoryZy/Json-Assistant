@@ -2,7 +2,7 @@ package cn.memoryzy.json.action;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonToJavaBeanDialog;
+import cn.memoryzy.json.ui.dialog.JsonToJavaBeanDialog;
 import com.intellij.ide.IdeView;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;

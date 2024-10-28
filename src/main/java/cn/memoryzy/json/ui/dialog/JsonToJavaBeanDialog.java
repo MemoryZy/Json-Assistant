@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui;
+package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
@@ -71,7 +71,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.directory = directory;
         this.module = module;
 
-        setTitle(JsonAssistantBundle.message("json.to.javabean.title"));
+        setTitle(JsonAssistantBundle.messageOnSystem("json.to.javabean.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.ok.button.text"));
         setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.cancel.button.text"));
         getOKAction().setEnabled(false);

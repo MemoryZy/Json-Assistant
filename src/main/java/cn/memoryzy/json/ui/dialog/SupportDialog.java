@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui;
+package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;

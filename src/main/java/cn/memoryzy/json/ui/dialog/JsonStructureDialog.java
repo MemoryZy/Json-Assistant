@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui;
+package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
@@ -51,8 +51,8 @@ public class JsonStructureDialog extends DialogWrapper {
         this.json = json;
 
         setModal(false);
-        setTitle(JsonAssistantBundle.message("json.structure.window.title"));
-        setOKButtonText(JsonAssistantBundle.message("ok.button.text"));
+        setTitle(JsonAssistantBundle.messageOnSystem("json.structure.window.title"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.ok.button.text"));
         init();
     }
 

@@ -18,7 +18,7 @@ public class JsonAssistantMainConfigurable implements Configurable {
 
     @Override
     public String getDisplayName() {
-        return JsonAssistantBundle.message("plugin.main.configurable.displayName");
+        return JsonAssistantBundle.message("setting.display.name");
     }
 
     @Override

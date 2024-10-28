@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.model.YamlDocumentModel;
-import cn.memoryzy.json.ui.MultiYamlDocumentChooser;
+import cn.memoryzy.json.ui.dialog.MultiYamlDocumentChooser;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.YamlUtil;
 import com.intellij.icons.AllIcons;

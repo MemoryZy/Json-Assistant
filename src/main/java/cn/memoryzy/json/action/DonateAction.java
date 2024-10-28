@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.SupportDialog;
+import cn.memoryzy.json.ui.dialog.SupportDialog;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;

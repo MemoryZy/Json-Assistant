@@ -7,7 +7,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlEnum;
-import cn.memoryzy.json.ui.SupportDialog;
+import cn.memoryzy.json.ui.dialog.SupportDialog;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
@@ -18,14 +18,20 @@ import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.ui.BalloonImpl;
 import com.intellij.ui.BalloonLayoutData;
 import com.intellij.ui.awt.RelativePoint;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Memory
@@ -114,6 +120,9 @@ public class Notifications {
         String changeNotes = JsonAssistantPlugin.getJsonAssistant().getChangeNotes();
         if (StrUtil.isBlank(changeNotes)) {
             changeNotes = "<ul></ul>";
+        } else {
+            ImmutablePair<String, String> pair = distinguishChineseAndEnglishChangeNote(changeNotes);
+            changeNotes = PlatformUtil.isChineseLocale() ? pair.left : pair.right;
         }
 
         String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", Urls.GITHUB_LINK, UrlEnum.SPONSOR.getId());
@@ -168,6 +177,60 @@ public class Notifications {
         return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
     }
 
+    /**
+     * 区分中文与英文的 ChangeNote
+     *
+     * @param changeNotes 变更日志 (html)
+     * @return left: 中文；right: 英文
+     */
+    public static ImmutablePair<String, String> distinguishChineseAndEnglishChangeNote(String changeNotes) {
+        // 解析 HTML 代码
+        Document doc = Jsoup.parse(changeNotes);
+        // 获取所有<li>标签
+        Elements liElements = doc.select("li");
+        // 中文完整 Html
+        StringBuilder chineseHtml = new StringBuilder("<ul>");
+        // 英文完整 Html
+        StringBuilder englishHtml = new StringBuilder("<ul>");
+
+        for (Element li : liElements) {
+            List<String> parentsTagNameList = getParentsTagNameList(li);
+            Map<String, Long> tagMap = parentsTagNameList.stream().collect(Collectors.groupingBy(el -> el, Collectors.counting()));
+            Long ulNum = tagMap.get("ul");
+            Long liNum = tagMap.get("li");
+            // 去除嵌套的 li 标签（是否存在多个 ul 或多个 li）
+            if ((ulNum != null && ulNum > 1) || (liNum != null && liNum > 1)) {
+                continue;
+            }
+
+            // 标签内文本
+            String text = li.text();
+            // 完整标签
+            String outerHtml = li.outerHtml();
+            // 中文
+            if (JsonAssistantUtil.containsMultipleChineseCharacters(text)) {
+                chineseHtml.append(outerHtml);
+            } else {
+                englishHtml.append(outerHtml);
+            }
+        }
+
+        chineseHtml.append("</ul>");
+        englishHtml.append("</ul>");
+
+        return ImmutablePair.of(chineseHtml.toString(), englishHtml.toString());
+    }
+
+
+    private static List<String> getParentsTagNameList(Element li) {
+        List<String> list = new ArrayList<>();
+        Elements parents = li.parents();
+        for (Element parent : parents) {
+            list.add(parent.tagName());
+        }
+
+        return list;
+    }
 
     private static class FullContentNotification extends Notification implements NotificationFullContent {
         public FullContentNotification(@NotNull @NonNls String groupId, @NotNull String title, @NotNull String content, @NotNull NotificationType type) {

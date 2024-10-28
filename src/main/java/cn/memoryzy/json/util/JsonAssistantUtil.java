@@ -11,8 +11,8 @@ import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypeEnum;
 import cn.memoryzy.json.model.formats.*;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
-import cn.memoryzy.json.ui.JsonStructureDialog;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.execution.ui.ConsoleView;
 import com.intellij.ide.BrowserUtil;
@@ -348,6 +348,32 @@ public class JsonAssistantUtil {
 
     public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
         return fileType != null && Objects.equals(fileTypeClassName, fileType.getClass().getName());
+    }
+
+    /**
+     * 判断一个字符是否是中文字符（基本汉字范围）
+     */
+    private static boolean isChineseCharacter(char c) {
+        return (c >= '一' && c <= '\u9FFF');
+    }
+
+    /**
+     * 判断文本中是否存在多个中文字符
+     */
+    public static boolean containsMultipleChineseCharacters(String text) {
+        int chineseCount = 0;
+        for (char c : text.toCharArray()) {
+            if (isChineseCharacter(c)) {
+                chineseCount++;
+                if (chineseCount > 1) {
+                    // 一旦发现超过一个中文字符，立即返回true
+                    return true;
+                }
+            }
+        }
+
+        // 遍历完所有字符后，如果没有发现超过一个中文字符，则返回false
+        return false;
     }
 
 }

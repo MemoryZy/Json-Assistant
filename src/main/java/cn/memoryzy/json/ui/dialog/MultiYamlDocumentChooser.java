@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui;
+package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
