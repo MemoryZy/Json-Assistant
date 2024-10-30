@@ -21,7 +21,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 
 ## Key Features
-- JSON Viewer (Multi-Tab)
+- JSON Window (Multi-Tab)
   - Add Tab
   - Rename Tab
   - Move Tab to Editor

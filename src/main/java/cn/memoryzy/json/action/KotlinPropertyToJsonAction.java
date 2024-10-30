@@ -52,7 +52,7 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         } catch (Error e) {
             LOG.error(e);
             // 给通知
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.recursion"), NotificationType.ERROR, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.json.serialize.recursion"), NotificationType.ERROR, project);
             return;
         }
 
@@ -67,12 +67,12 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
 
         if (CollUtil.isNotEmpty(ignoreMap)) {
             Notifications.showFullNotification(
-                    JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.ignore.title"),
+                    JsonAssistantBundle.messageOnSystem("tip.json.serialize.ignore.title"),
                     JavaBeanToJsonAction.generateNotificationContent(entries),
                     NotificationType.INFORMATION,
                     project);
         } else {
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.javabean.to.json.tip.copy"), NotificationType.INFORMATION, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.json.serialize.copy"), NotificationType.INFORMATION, project);
         }
     }
 

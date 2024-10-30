@@ -64,7 +64,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
             JsonAssistantUtil.addNewContentWithEditorContentIfNeeded(project, jsonStr, FileTypeHolder.JSON);
         } catch (Exception ex) {
             PlatformUtil.setClipboard(jsonStr);
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
         }
     }
 

@@ -3,12 +3,16 @@ package cn.memoryzy.json.ui;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
+import cn.memoryzy.json.ui.dialog.SupportDialog;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
+import icons.JsonAssistantIcons;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
@@ -40,6 +44,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBCheckBox jacksonCb;
     private JBLabel jacksonLabel;
     private JBLabel jacksonDesc;
+    private ActionLink donateLink;
 
     private final EditorOptionsPersistentState editorOptionsPersistentState = EditorOptionsPersistentState.getInstance();
     private final AttributeSerializationPersistentState attributeSerializationPersistentState = AttributeSerializationPersistentState.getInstance();
@@ -47,6 +52,15 @@ public class JsonAssistantMainConfigurableComponentProvider {
     public JsonAssistantMainConfigurableComponentProvider() {
         initAttributeSerializationComponent();
         initToolWindowComponent();
+
+        donateLink.setIcon(JsonAssistantIcons.DONATE);
+        donateLink.setText(JsonAssistantBundle.messageOnSystem("action.welcome.donate.text"));
+        donateLink.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SupportDialog().show();
+            }
+        });
     }
 
     private void initAttributeSerializationComponent() {

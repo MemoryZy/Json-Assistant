@@ -99,7 +99,7 @@ public class JsonAssistantUtil {
                 addNewContentWithEditorContentIfNeeded(project, processedText, editorFileType);
             } catch (Exception e) {
                 PlatformUtil.setClipboard(processedText);
-                Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notify.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+                Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
             } finally {
                 if (model.getSelectedText()) {
                     model.getPrimaryCaret().removeSelection();
@@ -305,7 +305,7 @@ public class JsonAssistantUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false, false);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
         Content content = contentFactory.createContent(window.createRootPanel(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);

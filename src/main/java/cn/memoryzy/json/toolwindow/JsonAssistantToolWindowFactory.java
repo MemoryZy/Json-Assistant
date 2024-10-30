@@ -46,22 +46,22 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
         // 主界面
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON, true, true);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON, true);
 
         // 选项卡旁
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
         // 标题行
-        List<AnAction> titleActions = List.of(new JsonHistoryAction(toolWindowEx), new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
+        List<AnAction> titleActions = List.of(new JsonHistoryAction(toolWindowEx), new OpenSettingsAction(toolWindowEx));
+
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
         group.add(new RenameTabAction());
         group.add(new MoveToEditorAction(toolWindowEx));
         group.add(new FloatingWindowAction(toolWindowEx));
-        group.add(Separator.create());
         group.add(new EditInNewWindowAction(toolWindowEx));
         group.add(Separator.create());
-        group.add(new ConfigureEditorOptionsAction(toolWindowEx));
+        group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("help.tooltip.donate.action.description")));
         group.add(Separator.create());
 
         toolWindowEx.setTabActions(tabActions);

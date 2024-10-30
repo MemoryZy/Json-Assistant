@@ -51,7 +51,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
         DataContext dataContext = e.getDataContext();
         ListPopup popup = JBPopupFactory.getInstance()
-                .createActionGroupPopup(JsonAssistantBundle.message("plugin.menu.popup.title"),
+                .createActionGroupPopup(JsonAssistantBundle.message("menu.popup.title"),
                         this, dataContext, JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING, true);
         popup.showInBestPositionFor(dataContext);
     }

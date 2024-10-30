@@ -4,6 +4,7 @@
       "groupByClass.svg": "icons/groupByClass.svg",
       "json.svg": "icons/json.svg",
       "extract.svg": "icons/extract.svg",
+      "donate.svg": "icons/donate.svg",
       "fileTypes": {
         "toml.svg": "icons/fileTypes/toml-file.svg"
       },

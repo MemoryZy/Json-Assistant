@@ -71,9 +71,9 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.directory = directory;
         this.module = module;
 
-        setTitle(JsonAssistantBundle.messageOnSystem("json.to.javabean.title"));
-        setOKButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.ok.button.text"));
-        setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.to.javabean.cancel.button.text"));
+        setTitle(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.title"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.ok.button"));
+        setCancelButtonText(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.cancel.button"));
         getOKAction().setEnabled(false);
         init();
     }
@@ -81,13 +81,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         classNameTextField = new JBTextField();
-        JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("json.window.label.text"));
+        JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.label.class.name.text"));
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
-        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("json.window.placeholder.text") + PluginConstant.JSON_EXAMPLE);
+        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
 
@@ -134,7 +134,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         String jsonText = StrUtil.trim(jsonTextField.getText());
         if (StringUtils.isBlank(jsonText)) {
             // 为空则提示
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("json.to.javabean.invalid.json.text"));
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
             return false;
         }
 
@@ -154,7 +154,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         // 判断文件是否已经存在
         if (directory.findFile(className + ".java") != null) {
             // 提示
-            classNameErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("json.to.javabean.already.exists.text", className));
+            classNameErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.already.exists.text", className));
             return false;
         }
 
@@ -162,7 +162,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         // 解析Json
         if (!JsonUtil.isJsonStr(jsonText)) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("json.to.javabean.invalid.json.text"));
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
             return false;
         }
 
@@ -170,7 +170,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             JSONArray jsonArray = JSONUtil.parseArray(jsonText);
             // 数组为空
             if (jsonArray.isEmpty()) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("json.to.javabean.invalid.json.text"));
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
                 return false;
             }
 
@@ -183,7 +183,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         // 属性为空
         if (Objects.isNull(jsonObject) || jsonObject.isEmpty()) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("json.to.javabean.invalid.json.text"));
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
             return false;
         }
 
@@ -375,12 +375,12 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         public String getErrorText(String inputString) {
             if (!inputString.isEmpty() && !PsiNameHelper.getInstance(project).isQualifiedName(inputString)) {
                 // return JavaErrorBundle.message("create.class.action.this.not.valid.java.qualified.name");
-                return JsonAssistantBundle.messageOnSystem("json.to.javabean.illegal.class.name.text");
+                return JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.illegal.class.name.text");
             }
             String shortName = StringUtil.getShortName(inputString);
             if (HighlightClassUtil.isRestrictedIdentifier(shortName, level)) {
                 // return JavaErrorBundle.message("restricted.identifier", shortName);
-                return JsonAssistantBundle.messageOnSystem("json.to.javabean.not.applicable.class.name.text", shortName);
+                return JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.not.applicable.class.name.text", shortName);
             }
             return null;
         }

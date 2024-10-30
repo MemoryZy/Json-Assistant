@@ -52,7 +52,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
         setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("json.structure.window.title"));
-        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.ok.button.text"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.ok.button"));
         init();
     }
 

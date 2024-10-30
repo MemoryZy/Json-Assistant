@@ -9,7 +9,7 @@
 <br/>
 
 ## Key Features
-- JSON Viewer (Multi-Tab)
+- JSON Window (Multi-Tab)
    - Add Tab
    - Rename Tab
    - Move Tab to Editor

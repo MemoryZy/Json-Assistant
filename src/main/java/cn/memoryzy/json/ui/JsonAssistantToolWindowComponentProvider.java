@@ -53,18 +53,15 @@ public class JsonAssistantToolWindowComponentProvider {
 
     private final Project project;
     private final FileType editorFileType;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final boolean firstContent;
     private final boolean initWindow;
     private final JsonHistoryPersistentState historyState;
     private EditorEx editor;
 
     private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
-    public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean firstContent, boolean initWindow) {
+    public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initWindow) {
         this.project = project;
         this.editorFileType = editorFileType;
-        this.firstContent = firstContent;
         this.initWindow = initWindow;
         this.historyState = JsonHistoryPersistentState.getInstance(project);
     }
@@ -109,11 +106,6 @@ public class JsonAssistantToolWindowComponentProvider {
         gutterComponentEx.setPaintBackground(false);
 
         toggleColorSchema(editor, editor.getColorsScheme(), persistentState.followEditorTheme);
-
-        // if (firstContent) {
-        //     editor.setPlaceholder(JsonAssistantBundle.messageOnSystem("placeholder.json.viewer.text"));
-        //     editor.setShowPlaceholderWhenFocused(true);
-        // }
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -168,6 +160,9 @@ public class JsonAssistantToolWindowComponentProvider {
 
 
     private void pasteJsonToEditor() {
+        // TODO 剪贴板若有json、xml、url param、java tostring就转化 （配置开关）
+        // TODO JSON5切换 （配置开关）
+
         if (initWindow) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
