@@ -160,8 +160,9 @@ public class JsonAssistantToolWindowComponentProvider {
 
 
     private void pasteJsonToEditor() {
+        // TODO 配置开关加上 是否识别 JSON5
         // TODO 剪贴板若有json、xml、url param、java tostring就转化 （配置开关）
-        // TODO JSON5切换 （配置开关）
+        // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
 
         if (initWindow) {
             String text = editor.getDocument().getText();
