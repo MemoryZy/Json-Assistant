@@ -25,11 +25,6 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
     public boolean loadLastRecord = true;
 
     /**
-     * 自动识别并转换其他格式为 JSON 数据
-     */
-    public boolean recognizeOtherFormats = true;
-
-    /**
      * 展示编辑器行号
      */
     public boolean displayLineNumbers = false;
@@ -44,6 +39,27 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
      */
     public boolean foldingOutline = PlatformUtil.isNewUi();
 
+    /**
+     * 自动识别并转换 XML 格式为 JSON 数据
+     */
+    public boolean recognizeXmlFormat = true;
+
+    /**
+     * 自动识别并转换 YAML 格式为 JSON 数据
+     */
+    public boolean recognizeYamlFormat = true;
+
+    /**
+     * 自动识别并转换 TOML 格式为 JSON 数据
+     */
+    public boolean recognizeTomlFormat = true;
+
+    /**
+     * 自动识别并转换 URL Param 格式为 JSON 数据
+     */
+    public boolean recognizeUrlParamFormat = true;
+
+
     @Override
     public @Nullable EditorOptionsPersistentState getState() {
         return this;
@@ -55,5 +71,10 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
         this.displayLineNumbers = state.displayLineNumbers;
         this.followEditorTheme = state.followEditorTheme;
         this.foldingOutline = state.foldingOutline;
+
+        this.recognizeXmlFormat = state.recognizeXmlFormat;
+        this.recognizeYamlFormat = state.recognizeYamlFormat;
+        this.recognizeTomlFormat = state.recognizeTomlFormat;
+        this.recognizeUrlParamFormat = state.recognizeUrlParamFormat;
     }
 }

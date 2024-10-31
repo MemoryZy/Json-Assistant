@@ -44,13 +44,16 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private TitledSeparator toolWindowLabel;
     private JBCheckBox loadLastRecordCb;
     private JBLabel loadLastRecordDesc;
-    private JBCheckBox recognizeOtherFormatsCb;
+    private JBLabel recognizeOtherFormatsTitle;
     private JBLabel recognizeOtherFormatsDesc;
     private JBCheckBox followEditorThemeCb;
     private JBCheckBox displayLineNumbersCb;
     private JBCheckBox foldingOutlineCb;
     private ActionLink donateLink;
-    private JBLabel recognizeOtherFormatsTip;
+    private JBCheckBox recognizeXmlFormatsCb;
+    private JBCheckBox recognizeYamlFormatsCb;
+    private JBCheckBox recognizeTomlFormatsCb;
+    private JBCheckBox recognizeUrlParamFormatsCb;
     // endregion
 
     private final EditorOptionsPersistentState editorOptionsState = EditorOptionsPersistentState.getInstance();
@@ -86,10 +89,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
         loadLastRecordCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.load.last.record.text"));
         setCommentLabel(loadLastRecordDesc, loadLastRecordCb, JsonAssistantBundle.messageOnSystem("setting.component.load.last.record.desc"));
 
-        recognizeOtherFormatsTip.setIcon(AllIcons.General.ContextHelp);
-        recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
-        new HelpTooltip().setDescription(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.tip")).installOn(recognizeOtherFormatsTip);
-        setCommentLabel(recognizeOtherFormatsDesc, recognizeOtherFormatsCb, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
+        recognizeOtherFormatsDesc.setIcon(AllIcons.General.ContextHelp);
+        recognizeOtherFormatsTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
+
+        // TODO 处理
+
+        // JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc")
+
+        new HelpTooltip().setDescription(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.tip")).installOn(recognizeOtherFormatsDesc);
 
         followEditorThemeCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.follow.editor.theme.text"));
         displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
@@ -115,7 +122,12 @@ public class JsonAssistantMainConfigurableComponentProvider {
         jacksonCb.setSelected(attributeSerializationState.recognitionJacksonAnnotation);
 
         loadLastRecordCb.setSelected(editorOptionsState.loadLastRecord);
-        recognizeOtherFormatsCb.setSelected(editorOptionsState.recognizeOtherFormats);
+
+        recognizeXmlFormatsCb.setSelected(editorOptionsState.recognizeXmlFormat);
+        recognizeYamlFormatsCb.setSelected(editorOptionsState.recognizeYamlFormat);
+        recognizeTomlFormatsCb.setSelected(editorOptionsState.recognizeTomlFormat);
+        recognizeUrlParamFormatsCb.setSelected(editorOptionsState.recognizeUrlParamFormat);
+
         followEditorThemeCb.setSelected(editorOptionsState.followEditorTheme);
         displayLineNumbersCb.setSelected(editorOptionsState.displayLineNumbers);
         foldingOutlineCb.setSelected(editorOptionsState.foldingOutline);
@@ -128,17 +140,28 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean oldRecognitionJacksonAnnotation = attributeSerializationState.recognitionJacksonAnnotation;
 
         boolean oldLoadLastRecord = editorOptionsState.loadLastRecord;
-        boolean oldRecognizeOtherFormats = editorOptionsState.recognizeOtherFormats;
+
+        boolean oldRecognizeXmlFormat = editorOptionsState.recognizeXmlFormat;
+        boolean oldRecognizeYamlFormat = editorOptionsState.recognizeYamlFormat;
+        boolean oldRecognizeTomlFormat = editorOptionsState.recognizeTomlFormat;
+        boolean oldRecognizeUrlParamFormat = editorOptionsState.recognizeUrlParamFormat;
+
         boolean oldFollowEditorTheme = editorOptionsState.followEditorTheme;
         boolean oldDisplayLineNumbers = editorOptionsState.displayLineNumbers;
         boolean oldFoldingOutline = editorOptionsState.foldingOutline;
+
 
         boolean includeRandomValues = includeRandomValuesCb.isSelected();
         boolean recognitionFastJsonAnnotation = fastJsonCb.isSelected();
         boolean recognitionJacksonAnnotation = jacksonCb.isSelected();
 
         boolean loadLastRecord = loadLastRecordCb.isSelected();
-        boolean recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
+
+        boolean recognizeXmlFormat = recognizeXmlFormatsCb.isSelected();
+        boolean recognizeYamlFormat = recognizeYamlFormatsCb.isSelected();
+        boolean recognizeTomlFormat = recognizeTomlFormatsCb.isSelected();
+        boolean recognizeUrlParamFormat = recognizeUrlParamFormatsCb.isSelected();
+
         boolean followEditorTheme = followEditorThemeCb.isSelected();
         boolean displayLineNumbers = displayLineNumbersCb.isSelected();
         boolean foldingOutline = foldingOutlineCb.isSelected();
@@ -148,7 +171,12 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognitionJacksonAnnotation, recognitionJacksonAnnotation)
 
                 || !Objects.equals(oldLoadLastRecord, loadLastRecord)
-                || !Objects.equals(oldRecognizeOtherFormats, recognizeOtherFormats)
+
+                || !Objects.equals(oldRecognizeXmlFormat, recognizeXmlFormat)
+                || !Objects.equals(oldRecognizeYamlFormat, recognizeYamlFormat)
+                || !Objects.equals(oldRecognizeTomlFormat, recognizeTomlFormat)
+                || !Objects.equals(oldRecognizeUrlParamFormat, recognizeUrlParamFormat)
+
                 || !Objects.equals(oldFollowEditorTheme, followEditorTheme)
                 || !Objects.equals(oldDisplayLineNumbers, displayLineNumbers)
                 || !Objects.equals(oldFoldingOutline, foldingOutline);
@@ -160,7 +188,12 @@ public class JsonAssistantMainConfigurableComponentProvider {
         attributeSerializationState.recognitionJacksonAnnotation = jacksonCb.isSelected();
 
         editorOptionsState.loadLastRecord = loadLastRecordCb.isSelected();
-        editorOptionsState.recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
+
+        editorOptionsState.recognizeXmlFormat = recognizeXmlFormatsCb.isSelected();
+        editorOptionsState.recognizeYamlFormat = recognizeYamlFormatsCb.isSelected();
+        editorOptionsState.recognizeTomlFormat = recognizeTomlFormatsCb.isSelected();
+        editorOptionsState.recognizeUrlParamFormat = recognizeUrlParamFormatsCb.isSelected();
+
         editorOptionsState.followEditorTheme = followEditorThemeCb.isSelected();
         editorOptionsState.displayLineNumbers = displayLineNumbersCb.isSelected();
         editorOptionsState.foldingOutline = foldingOutlineCb.isSelected();

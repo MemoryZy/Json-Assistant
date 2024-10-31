@@ -137,7 +137,10 @@ public class JsonAssistantToolWindowComponentProvider {
     private String getInitText() {
         if (initWindow) {
             String jsonStr = "";
-            if (persistentState.recognizeOtherFormats) {
+
+            // TODO 这里做判断，只要 xml、yaml、toml、url param 勾选了一个就可以
+
+            // if (persistentState.recognizeOtherFormats) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
@@ -148,7 +151,7 @@ public class JsonAssistantToolWindowComponentProvider {
                         jsonStr = JsonUtil.formatJson(jsonStr);
                     }
                 }
-            }
+            // }
 
             if (StrUtil.isBlank(jsonStr) && persistentState.loadLastRecord) {
                 JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
@@ -170,7 +173,9 @@ public class JsonAssistantToolWindowComponentProvider {
         // TODO 剪贴板若有json、xml、url param、java tostring就转化 （配置开关）
         // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
 
-        if (initWindow && persistentState.recognizeOtherFormats) {
+        // TODO 这里做判断，只要 xml、yaml、toml、url param 勾选了一个就可以
+
+        // if (initWindow && persistentState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = PlatformUtil.getClipboard();
@@ -185,7 +190,7 @@ public class JsonAssistantToolWindowComponentProvider {
                         WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(finalJsonStr));
                     }
                 }
-            }
+            // }
         }
     }
 
