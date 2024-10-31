@@ -27,6 +27,7 @@ public class Urls {
     public static final String EMAIL_LINK = "memoryzk@outlook.com";
 
     public static final String JSONPATH_EXPRESS_DESCRIPTION = "https://goessner.net/articles/JsonPath/index.html#e2";
+    public static final String JSON5_SITE_LINK = "https://json5.org/";
 
     public static void verifyReachable() {
         new Thread(() -> reachableAtomic.getAndSet(isReachable(OVERVIEW))).start();

@@ -7,6 +7,7 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.model.LimitedList;
+import cn.memoryzy.json.model.strategy.clipboard.ConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
@@ -55,15 +56,15 @@ public class JsonAssistantToolWindowComponentProvider {
     private final FileType editorFileType;
     private final boolean initWindow;
     private final JsonHistoryPersistentState historyState;
+    private final EditorOptionsPersistentState persistentState;
     private EditorEx editor;
-
-    private final EditorOptionsPersistentState persistentState = EditorOptionsPersistentState.getInstance();
 
     public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initWindow) {
         this.project = project;
         this.editorFileType = editorFileType;
         this.initWindow = initWindow;
         this.historyState = JsonHistoryPersistentState.getInstance(project);
+        this.persistentState = EditorOptionsPersistentState.getInstance();
     }
 
     public JComponent createRootPanel() {
@@ -136,11 +137,16 @@ public class JsonAssistantToolWindowComponentProvider {
     private String getInitText() {
         if (initWindow) {
             String jsonStr = "";
-            String clipboard = PlatformUtil.getClipboard();
-            if (StrUtil.isNotBlank(clipboard)) {
-                jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
-                if (StrUtil.isNotBlank(jsonStr)) {
-                    jsonStr = JsonUtil.formatJson(jsonStr);
+            if (persistentState.recognizeOtherFormats) {
+                String clipboard = PlatformUtil.getClipboard();
+                if (StrUtil.isNotBlank(clipboard)) {
+                    // 尝试不同格式数据策略
+                    ConversionContext context = new ConversionContext();
+                    jsonStr = ConversionContext.applyStrategies(context, clipboard);
+
+                    if (StrUtil.isNotBlank(jsonStr)) {
+                        jsonStr = JsonUtil.formatJson(jsonStr);
+                    }
                 }
             }
 
@@ -164,12 +170,15 @@ public class JsonAssistantToolWindowComponentProvider {
         // TODO 剪贴板若有json、xml、url param、java tostring就转化 （配置开关）
         // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
 
-        if (initWindow) {
+        if (initWindow && persistentState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
-                    String jsonStr = (JsonUtil.isJsonStr(clipboard)) ? clipboard : JsonUtil.extractJsonStr(clipboard);
+                    // 尝试不同格式数据策略
+                    ConversionContext context = new ConversionContext();
+                    String jsonStr = ConversionContext.applyStrategies(context, clipboard);
+
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);
                         String finalJsonStr = jsonStr;
@@ -184,7 +193,7 @@ public class JsonAssistantToolWindowComponentProvider {
         LimitedList historyList = historyState.getHistory();
         String text = StrUtil.trim(editor.getDocument().getText());
 
-        ApplicationManager.getApplication().invokeLater(()-> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             if (JsonUtil.isJsonStr(text)) {
                 // 无元素，不添加
                 if (JsonUtil.isJsonArray(text)) {

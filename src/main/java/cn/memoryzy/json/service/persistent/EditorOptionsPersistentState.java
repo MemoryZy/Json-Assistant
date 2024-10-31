@@ -25,6 +25,11 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
     public boolean loadLastRecord = true;
 
     /**
+     * 自动识别并转换其他格式为 JSON 数据
+     */
+    public boolean recognizeOtherFormats = true;
+
+    /**
      * 展示编辑器行号
      */
     public boolean displayLineNumbers = false;
