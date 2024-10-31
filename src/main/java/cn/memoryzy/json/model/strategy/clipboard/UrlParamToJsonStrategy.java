@@ -1,6 +1,7 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
 import cn.memoryzy.json.model.strategy.ConversionStrategy;
+import cn.memoryzy.json.util.ConversionUtil;
 
 /**
  * @author Memory
@@ -10,12 +11,12 @@ public class UrlParamToJsonStrategy implements ConversionStrategy {
 
     @Override
     public boolean canConvert(String text) {
-        return false;
+        return null != ConversionUtil.urlParamsToJson(text);
     }
 
     @Override
     public String convertToJson(String text) {
-        return null;
+        return ConversionUtil.urlParamsToJson(text);
     }
 
 }

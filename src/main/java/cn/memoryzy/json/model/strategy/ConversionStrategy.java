@@ -6,8 +6,8 @@ package cn.memoryzy.json.model.strategy;
  */
 public interface ConversionStrategy {
 
-    boolean canConvert(String text);
+    boolean canConvert(String text) throws Exception;
 
-    String convertToJson(String text);
+    String convertToJson(String text) throws Exception;
 
 }
