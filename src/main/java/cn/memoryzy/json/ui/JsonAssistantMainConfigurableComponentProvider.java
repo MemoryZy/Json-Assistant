@@ -1,30 +1,24 @@
 package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
 import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
-import com.intellij.icons.AllIcons;
-import com.intellij.ide.HelpTooltip;
-import com.intellij.openapi.ui.panel.ComponentPanelBuilder;
-import com.intellij.openapi.util.text.HtmlBuilder;
-import com.intellij.openapi.util.text.HtmlChunk;
-import com.intellij.ui.ColorUtil;
+import cn.memoryzy.json.util.UIManager;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
-import org.jetbrains.annotations.NonNls;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
 import java.util.Objects;
 
 /**
@@ -41,19 +35,22 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel fastJsonDesc;
     private JBCheckBox jacksonCb;
     private JBLabel jacksonDesc;
-    private TitledSeparator toolWindowLabel;
-    private JBCheckBox loadLastRecordCb;
-    private JBLabel loadLastRecordDesc;
-    private JBLabel recognizeOtherFormatsTitle;
-    private JBLabel recognizeOtherFormatsDesc;
-    private JBCheckBox followEditorThemeCb;
+    private TitledSeparator windowBehaviorLabel;
+    private JBCheckBox importHistoryCb;
+    private JBLabel importHistoryDesc;
     private JBCheckBox displayLineNumbersCb;
     private JBCheckBox foldingOutlineCb;
     private ActionLink donateLink;
-    private JBCheckBox recognizeXmlFormatsCb;
-    private JBCheckBox recognizeYamlFormatsCb;
-    private JBCheckBox recognizeTomlFormatsCb;
-    private JBCheckBox recognizeUrlParamFormatsCb;
+    private JBCheckBox recognizeOtherFormatsCb;
+    private JBLabel recognizeOtherFormatsDesc;
+    private JBCheckBox xmlFormatsCb;
+    private JBCheckBox yamlFormatsCb;
+    private JBCheckBox tomlFormatsCb;
+    private JBCheckBox urlParamFormatsCb;
+    private JPanel formatCbPanel;
+    private JBLabel backgroundColorTitle;
+    private ComboBox<BackgroundColorMatchingEnum> backgroundColorBox;
+    private TitledSeparator windowAppearanceLabel;
     // endregion
 
     private final EditorOptionsPersistentState editorOptionsState = EditorOptionsPersistentState.getInstance();
@@ -61,46 +58,89 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
     public JPanel createRootPanel() {
         applyAttributeSerializationChunk();
-        applyToolWindowChunk();
+        applyToolWindowBehaviorChunk();
+        applyToolWindowAppearanceChunk();
         applyDonateLinkChunk();
 
+        addSwitchListener();
         // 初始化
         reset();
 
         return rootPanel;
     }
 
+
     private void applyAttributeSerializationChunk() {
         attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
 
         includeRandomValuesCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
-        setCommentLabel(includeRandomValuesDesc, includeRandomValuesCb, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
+        UIManager.setCommentLabel(includeRandomValuesDesc, includeRandomValuesCb, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
 
         fastJsonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.text"));
-        setCommentLabel(fastJsonDesc, fastJsonCb, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
+        UIManager.setCommentLabel(fastJsonDesc, fastJsonCb, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
 
         jacksonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
-        setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
+        UIManager.setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
     }
 
-    private void applyToolWindowChunk() {
-        toolWindowLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.tool.window.text"));
+    private void applyToolWindowBehaviorChunk() {
+        windowBehaviorLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
 
-        loadLastRecordCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.load.last.record.text"));
-        setCommentLabel(loadLastRecordDesc, loadLastRecordCb, JsonAssistantBundle.messageOnSystem("setting.component.load.last.record.desc"));
+        importHistoryCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.history.text"));
+        UIManager.setCommentLabel(importHistoryDesc, importHistoryCb, JsonAssistantBundle.messageOnSystem("setting.component.import.history.desc"));
 
-        recognizeOtherFormatsDesc.setIcon(AllIcons.General.ContextHelp);
-        recognizeOtherFormatsTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
+        recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
+        UIManager.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
 
-        // TODO 处理
+        xmlFormatsCb.setText("XML");
+        yamlFormatsCb.setText("YAML");
+        tomlFormatsCb.setText("TOML");
+        urlParamFormatsCb.setText("URL Param");
 
-        // JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc")
+        int left = UIUtil.getCheckBoxTextHorizontalOffset(recognizeOtherFormatsCb);
+        formatCbPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
+    }
 
-        new HelpTooltip().setDescription(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.tip")).installOn(recognizeOtherFormatsDesc);
+    private void applyToolWindowAppearanceChunk() {
+        windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
 
-        followEditorThemeCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.follow.editor.theme.text"));
+        backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
+        for (BackgroundColorMatchingEnum value : BackgroundColorMatchingEnum.values()) {
+            backgroundColorBox.addItem(value);
+        }
+
         displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
         foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
+    }
+
+    private void addSwitchListener() {
+        recognizeOtherFormatsCb.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                UIManager.controlEnableCheckBox(xmlFormatsCb, true);
+                UIManager.controlEnableCheckBox(yamlFormatsCb, true);
+                UIManager.controlEnableCheckBox(tomlFormatsCb, true);
+                UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
+            } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                UIManager.controlEnableCheckBox(xmlFormatsCb, false);
+                UIManager.controlEnableCheckBox(yamlFormatsCb, false);
+                UIManager.controlEnableCheckBox(tomlFormatsCb, false);
+                UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
+            }
+        });
+
+        // backgroundColorBox.addActionListener(new AbstractAction() {
+        //     @Override
+        //     public void actionPerformed(ActionEvent e) {
+        //         BackgroundColorMatchingEnum item = backgroundColorBox.getItem();
+        //         if (BackgroundColorMatchingEnum.CUSTOM.equals(item)) {
+        //             Color selectedColor = ColorPicker.showDialog(backgroundColorBox, IdeBundle.message("dialog.title.choose.color"),
+        //                     editorOptionsState.customColor, true, null, true);
+        //             if (null != selectedColor) {
+        //                 color = selectedColor;
+        //             }
+        //         }
+        //     }
+        // });
     }
 
     private void applyDonateLinkChunk() {
@@ -116,129 +156,116 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
 
     public void reset() {
-        // 恢复为初始状态
+        // 属性序列化
         includeRandomValuesCb.setSelected(attributeSerializationState.includeRandomValues);
         fastJsonCb.setSelected(attributeSerializationState.recognitionFastJsonAnnotation);
         jacksonCb.setSelected(attributeSerializationState.recognitionJacksonAnnotation);
 
-        loadLastRecordCb.setSelected(editorOptionsState.loadLastRecord);
-
-        recognizeXmlFormatsCb.setSelected(editorOptionsState.recognizeXmlFormat);
-        recognizeYamlFormatsCb.setSelected(editorOptionsState.recognizeYamlFormat);
-        recognizeTomlFormatsCb.setSelected(editorOptionsState.recognizeTomlFormat);
-        recognizeUrlParamFormatsCb.setSelected(editorOptionsState.recognizeUrlParamFormat);
-
-        followEditorThemeCb.setSelected(editorOptionsState.followEditorTheme);
+        // 外观
+        importHistoryCb.setSelected(editorOptionsState.importHistory);
+        backgroundColorBox.setItem(editorOptionsState.backgroundColorMatchingEnum);
         displayLineNumbersCb.setSelected(editorOptionsState.displayLineNumbers);
         foldingOutlineCb.setSelected(editorOptionsState.foldingOutline);
+
+        // 解析
+        boolean recognizeOtherFormats = editorOptionsState.recognizeOtherFormats;
+        recognizeOtherFormatsCb.setSelected(recognizeOtherFormats);
+        xmlFormatsCb.setSelected(editorOptionsState.recognizeXmlFormat);
+        yamlFormatsCb.setSelected(editorOptionsState.recognizeYamlFormat);
+        tomlFormatsCb.setSelected(editorOptionsState.recognizeTomlFormat);
+        urlParamFormatsCb.setSelected(editorOptionsState.recognizeUrlParamFormat);
+
+        if (recognizeOtherFormats) {
+            UIManager.controlEnableCheckBox(xmlFormatsCb, true);
+            UIManager.controlEnableCheckBox(yamlFormatsCb, true);
+            UIManager.controlEnableCheckBox(tomlFormatsCb, true);
+            UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
+        } else {
+            UIManager.controlEnableCheckBox(xmlFormatsCb, false);
+            UIManager.controlEnableCheckBox(yamlFormatsCb, false);
+            UIManager.controlEnableCheckBox(tomlFormatsCb, false);
+            UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
+        }
     }
 
 
     public boolean isModified() {
+        // 属性序列化
         boolean oldIncludeRandomValues = attributeSerializationState.includeRandomValues;
         boolean oldRecognitionFastJsonAnnotation = attributeSerializationState.recognitionFastJsonAnnotation;
         boolean oldRecognitionJacksonAnnotation = attributeSerializationState.recognitionJacksonAnnotation;
 
-        boolean oldLoadLastRecord = editorOptionsState.loadLastRecord;
+        // 外观
+        boolean oldImportHistory = editorOptionsState.importHistory;
+        BackgroundColorMatchingEnum oldBackgroundColorMatchingEnum = editorOptionsState.backgroundColorMatchingEnum;
+        boolean oldDisplayLineNumbers = editorOptionsState.displayLineNumbers;
+        boolean oldFoldingOutline = editorOptionsState.foldingOutline;
 
+        // 解析
+        boolean oldRecognizeOtherFormats = editorOptionsState.recognizeOtherFormats;
         boolean oldRecognizeXmlFormat = editorOptionsState.recognizeXmlFormat;
         boolean oldRecognizeYamlFormat = editorOptionsState.recognizeYamlFormat;
         boolean oldRecognizeTomlFormat = editorOptionsState.recognizeTomlFormat;
         boolean oldRecognizeUrlParamFormat = editorOptionsState.recognizeUrlParamFormat;
 
-        boolean oldFollowEditorTheme = editorOptionsState.followEditorTheme;
-        boolean oldDisplayLineNumbers = editorOptionsState.displayLineNumbers;
-        boolean oldFoldingOutline = editorOptionsState.foldingOutline;
+        // ----------------------------------------------------------------------
 
-
+        // 属性序列化
         boolean includeRandomValues = includeRandomValuesCb.isSelected();
         boolean recognitionFastJsonAnnotation = fastJsonCb.isSelected();
         boolean recognitionJacksonAnnotation = jacksonCb.isSelected();
 
-        boolean loadLastRecord = loadLastRecordCb.isSelected();
-
-        boolean recognizeXmlFormat = recognizeXmlFormatsCb.isSelected();
-        boolean recognizeYamlFormat = recognizeYamlFormatsCb.isSelected();
-        boolean recognizeTomlFormat = recognizeTomlFormatsCb.isSelected();
-        boolean recognizeUrlParamFormat = recognizeUrlParamFormatsCb.isSelected();
-
-        boolean followEditorTheme = followEditorThemeCb.isSelected();
+        // 外观
+        boolean importHistory = importHistoryCb.isSelected();
+        BackgroundColorMatchingEnum backgroundColorMatchingEnum = backgroundColorBox.getItem();
         boolean displayLineNumbers = displayLineNumbersCb.isSelected();
         boolean foldingOutline = foldingOutlineCb.isSelected();
 
+        // 解析
+        boolean recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
+        boolean recognizeXmlFormat = xmlFormatsCb.isSelected();
+        boolean recognizeYamlFormat = yamlFormatsCb.isSelected();
+        boolean recognizeTomlFormat = tomlFormatsCb.isSelected();
+        boolean recognizeUrlParamFormat = urlParamFormatsCb.isSelected();
+
+        // 比较是否更改
         return !Objects.equals(oldIncludeRandomValues, includeRandomValues)
                 || !Objects.equals(oldRecognitionFastJsonAnnotation, recognitionFastJsonAnnotation)
                 || !Objects.equals(oldRecognitionJacksonAnnotation, recognitionJacksonAnnotation)
 
-                || !Objects.equals(oldLoadLastRecord, loadLastRecord)
+                || !Objects.equals(oldImportHistory, importHistory)
+                || !Objects.equals(oldBackgroundColorMatchingEnum, backgroundColorMatchingEnum)
+                || !Objects.equals(oldDisplayLineNumbers, displayLineNumbers)
+                || !Objects.equals(oldFoldingOutline, foldingOutline)
 
+                || !Objects.equals(oldRecognizeOtherFormats, recognizeOtherFormats)
                 || !Objects.equals(oldRecognizeXmlFormat, recognizeXmlFormat)
                 || !Objects.equals(oldRecognizeYamlFormat, recognizeYamlFormat)
                 || !Objects.equals(oldRecognizeTomlFormat, recognizeTomlFormat)
-                || !Objects.equals(oldRecognizeUrlParamFormat, recognizeUrlParamFormat)
-
-                || !Objects.equals(oldFollowEditorTheme, followEditorTheme)
-                || !Objects.equals(oldDisplayLineNumbers, displayLineNumbers)
-                || !Objects.equals(oldFoldingOutline, foldingOutline);
+                || !Objects.equals(oldRecognizeUrlParamFormat, recognizeUrlParamFormat);
     }
 
     public void apply() {
+        // 属性序列化
         attributeSerializationState.includeRandomValues = includeRandomValuesCb.isSelected();
         attributeSerializationState.recognitionFastJsonAnnotation = fastJsonCb.isSelected();
         attributeSerializationState.recognitionJacksonAnnotation = jacksonCb.isSelected();
 
-        editorOptionsState.loadLastRecord = loadLastRecordCb.isSelected();
-
-        editorOptionsState.recognizeXmlFormat = recognizeXmlFormatsCb.isSelected();
-        editorOptionsState.recognizeYamlFormat = recognizeYamlFormatsCb.isSelected();
-        editorOptionsState.recognizeTomlFormat = recognizeTomlFormatsCb.isSelected();
-        editorOptionsState.recognizeUrlParamFormat = recognizeUrlParamFormatsCb.isSelected();
-
-        editorOptionsState.followEditorTheme = followEditorThemeCb.isSelected();
+        // 外观
+        editorOptionsState.importHistory = importHistoryCb.isSelected();
         editorOptionsState.displayLineNumbers = displayLineNumbersCb.isSelected();
         editorOptionsState.foldingOutline = foldingOutlineCb.isSelected();
-    }
+        editorOptionsState.backgroundColorMatchingEnum = backgroundColorBox.getItem();
+        // if (null != color && BackgroundColorMatchingEnum.CUSTOM.equals(colorBoxItem)) {
+        //     editorOptionsState.customColor = color;
+        // }
 
-
-    private static void setCommentLabel(JLabel label, JCheckBox checkBox, String commentText) {
-        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-        label.setFont(ComponentPanelBuilder.getCommentFont(label.getFont()));
-        label.setBorder(getCommentBorder(checkBox));
-        setCommentText(label, commentText, true, ComponentPanelBuilder.MAX_COMMENT_WIDTH);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private static void setCommentText(@NotNull JLabel component,
-                                       @Nullable String commentText,
-                                       boolean isCommentBelow,
-                                       int maxLineLength) {
-        if (commentText != null) {
-            @NonNls String css = "<head><style type=\"text/css\">\n" +
-                    "a, a:link {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.ENABLED) + ";}\n" +
-                    "a:visited {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.VISITED) + ";}\n" +
-                    "a:hover {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.HOVERED) + ";}\n" +
-                    "a:active {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.PRESSED) + ";}\n" +
-                    //"body {background-color:#" + ColorUtil.toHex(JBColor.YELLOW) + ";}\n" + // Left for visual debugging
-                    "</style>\n</head>";
-            HtmlChunk text = HtmlChunk.raw(commentText);
-            if (maxLineLength > 0 && commentText.length() > maxLineLength && isCommentBelow) {
-                int width = component.getFontMetrics(component.getFont()).stringWidth(commentText.substring(0, maxLineLength));
-                text = text.wrapWith(HtmlChunk.div().attr("width", width));
-            } else {
-                text = text.wrapWith(HtmlChunk.div());
-            }
-            component.setText(new HtmlBuilder()
-                    .append(HtmlChunk.raw(css))
-                    .append(text.wrapWith("body"))
-                    .wrapWith("html")
-                    .toString());
-        }
-    }
-
-    private static Border getCommentBorder(JCheckBox checkBox) {
-        Insets insets = ComponentPanelBuilder.computeCommentInsets(checkBox, true);
-        insets.bottom -= 4;
-        return new JBEmptyBorder(insets);
+        // 解析
+        editorOptionsState.recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
+        editorOptionsState.recognizeXmlFormat = xmlFormatsCb.isSelected();
+        editorOptionsState.recognizeYamlFormat = yamlFormatsCb.isSelected();
+        editorOptionsState.recognizeTomlFormat = tomlFormatsCb.isSelected();
+        editorOptionsState.recognizeUrlParamFormat = urlParamFormatsCb.isSelected();
     }
 
 }

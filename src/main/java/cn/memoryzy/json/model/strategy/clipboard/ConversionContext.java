@@ -2,7 +2,11 @@ package cn.memoryzy.json.model.strategy.clipboard;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.strategy.ConversionStrategy;
+import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
+
+import java.util.List;
 
 /**
  * 维护成功的策略
@@ -13,6 +17,7 @@ import com.intellij.openapi.diagnostic.Logger;
 public class ConversionContext {
 
     private static final Logger LOG = Logger.getInstance(ConversionContext.class);
+    private static final EditorOptionsPersistentState STATE = EditorOptionsPersistentState.getInstance();
 
     // TODO 用策略模式改造格式转换那块
     private ConversionStrategy strategy;
@@ -39,19 +44,29 @@ public class ConversionContext {
 
 
     public static String applyStrategies(ConversionContext context, String text) {
-        // 依次尝试不同的转换策略
-        ConversionStrategy[] strategies = {
-                new JsonToJsonStrategy(),
-                new XmlToJsonStrategy(),
-                new YamlToJsonStrategy(),
-                new TomlToJsonStrategy(),
-                new UrlParamToJsonStrategy()
-        };
+        List<ConversionStrategy> conversionStrategies = Lists.newArrayList(new JsonToJsonStrategy());
 
-        return applyStrategies(context, strategies, text);
+        if (STATE.recognizeXmlFormat) {
+            conversionStrategies.add(new XmlToJsonStrategy());
+        }
+
+        if (STATE.recognizeYamlFormat) {
+            conversionStrategies.add(new YamlToJsonStrategy());
+        }
+
+        if (STATE.recognizeTomlFormat) {
+            conversionStrategies.add(new TomlToJsonStrategy());
+        }
+
+        if (STATE.recognizeUrlParamFormat) {
+            conversionStrategies.add(new UrlParamToJsonStrategy());
+        }
+
+        // 依次尝试不同的转换策略
+        return applyStrategies(context, conversionStrategies, text);
     }
 
-    private static String applyStrategies(ConversionContext context, ConversionStrategy[] strategies, String text) {
+    private static String applyStrategies(ConversionContext context, List<ConversionStrategy> strategies, String text) {
         for (ConversionStrategy strategy : strategies) {
             context.setStrategy(strategy);
             String result = context.convert(text);

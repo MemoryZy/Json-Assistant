@@ -30,7 +30,7 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        new JsonAssistantPopupGroup(true).actionPerformed(e);
+        new JsonAssistantPopupGroup(true).showPopupMenu(e);
     }
 
     @Override

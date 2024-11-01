@@ -1,5 +1,6 @@
 package cn.memoryzy.json.service.persistent;
 
+import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -22,7 +23,7 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
     /**
      * 自动导入最新 JSON 记录至编辑器
      */
-    public boolean loadLastRecord = true;
+    public boolean importHistory = true;
 
     /**
      * 展示编辑器行号
@@ -30,14 +31,21 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
     public boolean displayLineNumbers = false;
 
     /**
-     * 跟随主编辑器配色主题
+     * 编辑器背景配色主题
      */
-    public boolean followEditorTheme = true;
+    public BackgroundColorMatchingEnum backgroundColorMatchingEnum = BackgroundColorMatchingEnum.DEFAULT;
 
     /**
      * 显示折叠轮廓
      */
     public boolean foldingOutline = PlatformUtil.isNewUi();
+
+    // ---------------------------------------------------
+
+    /**
+     * 自动识别并转换其他格式数据（总开关）
+     */
+    public boolean recognizeOtherFormats = true;
 
     /**
      * 自动识别并转换 XML 格式为 JSON 数据
@@ -67,11 +75,12 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
 
     @Override
     public void loadState(@NotNull EditorOptionsPersistentState state) {
-        this.loadLastRecord = state.loadLastRecord;
+        this.importHistory = state.importHistory;
         this.displayLineNumbers = state.displayLineNumbers;
-        this.followEditorTheme = state.followEditorTheme;
+        this.backgroundColorMatchingEnum = state.backgroundColorMatchingEnum;
         this.foldingOutline = state.foldingOutline;
 
+        this.recognizeOtherFormats = state.recognizeOtherFormats;
         this.recognizeXmlFormat = state.recognizeXmlFormat;
         this.recognizeYamlFormat = state.recognizeYamlFormat;
         this.recognizeTomlFormat = state.recognizeTomlFormat;

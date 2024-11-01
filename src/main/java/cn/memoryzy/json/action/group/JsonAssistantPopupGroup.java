@@ -27,6 +27,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
     private final boolean actionEventPopup;
 
+    @SuppressWarnings("unused")
     public JsonAssistantPopupGroup() {
         super();
         setPopup(true);
@@ -44,6 +45,10 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        showPopupMenu(e);
+    }
+
+    public void showPopupMenu(AnActionEvent e) {
         Project project = e.getProject();
         if (Objects.isNull(project)) {
             return;

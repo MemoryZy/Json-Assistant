@@ -6,6 +6,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
+import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.model.strategy.clipboard.ConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
@@ -27,7 +28,6 @@ import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -106,7 +106,7 @@ public class JsonAssistantToolWindowComponentProvider {
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
 
-        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.followEditorTheme);
+        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.backgroundColorMatchingEnum);
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -137,10 +137,7 @@ public class JsonAssistantToolWindowComponentProvider {
     private String getInitText() {
         if (initWindow) {
             String jsonStr = "";
-
-            // TODO 这里做判断，只要 xml、yaml、toml、url param 勾选了一个就可以
-
-            // if (persistentState.recognizeOtherFormats) {
+            if (persistentState.recognizeOtherFormats) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
@@ -151,9 +148,9 @@ public class JsonAssistantToolWindowComponentProvider {
                         jsonStr = JsonUtil.formatJson(jsonStr);
                     }
                 }
-            // }
+            }
 
-            if (StrUtil.isBlank(jsonStr) && persistentState.loadLastRecord) {
+            if (StrUtil.isBlank(jsonStr) && persistentState.importHistory) {
                 JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
                 LimitedList history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
@@ -170,12 +167,11 @@ public class JsonAssistantToolWindowComponentProvider {
 
     private void pasteJsonToEditor() {
         // TODO 配置开关加上 是否识别 JSON5
-        // TODO 剪贴板若有json、xml、url param、java tostring就转化 （配置开关）
+
+
         // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
 
-        // TODO 这里做判断，只要 xml、yaml、toml、url param 勾选了一个就可以
-
-        // if (initWindow && persistentState.recognizeOtherFormats) {
+        if (initWindow && persistentState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = PlatformUtil.getClipboard();
@@ -190,7 +186,7 @@ public class JsonAssistantToolWindowComponentProvider {
                         WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(finalJsonStr));
                     }
                 }
-            // }
+            }
         }
     }
 
@@ -231,17 +227,24 @@ public class JsonAssistantToolWindowComponentProvider {
         });
     }
 
-    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, boolean followEditorColor) {
-        // true：跟随IDE配色；false：改为新配色
-        if (followEditorColor) {
-            editor.setColorsScheme(defaultColorsScheme);
-        } else {
-            DelegateColorScheme scheme = ConsoleViewUtil.updateConsoleColorScheme(defaultColorsScheme);
-            if (UISettings.getInstance().getPresentationMode()) {
-                scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
+    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, BackgroundColorMatchingEnum followEditorColor) {
+        EditorColorsScheme scheme = defaultColorsScheme;
+        switch (followEditorColor) {
+            case DEFAULT: {
+                // 改为新配色
+                scheme = ConsoleViewUtil.updateConsoleColorScheme(defaultColorsScheme);
+                if (UISettings.getInstance().getPresentationMode()) {
+                    scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
+                }
+                break;
             }
-            editor.setColorsScheme(scheme);
+            case FOLLOW_MAIN_EDITOR: {
+                // 跟随IDE配色
+                break;
+            }
         }
+
+        editor.setColorsScheme(scheme);
     }
 
     public static void toggleFoldingOutline(EditorEx editor, boolean show) {
@@ -269,7 +272,7 @@ public class JsonAssistantToolWindowComponentProvider {
             // 行号显示
             toggleLineNumbers(editor, persistentState.displayLineNumbers);
             // 配色切换
-            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.followEditorTheme);
+            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.backgroundColorMatchingEnum);
             // 切换展示折叠区域
             toggleFoldingOutline(editor, persistentState.foldingOutline);
         }

@@ -1,6 +1,8 @@
 package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.PluginConstant;
+import com.intellij.icons.AllIcons;
+import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
@@ -10,22 +12,26 @@ import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.panel.ComponentPanelBuilder;
+import com.intellij.openapi.util.text.HtmlBuilder;
+import com.intellij.openapi.util.text.HtmlChunk;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.EditorTextField;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.ScrollPaneFactory;
+import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Function;
 import com.intellij.util.ObjectUtils;
+import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -182,6 +188,76 @@ public class UIManager implements Disposable {
         }
 
         return font;
+    }
+
+    public static void setCommentLabel(JLabel label, JCheckBox checkBox, String commentText) {
+        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        label.setFont(ComponentPanelBuilder.getCommentFont(label.getFont()));
+        label.setBorder(getCommentBorder(checkBox));
+        setCommentText(label, commentText, true, ComponentPanelBuilder.MAX_COMMENT_WIDTH);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    public static void setCommentText(@NotNull JLabel component,
+                                      @Nullable String commentText,
+                                      boolean isCommentBelow,
+                                      int maxLineLength) {
+        if (commentText != null) {
+            @NonNls String css = "<head><style type=\"text/css\">\n" +
+                    "a, a:link {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.ENABLED) + ";}\n" +
+                    "a:visited {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.VISITED) + ";}\n" +
+                    "a:hover {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.HOVERED) + ";}\n" +
+                    "a:active {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.PRESSED) + ";}\n" +
+                    //"body {background-color:#" + ColorUtil.toHex(JBColor.YELLOW) + ";}\n" + // Left for visual debugging
+                    "</style>\n</head>";
+            HtmlChunk text = HtmlChunk.raw(commentText);
+            if (maxLineLength > 0 && commentText.length() > maxLineLength && isCommentBelow) {
+                int width = component.getFontMetrics(component.getFont()).stringWidth(commentText.substring(0, maxLineLength));
+                text = text.wrapWith(HtmlChunk.div().attr("width", width));
+            } else {
+                text = text.wrapWith(HtmlChunk.div());
+            }
+            component.setText(new HtmlBuilder()
+                    .append(HtmlChunk.raw(css))
+                    .append(text.wrapWith("body"))
+                    .wrapWith("html")
+                    .toString());
+        }
+    }
+
+    public static Border getCommentBorder(JCheckBox checkBox) {
+        Insets insets = ComponentPanelBuilder.computeCommentInsets(checkBox, true);
+        insets.bottom -= 4;
+        return new JBEmptyBorder(insets);
+    }
+
+
+    public static void controlEnableCheckBox(JCheckBox checkBox, boolean enable) {
+        // 开
+        if (enable) {
+            if (!checkBox.isEnabled()) {
+                checkBox.setEnabled(true);
+            }
+        } else {
+            // 关
+            if (checkBox.isEnabled()) {
+                checkBox.setEnabled(false);
+            }
+        }
+    }
+
+    public static void setHelpLabel(JLabel label, String description) {
+        label.setIcon(AllIcons.General.ContextHelp);
+        new HelpTooltip().setDescription(description).installOn(label);
+    }
+
+    /**
+     * 获取当前取得焦点的组件
+     *
+     * @return 组件
+     */
+    public static Component getFocusComponent() {
+        return IdeFocusManager.getGlobalInstance().getFocusOwner();
     }
 
 }
