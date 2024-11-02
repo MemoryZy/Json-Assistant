@@ -4,7 +4,7 @@ package cn.memoryzy.json.enums;
  * @author Memory
  * @since 2024/11/1
  */
-public enum BackgroundColorMatchingEnum {
+public enum BackgroundMatchingEnum {
     DEFAULT("默认"),
     FOLLOW_MAIN_EDITOR("跟随主编辑器"),
     // CUSTOM("自定义")
@@ -13,7 +13,7 @@ public enum BackgroundColorMatchingEnum {
 
     private final String name;
 
-    BackgroundColorMatchingEnum(String name) {
+    BackgroundMatchingEnum(String name) {
         this.name = name;
     }
 

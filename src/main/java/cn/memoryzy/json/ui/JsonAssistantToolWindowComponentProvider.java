@@ -6,7 +6,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
-import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
+import cn.memoryzy.json.enums.BackgroundMatchingEnum;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.model.strategy.clipboard.ConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
@@ -106,7 +106,7 @@ public class JsonAssistantToolWindowComponentProvider {
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
 
-        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.backgroundColorMatchingEnum);
+        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.backgroundMatchingEnum);
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -227,7 +227,7 @@ public class JsonAssistantToolWindowComponentProvider {
         });
     }
 
-    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, BackgroundColorMatchingEnum followEditorColor) {
+    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, BackgroundMatchingEnum followEditorColor) {
         EditorColorsScheme scheme = defaultColorsScheme;
         switch (followEditorColor) {
             case DEFAULT: {
@@ -272,7 +272,7 @@ public class JsonAssistantToolWindowComponentProvider {
             // 行号显示
             toggleLineNumbers(editor, persistentState.displayLineNumbers);
             // 配色切换
-            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.backgroundColorMatchingEnum);
+            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.backgroundMatchingEnum);
             // 切换展示折叠区域
             toggleFoldingOutline(editor, persistentState.foldingOutline);
         }
