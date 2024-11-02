@@ -1,7 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.strategy.ConversionStrategy;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
@@ -19,7 +18,6 @@ public class ConversionContext {
     private static final Logger LOG = Logger.getInstance(ConversionContext.class);
     private static final EditorOptionsPersistentState STATE = EditorOptionsPersistentState.getInstance();
 
-    // TODO 用策略模式改造格式转换那块
     private ConversionStrategy strategy;
 
     public ConversionStrategy getStrategy() {

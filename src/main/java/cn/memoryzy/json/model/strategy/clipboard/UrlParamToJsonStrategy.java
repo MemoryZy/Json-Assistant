@@ -1,6 +1,5 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
-import cn.memoryzy.json.model.strategy.ConversionStrategy;
 import cn.memoryzy.json.util.ConversionUtil;
 
 /**

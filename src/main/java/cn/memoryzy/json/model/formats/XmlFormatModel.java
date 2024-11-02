@@ -48,12 +48,12 @@ public class XmlFormatModel extends BaseFormatModel {
 
     @Override
     public String getSelectHint() {
-        return JsonAssistantBundle.messageOnSystem("hint.select.xml.to.json.text");
+        return JsonAssistantBundle.messageOnSystem("hint.selection.xml.to.json.text");
     }
 
     @Override
     public String getDefaultHint() {
-        return JsonAssistantBundle.messageOnSystem("hint.all.xml.to.json.text");
+        return JsonAssistantBundle.messageOnSystem("hint.global.xml.to.json.text");
     }
 
     @Override

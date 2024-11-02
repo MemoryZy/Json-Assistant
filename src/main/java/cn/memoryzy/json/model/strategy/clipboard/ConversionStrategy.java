@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.strategy;
+package cn.memoryzy.json.model.strategy.clipboard;
 
 /**
  * @author Memory
