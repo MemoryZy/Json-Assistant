@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.formats;
 
+import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.formats.ActionInfo;
 import cn.memoryzy.json.model.formats.EditorInfo;
 import cn.memoryzy.json.model.formats.MessageInfo;
@@ -15,6 +16,11 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
      * 当前获取的文本（符合格式的文本）
      */
     protected String content;
+
+    /**
+     * 解析编辑器文本的成功与否状态
+     */
+    protected TextResolveStatus textResolveStatus;
 
     /**
      * 处理器所代表的数据类型（类全限定名）
@@ -75,11 +81,11 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
 
 
     @Override
-    public void preprocessing() throws Exception {
+    public void preprocessing() {
     }
 
     @Override
-    public String postprocessing(String text) throws Exception {
+    public String postprocessing(String text) {
         return JsonUtil.formatJson(text);
     }
 
@@ -92,6 +98,14 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
 
     public String getContent() {
         return content;
+    }
+
+    public TextResolveStatus getTextResolveStatus() {
+        return textResolveStatus;
+    }
+
+    public void setTextResolveStatus(TextResolveStatus textResolveStatus) {
+        this.textResolveStatus = textResolveStatus;
     }
 
     public String getFileTypeClassName() {

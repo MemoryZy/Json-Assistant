@@ -1,6 +1,7 @@
 package cn.memoryzy.json.model.strategy.formats;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.formats.DocumentTextInfo;
 import cn.memoryzy.json.model.formats.EditorInfo;
 import cn.memoryzy.json.model.formats.SelectionInfo;
@@ -28,18 +29,34 @@ public class ConversionProcessorContext {
     /**
      * 代理处理器转换文本
      *
-     * @param documentTextInfo 文档信息
+     * @param editorInfo 编辑器信息
      * @return 转换成功的 JSON 文本
      */
-    public String convert(DocumentTextInfo documentTextInfo) {
+    public String convert(EditorInfo editorInfo) {
+        SelectionInfo selectionInfo = editorInfo.getSelectionInfo();
+        DocumentTextInfo documentTextInfo = editorInfo.getDocumentTextInfo();
         String selectedText = documentTextInfo.getSelectedText();
         String documentText = documentTextInfo.getDocumentText();
 
-        String converted = processor.convert(selectedText);
-        if (StrUtil.isNotBlank(converted)) return converted;
+        String result;
+        if (selectionInfo.isHasSelection()) {
+            result = processor.convert(selectedText);
+            if (StrUtil.isNotBlank(result)) {
+                processor.setTextResolveStatus(TextResolveStatus.SELECTED_SUCCESS);
+                return result;
+            } else {
+                // 如果选择了文本，但是没通过匹配，则跳过，选择下一个处理器
+                processor.setTextResolveStatus(TextResolveStatus.RESOLVE_FAILED);
+                return null;
+            }
+        }
 
-        converted = processor.convert(documentText);
-        return StrUtil.isNotBlank(converted) ? converted : null;
+        result = processor.convert(documentText);
+        processor.setTextResolveStatus(StrUtil.isNotBlank(result)
+                ? TextResolveStatus.GLOBAL_SUCCESS
+                : TextResolveStatus.RESOLVE_FAILED);
+
+        return result;
     }
 
     /**
@@ -59,13 +76,13 @@ public class ConversionProcessorContext {
                 // TODO 待实现其他的处理器
         };
 
-        return applyProcessors(context, processors, editorInfo.getDocumentTextInfo());
+        return applyProcessors(context, processors, editorInfo);
     }
 
-    public static String applyProcessors(ConversionProcessorContext context, AbstractConversionProcessor[] processors, DocumentTextInfo documentTextInfo) {
+    public static String applyProcessors(ConversionProcessorContext context, AbstractConversionProcessor[] processors, EditorInfo editorInfo) {
         for (AbstractConversionProcessor processor : processors) {
             context.setProcessor(processor);
-            String result = context.convert(documentTextInfo);
+            String result = context.convert(editorInfo);
             if (StrUtil.isNotBlank(result)) {
                 return result;
             }
