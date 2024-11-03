@@ -39,8 +39,8 @@ public class ToYamlAction extends DumbAwareAction {
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
         JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.to.yaml.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.to.yaml.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.json.to.yaml.text"),
+                JsonAssistantBundle.messageOnSystem("hint.global.json.to.yaml.text"));
 
         String yamlStr;
         try {

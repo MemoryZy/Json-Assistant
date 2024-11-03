@@ -9,7 +9,8 @@ import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypeEnum;
-import cn.memoryzy.json.model.formats.*;
+import cn.memoryzy.json.model.formats.BaseFormatModel;
+import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
@@ -21,7 +22,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -29,7 +29,6 @@ import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -126,45 +125,6 @@ public class JsonAssistantUtil {
         toolWindow.show();
     }
 
-
-    @SuppressWarnings("DuplicatedCode")
-    public static BaseFormatModel createFormatModelFromEditor(Project project, Editor editor) {
-        if (editor == null) {
-            return null;
-        }
-
-        Document document = editor.getDocument();
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int startOffset = primaryCaret.getSelectionStart();
-        int endOffset = primaryCaret.getSelectionEnd();
-        String selectText = document.getText(new TextRange(startOffset, endOffset));
-        String documentText = document.getText();
-
-        BaseFormatModel model = new XmlFormatModel(startOffset, endOffset, primaryCaret);
-        BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
-
-        if (StrUtil.isNotBlank(model.getContent())) {
-            return model;
-        }
-
-        model = new YamlFormatModel(startOffset, endOffset, primaryCaret);
-        BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
-
-        if (StrUtil.isNotBlank(model.getContent())) {
-            return model;
-        }
-
-        model = new TomlFormatModel(startOffset, endOffset, primaryCaret);
-        BaseFormatModel.prepareModel(project, document, selectText, documentText, model);
-
-        if (StrUtil.isNotBlank(model.getContent())) {
-            return model;
-        }
-
-        // 其他格式 .........
-
-        return null;
-    }
 
 
     public static String truncateText(String text, int maxLength, String omitHint) {

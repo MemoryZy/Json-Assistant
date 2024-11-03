@@ -39,7 +39,7 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
         String processedText = ConversionProcessorContext.applyProcessors(context, editor);
         if (StrUtil.isNotBlank(processedText)) {
             TextTransformUtil.applyProcessedTextToDocument(
-                    e.getProject(),
+                    getEventProject(e),
                     editor,
                     processedText,
                     context.getProcessor(),

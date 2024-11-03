@@ -1,10 +1,13 @@
 package cn.memoryzy.json.action.group;
 
-import cn.memoryzy.json.action.JsonAssistantAction;
 import cn.memoryzy.json.action.OnlineDocAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
+import cn.memoryzy.json.model.strategy.formats.JsonProcessor;
+import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.context.ConversionProcessorContext;
 import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAware;
@@ -86,8 +89,19 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
-        Editor editor = PlatformUtil.getEditor(e);
-        e.getPresentation().setEnabledAndVisible(project != null && editor != null && JsonAssistantAction.isOrHasJsonStr(project, editor));
+        e.getPresentation().setEnabledAndVisible(validateJson(getEventProject(e), PlatformUtil.getEditor(e), e.getDataContext()));
     }
+
+
+    public static boolean validateJson(Project project, Editor editor, @NotNull DataContext dataContext) {
+        if (project == null || editor == null) {
+            return false;
+        }
+
+        JsonProcessor jsonProcessor = new JsonProcessor(dataContext, TextTransformUtil.resolveEditor(editor), true);
+        return ConversionProcessorContext.processMatching(
+                new ConversionProcessorContext(),
+                new AbstractConversionProcessor[]{jsonProcessor});
+    }
+
 }

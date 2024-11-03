@@ -5,13 +5,11 @@ import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.formats.DocumentTextInfo;
 import cn.memoryzy.json.model.formats.EditorInfo;
 import cn.memoryzy.json.model.formats.SelectionInfo;
-import cn.memoryzy.json.model.strategy.formats.TomlProcessor;
-import cn.memoryzy.json.model.strategy.formats.XmlProcessor;
-import cn.memoryzy.json.model.strategy.formats.YamlProcessor;
-import com.intellij.openapi.editor.Caret;
-import com.intellij.openapi.editor.Document;
+import cn.memoryzy.json.model.strategy.formats.processor.TomlProcessor;
+import cn.memoryzy.json.model.strategy.formats.processor.XmlProcessor;
+import cn.memoryzy.json.model.strategy.formats.processor.YamlProcessor;
+import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.TextRange;
 
 /**
  * @author Memory
@@ -63,7 +61,7 @@ public class ConversionProcessorContext {
     }
 
     /**
-     * 文本是否匹配成功（在转换方法前执行）
+     * 文本是否匹配成功（在转换方法 {@link ConversionProcessorContext#convert(EditorInfo)} 前执行）
      *
      * @param editorInfo 编辑器信息
      * @return 文本匹配成功为 true，反之为 false
@@ -95,15 +93,22 @@ public class ConversionProcessorContext {
      * @return 转换成功的 JSON 文本
      */
     public static String applyProcessors(ConversionProcessorContext context, Editor editor) {
-        EditorInfo editorInfo = resolveEditor(editor);
+        EditorInfo editorInfo = TextTransformUtil.resolveEditor(editor);
         if (editorInfo == null) return null;
-        return applyProcessors(context, getProcessors(editorInfo), editorInfo);
+        return applyProcessors(context, getProcessors(editorInfo));
     }
 
-    private static String applyProcessors(ConversionProcessorContext context, AbstractConversionProcessor[] processors, EditorInfo editorInfo) {
+    /**
+     * 尝试不同的策略解析并转换编辑器文本
+     *
+     * @param context    上下文
+     * @param processors 处理器
+     * @return 转换成功的 JSON 文本
+     */
+    public static String applyProcessors(ConversionProcessorContext context, AbstractConversionProcessor[] processors) {
         for (AbstractConversionProcessor processor : processors) {
             context.setProcessor(processor);
-            String result = context.convert(editorInfo);
+            String result = context.convert(processor.getEditorInfo());
             if (StrUtil.isNotBlank(result)) {
                 return result;
             }
@@ -120,15 +125,22 @@ public class ConversionProcessorContext {
      * @return 解析成功为 true，反之为 false
      */
     public static boolean processMatching(ConversionProcessorContext context, Editor editor) {
-        EditorInfo editorInfo = resolveEditor(editor);
+        EditorInfo editorInfo = TextTransformUtil.resolveEditor(editor);
         if (editorInfo == null) return false;
-        return processMatching(context, getProcessors(editorInfo), editorInfo);
+        return processMatching(context, getProcessors(editorInfo));
     }
 
-    private static boolean processMatching(ConversionProcessorContext context, AbstractConversionProcessor[] processors, EditorInfo editorInfo) {
+    /**
+     * 尝试不同的策略解析编辑器文本
+     *
+     * @param context    上下文
+     * @param processors 处理器
+     * @return 解析成功为 true，反之为 false
+     */
+    public static boolean processMatching(ConversionProcessorContext context, AbstractConversionProcessor[] processors) {
         for (AbstractConversionProcessor processor : processors) {
             context.setProcessor(processor);
-            boolean matched = context.isMatched(editorInfo);
+            boolean matched = context.isMatched(processor.getEditorInfo());
             if (matched) return true;
         }
 
@@ -150,35 +162,5 @@ public class ConversionProcessorContext {
         };
     }
 
-
-    /**
-     * 解析编辑器文本
-     *
-     * @param editor 编辑器
-     * @return left：解析完成的文本；right：编辑器相关信息
-     */
-    private static EditorInfo resolveEditor(Editor editor) {
-        if (editor == null) return null;
-        Document document = editor.getDocument();
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int startOffset = primaryCaret.getSelectionStart();
-        int endOffset = primaryCaret.getSelectionEnd();
-
-        String documentText = document.getText();
-        String selectedText = document.getText(new TextRange(startOffset, endOffset));
-
-        if (StrUtil.isBlank(documentText) && StrUtil.isBlank(selectedText)) return null;
-
-        DocumentTextInfo documentTextInfo = new DocumentTextInfo()
-                .setSelectedText(selectedText)
-                .setDocumentText(documentText);
-
-        SelectionInfo selectionInfo = new SelectionInfo()
-                .setHasSelection(StrUtil.isNotBlank(selectedText))
-                .setStartOffset(startOffset)
-                .setEndOffset(endOffset);
-
-        return new EditorInfo().setPrimaryCaret(primaryCaret).setDocumentTextInfo(documentTextInfo).setSelectionInfo(selectionInfo);
-    }
 
 }

@@ -1,8 +1,10 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.TextResolveStatus;
+import cn.memoryzy.json.model.formats.DocumentTextInfo;
 import cn.memoryzy.json.model.formats.EditorInfo;
 import cn.memoryzy.json.model.formats.MessageInfo;
 import cn.memoryzy.json.model.formats.SelectionInfo;
@@ -13,10 +15,12 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -123,6 +127,12 @@ public class TextTransformUtil {
         }
     }
 
+
+    public static void processJson(){
+
+    }
+
+
     /**
      * 去除选中
      *
@@ -178,6 +188,36 @@ public class TextTransformUtil {
         return null != LangDataKeys.CONSOLE_VIEW.getData(dataContext);
     }
 
+
+    /**
+     * 解析编辑器文本
+     *
+     * @param editor 编辑器
+     * @return left：解析完成的文本；right：编辑器相关信息
+     */
+    public static EditorInfo resolveEditor(Editor editor) {
+        if (editor == null) return null;
+        Document document = editor.getDocument();
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int startOffset = primaryCaret.getSelectionStart();
+        int endOffset = primaryCaret.getSelectionEnd();
+
+        String documentText = document.getText();
+        String selectedText = document.getText(new TextRange(startOffset, endOffset));
+
+        if (StrUtil.isBlank(documentText) && StrUtil.isBlank(selectedText)) return null;
+
+        DocumentTextInfo documentTextInfo = new DocumentTextInfo()
+                .setSelectedText(selectedText)
+                .setDocumentText(documentText);
+
+        SelectionInfo selectionInfo = new SelectionInfo()
+                .setHasSelection(StrUtil.isNotBlank(selectedText))
+                .setStartOffset(startOffset)
+                .setEndOffset(endOffset);
+
+        return new EditorInfo().setPrimaryCaret(primaryCaret).setDocumentTextInfo(documentTextInfo).setSelectionInfo(selectionInfo);
+    }
 
     public static String urlParamsToJson(String url) {
         try {

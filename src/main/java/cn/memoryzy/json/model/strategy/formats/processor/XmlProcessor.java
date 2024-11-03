@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.strategy.formats;
+package cn.memoryzy.json.model.strategy.formats.processor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.formats.ActionInfo;
@@ -24,7 +24,7 @@ public class XmlProcessor extends AbstractConversionProcessor {
     }
 
     @Override
-    public String convertToJson() {
+    public String convert() {
         return XmlUtil.toJson(getContent());
     }
 
@@ -33,7 +33,7 @@ public class XmlProcessor extends AbstractConversionProcessor {
 
     @Override
     protected ActionInfo createActionInfo() {
-        return new ActionInfo()
+        return super.createActionInfo()
                 .setActionName(JsonAssistantBundle.message("action.xml.to.json.text"))
                 .setActionDescription(JsonAssistantBundle.messageOnSystem("action.xml.to.json.description"))
                 .setActionIcon(AllIcons.FileTypes.Xml);
@@ -41,7 +41,7 @@ public class XmlProcessor extends AbstractConversionProcessor {
 
     @Override
     protected MessageInfo createMessageInfo() {
-        return new MessageInfo()
+        return super.createMessageInfo()
                 .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.xml.to.json.text"))
                 .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.xml.to.json.text"));
     }

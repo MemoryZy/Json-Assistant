@@ -41,8 +41,8 @@ public class JsonMinifyAction extends DumbAwareAction {
         Project project = e.getProject();
         Document document = editor.getDocument();
         JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.minify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.minify.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.json.minify.text"),
+                JsonAssistantBundle.messageOnSystem("hint.global.json.minify.text"));
 
         String compressedJson;
         try {

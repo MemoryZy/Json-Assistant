@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.strategy.formats;
+package cn.memoryzy.json.model.strategy.formats.processor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.formats.ActionInfo;
@@ -24,7 +24,7 @@ public class TomlProcessor extends AbstractConversionProcessor {
     }
 
     @Override
-    public String convertToJson() {
+    public String convert() {
         return TomlUtil.toJson(getContent());
     }
 
@@ -33,7 +33,7 @@ public class TomlProcessor extends AbstractConversionProcessor {
 
     @Override
     protected ActionInfo createActionInfo() {
-        return new ActionInfo()
+        return super.createActionInfo()
                 .setActionName(JsonAssistantBundle.message("action.toml.to.json.text"))
                 .setActionDescription(JsonAssistantBundle.messageOnSystem("action.toml.to.json.description"))
                 .setActionIcon(JsonAssistantIcons.FileTypes.TOML);
@@ -41,7 +41,7 @@ public class TomlProcessor extends AbstractConversionProcessor {
 
     @Override
     protected MessageInfo createMessageInfo() {
-        return new MessageInfo()
+        return super.createMessageInfo()
                 .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.toml.to.json.text"))
                 .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.toml.to.json.text"));
     }

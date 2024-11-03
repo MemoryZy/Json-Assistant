@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.strategy.formats;
+package cn.memoryzy.json.model.strategy.formats.processor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.YamlDocumentModel;
@@ -30,7 +30,7 @@ public class YamlProcessor extends AbstractConversionProcessor {
     }
 
     @Override
-    public String convertToJson() {
+    public String convert() {
         return YamlUtil.toJson(getContent());
     }
 
@@ -63,7 +63,7 @@ public class YamlProcessor extends AbstractConversionProcessor {
 
     @Override
     protected ActionInfo createActionInfo() {
-        return new ActionInfo()
+        return super.createActionInfo()
                 .setActionName(JsonAssistantBundle.message("action.yaml.to.json.text"))
                 .setActionDescription(JsonAssistantBundle.messageOnSystem("action.yaml.to.json.description"))
                 .setActionIcon(AllIcons.FileTypes.Yaml);
@@ -71,7 +71,7 @@ public class YamlProcessor extends AbstractConversionProcessor {
 
     @Override
     protected MessageInfo createMessageInfo() {
-        return new MessageInfo()
+        return super.createMessageInfo()
                 .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.yaml.to.json.text"))
                 .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.yaml.to.json.text"));
     }

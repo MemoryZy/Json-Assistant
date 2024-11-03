@@ -34,7 +34,7 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        JsonBeautifyAction.handleJsonBeautify(e, editor);
+        JsonBeautifyAction.beautifyJson(e, editor);
     }
 
     @Override

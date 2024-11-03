@@ -55,7 +55,7 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
         this.needsFormatting = needsFormatting;
         this.actionInfo = createActionInfo();
         this.messageInfo = createMessageInfo();
-        this.fileTypeInfo = buildFileTypeInfo();
+        this.fileTypeInfo = createFileTypeInfo();
     }
 
 
@@ -67,7 +67,7 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
                 // 执行前置逻辑
                 preprocessing();
                 // 执行转换逻辑
-                String json = convertToJson();
+                String json = convert();
                 // 执行后置逻辑
                 return postprocessing(json);
             }
@@ -80,26 +80,22 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
     /**
      * 构建操作相关信息
      */
-    protected abstract ActionInfo createActionInfo();
+    protected ActionInfo createActionInfo() {
+        return new ActionInfo();
+    }
 
     /**
      * 构建文本转换后的提示信息相关信息
      */
-    protected abstract MessageInfo createMessageInfo();
-
-    /**
-     * 构建支持写入的文件类型，类全限定名（通常只是 JSON 类型赋此值，其他类型可置为 null）
-     */
-    protected String[] createAllowedFileTypeQualifiedNames() {
-        // 默认为 null
-        return null;
+    protected MessageInfo createMessageInfo() {
+        return new MessageInfo();
     }
 
     /**
      * 构建文件类型所代表的类型，默认 JSON 类型
      */
-    private FileTypeInfo buildFileTypeInfo() {
-        return new FileTypeInfo().setProcessedFileType(FileTypeHolder.JSON).setAllowedFileTypeQualifiedNames(createAllowedFileTypeQualifiedNames());
+    protected FileTypeInfo createFileTypeInfo() {
+        return new FileTypeInfo().setProcessedFileType(FileTypeHolder.JSON);
     }
 
 

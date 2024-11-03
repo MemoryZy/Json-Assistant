@@ -40,8 +40,8 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
         Editor editor = PlatformUtil.getEditor(e);
         Document document = editor.getDocument();
         JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor,
-                JsonAssistantBundle.messageOnSystem("hint.select.json.to.toml.text"),
-                JsonAssistantBundle.messageOnSystem("hint.all.json.to.toml.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.json.to.toml.text"),
+                JsonAssistantBundle.messageOnSystem("hint.global.json.to.toml.text"));
 
         String tomlStr;
         try {

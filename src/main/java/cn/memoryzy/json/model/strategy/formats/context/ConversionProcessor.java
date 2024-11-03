@@ -21,7 +21,7 @@ public interface ConversionProcessor {
      * @return JSON 文本
      * @throws Exception 异常
      */
-    String convertToJson() throws Exception;
+    String convert() throws Exception;
 
     /**
      * 执行转换方法前所执行的操作

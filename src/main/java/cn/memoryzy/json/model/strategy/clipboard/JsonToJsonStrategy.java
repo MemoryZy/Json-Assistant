@@ -12,11 +12,7 @@ public class JsonToJsonStrategy implements ConversionStrategy {
 
     @Override
     public boolean canConvert(String text) {
-        if (JsonUtil.isJsonStr(text)) {
-            return true;
-        }
-
-        return StrUtil.isNotBlank(JsonUtil.extractJsonStr(text));
+        return JsonUtil.isJsonStr(text) || StrUtil.isNotBlank(JsonUtil.extractJsonStr(text));
     }
 
     @Override
