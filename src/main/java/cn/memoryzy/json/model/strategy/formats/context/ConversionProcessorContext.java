@@ -1,10 +1,13 @@
-package cn.memoryzy.json.model.strategy.formats;
+package cn.memoryzy.json.model.strategy.formats.context;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.formats.DocumentTextInfo;
 import cn.memoryzy.json.model.formats.EditorInfo;
 import cn.memoryzy.json.model.formats.SelectionInfo;
+import cn.memoryzy.json.model.strategy.formats.TomlProcessor;
+import cn.memoryzy.json.model.strategy.formats.XmlProcessor;
+import cn.memoryzy.json.model.strategy.formats.YamlProcessor;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -60,7 +63,32 @@ public class ConversionProcessorContext {
     }
 
     /**
-     * 尝试不同的策略解析编辑器文本
+     * 文本是否匹配成功（在转换方法前执行）
+     *
+     * @param editorInfo 编辑器信息
+     * @return 文本匹配成功为 true，反之为 false
+     */
+    public boolean isMatched(EditorInfo editorInfo) {
+        SelectionInfo selectionInfo = editorInfo.getSelectionInfo();
+        DocumentTextInfo documentTextInfo = editorInfo.getDocumentTextInfo();
+        String selectedText = documentTextInfo.getSelectedText();
+        String documentText = documentTextInfo.getDocumentText();
+
+        try {
+            if (selectionInfo.isHasSelection()) {
+                // 如果选择了文本，通过匹配则返回 true；若没通过匹配，则跳过，选择下一个处理器
+                return processor.canConvert(selectedText);
+            }
+
+            return processor.canConvert(documentText);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    /**
+     * 尝试不同的策略解析并转换编辑器文本
      *
      * @param context 上下文
      * @param editor  编辑器
@@ -69,17 +97,10 @@ public class ConversionProcessorContext {
     public static String applyProcessors(ConversionProcessorContext context, Editor editor) {
         EditorInfo editorInfo = resolveEditor(editor);
         if (editorInfo == null) return null;
-
-        // 策略处理器
-        AbstractConversionProcessor[] processors = {
-                new XmlProcessor(editorInfo)
-                // TODO 待实现其他的处理器
-        };
-
-        return applyProcessors(context, processors, editorInfo);
+        return applyProcessors(context, getProcessors(editorInfo), editorInfo);
     }
 
-    public static String applyProcessors(ConversionProcessorContext context, AbstractConversionProcessor[] processors, EditorInfo editorInfo) {
+    private static String applyProcessors(ConversionProcessorContext context, AbstractConversionProcessor[] processors, EditorInfo editorInfo) {
         for (AbstractConversionProcessor processor : processors) {
             context.setProcessor(processor);
             String result = context.convert(editorInfo);
@@ -89,6 +110,46 @@ public class ConversionProcessorContext {
         }
         return null;
     }
+
+
+    /**
+     * 尝试不同的策略解析编辑器文本
+     *
+     * @param context 上下文
+     * @param editor  编辑器
+     * @return 解析成功为 true，反之为 false
+     */
+    public static boolean processMatching(ConversionProcessorContext context, Editor editor) {
+        EditorInfo editorInfo = resolveEditor(editor);
+        if (editorInfo == null) return false;
+        return processMatching(context, getProcessors(editorInfo), editorInfo);
+    }
+
+    private static boolean processMatching(ConversionProcessorContext context, AbstractConversionProcessor[] processors, EditorInfo editorInfo) {
+        for (AbstractConversionProcessor processor : processors) {
+            context.setProcessor(processor);
+            boolean matched = context.isMatched(editorInfo);
+            if (matched) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * 获取策略处理器列表
+     *
+     * @param editorInfo 编辑器信息
+     * @return 策略处理器列表
+     */
+    private static AbstractConversionProcessor[] getProcessors(EditorInfo editorInfo) {
+        return new AbstractConversionProcessor[]{
+                new XmlProcessor(editorInfo),
+                new YamlProcessor(editorInfo),
+                new TomlProcessor(editorInfo)
+                // 待实现其他的处理器
+        };
+    }
+
 
     /**
      * 解析编辑器文本

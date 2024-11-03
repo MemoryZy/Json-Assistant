@@ -1,6 +1,7 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.model.strategy.clipboard.context.ConversionStrategy;
 import cn.memoryzy.json.util.JsonUtil;
 
 /**

@@ -232,8 +232,11 @@ public class JsonAssistantUtil {
      * 是否不允许在当前文档内写入；true，不允许写入；false：允许写入
      */
     public static boolean isWriteDocForbidden(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, String... fileTypeQualifiedNames) {
+
+
+
         // 文档不可写入，或在控制台内，返回不允许写
-        if (!document.isWritable() || inConsole(e)) {
+        if (!document.isWritable() || isConsoleDocument(e)) {
             return true;
         }
 
@@ -252,11 +255,16 @@ public class JsonAssistantUtil {
     }
 
 
+
+
+
+
     /**
      * 是否处于控制台；true，处于控制台；false反之。
      */
-    public static boolean inConsole(AnActionEvent e) {
+    public static boolean isConsoleDocument(AnActionEvent e) {
         ConsoleView data = e.getData(LangDataKeys.CONSOLE_VIEW);
+
         return data != null;
     }
 

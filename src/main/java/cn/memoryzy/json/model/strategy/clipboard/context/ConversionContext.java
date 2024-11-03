@@ -1,6 +1,7 @@
-package cn.memoryzy.json.model.strategy.clipboard;
+package cn.memoryzy.json.model.strategy.clipboard.context;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.model.strategy.clipboard.*;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;

@@ -1,16 +1,17 @@
 package cn.memoryzy.json.action;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.model.formats.BaseFormatModel;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.model.formats.ActionInfo;
+import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.context.ConversionProcessorContext;
 import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -33,16 +34,17 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e);
-        try {
-            BaseFormatModel model = JsonAssistantUtil.createFormatModelFromEditor(e.getProject(), editor);
-            if (Objects.nonNull(model)) {
-                model.preprocessing();
-                JsonAssistantUtil.applyProcessedTextToDocumentOrClipboard(
-                        e.getProject(), editor, editor.getDocument(),
-                        model.convertToJson(), model, true, true,
-                        FileTypeHolder.JSON);
-            }
-        } catch (Exception ignored) {
+        // 使用多策略处理文本
+        ConversionProcessorContext context = new ConversionProcessorContext();
+        String processedText = ConversionProcessorContext.applyProcessors(context, editor);
+        if (StrUtil.isNotBlank(processedText)) {
+            TextTransformUtil.applyProcessedTextToDocument(
+                    e.getProject(),
+                    editor,
+                    processedText,
+                    context.getProcessor(),
+                    // 创建新窗口展示转换完成的文本
+                    false);
         }
     }
 
@@ -50,16 +52,13 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     public void update(@NotNull AnActionEvent e) {
         boolean enabled = false;
         Presentation presentation = e.getPresentation();
-        Project project = e.getProject();
         Editor editor = PlatformUtil.getEditor(e);
-        if (Objects.nonNull(project) && Objects.nonNull(editor)) {
-            try {
-                BaseFormatModel model = JsonAssistantUtil.createFormatModelFromEditor(project, editor);
-                if (Objects.nonNull(model)) {
-                    enabled = true;
-                    updateActionIfNeeded(presentation, model);
-                }
-            } catch (Exception ignored) {
+
+        if (Objects.nonNull(getEventProject(e)) && Objects.nonNull(editor)) {
+            ConversionProcessorContext context = new ConversionProcessorContext();
+            if (ConversionProcessorContext.processMatching(context, editor)) {
+                enabled = true;
+                updateActionIfNeeded(presentation, context.getProcessor());
             }
         }
 
@@ -67,18 +66,19 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     }
 
 
-    private void updateActionIfNeeded(Presentation presentation, BaseFormatModel model) {
-        String actionName = model.getActionName();
-        String actionDescription = model.getActionDescription();
-        Icon actionIcon = model.getActionIcon();
+    private void updateActionIfNeeded(Presentation presentation, AbstractConversionProcessor processor) {
+        ActionInfo actionInfo = processor.getActionInfo();
+        String actionName = actionInfo.getActionName();
+        String actionDescription = actionInfo.getActionDescription();
+        Icon actionIcon = actionInfo.getActionIcon();
 
         String text = presentation.getText();
         String description = presentation.getDescription();
         Icon icon = presentation.getIcon();
 
-        if (!Objects.equals(actionName, text)) presentation.setText(model.getActionName());
-        if (!Objects.equals(actionDescription, description)) presentation.setDescription(model.getActionDescription());
-        if (!Objects.equals(actionIcon, icon)) presentation.setIcon(model.getActionIcon());
+        if (!Objects.equals(actionName, text)) presentation.setText(actionName);
+        if (!Objects.equals(actionDescription, description)) presentation.setDescription(actionDescription);
+        if (!Objects.equals(actionIcon, icon)) presentation.setIcon(actionIcon);
     }
 
 }

@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
+import cn.memoryzy.json.model.strategy.clipboard.context.ConversionStrategy;
 import cn.memoryzy.json.util.TomlUtil;
 
 /**

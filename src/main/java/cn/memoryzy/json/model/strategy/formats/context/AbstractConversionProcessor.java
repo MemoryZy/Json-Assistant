@@ -1,8 +1,10 @@
-package cn.memoryzy.json.model.strategy.formats;
+package cn.memoryzy.json.model.strategy.formats.context;
 
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.formats.ActionInfo;
 import cn.memoryzy.json.model.formats.EditorInfo;
+import cn.memoryzy.json.model.formats.FileTypeInfo;
 import cn.memoryzy.json.model.formats.MessageInfo;
 import cn.memoryzy.json.util.JsonUtil;
 
@@ -23,9 +25,14 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
     protected TextResolveStatus textResolveStatus;
 
     /**
-     * 处理器所代表的数据类型（类全限定名）
+     * 转换完成的 JSON 文本是否需要格式化
      */
-    protected final String fileTypeClassName;
+    private final boolean needsFormatting;
+
+    /**
+     * 处理器所代表的数据类型
+     */
+    protected final FileTypeInfo fileTypeInfo;
 
     /**
      * 编辑器相关信息
@@ -43,11 +50,12 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
     protected final MessageInfo messageInfo;
 
 
-    protected AbstractConversionProcessor(EditorInfo editorInfo, String fileTypeClassName) {
-        this.fileTypeClassName = fileTypeClassName;
+    protected AbstractConversionProcessor(EditorInfo editorInfo, boolean needsFormatting) {
         this.editorInfo = editorInfo;
+        this.needsFormatting = needsFormatting;
         this.actionInfo = createActionInfo();
         this.messageInfo = createMessageInfo();
+        this.fileTypeInfo = buildFileTypeInfo();
     }
 
 
@@ -79,6 +87,21 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
      */
     protected abstract MessageInfo createMessageInfo();
 
+    /**
+     * 构建支持写入的文件类型，类全限定名（通常只是 JSON 类型赋此值，其他类型可置为 null）
+     */
+    protected String[] createAllowedFileTypeQualifiedNames() {
+        // 默认为 null
+        return null;
+    }
+
+    /**
+     * 构建文件类型所代表的类型，默认 JSON 类型
+     */
+    private FileTypeInfo buildFileTypeInfo() {
+        return new FileTypeInfo().setProcessedFileType(FileTypeHolder.JSON).setAllowedFileTypeQualifiedNames(createAllowedFileTypeQualifiedNames());
+    }
+
 
     @Override
     public void preprocessing() {
@@ -86,7 +109,7 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
 
     @Override
     public String postprocessing(String text) {
-        return JsonUtil.formatJson(text);
+        return needsFormatting ? JsonUtil.formatJson(text) : text;
     }
 
     // ----------------------- GETTER/SETTER -----------------------
@@ -108,8 +131,12 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
         this.textResolveStatus = textResolveStatus;
     }
 
-    public String getFileTypeClassName() {
-        return fileTypeClassName;
+    public boolean isNeedsFormatting() {
+        return needsFormatting;
+    }
+
+    public FileTypeInfo getFileTypeInfo() {
+        return fileTypeInfo;
     }
 
     public EditorInfo getEditorInfo() {

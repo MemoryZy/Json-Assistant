@@ -53,12 +53,12 @@ public class YamlFormatModel extends BaseFormatModel {
 
     @Override
     public String getSelectHint() {
-        return JsonAssistantBundle.messageOnSystem("hint.select.yaml.to.json.text");
+        return JsonAssistantBundle.messageOnSystem("hint.selection.yaml.to.json.text");
     }
 
     @Override
     public String getDefaultHint() {
-        return JsonAssistantBundle.messageOnSystem("hint.all.yaml.to.json.text");
+        return JsonAssistantBundle.messageOnSystem("hint.global.yaml.to.json.text");
     }
 
     @Override

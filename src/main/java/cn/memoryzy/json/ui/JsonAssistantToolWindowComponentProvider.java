@@ -8,7 +8,7 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.enums.BackgroundMatchingEnum;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.model.strategy.clipboard.ConversionContext;
+import cn.memoryzy.json.model.strategy.clipboard.context.ConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;

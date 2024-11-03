@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.strategy.clipboard;
+package cn.memoryzy.json.model.strategy.clipboard.context;
 
 /**
  * @author Memory

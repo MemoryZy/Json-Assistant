@@ -48,12 +48,12 @@ public class TomlFormatModel extends BaseFormatModel {
 
     @Override
     public String getSelectHint() {
-        return JsonAssistantBundle.messageOnSystem("hint.select.toml.to.json.text");
+        return JsonAssistantBundle.messageOnSystem("hint.selection.toml.to.json.text");
     }
 
     @Override
     public String getDefaultHint() {
-        return JsonAssistantBundle.messageOnSystem("hint.all.toml.to.json.text");
+        return JsonAssistantBundle.messageOnSystem("hint.global.toml.to.json.text");
     }
 
     @Override
