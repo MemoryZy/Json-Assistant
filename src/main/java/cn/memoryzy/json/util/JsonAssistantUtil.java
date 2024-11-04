@@ -2,30 +2,14 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HtmlConstant;
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypeEnum;
-import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
-import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentFactory;
-import com.intellij.ui.content.ContentManager;
 import com.intellij.util.ui.UIUtil;
 
 import java.lang.reflect.Field;
@@ -39,36 +23,6 @@ import java.util.Objects;
  * @since 2024/8/3
  */
 public class JsonAssistantUtil {
-
-    private static final Logger LOG = Logger.getInstance(JsonAssistantUtil.class);
-
-    public static void showJsonStructureDialog(String text) {
-        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
-        if (StrUtil.isBlank(jsonStr)) {
-            return;
-        }
-
-        new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG)).show();
-    }
-
-    public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType) {
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        ToolWindowEx toolWindow = (ToolWindowEx) getJsonViewToolWindow(project);
-        Content mainContent = getMainContent(toolWindow);
-        EditorEx editor = getEditorOnContent(mainContent);
-
-        if (StrUtil.isBlank(Objects.requireNonNull(editor).getDocument().getText())) {
-            WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(processedText));
-        } else {
-            Content content = addNewContent(project, toolWindow, contentFactory, editorFileType);
-            EditorEx editorEx = getEditorOnContent(content);
-            WriteCommandAction.runWriteCommandAction(project, () -> Objects.requireNonNull(editorEx).getDocument().setText(processedText));
-        }
-
-        toolWindow.show();
-    }
-
-
 
     public static String truncateText(String text, int maxLength, String omitHint) {
         if (text.length() > maxLength) {
@@ -123,57 +77,6 @@ public class JsonAssistantUtil {
         }
 
         return null;
-    }
-
-    public static ToolWindow getJsonViewToolWindow(Project project) {
-        return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
-    }
-
-    public static Content getSelectedContent(ToolWindow toolWindow) {
-        if (toolWindow == null) return null;
-        ContentManager contentManager = toolWindow.getContentManager();
-        Content selectedContent = contentManager.getSelectedContent();
-        if (Objects.isNull(selectedContent)) {
-            selectedContent = contentManager.getContent(0);
-        }
-
-        return selectedContent;
-    }
-
-    public static Content getMainContent(ToolWindow toolWindow) {
-        if (toolWindow == null) return null;
-        ContentManager contentManager = toolWindow.getContentManager();
-        return contentManager.getContent(0);
-    }
-
-    public static JsonAssistantToolWindowPanel getPanelOnContent(Content content) {
-        if (Objects.nonNull(content)) {
-            SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
-            return (JsonAssistantToolWindowPanel) windowPanel.getContent();
-        }
-
-        return null;
-    }
-
-    public static EditorEx getEditorOnContent(Content content) {
-        JsonAssistantToolWindowPanel viewerPanel = getPanelOnContent(content);
-        if (Objects.nonNull(viewerPanel)) {
-            return viewerPanel.getEditor();
-        }
-
-        return null;
-    }
-
-    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType) {
-        ContentManager contentManager = toolWindow.getContentManager();
-        int contentCount = contentManager.getContentCount();
-        String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
-
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
-        Content content = contentFactory.createContent(window.createRootPanel(), displayName, false);
-        contentManager.addContent(content, contentCount);
-        contentManager.setSelectedContent(content, true);
-        return content;
     }
 
 

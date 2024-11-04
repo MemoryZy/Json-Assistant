@@ -116,7 +116,7 @@ public class TextTransformUtil {
     public static void applyTextWhenNotWritable(Project project, String processedText, FileType fileType) {
         // 若当前文档不允许写入，则新开工具窗口，用于展示处理完的文本
         try {
-            JsonAssistantUtil.addNewContentWithEditorContentIfNeeded(project, processedText, fileType);
+            ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, processedText, fileType);
         } catch (Exception e) {
             PlatformUtil.setClipboard(processedText);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);

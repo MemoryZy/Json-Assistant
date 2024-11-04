@@ -3,6 +3,7 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -47,7 +48,7 @@ public class EditInNewWindowAction extends DumbAwareAction {
         Project project = event.getRequiredData(CommonDataKeys.PROJECT);
         final FileEditorManager manager = FileEditorManager.getInstance(project);
         VirtualFile virtualFile = getVirtualFile(project);
-        Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
+        Content content = ToolWindowUtil.getSelectedContent(toolWindow);
         rename(project, virtualFile, content);
         JsonAssistantUtil.invokeMethod(manager, "openFileInNewWindow", virtualFile);
     }
@@ -59,8 +60,8 @@ public class EditInNewWindowAction extends DumbAwareAction {
 
     @SuppressWarnings("DataFlowIssue")
     public VirtualFile getVirtualFile(Project project) {
-        Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
-        EditorEx editor = Optional.ofNullable(content).map(JsonAssistantUtil::getEditorOnContent).orElse(null);
+        Content content = ToolWindowUtil.getSelectedContent(toolWindow);
+        EditorEx editor = Optional.ofNullable(content).map(ToolWindowUtil::getEditorOnContent).orElse(null);
         String text = editor == null ? "" : editor.getDocument().getText();
         return Optional.ofNullable(editor)
                 .map(Editor::getDocument)

@@ -171,6 +171,7 @@ public class JsonAssistantToolWindowComponentProvider {
 
 
         // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
+        // TODO 如果 editor.setFile() 不行，就关闭初始选项卡，再创建一个新的，文本原样移动过去
 
         if (initWindow && persistentState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();

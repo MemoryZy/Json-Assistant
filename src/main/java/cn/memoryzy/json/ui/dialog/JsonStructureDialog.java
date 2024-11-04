@@ -2,15 +2,13 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONNull;
-import cn.hutool.json.JSONObject;
+import cn.hutool.json.*;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
 import cn.memoryzy.json.enums.UrlEnum;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -105,6 +103,13 @@ public class JsonStructureDialog extends DialogWrapper {
     public void show() {
         ApplicationManager.getApplication().invokeLater(super::show);
     }
+
+
+    public static void show(String text) {
+        String jsonStr = JsonUtil.isJsonStr(text) ? text : JsonUtil.extractJsonStr(text);
+        new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG)).show();
+    }
+
 
     public void convertToTreeNode(JSON json, JsonCollectInfoMutableTreeNode node) {
         if (json instanceof JSONObject) {

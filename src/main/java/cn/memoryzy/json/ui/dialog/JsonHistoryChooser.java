@@ -7,7 +7,7 @@ import cn.memoryzy.json.model.HistoryModel;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -131,9 +131,9 @@ public class JsonHistoryChooser extends DialogWrapper {
     private void executeOkAction() {
         HistoryModel selectedValue = showList.getSelectedValue();
         if (selectedValue != null) {
-            Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
+            Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
             if (Objects.nonNull(selectedContent)) {
-                EditorEx editor = JsonAssistantUtil.getEditorOnContent(selectedContent);
+                EditorEx editor = ToolWindowUtil.getEditorOnContent(selectedContent);
                 if (Objects.nonNull(editor)) {
                     WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(selectedValue.getLongText()));
                     toolWindow.show();
