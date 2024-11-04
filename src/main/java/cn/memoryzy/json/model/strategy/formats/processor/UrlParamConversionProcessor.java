@@ -6,7 +6,7 @@ import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.data.MessageData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.util.TextTransformUtil;
-import com.intellij.icons.AllIcons;
+import icons.JsonAssistantIcons;
 
 /**
  * @author Memory
@@ -36,7 +36,7 @@ public class UrlParamConversionProcessor extends AbstractGlobalTextConversionPro
         return super.createActionData()
                 .setActionName(JsonAssistantBundle.message("action.url.param.to.json.text"))
                 .setActionDescription(JsonAssistantBundle.messageOnSystem("action.url.param.to.json.description"))
-                .setActionIcon(AllIcons.FileTypes.Xml);
+                .setActionIcon(JsonAssistantIcons.FileTypes.URL);
     }
 
     @Override
