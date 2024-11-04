@@ -31,6 +31,8 @@ public class JsonAssistantIcons {
 
     public static class FileTypes {
         public static final Icon TOML = load("/icons/fileTypes/toml-file.svg");
+        public static final Icon URL = load("/icons/fileTypes/url.svg");
+        public static final Icon KV = load("/icons/fileTypes/kv.svg");
     }
 
     /**

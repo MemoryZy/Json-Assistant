@@ -6,7 +6,9 @@
       "extract.svg": "icons/extract.svg",
       "donate.svg": "icons/donate.svg",
       "fileTypes": {
-        "toml.svg": "icons/fileTypes/toml-file.svg"
+        "toml.svg": "icons/fileTypes/toml-file.svg",
+        "url.svg": "icons/fileTypes/url.svg",
+        "kv.svg": "icons/fileTypes/kv.svg"
       },
       "toolwindow": {
         "logo.svg": "icons/toolwindow/logo.svg"
