@@ -36,7 +36,7 @@ public class ToolWindowUtil {
     public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ToolWindowEx toolWindow = (ToolWindowEx) getJsonAssistantToolWindow(project);
-        Content mainContent = getMainContent(toolWindow);
+        Content mainContent = getInitialContent(toolWindow);
         EditorEx editor = getEditorOnContent(mainContent);
 
         if (StrUtil.isBlank(Objects.requireNonNull(editor).getDocument().getText())) {
@@ -50,12 +50,22 @@ public class ToolWindowUtil {
         toolWindow.show();
     }
 
-
+    /**
+     * 获取 Json Assistant 的工具窗口
+     *
+     * @param project 项目实例，用于确定工具窗口所属的项目
+     * @return ToolWindow 返回找到或新创建的工具窗口实例
+     */
     public static ToolWindow getJsonAssistantToolWindow(Project project) {
         return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
     }
 
-
+    /**
+     * 获取选定的选项卡，如果未选定任何选项卡，则返回第一个选项卡
+     *
+     * @param toolWindow 工具窗口对象
+     * @return 当前选定的选项卡，如果未选定任何选项卡，则返回第一个选项卡
+     */
     public static Content getSelectedContent(ToolWindow toolWindow) {
         if (toolWindow == null) return null;
         ContentManager contentManager = toolWindow.getContentManager();
@@ -67,13 +77,25 @@ public class ToolWindowUtil {
         return selectedContent;
     }
 
-    public static Content getMainContent(ToolWindow toolWindow) {
+    /**
+     * 获取工具窗口的初始选项卡
+     *
+     * @param toolWindow 工具窗口对象
+     * @return 工具窗口的初始选项卡
+     **/
+    public static Content getInitialContent(ToolWindow toolWindow) {
         if (toolWindow == null) return null;
         ContentManager contentManager = toolWindow.getContentManager();
         return contentManager.getContent(0);
     }
 
 
+    /**
+     * 获取选项卡内的面板实例
+     *
+     * @param content 选项卡实例，从中获取面板实例
+     * @return 组件面板
+     */
     public static JsonAssistantToolWindowPanel getPanelOnContent(Content content) {
         if (Objects.nonNull(content)) {
             SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
@@ -83,6 +105,12 @@ public class ToolWindowUtil {
         return null;
     }
 
+    /**
+     * 获取选项卡内的编辑器实例
+     *
+     * @param content 选项卡实例，从中获取编辑器实例
+     * @return 编辑器
+     */
     public static EditorEx getEditorOnContent(Content content) {
         JsonAssistantToolWindowPanel viewerPanel = getPanelOnContent(content);
         if (Objects.nonNull(viewerPanel)) {
@@ -92,6 +120,15 @@ public class ToolWindowUtil {
         return null;
     }
 
+    /**
+     * 向指定的工具窗口中添加新选项卡
+     *
+     * @param project        当前的项目实例，用于创建窗口组件提供者
+     * @param toolWindow     工具窗口实例，用于获取选项卡管理器
+     * @param contentFactory 选项卡工厂实例，用于创建新选项卡
+     * @param editorFileType 编辑器文件类型，用于创建窗口组件提供者
+     * @return 返回创建并添加到工具窗口的新选项卡
+     */
     public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType) {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
