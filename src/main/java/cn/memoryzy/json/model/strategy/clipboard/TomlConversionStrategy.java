@@ -1,13 +1,13 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
-import cn.memoryzy.json.model.strategy.clipboard.context.ConversionStrategy;
+import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.TomlUtil;
 
 /**
  * @author Memory
  * @since 2024/10/31
  */
-public class TomlToJsonStrategy implements ConversionStrategy {
+public class TomlConversionStrategy implements ClipboardTextConversionStrategy {
 
     @Override
     public boolean canConvert(String text) {

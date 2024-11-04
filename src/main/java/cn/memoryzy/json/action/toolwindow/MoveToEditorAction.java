@@ -40,8 +40,8 @@ public class MoveToEditorAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getProject();
         if (project == null) {
             return;
         }

@@ -68,7 +68,7 @@ public class CopyKeyValueAction extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent event) {
         TreePath[] paths = tree.getSelectionPaths();
         boolean visible = true;
         if (Objects.nonNull(paths) && paths.length == 1) {
@@ -80,6 +80,6 @@ public class CopyKeyValueAction extends DumbAwareAction {
             }
         }
 
-        e.getPresentation().setEnabledAndVisible(visible);
+        event.getPresentation().setEnabledAndVisible(visible);
     }
 }

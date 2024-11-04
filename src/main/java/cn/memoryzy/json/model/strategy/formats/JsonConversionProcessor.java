@@ -2,8 +2,8 @@ package cn.memoryzy.json.model.strategy.formats;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.FileTypeEnum;
-import cn.memoryzy.json.model.formats.EditorInfo;
-import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
+import cn.memoryzy.json.model.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -17,20 +17,24 @@ import com.intellij.openapi.project.Project;
 import java.util.Objects;
 
 /**
- * 不参与策略处理，只存储一些信息
+ * 不参与策略处理
  *
  * @author Memory
  * @since 2024/11/3
  */
-public class JsonProcessor extends AbstractConversionProcessor {
+public class JsonConversionProcessor extends AbstractGlobalTextConversionProcessor {
 
-    private final DataContext dataContext;
+    private DataContext dataContext;
 
-    public JsonProcessor(DataContext dataContext, EditorInfo editorInfo, boolean needsFormatting) {
-        super(editorInfo, needsFormatting);
+    public JsonConversionProcessor(EditorData editorData, boolean needBeautify) {
+        super(editorData, needBeautify);
+    }
+
+    public JsonConversionProcessor(DataContext dataContext, EditorData editorData, boolean needBeautify) {
+        super(editorData, needBeautify);
         this.dataContext = dataContext;
         String[] fileTypes = {FileTypeEnum.JSON.getFileTypeQualifiedName(), FileTypeEnum.JSON5.getFileTypeQualifiedName()};
-        getFileTypeInfo().setAllowedFileTypeQualifiedNames(fileTypes);
+        getFileTypeData().setAllowedFileTypeQualifiedNames(fileTypes);
     }
 
     @Override
@@ -39,7 +43,7 @@ public class JsonProcessor extends AbstractConversionProcessor {
     }
 
     @Override
-    public String convert() {
+    public String convertToJson() {
         String contentStr = getContent();
         if (JsonUtil.isJsonStr(contentStr)) {
             return contentStr;
@@ -60,8 +64,12 @@ public class JsonProcessor extends AbstractConversionProcessor {
      * @return 提取出的文本
      */
     private String extractJson(String text) {
+        if (Objects.isNull(dataContext)) {
+            return null;
+        }
+
         // 是否使用全局文本做匹配
-        String documentText = editorInfo.getDocumentTextInfo().getDocumentText();
+        String documentText = editorData.getDocTextData().getDocumentText();
         if (Objects.equals(documentText, text)) {
             // 效率优化（防止全部文本过多）
             Project project = CommonDataKeys.PROJECT.getData(dataContext);

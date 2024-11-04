@@ -28,7 +28,7 @@ public class ConvertOtherFormatsGroup extends DefaultActionGroup implements Dumb
     }
 
     @Override
-    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
+    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         return new AnAction[]{
                 ActionHolder.TO_XML_ACTION,
                 ActionHolder.TO_YAML_ACTION,

@@ -43,23 +43,22 @@ public class EditInNewWindowAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getRequiredData(CommonDataKeys.PROJECT);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getRequiredData(CommonDataKeys.PROJECT);
         final FileEditorManager manager = FileEditorManager.getInstance(project);
-        VirtualFile virtualFile = getVirtualFile(e);
+        VirtualFile virtualFile = getVirtualFile(project);
         Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
         rename(project, virtualFile, content);
         JsonAssistantUtil.invokeMethod(manager, "openFileInNewWindow", virtualFile);
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(getEventProject(e) != null);
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabledAndVisible(getEventProject(event) != null);
     }
 
     @SuppressWarnings("DataFlowIssue")
-    public VirtualFile getVirtualFile(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
+    public VirtualFile getVirtualFile(Project project) {
         Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
         EditorEx editor = Optional.ofNullable(content).map(JsonAssistantUtil::getEditorOnContent).orElse(null);
         String text = editor == null ? "" : editor.getDocument().getText();

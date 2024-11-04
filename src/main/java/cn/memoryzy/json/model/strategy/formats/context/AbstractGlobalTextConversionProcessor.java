@@ -2,17 +2,17 @@ package cn.memoryzy.json.model.strategy.formats.context;
 
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.TextResolveStatus;
-import cn.memoryzy.json.model.formats.ActionInfo;
-import cn.memoryzy.json.model.formats.EditorInfo;
-import cn.memoryzy.json.model.formats.FileTypeInfo;
-import cn.memoryzy.json.model.formats.MessageInfo;
+import cn.memoryzy.json.model.data.ActionData;
+import cn.memoryzy.json.model.data.EditorData;
+import cn.memoryzy.json.model.data.FileTypeData;
+import cn.memoryzy.json.model.data.MessageData;
 import cn.memoryzy.json.util.JsonUtil;
 
 /**
  * @author Memory
  * @since 2024/10/31
  */
-public abstract class AbstractConversionProcessor implements ConversionProcessor {
+public abstract class AbstractGlobalTextConversionProcessor implements GlobalTextConversionProcessor {
 
     /**
      * 当前获取的文本（符合格式的文本）
@@ -27,35 +27,35 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
     /**
      * 转换完成的 JSON 文本是否需要格式化
      */
-    private final boolean needsFormatting;
+    private final boolean needBeautify;
 
     /**
      * 处理器所代表的数据类型
      */
-    protected final FileTypeInfo fileTypeInfo;
+    protected final FileTypeData fileTypeData;
 
     /**
      * 编辑器相关信息
      */
-    protected final EditorInfo editorInfo;
+    protected final EditorData editorData;
 
     /**
      * 当文本匹配成功，用于替换的操作信息
      */
-    protected final ActionInfo actionInfo;
+    protected final ActionData actionData;
 
     /**
      * 文本转换后的提示信息
      */
-    protected final MessageInfo messageInfo;
+    protected final MessageData messageData;
 
 
-    protected AbstractConversionProcessor(EditorInfo editorInfo, boolean needsFormatting) {
-        this.editorInfo = editorInfo;
-        this.needsFormatting = needsFormatting;
-        this.actionInfo = createActionInfo();
-        this.messageInfo = createMessageInfo();
-        this.fileTypeInfo = createFileTypeInfo();
+    protected AbstractGlobalTextConversionProcessor(EditorData editorData, boolean needBeautify) {
+        this.editorData = editorData;
+        this.needBeautify = needBeautify;
+        this.actionData = createActionData();
+        this.messageData = createMessageData();
+        this.fileTypeData = createFileTypeData();
     }
 
 
@@ -67,7 +67,7 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
                 // 执行前置逻辑
                 preprocessing();
                 // 执行转换逻辑
-                String json = convert();
+                String json = convertToJson();
                 // 执行后置逻辑
                 return postprocessing(json);
             }
@@ -80,22 +80,22 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
     /**
      * 构建操作相关信息
      */
-    protected ActionInfo createActionInfo() {
-        return new ActionInfo();
+    protected ActionData createActionData() {
+        return new ActionData();
     }
 
     /**
      * 构建文本转换后的提示信息相关信息
      */
-    protected MessageInfo createMessageInfo() {
-        return new MessageInfo();
+    protected MessageData createMessageData() {
+        return new MessageData();
     }
 
     /**
      * 构建文件类型所代表的类型，默认 JSON 类型
      */
-    protected FileTypeInfo createFileTypeInfo() {
-        return new FileTypeInfo().setProcessedFileType(FileTypeHolder.JSON);
+    protected FileTypeData createFileTypeData() {
+        return new FileTypeData().setProcessedFileType(FileTypeHolder.JSON);
     }
 
 
@@ -104,8 +104,8 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
     }
 
     @Override
-    public String postprocessing(String text) {
-        return needsFormatting ? JsonUtil.formatJson(text) : text;
+    public String postprocessing(String text) throws Exception {
+        return needBeautify ? JsonUtil.formatJson(text) : JsonUtil.compressJson(text);
     }
 
     // ----------------------- GETTER/SETTER -----------------------
@@ -127,23 +127,23 @@ public abstract class AbstractConversionProcessor implements ConversionProcessor
         this.textResolveStatus = textResolveStatus;
     }
 
-    public boolean isNeedsFormatting() {
-        return needsFormatting;
+    public boolean isNeedBeautify() {
+        return needBeautify;
     }
 
-    public FileTypeInfo getFileTypeInfo() {
-        return fileTypeInfo;
+    public FileTypeData getFileTypeData() {
+        return fileTypeData;
     }
 
-    public EditorInfo getEditorInfo() {
-        return editorInfo;
+    public EditorData getEditorData() {
+        return editorData;
     }
 
-    public ActionInfo getActionInfo() {
-        return actionInfo;
+    public ActionData getActionData() {
+        return actionData;
     }
 
-    public MessageInfo getMessageInfo() {
-        return messageInfo;
+    public MessageData getMessageData() {
+        return messageData;
     }
 }

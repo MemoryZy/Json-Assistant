@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.model.data;
 
 /**
  * 文档内文本信息
@@ -6,7 +6,7 @@ package cn.memoryzy.json.model.formats;
  * @author Memory
  * @since 2024/11/2
  */
-public class DocumentTextInfo {
+public class DocTextData {
 
     /**
      * 文档内的全部文本
@@ -26,7 +26,7 @@ public class DocumentTextInfo {
         return documentText;
     }
 
-    public DocumentTextInfo setDocumentText(String documentText) {
+    public DocTextData setDocumentText(String documentText) {
         this.documentText = documentText;
         return this;
     }
@@ -35,7 +35,7 @@ public class DocumentTextInfo {
         return selectedText;
     }
 
-    public DocumentTextInfo setSelectedText(String selectedText) {
+    public DocTextData setSelectedText(String selectedText) {
         this.selectedText = selectedText;
         return this;
     }

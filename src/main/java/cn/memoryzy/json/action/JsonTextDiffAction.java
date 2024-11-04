@@ -3,8 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
-import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffDialogHints;
@@ -12,8 +11,8 @@ import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -36,18 +35,13 @@ public class JsonTextDiffAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) return;
-        Editor editor = PlatformUtil.getEditor(e);
-        JsonFormatHandleModel model = JsonFormatHandleModel.of(project, editor);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getProject();
+        DataContext dataContext = event.getDataContext();
 
-        String leftJsonStr;
-        try {
-            leftJsonStr = StrUtil.trim(JsonUtil.formatJson(model.getContent()));
-        } catch (Exception ex) {
-            leftJsonStr = "";
-        }
+        String leftJsonStr = StrUtil.trim(
+                GlobalTextConverter.parseJson(
+                        dataContext, PlatformUtil.getEditor(dataContext), true));
 
         FileType fileType = FileTypeHolder.JSON;
         DocumentContent leftDocumentContent = DiffContentFactory.getInstance().createEditable(project, leftJsonStr, fileType);

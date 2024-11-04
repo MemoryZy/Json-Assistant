@@ -6,7 +6,6 @@ import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -56,9 +55,9 @@ public class PlatformUtil {
      * @param event 事件源
      * @return 结构化文件
      */
-    public static PsiFile getPsiFile(AnActionEvent event) {
+    public static PsiFile getPsiFile(DataContext dataContext) {
         try {
-            return event.getData(CommonDataKeys.PSI_FILE);
+            return dataContext.getData(CommonDataKeys.PSI_FILE);
         } catch (Throwable e) {
             return null;
         }
@@ -82,9 +81,9 @@ public class PlatformUtil {
      *
      * @return Psi元素
      */
-    public static PsiElement getPsiElementByOffset(AnActionEvent e) {
-        PsiFile psiFile = PlatformUtil.getPsiFile(e);
-        Editor editor = PlatformUtil.getEditor(e);
+    public static PsiElement getPsiElementByOffset(DataContext dataContext) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
+        Editor editor = PlatformUtil.getEditor(dataContext);
         return (psiFile != null && editor != null) ? getPsiElementByOffset(editor, psiFile) : null;
     }
 
@@ -95,8 +94,8 @@ public class PlatformUtil {
      * @param event 事件源
      * @return 编辑器
      */
-    public static Editor getEditor(AnActionEvent event) {
-        return event.getData(CommonDataKeys.EDITOR);
+    public static Editor getEditor(DataContext dataContext) {
+        return dataContext.getData(CommonDataKeys.EDITOR);
     }
 
 

@@ -3,7 +3,7 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -40,8 +40,8 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getProject();
         FileChooserFactory chooserFactory = FileChooserFactory.getInstance();
         FileSaverDescriptor saverDescriptor = new FileSaverDescriptor(
                 JsonAssistantBundle.messageOnSystem("dialog.file.save.json.title"),
@@ -60,7 +60,9 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(e.getProject() != null && JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabled(
+                GlobalTextConverter.validateEditorJson(
+                        getEventProject(event), editor, event.getDataContext()));
     }
 }

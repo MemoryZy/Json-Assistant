@@ -2,10 +2,10 @@ package cn.memoryzy.json.model.strategy.formats.processor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.YamlDocumentModel;
-import cn.memoryzy.json.model.formats.ActionInfo;
-import cn.memoryzy.json.model.formats.EditorInfo;
-import cn.memoryzy.json.model.formats.MessageInfo;
-import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
+import cn.memoryzy.json.model.data.ActionData;
+import cn.memoryzy.json.model.data.EditorData;
+import cn.memoryzy.json.model.data.MessageData;
+import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.ui.dialog.MultiYamlDocumentChooser;
 import cn.memoryzy.json.util.YamlUtil;
 import com.intellij.icons.AllIcons;
@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
  * @author Memory
  * @since 2024/11/3
  */
-public class YamlProcessor extends AbstractConversionProcessor {
+public class YamlConversionProcessor extends AbstractGlobalTextConversionProcessor {
 
-    public YamlProcessor(EditorInfo editorInfo) {
-        super(editorInfo, true);
+    public YamlConversionProcessor(EditorData editorData) {
+        super(editorData, true);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class YamlProcessor extends AbstractConversionProcessor {
     }
 
     @Override
-    public String convert() {
+    public String convertToJson() {
         return YamlUtil.toJson(getContent());
     }
 
@@ -62,16 +62,16 @@ public class YamlProcessor extends AbstractConversionProcessor {
     // -------------------------- Provide Information -------------------------- //
 
     @Override
-    protected ActionInfo createActionInfo() {
-        return super.createActionInfo()
+    protected ActionData createActionData() {
+        return super.createActionData()
                 .setActionName(JsonAssistantBundle.message("action.yaml.to.json.text"))
                 .setActionDescription(JsonAssistantBundle.messageOnSystem("action.yaml.to.json.description"))
                 .setActionIcon(AllIcons.FileTypes.Yaml);
     }
 
     @Override
-    protected MessageInfo createMessageInfo() {
-        return super.createMessageInfo()
+    protected MessageData createMessageData() {
+        return super.createMessageData()
                 .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.yaml.to.json.text"))
                 .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.yaml.to.json.text"));
     }

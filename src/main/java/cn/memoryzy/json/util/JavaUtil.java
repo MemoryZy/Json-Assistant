@@ -11,8 +11,8 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotationEnum;
 import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import com.intellij.ide.highlighter.JavaFileType;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
@@ -387,22 +387,22 @@ public class JavaUtil {
      * @param event 事件源
      * @return Class
      */
-    public static PsiClass getPsiClass(AnActionEvent event) {
+    public static PsiClass getPsiClass(DataContext dataContext) {
         PsiClass psiClass = null;
 
         try {
             // 一个类中可能存在几个内部类
-            PsiClass[] psiClasses = getAllPsiClassByPsiFile(event);
+            PsiClass[] psiClasses = getAllPsiClassByPsiFile(dataContext);
 
             if (ArrayUtil.isEmpty(psiClasses)) {
-                return getCurrentPsiClassByOffset(event);
+                return getCurrentPsiClassByOffset(dataContext);
             } else {
                 // 单独Class
                 if (psiClasses.length == 1) {
                     psiClass = psiClasses[0];
                 } else {
                     // 偏移量获取
-                    PsiClass curClz = getCurrentPsiClassByOffset(event);
+                    PsiClass curClz = getCurrentPsiClassByOffset(dataContext);
                     if (Objects.nonNull(curClz)) {
                         psiClass = curClz;
                     } else {
@@ -423,9 +423,9 @@ public class JavaUtil {
      * @param event 事件信息
      * @return Class
      */
-    public static PsiClass[] getAllPsiClassByPsiFile(AnActionEvent event) {
+    public static PsiClass[] getAllPsiClassByPsiFile(DataContext dataContext) {
         List<PsiClass> psiClassList = new ArrayList<>();
-        PsiFile psiFile = PlatformUtil.getPsiFile(event);
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
 
         if (psiFile instanceof PsiJavaFile) {
             PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
@@ -445,12 +445,12 @@ public class JavaUtil {
     /**
      * 根据编辑器的偏移量获取当前所在的Class文件（因为利用了编辑器，光标必须在类中，也就是类的上下作用域内）
      *
-     * @param event 事件信息
+     * @param dataContext 数据上下文信息
      * @return class
      */
-    public static PsiClass getCurrentPsiClassByOffset(AnActionEvent event) {
-        PsiFile psiFile = PlatformUtil.getPsiFile(event);
-        Editor editor = PlatformUtil.getEditor(event);
+    public static PsiClass getCurrentPsiClassByOffset(DataContext dataContext) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
+        Editor editor = PlatformUtil.getEditor(dataContext);
 
         if (Objects.nonNull(psiFile) && Objects.nonNull(editor) && (psiFile.getFileType() instanceof JavaFileType)) {
             return PsiTreeUtil.getParentOfType(PlatformUtil.getPsiElementByOffset(editor, psiFile), PsiClass.class);
@@ -486,21 +486,21 @@ public class JavaUtil {
      * @param event 事件源
      * @return true -> 处于；false -> 不处于
      */
-    public static boolean isJavaFile(AnActionEvent event) {
+    public static boolean isJavaFile(DataContext dataContext) {
         // 获取当前选中的 PsiClass
-        PsiFile psiFile = event.getData(CommonDataKeys.PSI_FILE);
+        PsiFile psiFile = dataContext.getData(CommonDataKeys.PSI_FILE);
         return psiFile instanceof PsiJavaFile;
     }
 
     /**
      * 当前 Java 类中是否存在属性
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return true -> 存在；false -> 不存在
      */
-    public static boolean hasJavaProperty(AnActionEvent event) {
+    public static boolean hasJavaProperty(DataContext dataContext) {
         boolean enabled = false;
-        PsiClass psiClass = getPsiClass(event);
+        PsiClass psiClass = getPsiClass(dataContext);
         if (Objects.nonNull(psiClass)) {
             PsiField[] fields = getAllFieldFilterStatic(psiClass);
             enabled = ArrayUtil.isNotEmpty(fields);

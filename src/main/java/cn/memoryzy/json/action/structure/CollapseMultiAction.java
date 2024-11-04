@@ -37,7 +37,7 @@ public class CollapseMultiAction extends DumbAwareAction implements UpdateInBack
 
     @Override
     @SuppressWarnings("DuplicatedCode")
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent event) {
         boolean enabled = false;
         TreePath[] paths = tree.getSelectionPaths();
         if (ArrayUtil.isNotEmpty(paths)) {
@@ -51,6 +51,6 @@ public class CollapseMultiAction extends DumbAwareAction implements UpdateInBack
             }
         }
 
-        e.getPresentation().setEnabledAndVisible(enabled);
+        event.getPresentation().setEnabledAndVisible(enabled);
     }
 }

@@ -1,10 +1,12 @@
 package cn.memoryzy.json.model.strategy.formats.context;
 
 /**
+ * 全局的文本转为 JSON 的处理
+ *
  * @author Memory
  * @since 2024/11/2
  */
-public interface ConversionProcessor {
+public interface GlobalTextConversionProcessor {
 
     /**
      * 提供的文本是否符合转换为 JSON 格式的要求
@@ -21,7 +23,7 @@ public interface ConversionProcessor {
      * @return JSON 文本
      * @throws Exception 异常
      */
-    String convert() throws Exception;
+    String convertToJson() throws Exception;
 
     /**
      * 执行转换方法前所执行的操作

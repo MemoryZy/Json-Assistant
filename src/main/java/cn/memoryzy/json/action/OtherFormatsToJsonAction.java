@@ -2,9 +2,10 @@ package cn.memoryzy.json.action;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.formats.ActionInfo;
-import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
-import cn.memoryzy.json.model.strategy.formats.context.ConversionProcessorContext;
+import cn.memoryzy.json.model.data.ActionData;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -32,14 +33,14 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Editor editor = PlatformUtil.getEditor(e);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Editor editor = PlatformUtil.getEditor(event.getDataContext());
         // 使用多策略处理文本
-        ConversionProcessorContext context = new ConversionProcessorContext();
-        String processedText = ConversionProcessorContext.applyProcessors(context, editor);
+        GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
+        String processedText = GlobalTextConverter.applyConversionProcessors(context, editor);
         if (StrUtil.isNotBlank(processedText)) {
             TextTransformUtil.applyProcessedTextToDocument(
-                    getEventProject(e),
+                    getEventProject(event),
                     editor,
                     processedText,
                     context.getProcessor(),
@@ -49,14 +50,14 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent event) {
         boolean enabled = false;
-        Presentation presentation = e.getPresentation();
-        Editor editor = PlatformUtil.getEditor(e);
+        Presentation presentation = event.getPresentation();
+        Editor editor = PlatformUtil.getEditor(event.getDataContext());
 
-        if (Objects.nonNull(getEventProject(e)) && Objects.nonNull(editor)) {
-            ConversionProcessorContext context = new ConversionProcessorContext();
-            if (ConversionProcessorContext.processMatching(context, editor)) {
+        if (Objects.nonNull(getEventProject(event)) && Objects.nonNull(editor)) {
+            GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
+            if (GlobalTextConverter.validateEditorText(context, editor)) {
                 enabled = true;
                 updateActionIfNeeded(presentation, context.getProcessor());
             }
@@ -66,11 +67,11 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
     }
 
 
-    private void updateActionIfNeeded(Presentation presentation, AbstractConversionProcessor processor) {
-        ActionInfo actionInfo = processor.getActionInfo();
-        String actionName = actionInfo.getActionName();
-        String actionDescription = actionInfo.getActionDescription();
-        Icon actionIcon = actionInfo.getActionIcon();
+    private void updateActionIfNeeded(Presentation presentation, AbstractGlobalTextConversionProcessor processor) {
+        ActionData actionData = processor.getActionData();
+        String actionName = actionData.getActionName();
+        String actionDescription = actionData.getActionDescription();
+        Icon actionIcon = actionData.getActionIcon();
 
         String text = presentation.getText();
         String description = presentation.getDescription();

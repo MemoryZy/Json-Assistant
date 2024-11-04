@@ -36,7 +36,7 @@ public class ExpandMultiAction extends DumbAwareAction {
 
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent event) {
         boolean enabled = false;
         TreePath[] paths = tree.getSelectionPaths();
         if (ArrayUtil.isNotEmpty(paths)) {
@@ -50,6 +50,6 @@ public class ExpandMultiAction extends DumbAwareAction {
             }
         }
 
-        e.getPresentation().setEnabledAndVisible(enabled);
+        event.getPresentation().setEnabledAndVisible(enabled);
     }
 }

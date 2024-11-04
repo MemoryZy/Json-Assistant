@@ -20,8 +20,8 @@ public class QuickStartAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        JsonAssistantUtil.openOnlineDoc(e.getProject(), true);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        JsonAssistantUtil.openOnlineDoc(event.getProject(), true);
     }
 
 }

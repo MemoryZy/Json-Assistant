@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.model.data;
 
 import com.intellij.openapi.fileTypes.FileType;
 
@@ -8,7 +8,7 @@ import com.intellij.openapi.fileTypes.FileType;
  * @author Memory
  * @since 2024/11/3
  */
-public class FileTypeInfo {
+public class FileTypeData {
 
     /**
      * 转换完成后的文本代表的文件类型
@@ -29,7 +29,7 @@ public class FileTypeInfo {
         return processedFileType;
     }
 
-    public FileTypeInfo setProcessedFileType(FileType processedFileType) {
+    public FileTypeData setProcessedFileType(FileType processedFileType) {
         this.processedFileType = processedFileType;
         return this;
     }
@@ -38,7 +38,7 @@ public class FileTypeInfo {
         return allowedFileTypeQualifiedNames;
     }
 
-    public FileTypeInfo setAllowedFileTypeQualifiedNames(String[] allowedFileTypeQualifiedNames) {
+    public FileTypeData setAllowedFileTypeQualifiedNames(String[] allowedFileTypeQualifiedNames) {
         this.allowedFileTypeQualifiedNames = allowedFileTypeQualifiedNames;
         return this;
     }

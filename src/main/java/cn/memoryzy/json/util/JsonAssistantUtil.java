@@ -9,21 +9,12 @@ import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypeEnum;
-import cn.memoryzy.json.model.formats.BaseFormatModel;
-import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
-import com.intellij.codeInsight.hint.HintManager;
-import com.intellij.execution.ui.ConsoleView;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
@@ -32,9 +23,6 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
-import com.intellij.psi.PsiDocumentManager;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -43,10 +31,8 @@ import com.intellij.util.ui.UIUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Memory
@@ -64,49 +50,6 @@ public class JsonAssistantUtil {
 
         new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG)).show();
     }
-
-    public static void applyProcessedTextToDocumentOrClipboard(Project project, Editor editor, Document document,
-                                                               String processedText, BaseFormatModel model,
-                                                               boolean noMinify, boolean convertFormat,
-                                                               FileType editorFileType) {
-        // 可写的话就写，不可写就拷贝到剪贴板
-        if (document.isWritable() && !convertFormat) {
-            // 获取当前文档内的psiFile
-            PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
-            WriteCommandAction.runWriteCommandAction(project, () -> {
-                String hintText;
-                if (model.getSelectedText()) {
-                    document.replaceString(model.getStartOffset(), model.getEndOffset(), processedText);
-                    model.getPrimaryCaret().moveToOffset(model.getStartOffset());
-                    hintText = model.getSelectHint();
-                } else {
-                    document.setText(processedText);
-
-                    if (noMinify) {
-                        // 格式化
-                        Optional.ofNullable(psiFile).ifPresent(el -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
-                    }
-
-                    model.getPrimaryCaret().moveToOffset(0);
-                    hintText = model.getDefaultHint();
-                }
-
-                HintManager.getInstance().showInformationHint(editor, hintText);
-            });
-        } else {
-            try {
-                addNewContentWithEditorContentIfNeeded(project, processedText, editorFileType);
-            } catch (Exception e) {
-                PlatformUtil.setClipboard(processedText);
-                Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
-            } finally {
-                if (model.getSelectedText()) {
-                    model.getPrimaryCaret().removeSelection();
-                }
-            }
-        }
-    }
-
 
     public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
@@ -172,6 +115,7 @@ public class JsonAssistantUtil {
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     public static Object invokeMethod(Object obj, String methodName, Object... params) {
         Method method = getMethod(obj, methodName, params);
         if (Objects.nonNull(method)) {
@@ -180,54 +124,6 @@ public class JsonAssistantUtil {
 
         return null;
     }
-
-    /**
-     * 是否不允许在当前 JSON 文档内写入；true，不写；false：写入
-     */
-    public static boolean isNotWriteJsonDoc(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model) {
-        return isWriteDocForbidden(e, project, document, model, FileTypeEnum.JSON.getFileTypeQualifiedName(), FileTypeEnum.JSON5.getFileTypeQualifiedName());
-    }
-
-    /**
-     * 是否不允许在当前文档内写入；true，不允许写入；false：允许写入
-     */
-    public static boolean isWriteDocForbidden(AnActionEvent e, Project project, Document document, JsonFormatHandleModel model, String... fileTypeQualifiedNames) {
-
-
-
-        // 文档不可写入，或在控制台内，返回不允许写
-        if (!document.isWritable() || isConsoleDocument(e)) {
-            return true;
-        }
-
-        // 选中了文本，将在选中区域内写入更改后的文本，返回允许写入
-        if (model.getSelectedText()) {
-            return false;
-        }
-
-        FileType fileType = PlatformUtil.getDocumentFileType(project, document);
-        if (fileType == null) {
-            return true;
-        }
-
-        // 若未选中文本，判断是否符合文件类型，符合的话也可写入（置为false，表示可写入）
-        return !Arrays.asList(fileTypeQualifiedNames).contains(fileType.getClass().getName());
-    }
-
-
-
-
-
-
-    /**
-     * 是否处于控制台；true，处于控制台；false反之。
-     */
-    public static boolean isConsoleDocument(AnActionEvent e) {
-        ConsoleView data = e.getData(LangDataKeys.CONSOLE_VIEW);
-
-        return data != null;
-    }
-
 
     public static ToolWindow getJsonViewToolWindow(Project project) {
         return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
@@ -303,15 +199,9 @@ public class JsonAssistantUtil {
         BrowserUtil.browse(url);
     }
 
-
-    public static boolean isJsonOrExtract(String text) {
-        text = StrUtil.trim(text);
-        String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
-        return StrUtil.isNotBlank(jsonStr);
-    }
-
     public static boolean isJsonFileType(FileType fileType) {
-        return isAssignFileType(fileType, FileTypeEnum.JSON.getFileTypeQualifiedName());
+        return isAssignFileType(fileType, FileTypeEnum.JSON.getFileTypeQualifiedName())
+                || isAssignFileType(fileType, FileTypeEnum.JSON5.getFileTypeQualifiedName());
     }
 
     public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {

@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.model.data;
 
 /**
  * 文本转换后的提示信息
@@ -6,7 +6,7 @@ package cn.memoryzy.json.model.formats;
  * @author Memory
  * @since 2024/11/2
  */
-public class MessageInfo {
+public class MessageData {
 
     /**
      * 选中内容转换成功后的提示信息
@@ -27,7 +27,7 @@ public class MessageInfo {
         return selectionConvertSuccessMessage;
     }
 
-    public MessageInfo setSelectionConvertSuccessMessage(String selectionConvertSuccessMessage) {
+    public MessageData setSelectionConvertSuccessMessage(String selectionConvertSuccessMessage) {
         this.selectionConvertSuccessMessage = selectionConvertSuccessMessage;
         return this;
     }
@@ -36,7 +36,7 @@ public class MessageInfo {
         return globalConvertSuccessMessage;
     }
 
-    public MessageInfo setGlobalConvertSuccessMessage(String globalConvertSuccessMessage) {
+    public MessageData setGlobalConvertSuccessMessage(String globalConvertSuccessMessage) {
         this.globalConvertSuccessMessage = globalConvertSuccessMessage;
         return this;
     }

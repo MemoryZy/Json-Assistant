@@ -1,26 +1,22 @@
 package cn.memoryzy.json.util;
 
-import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.TextResolveStatus;
-import cn.memoryzy.json.model.formats.DocumentTextInfo;
-import cn.memoryzy.json.model.formats.EditorInfo;
-import cn.memoryzy.json.model.formats.MessageInfo;
-import cn.memoryzy.json.model.formats.SelectionInfo;
-import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
+import cn.memoryzy.json.model.data.EditorData;
+import cn.memoryzy.json.model.data.MessageData;
+import cn.memoryzy.json.model.data.SelectionData;
+import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -50,13 +46,13 @@ public class TextTransformUtil {
     public static void applyProcessedTextToDocument(Project project,
                                                     Editor editor,
                                                     String processedText,
-                                                    AbstractConversionProcessor processor,
+                                                    AbstractGlobalTextConversionProcessor processor,
                                                     boolean canWrite) {
         // 若当前文档允许写入
         if (canWrite) {
             applyTextWhenWritable(project, editor, processedText, processor);
         } else {
-            applyTextWhenNotWritable(project, processedText, processor.getFileTypeInfo().getProcessedFileType());
+            applyTextWhenNotWritable(project, processedText, processor.getFileTypeData().getProcessedFileType());
         }
 
         removeSelection(processor);
@@ -70,10 +66,10 @@ public class TextTransformUtil {
      * @param processedText 处理完的文本
      * @param processor     文本处理器
      */
-    public static void applyTextWhenWritable(Project project, Editor editor, String processedText, AbstractConversionProcessor processor) {
+    public static void applyTextWhenWritable(Project project, Editor editor, String processedText, AbstractGlobalTextConversionProcessor processor) {
         Document document = editor.getDocument();
-        EditorInfo editorInfo = processor.getEditorInfo();
-        MessageInfo messageInfo = processor.getMessageInfo();
+        EditorData editorData = processor.getEditorData();
+        MessageData messageData = processor.getMessageData();
 
         // 获取当前文档内的 PsiFile
         PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
@@ -83,27 +79,27 @@ public class TextTransformUtil {
             // 若是选中的文本解析成功
             if (TextResolveStatus.SELECTED_SUCCESS.equals(processor.getTextResolveStatus())) {
                 // 获取选中区域相关信息
-                SelectionInfo selectionInfo = editorInfo.getSelectionInfo();
+                SelectionData selectionData = editorData.getSelectionData();
                 // 在选中区域中替换处理过后的文本
-                document.replaceString(selectionInfo.getStartOffset(), selectionInfo.getEndOffset(), processedText);
+                document.replaceString(selectionData.getStartOffset(), selectionData.getEndOffset(), processedText);
                 // 移动光标至起始位置，便于展示提醒
-                editorInfo.getPrimaryCaret().moveToOffset(selectionInfo.getStartOffset());
+                editorData.getPrimaryCaret().moveToOffset(selectionData.getStartOffset());
                 // 将提醒文本设置为预先定义的文本
-                hintText = messageInfo.getSelectionConvertSuccessMessage();
+                hintText = messageData.getSelectionConvertSuccessMessage();
 
             } else {
                 // 若是文档内的全部文本解析成功
                 document.setText(processedText);
                 // 是否需要格式化文本
-                if (processor.isNeedsFormatting()) {
+                if (Boolean.TRUE.equals(processor.isNeedBeautify())) {
                     // 格式化
                     Optional.ofNullable(psiFile).ifPresent(el -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
                 }
 
                 // 移动光标至末尾，便于展示提醒
-                editorInfo.getPrimaryCaret().moveToOffset(0);
+                editorData.getPrimaryCaret().moveToOffset(0);
                 // 将提醒文本设置为预先定义的文本
-                hintText = messageInfo.getGlobalConvertSuccessMessage();
+                hintText = messageData.getGlobalConvertSuccessMessage();
             }
 
             HintManager.getInstance().showInformationHint(editor, hintText);
@@ -127,20 +123,14 @@ public class TextTransformUtil {
         }
     }
 
-
-    public static void processJson(){
-
-    }
-
-
     /**
      * 去除选中
      *
      * @param processor 处理器
      */
-    private static void removeSelection(AbstractConversionProcessor processor) {
+    private static void removeSelection(AbstractGlobalTextConversionProcessor processor) {
         if (TextResolveStatus.SELECTED_SUCCESS.equals(processor.getTextResolveStatus())) {
-            processor.getEditorInfo().getPrimaryCaret().removeSelection();
+            processor.getEditorData().getPrimaryCaret().removeSelection();
         }
     }
 
@@ -188,36 +178,6 @@ public class TextTransformUtil {
         return null != LangDataKeys.CONSOLE_VIEW.getData(dataContext);
     }
 
-
-    /**
-     * 解析编辑器文本
-     *
-     * @param editor 编辑器
-     * @return left：解析完成的文本；right：编辑器相关信息
-     */
-    public static EditorInfo resolveEditor(Editor editor) {
-        if (editor == null) return null;
-        Document document = editor.getDocument();
-        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
-        int startOffset = primaryCaret.getSelectionStart();
-        int endOffset = primaryCaret.getSelectionEnd();
-
-        String documentText = document.getText();
-        String selectedText = document.getText(new TextRange(startOffset, endOffset));
-
-        if (StrUtil.isBlank(documentText) && StrUtil.isBlank(selectedText)) return null;
-
-        DocumentTextInfo documentTextInfo = new DocumentTextInfo()
-                .setSelectedText(selectedText)
-                .setDocumentText(documentText);
-
-        SelectionInfo selectionInfo = new SelectionInfo()
-                .setHasSelection(StrUtil.isNotBlank(selectedText))
-                .setStartOffset(startOffset)
-                .setEndOffset(endOffset);
-
-        return new EditorInfo().setPrimaryCaret(primaryCaret).setDocumentTextInfo(documentTextInfo).setSelectionInfo(selectionInfo);
-    }
 
     public static String urlParamsToJson(String url) {
         try {

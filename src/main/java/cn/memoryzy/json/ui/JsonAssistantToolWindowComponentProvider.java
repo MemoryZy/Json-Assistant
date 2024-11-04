@@ -8,7 +8,8 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.enums.BackgroundMatchingEnum;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.model.strategy.clipboard.context.ConversionContext;
+import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
+import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
@@ -141,8 +142,8 @@ public class JsonAssistantToolWindowComponentProvider {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
-                    ConversionContext context = new ConversionContext();
-                    jsonStr = ConversionContext.applyStrategies(context, clipboard);
+                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
+                    jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);
@@ -177,8 +178,8 @@ public class JsonAssistantToolWindowComponentProvider {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
-                    ConversionContext context = new ConversionContext();
-                    String jsonStr = ConversionContext.applyStrategies(context, clipboard);
+                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
+                    String jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);

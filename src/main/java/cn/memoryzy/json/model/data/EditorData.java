@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.model.data;
 
 import com.intellij.openapi.editor.Caret;
 
@@ -8,7 +8,7 @@ import com.intellij.openapi.editor.Caret;
  * @author Memory
  * @since 2024/11/2
  */
-public class EditorInfo {
+public class EditorData {
 
     /**
      * 当前编辑器中 '主要' 的光标（插入符）
@@ -18,12 +18,12 @@ public class EditorInfo {
     /**
      * 文档内文本信息
      */
-    private DocumentTextInfo documentTextInfo;
+    private DocTextData docTextData;
 
     /**
      * 编辑器内关于文本的相关信息
      */
-    private SelectionInfo selectionInfo;
+    private SelectionData selectionData;
 
 
 
@@ -33,26 +33,26 @@ public class EditorInfo {
         return primaryCaret;
     }
 
-    public EditorInfo setPrimaryCaret(Caret primaryCaret) {
+    public EditorData setPrimaryCaret(Caret primaryCaret) {
         this.primaryCaret = primaryCaret;
         return this;
     }
 
-    public DocumentTextInfo getDocumentTextInfo() {
-        return documentTextInfo;
+    public DocTextData getDocTextData() {
+        return docTextData;
     }
 
-    public EditorInfo setDocumentTextInfo(DocumentTextInfo documentTextInfo) {
-        this.documentTextInfo = documentTextInfo;
+    public EditorData setDocTextData(DocTextData docTextData) {
+        this.docTextData = docTextData;
         return this;
     }
 
-    public SelectionInfo getSelectionInfo() {
-        return selectionInfo;
+    public SelectionData getSelectionData() {
+        return selectionData;
     }
 
-    public EditorInfo setSelectionInfo(SelectionInfo selectionInfo) {
-        this.selectionInfo = selectionInfo;
+    public EditorData setSelectionData(SelectionData selectionData) {
+        this.selectionData = selectionData;
         return this;
     }
 }

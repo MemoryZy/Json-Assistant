@@ -1,14 +1,16 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.strategy.clipboard.context.ConversionStrategy;
+import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.JsonUtil;
 
 /**
+ * JSON 转 JSON 处理
+ *
  * @author Memory
  * @since 2024/10/31
  */
-public class JsonToJsonStrategy implements ConversionStrategy {
+public class JsonConversionStrategy implements ClipboardTextConversionStrategy {
 
     @Override
     public boolean canConvert(String text) {

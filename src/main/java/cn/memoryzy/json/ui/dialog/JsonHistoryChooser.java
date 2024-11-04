@@ -123,13 +123,12 @@ public class JsonHistoryChooser extends DialogWrapper {
     protected void doOKAction() {
         if (getOKAction().isEnabled()) {
             // 执行逻辑
-            if (executeOkAction()) {
-                close(OK_EXIT_CODE);
-            }
+            executeOkAction();
+            close(OK_EXIT_CODE);
         }
     }
 
-    private boolean executeOkAction() {
+    private void executeOkAction() {
         HistoryModel selectedValue = showList.getSelectedValue();
         if (selectedValue != null) {
             Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
@@ -141,8 +140,6 @@ public class JsonHistoryChooser extends DialogWrapper {
                 }
             }
         }
-
-        return true;
     }
 
     private void rebuildListWithFilter() {
@@ -229,8 +226,8 @@ public class JsonHistoryChooser extends DialogWrapper {
         }
 
         @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            Project project = e.getProject();
+        public void actionPerformed(@NotNull AnActionEvent event) {
+            Project project = event.getProject();
             if (project == null) return;
             int selectedIndex = showList.getSelectedIndex();
             HistoryModel selectedValue = showList.getSelectedValue();

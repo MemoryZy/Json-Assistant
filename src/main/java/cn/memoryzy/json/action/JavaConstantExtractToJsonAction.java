@@ -37,10 +37,10 @@ public class JavaConstantExtractToJsonAction extends AnAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = getEventProject(event);
         // 不做方法返回值的处理
-        PsiElement element = PlatformUtil.getPsiElementByOffset(e);
+        PsiElement element = PlatformUtil.getPsiElementByOffset(event.getDataContext());
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
 
@@ -70,9 +70,9 @@ public class JavaConstantExtractToJsonAction extends AnAction {
 
     @Override
     @SuppressWarnings("DuplicatedCode")
-    public void update(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
-        PsiElement element = PlatformUtil.getPsiElementByOffset(e);
+    public void update(@NotNull AnActionEvent event) {
+        Project project = getEventProject(event);
+        PsiElement element = PlatformUtil.getPsiElementByOffset(event.getDataContext());
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
 
@@ -89,7 +89,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
             }
         }
 
-        e.getPresentation().setEnabledAndVisible(project != null && StrUtil.isNotBlank(jsonStr) && JsonUtil.isJsonStr(jsonStr));
+        event.getPresentation().setEnabledAndVisible(project != null && StrUtil.isNotBlank(jsonStr) && JsonUtil.isJsonStr(jsonStr));
     }
 
 

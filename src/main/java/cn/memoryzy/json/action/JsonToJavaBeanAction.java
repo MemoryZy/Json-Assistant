@@ -64,18 +64,18 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        if (getEventProject(e) == null) {
-            e.getPresentation().setEnabledAndVisible(false);
+    public void update(@NotNull AnActionEvent event) {
+        if (getEventProject(event) == null) {
+            event.getPresentation().setEnabledAndVisible(false);
             return;
         }
 
         try {
             Object action = clz.getDeclaredConstructor().newInstance();
-            ReflectUtil.invoke(action, updateMethod, e);
+            ReflectUtil.invoke(action, updateMethod, event);
         } catch (Exception ex) {
-            final DataContext dataContext = e.getDataContext();
-            final Presentation presentation = e.getPresentation();
+            final DataContext dataContext = event.getDataContext();
+            final Presentation presentation = event.getPresentation();
             if (!presentation.isEnabledAndVisible()) {
                 presentation.setEnabledAndVisible(isAvailable(dataContext));
             }

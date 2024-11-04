@@ -3,15 +3,10 @@ package cn.memoryzy.json.action.group;
 import cn.memoryzy.json.action.OnlineDocAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
-import cn.memoryzy.json.model.strategy.formats.JsonProcessor;
-import cn.memoryzy.json.model.strategy.formats.context.AbstractConversionProcessor;
-import cn.memoryzy.json.model.strategy.formats.context.ConversionProcessorContext;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import icons.JsonAssistantIcons;
@@ -20,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -47,17 +41,11 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        showPopupMenu(e);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        showPopupMenu(event.getDataContext());
     }
 
-    public void showPopupMenu(AnActionEvent e) {
-        Project project = e.getProject();
-        if (Objects.isNull(project)) {
-            return;
-        }
-
-        DataContext dataContext = e.getDataContext();
+    public void showPopupMenu(DataContext dataContext) {
         ListPopup popup = JBPopupFactory.getInstance()
                 .createActionGroupPopup(JsonAssistantBundle.message("menu.popup.title"),
                         this, dataContext, JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING, true);
@@ -65,7 +53,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
     }
 
     @Override
-    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
+    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         List<AnAction> actions = new ArrayList<>();
         actions.add(ActionHolder.JSON_BEAUTIFY_ACTION);
         actions.add(ActionHolder.JSON_MINIFY_ACTION);
@@ -88,20 +76,13 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(validateJson(getEventProject(e), PlatformUtil.getEditor(e), e.getDataContext()));
-    }
-
-
-    public static boolean validateJson(Project project, Editor editor, @NotNull DataContext dataContext) {
-        if (project == null || editor == null) {
-            return false;
-        }
-
-        JsonProcessor jsonProcessor = new JsonProcessor(dataContext, TextTransformUtil.resolveEditor(editor), true);
-        return ConversionProcessorContext.processMatching(
-                new ConversionProcessorContext(),
-                new AbstractConversionProcessor[]{jsonProcessor});
+    public void update(@NotNull AnActionEvent event) {
+        DataContext dataContext = event.getDataContext();
+        event.getPresentation().setEnabledAndVisible(
+                GlobalTextConverter.validateEditorJson(
+                        getEventProject(event),
+                        PlatformUtil.getEditor(dataContext),
+                        dataContext));
     }
 
 }

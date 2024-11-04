@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.model.data;
 
 /**
  * 文本选择相关信息
@@ -6,7 +6,7 @@ package cn.memoryzy.json.model.formats;
  * @author Memory
  * @since 2024/11/2
  */
-public class SelectionInfo {
+public class SelectionData {
 
     /**
      * 检查当前是否选择了文本范围
@@ -31,7 +31,7 @@ public class SelectionInfo {
         return hasSelection;
     }
 
-    public SelectionInfo setHasSelection(boolean hasSelection) {
+    public SelectionData setHasSelection(boolean hasSelection) {
         this.hasSelection = hasSelection;
         return this;
     }
@@ -40,7 +40,7 @@ public class SelectionInfo {
         return startOffset;
     }
 
-    public SelectionInfo setStartOffset(int startOffset) {
+    public SelectionData setStartOffset(int startOffset) {
         this.startOffset = startOffset;
         return this;
     }
@@ -49,7 +49,7 @@ public class SelectionInfo {
         return endOffset;
     }
 
-    public SelectionInfo setEndOffset(int endOffset) {
+    public SelectionData setEndOffset(int endOffset) {
         this.endOffset = endOffset;
         return this;
     }

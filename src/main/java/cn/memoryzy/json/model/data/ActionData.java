@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.formats;
+package cn.memoryzy.json.model.data;
 
 import javax.swing.*;
 
@@ -8,7 +8,7 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/11/2
  */
-public class ActionInfo {
+public class ActionData {
 
     /**
      * 当文本匹配成功，用于替换的操作名称
@@ -34,7 +34,7 @@ public class ActionInfo {
         return actionName;
     }
 
-    public ActionInfo setActionName(String actionName) {
+    public ActionData setActionName(String actionName) {
         this.actionName = actionName;
         return this;
     }
@@ -43,7 +43,7 @@ public class ActionInfo {
         return actionDescription;
     }
 
-    public ActionInfo setActionDescription(String actionDescription) {
+    public ActionData setActionDescription(String actionDescription) {
         this.actionDescription = actionDescription;
         return this;
     }
@@ -52,7 +52,7 @@ public class ActionInfo {
         return actionIcon;
     }
 
-    public ActionInfo setActionIcon(Icon actionIcon) {
+    public ActionData setActionIcon(Icon actionIcon) {
         this.actionIcon = actionIcon;
         return this;
     }

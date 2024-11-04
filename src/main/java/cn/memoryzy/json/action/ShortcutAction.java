@@ -26,7 +26,7 @@ public class ShortcutAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(@NotNull AnActionEvent event) {
         EditKeymapsDialog dialog = new EditKeymapsDialog(null, PluginConstant.MAIN_ACTION_ID);
         ApplicationManager.getApplication().invokeLater(dialog::show);
     }
