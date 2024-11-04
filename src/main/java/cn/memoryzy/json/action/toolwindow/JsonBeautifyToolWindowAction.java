@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -33,7 +33,7 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        GlobalTextConverter.parseAndProcessJson(
+        GlobalJsonConverter.parseAndProcessJson(
                 event.getDataContext(), editor, true,
                 JsonAssistantBundle.messageOnSystem("hint.selection.json.beautify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.global.json.beautify.text"));
@@ -42,7 +42,7 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalTextConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 

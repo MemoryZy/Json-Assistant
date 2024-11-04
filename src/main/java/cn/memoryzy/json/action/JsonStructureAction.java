@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,7 +30,7 @@ public class JsonStructureAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
         JsonAssistantUtil.showJsonStructureDialog(
-                GlobalTextConverter.parseJson(
+                GlobalJsonConverter.parseJson(
                         dataContext, PlatformUtil.getEditor(dataContext), true));
     }
 

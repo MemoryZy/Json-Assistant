@@ -3,7 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.diff.DiffContentFactory;
 import com.intellij.diff.DiffDialogHints;
@@ -40,7 +40,7 @@ public class JsonTextDiffAction extends DumbAwareAction {
         DataContext dataContext = event.getDataContext();
 
         String leftJsonStr = StrUtil.trim(
-                GlobalTextConverter.parseJson(
+                GlobalJsonConverter.parseJson(
                         dataContext, PlatformUtil.getEditor(dataContext), true));
 
         FileType fileType = FileTypeHolder.JSON;

@@ -2,7 +2,7 @@ package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.action.group.JsonAssistantPopupGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -38,7 +38,7 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
         Presentation presentation = event.getPresentation();
         presentation.setVisible(false);
         presentation.setEnabled(
-                GlobalTextConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorJson(
                         getEventProject(event),
                         PlatformUtil.getEditor(dataContext),
                         dataContext));

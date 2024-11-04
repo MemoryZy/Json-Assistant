@@ -4,7 +4,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.ui.JsonPathComponentProvider;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
@@ -194,7 +194,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalTextConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 

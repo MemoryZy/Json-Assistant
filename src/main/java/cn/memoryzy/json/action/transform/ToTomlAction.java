@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.transform;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import cn.memoryzy.json.util.TomlUtil;
@@ -42,7 +42,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
         String tomlStr;
         try {
             tomlStr = TomlUtil.toToml(
-                    GlobalTextConverter.parseJson(
+                    GlobalJsonConverter.parseJson(
                             dataContext,
                             PlatformUtil.getEditor(dataContext)));
         } catch (Exception ex) {
@@ -59,7 +59,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
         DataContext dataContext = event.getDataContext();
         event.getPresentation().setEnabled(
                 TomlUtil.canConvertToToml(
-                        GlobalTextConverter.parseJson(
+                        GlobalJsonConverter.parseJson(
                                 dataContext,
                                 PlatformUtil.getEditor(dataContext),
                                 true)));

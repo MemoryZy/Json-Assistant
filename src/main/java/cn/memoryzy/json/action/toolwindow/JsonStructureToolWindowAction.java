@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -37,7 +37,7 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalTextConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 

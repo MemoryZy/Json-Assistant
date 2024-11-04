@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -28,7 +28,7 @@ public class JsonMinifyAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
-        GlobalTextConverter.parseAndProcessJson(
+        GlobalJsonConverter.parseAndProcessJson(
                 dataContext, PlatformUtil.getEditor(dataContext), false,
                 JsonAssistantBundle.messageOnSystem("hint.selection.json.minify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.global.json.minify.text"));

@@ -3,7 +3,7 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -62,7 +62,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalTextConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 }

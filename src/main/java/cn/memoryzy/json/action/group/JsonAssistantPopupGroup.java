@@ -3,7 +3,7 @@ package cn.memoryzy.json.action.group;
 import cn.memoryzy.json.action.OnlineDocAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAware;
@@ -79,7 +79,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
     public void update(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
         event.getPresentation().setEnabledAndVisible(
-                GlobalTextConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorJson(
                         getEventProject(event),
                         PlatformUtil.getEditor(dataContext),
                         dataContext));
