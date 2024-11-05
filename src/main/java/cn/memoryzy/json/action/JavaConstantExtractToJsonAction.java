@@ -33,7 +33,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.extractor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.extractor.description"));
-        presentation.setIcon(JsonAssistantIcons.EXTRACT);
+        presentation.setIcon(JsonAssistantIcons.ESC);
     }
 
     @Override

@@ -5,6 +5,7 @@
       "json.svg": "icons/json.svg",
       "extract.svg": "icons/extract.svg",
       "donate.svg": "icons/donate.svg",
+      "esc.svg": "icons/esc.svg",
       "fileTypes": {
         "toml.svg": "icons/fileTypes/toml-file.svg",
         "url.svg": "icons/fileTypes/url.svg",
