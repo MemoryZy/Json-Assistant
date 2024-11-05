@@ -7,6 +7,7 @@ import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -31,13 +32,9 @@ public class JsonEscapeAction extends DumbAwareAction {
     @SuppressWarnings("deprecation")
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
-
-        String escapeJson = StringEscapeUtils.escapeJson(
-                GlobalJsonConverter.parseJson(dataContext, PlatformUtil.getEditor(dataContext)));
-
+        String escapeJson = StringEscapeUtils.escapeJson(GlobalJsonConverter.parseJson(dataContext, PlatformUtil.getEditor(dataContext)));
         TextTransformUtil.copyToClipboardAndShowNotification(getEventProject(event), escapeJson);
-
-        // TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), escapeJson, PlainTextFileType.INSTANCE);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), escapeJson, PlainTextFileType.INSTANCE);
     }
 
 }
