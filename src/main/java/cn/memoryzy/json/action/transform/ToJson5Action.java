@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class ToJson5Action extends DumbAwareAction {
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(@NotNull AnActionEvent event) {
         // TODO 待实现
     }
 

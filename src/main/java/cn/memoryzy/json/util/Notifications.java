@@ -6,7 +6,7 @@ import cn.memoryzy.json.action.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.enums.UrlEnum;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
@@ -91,7 +91,7 @@ public class Notifications {
         Notification notification = Notifications.BALLOON_LOG_GROUP
                 .createNotification(JsonAssistantBundle.messageOnSystem("notify.welcome.content",
                                 Urls.GITHUB_LINK,
-                                UrlEnum.SPONSOR.getId()
+                                UrlType.SPONSOR.getId()
                         ) + "<br/>",
                         NotificationType.INFORMATION)
                 .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
@@ -125,7 +125,7 @@ public class Notifications {
             changeNotes = PlatformUtil.isChineseLocale() ? pair.left : pair.right;
         }
 
-        String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", Urls.GITHUB_LINK, UrlEnum.SPONSOR.getId());
+        String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", Urls.GITHUB_LINK, UrlType.SPONSOR.getId());
         content += "<br/>" + JsonAssistantBundle.messageOnSystem("notify.update.content", changeNotes);
 
         Notification notification = Notifications.BALLOON_LOG_GROUP
@@ -243,9 +243,9 @@ public class Notifications {
         protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
             String url = e.getDescription();
 
-            if (Objects.equals(UrlEnum.SPONSOR.getId(), url)) {
+            if (Objects.equals(UrlType.SPONSOR.getId(), url)) {
                 if (Urls.isReachable()) {
-                    BrowserUtil.browse(UrlEnum.SPONSOR.getUrl());
+                    BrowserUtil.browse(UrlType.SPONSOR.getUrl());
                 } else {
                     new SupportDialog().show();
                 }

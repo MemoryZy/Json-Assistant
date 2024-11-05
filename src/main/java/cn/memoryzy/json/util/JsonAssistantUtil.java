@@ -1,11 +1,14 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.enums.FileTypeEnum;
+import cn.memoryzy.json.enums.FileTypes;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
@@ -103,8 +106,8 @@ public class JsonAssistantUtil {
     }
 
     public static boolean isJsonFileType(FileType fileType) {
-        return isAssignFileType(fileType, FileTypeEnum.JSON.getFileTypeQualifiedName())
-                || isAssignFileType(fileType, FileTypeEnum.JSON5.getFileTypeQualifiedName());
+        return isAssignFileType(fileType, FileTypes.JSON.getFileTypeQualifiedName())
+                || isAssignFileType(fileType, FileTypes.JSON5.getFileTypeQualifiedName());
     }
 
     public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
@@ -135,6 +138,57 @@ public class JsonAssistantUtil {
 
         // 遍历完所有字符后，如果没有发现超过一个中文字符，则返回false
         return false;
+    }
+
+
+    /**
+     * 判断字符串是否属于数字、时间或布尔类型
+     *
+     * @param str 输入的字符串
+     * @return 返回字符串转化为对应类型后的值
+     */
+    public static Object detectType(String str) {
+        Object number = getNumber(str);
+        if (Objects.nonNull(number)) return number;
+
+        Object bool = getBoolean(str);
+        if (Objects.nonNull(bool)) return bool;
+
+        Object date = getDate(str);
+        if (Objects.nonNull(date)) return date;
+
+        return str;
+    }
+
+
+    public static Object getNumber(String str) {
+        try {
+            if (NumberUtil.isNumber(str)) {
+                return NumberUtil.parseNumber(str);
+            }
+        } catch (NumberFormatException ignored) {
+        }
+
+        return null;
+    }
+
+    public static Object getBoolean(String str) {
+        if (StrUtil.equalsIgnoreCase(Boolean.TRUE.toString(), str)) {
+            return true;
+        } else if (StrUtil.equalsIgnoreCase(Boolean.FALSE.toString(), str)) {
+            return false;
+        }
+
+        return null;
+    }
+
+    public static Object getDate(String str) {
+        try {
+            return DateUtil.parse(str);
+        } catch (Exception ignored) {
+        }
+
+        return null;
     }
 
 }

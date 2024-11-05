@@ -9,7 +9,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/10/25
  */
-public enum UrlEnum {
+public enum UrlType {
 
     /**
      * 默认（站点主页）
@@ -46,13 +46,13 @@ public enum UrlEnum {
     private final String id;
     private final String url;
 
-    UrlEnum(String id, String url) {
+    UrlType(String id, String url) {
         this.id = id;
         this.url = url;
     }
 
-    public static UrlEnum of(String id) {
-        for (UrlEnum value : values()) {
+    public static UrlType of(String id) {
+        for (UrlType value : values()) {
             if (Objects.equals(value.id, id)) {
                 return value;
             }

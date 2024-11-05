@@ -118,9 +118,13 @@ public class TextTransformUtil {
         try {
             ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, processedText, fileType);
         } catch (Exception e) {
-            PlatformUtil.setClipboard(processedText);
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+            copyToClipboardAndShowNotification(project, processedText);
         }
+    }
+
+    public static void copyToClipboardAndShowNotification(Project project, String processedText) {
+        PlatformUtil.setClipboard(processedText);
+        Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
     }
 
     /**
@@ -195,7 +199,9 @@ public class TextTransformUtil {
                 if (index > 0 && index < pair.length() - 1) {
                     String key = URLDecoder.decode(pair.substring(0, index), StandardCharsets.UTF_8);
                     String value = URLDecoder.decode(pair.substring(index + 1), StandardCharsets.UTF_8);
-                    params.put(key, value);
+
+                    // 判断是否为数字、时间、布尔类型
+                    params.put(key, JsonAssistantUtil.detectType(value));
                 }
             }
 
@@ -206,5 +212,27 @@ public class TextTransformUtil {
             return null;
         }
     }
+
+
+    // public static String keyValuePairsToJson(String keyValue) {
+    //     Map<String, String> params = new HashMap<>();
+    //     String[] lines = keyValue.split("\\n");
+    //
+    //     for (String line : lines) {
+    //         // 使用正则表达式匹配 ":" 或 "="
+    //         String[] parts = line.split("[:=]", 2);
+    //         if (parts.length == 2) {
+    //             String key = parts[0].trim();
+    //             String value = parts[1].trim();
+    //
+    //             // 判断键是否为数字或布尔值
+    //             if (Objects.isNull(getNumber(key)) && Objects.isNull(getBoolean(key))) {
+    //                 params.put(key, value);
+    //             }
+    //         }
+    //     }
+    //
+    //
+    // }
 
 }

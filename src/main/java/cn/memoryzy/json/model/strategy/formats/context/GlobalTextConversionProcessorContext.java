@@ -7,6 +7,7 @@ import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.data.SelectionData;
 import cn.memoryzy.json.model.strategy.formats.JsonConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.TomlConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.processor.UrlParamConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.XmlConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.YamlConversionProcessor;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -97,7 +98,8 @@ public class GlobalTextConversionProcessorContext {
         return new AbstractGlobalTextConversionProcessor[]{
                 new XmlConversionProcessor(editorData),
                 new YamlConversionProcessor(editorData),
-                new TomlConversionProcessor(editorData)
+                new TomlConversionProcessor(editorData),
+                new UrlParamConversionProcessor(editorData)
                 // 待实现其他的处理器
         };
     }

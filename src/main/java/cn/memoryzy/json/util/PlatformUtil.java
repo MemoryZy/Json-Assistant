@@ -1,7 +1,7 @@
 package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.enums.FileTypeEnum;
+import cn.memoryzy.json.enums.FileTypes;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
@@ -52,7 +52,7 @@ public class PlatformUtil {
     /**
      * 获取结构化文件
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return 结构化文件
      */
     public static PsiFile getPsiFile(DataContext dataContext) {
@@ -91,7 +91,7 @@ public class PlatformUtil {
     /**
      * 获取编辑器
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return 编辑器
      */
     public static Editor getEditor(DataContext dataContext) {
@@ -156,12 +156,12 @@ public class PlatformUtil {
         return CommonDataKeys.PROJECT.getData(dataContext);
     }
 
-    public static FileType getFileType(FileTypeEnum fileTypeEnum) {
+    public static FileType getFileType(FileTypes fileTypes) {
         FileType fileType = PlainTextFileType.INSTANCE;
-        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypeEnum.getFileTypeQualifiedName());
+        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getFileTypeQualifiedName());
 
         if (clz != null) {
-            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypeEnum.getFileTypeInstanceFieldName());
+            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypes.getFileTypeInstanceFieldName());
             if (instance instanceof FileType) {
                 fileType = (FileType) instance;
             }
@@ -170,12 +170,12 @@ public class PlatformUtil {
         return fileType;
     }
 
-    public static Language getLanguage(FileTypeEnum fileTypeEnum) {
+    public static Language getLanguage(FileTypes fileTypes) {
         Language language = PlainTextLanguage.INSTANCE;
-        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypeEnum.getLanguageQualifiedName());
+        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getLanguageQualifiedName());
 
         if (clz != null) {
-            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypeEnum.getLanguageInstanceFieldName());
+            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypes.getLanguageInstanceFieldName());
             if (instance instanceof Language) {
                 language = (Language) instance;
             }

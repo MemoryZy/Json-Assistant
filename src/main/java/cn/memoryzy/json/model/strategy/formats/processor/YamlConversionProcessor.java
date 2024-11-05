@@ -1,7 +1,7 @@
 package cn.memoryzy.json.model.strategy.formats.processor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.YamlDocumentModel;
+import cn.memoryzy.json.model.YamlDocEntry;
 import cn.memoryzy.json.model.data.ActionData;
 import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.data.MessageData;
@@ -51,7 +51,7 @@ public class YamlConversionProcessor extends AbstractGlobalTextConversionProcess
                 // 多文档选择
                 MultiYamlDocumentChooser chooser = new MultiYamlDocumentChooser(matchingValues);
                 if (chooser.showAndGet()) {
-                    YamlDocumentModel selectValue = chooser.getSelectValue();
+                    YamlDocEntry selectValue = chooser.getSelectValue();
                     setContent(YamlUtil.toYaml(selectValue.getValue()));
                 }
             }

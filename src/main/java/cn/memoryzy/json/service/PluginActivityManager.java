@@ -1,4 +1,4 @@
-package cn.memoryzy.json.extension;
+package cn.memoryzy.json.service;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;

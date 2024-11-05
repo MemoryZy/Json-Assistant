@@ -1,6 +1,6 @@
 package cn.memoryzy.json.constant;
 
-import cn.memoryzy.json.enums.FileTypeEnum;
+import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.fileTypes.FileType;
 
@@ -12,14 +12,14 @@ import com.intellij.openapi.fileTypes.FileType;
  */
 public interface FileTypeHolder {
 
-    FileType JSON = PlatformUtil.getFileType(FileTypeEnum.JSON);
+    FileType JSON = PlatformUtil.getFileType(FileTypes.JSON);
 
-    FileType JSON5 = PlatformUtil.getFileType(FileTypeEnum.JSON5);
+    FileType JSON5 = PlatformUtil.getFileType(FileTypes.JSON5);
 
-    FileType XML = PlatformUtil.getFileType(FileTypeEnum.XML);
+    FileType XML = PlatformUtil.getFileType(FileTypes.XML);
 
-    FileType YAML = PlatformUtil.getFileType(FileTypeEnum.YAML);
+    FileType YAML = PlatformUtil.getFileType(FileTypes.YAML);
 
-    FileType TOML = PlatformUtil.getFileType(FileTypeEnum.TOML);
+    FileType TOML = PlatformUtil.getFileType(FileTypes.TOML);
 
 }

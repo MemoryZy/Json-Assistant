@@ -4,7 +4,7 @@ package cn.memoryzy.json.enums;
  * @author Memory
  * @since 2024/2/28
  */
-public enum JsonTreeNodeTypeEnum {
+public enum JsonTreeNodeType {
 
     /**
      * 对象类型

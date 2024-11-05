@@ -3,7 +3,7 @@ package cn.memoryzy.json.util;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
-import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.component.ToolWindowPanel;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
@@ -57,7 +57,7 @@ public class ToolWindowUtil {
      * @return ToolWindow 返回找到或新创建的工具窗口实例
      */
     public static ToolWindow getJsonAssistantToolWindow(Project project) {
-        return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID);
+        return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID);
     }
 
     /**
@@ -96,10 +96,10 @@ public class ToolWindowUtil {
      * @param content 选项卡实例，从中获取面板实例
      * @return 组件面板
      */
-    public static JsonAssistantToolWindowPanel getPanelOnContent(Content content) {
+    public static ToolWindowPanel getPanelOnContent(Content content) {
         if (Objects.nonNull(content)) {
             SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
-            return (JsonAssistantToolWindowPanel) windowPanel.getContent();
+            return (ToolWindowPanel) windowPanel.getContent();
         }
 
         return null;
@@ -112,9 +112,9 @@ public class ToolWindowUtil {
      * @return 编辑器
      */
     public static EditorEx getEditorOnContent(Content content) {
-        JsonAssistantToolWindowPanel viewerPanel = getPanelOnContent(content);
-        if (Objects.nonNull(viewerPanel)) {
-            return viewerPanel.getEditor();
+        ToolWindowPanel showPanel = getPanelOnContent(content);
+        if (Objects.nonNull(showPanel)) {
+            return showPanel.getEditor();
         }
 
         return null;
@@ -132,7 +132,7 @@ public class ToolWindowUtil {
     public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType) {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
-        String displayName = PluginConstant.JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
+        String displayName = PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
         Content content = contentFactory.createContent(window.createRootPanel(), displayName, false);

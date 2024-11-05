@@ -12,25 +12,25 @@ import java.util.List;
  * @author Memory
  * @since 2024/9/25
  */
-public class YamlDocumentModel {
+public class YamlDocEntry {
 
     private final String shortText;
     private final String longText;
     private final Object value;
 
-    public YamlDocumentModel(String shortText, String longText, Object value) {
+    public YamlDocEntry(String shortText, String longText, Object value) {
         this.shortText = shortText;
         this.longText = longText;
         this.value = value;
     }
 
-    public static List<YamlDocumentModel> of(List<Object> values) {
-        List<YamlDocumentModel> models = new ArrayList<>();
+    public static List<YamlDocEntry> of(List<Object> values) {
+        List<YamlDocEntry> models = new ArrayList<>();
         for (Object value : values) {
             String yaml = YamlUtil.toYaml(value);
             String truncatedText = JsonAssistantUtil.truncateText(yaml, 70, "...");
             truncatedText = StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);
-            models.add(new YamlDocumentModel(truncatedText, yaml, value));
+            models.add(new YamlDocEntry(truncatedText, yaml, value));
         }
 
         return models;

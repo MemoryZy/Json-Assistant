@@ -10,8 +10,8 @@ import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.enums.LombokAnnotationEnum;
-import cn.memoryzy.json.enums.UrlEnum;
+import cn.memoryzy.json.enums.LombokAnnotations;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.util.UIManager;
@@ -111,7 +111,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlEnum.SITE_TO_JAVA_BEAN.getId();
+        return UrlType.SITE_TO_JAVA_BEAN.getId();
     }
 
     @Override
@@ -322,12 +322,12 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     private void importClass(Project project, PsiClass newClass, PsiElementFactory factory) {
         // 增加注解
         PsiAnnotation dataAnnotation = factory.createAnnotationFromText(
-                "@" + StringUtil.getShortName(LombokAnnotationEnum.DATA.getValue()), null);
+                "@" + StringUtil.getShortName(LombokAnnotations.DATA.getValue()), null);
         PsiAnnotation accessorsAnnotation = factory.createAnnotationFromText(
-                "@" + StringUtil.getShortName(LombokAnnotationEnum.ACCESSORS.getValue()) + "(chain = true)", null);
+                "@" + StringUtil.getShortName(LombokAnnotations.ACCESSORS.getValue()) + "(chain = true)", null);
 
         // 导入类
-        JavaUtil.importClassesInClass(project, newClass, LombokAnnotationEnum.DATA.getValue(), LombokAnnotationEnum.ACCESSORS.getValue());
+        JavaUtil.importClassesInClass(project, newClass, LombokAnnotations.DATA.getValue(), LombokAnnotations.ACCESSORS.getValue());
 
         PsiElement firstChild = newClass.getFirstChild();
         if (firstChild instanceof PsiDocComment) {

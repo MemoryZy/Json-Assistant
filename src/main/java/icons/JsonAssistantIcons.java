@@ -28,6 +28,7 @@ public class JsonAssistantIcons {
     public static final Icon DIFF = load("/icons/diff.svg");
     public static final Icon STAR_FALL_MINI = load("/icons/star_fall_mini.svg");
     public static final Icon EXTRACT = load("/icons/extract.svg");
+    public static final Icon ESCAPE = load("/icons/escape.svg");
 
     public static class FileTypes {
         public static final Icon TOML = load("/icons/fileTypes/toml-file.svg");

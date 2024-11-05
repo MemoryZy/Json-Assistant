@@ -3,7 +3,7 @@ package cn.memoryzy.json.ui.dialog;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.enums.UrlEnum;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.component.HyperLinkJBLabel;
 import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import com.intellij.openapi.application.ApplicationManager;
@@ -58,7 +58,7 @@ public class SupportDialog extends DialogWrapper {
         supportContent.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
                 Urls.GITHUB_LINK,
                 Urls.MARKETPLACE_REVIEWS_LINK,
-                UrlEnum.SHARE.getId())));
+                UrlType.SHARE.getId())));
 
         donateHeader.setIcon(JsonAssistantIcons.HEART);
         donateHeader.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.donate.header")));
@@ -87,7 +87,7 @@ public class SupportDialog extends DialogWrapper {
                 JBPopupFactory.getInstance()
                         .createHtmlTextBalloonBuilder(
                                 JsonAssistantBundle.messageOnSystem("dialog.support.donate.note.text",
-                                        UrlEnum.MAIL.getId(), Urls.EMAIL_LINK),
+                                        UrlType.MAIL.getId(), Urls.EMAIL_LINK),
                                 null,
                                 JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
                                 new HyperLinkListenerImpl())

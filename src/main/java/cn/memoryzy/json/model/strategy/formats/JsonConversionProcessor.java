@@ -1,7 +1,7 @@
 package cn.memoryzy.json.model.strategy.formats;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.enums.FileTypeEnum;
+import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
@@ -33,7 +33,7 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
     public JsonConversionProcessor(DataContext dataContext, EditorData editorData, boolean needBeautify) {
         super(editorData, needBeautify);
         this.dataContext = dataContext;
-        String[] fileTypes = {FileTypeEnum.JSON.getFileTypeQualifiedName(), FileTypeEnum.JSON5.getFileTypeQualifiedName()};
+        String[] fileTypes = {FileTypes.JSON.getFileTypeQualifiedName(), FileTypes.JSON5.getFileTypeQualifiedName()};
         getFileTypeData().setAllowedFileTypeQualifiedNames(fileTypes);
     }
 

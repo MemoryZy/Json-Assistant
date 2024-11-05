@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.listener;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.UrlEnum;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.diagnostic.Logger;
@@ -27,10 +27,10 @@ public class HyperLinkListenerImpl extends HyperlinkAdapter {
     @Override
     protected void hyperlinkActivated(HyperlinkEvent e) {
         String url = e.getDescription();
-        if (Objects.equals(UrlEnum.SHARE.getId(), url)) {
-            execShareLinkAction(e, UrlEnum.SHARE.getUrl());
-        } else if (Objects.equals(UrlEnum.MAIL.getId(), url)) {
-            execEmailLinkAction(UrlEnum.MAIL.getUrl());
+        if (Objects.equals(UrlType.SHARE.getId(), url)) {
+            execShareLinkAction(e, UrlType.SHARE.getUrl());
+        } else if (Objects.equals(UrlType.MAIL.getId(), url)) {
+            execEmailLinkAction(UrlType.MAIL.getUrl());
         } else {
             BrowserUtil.browse(url);
         }

@@ -2,8 +2,8 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
-import cn.memoryzy.json.enums.UrlEnum;
-import cn.memoryzy.json.model.YamlDocumentModel;
+import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.model.YamlDocEntry;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
@@ -36,7 +36,7 @@ import java.util.List;
 @SuppressWarnings("DuplicatedCode")
 public class MultiYamlDocumentChooser extends DialogWrapper {
 
-    private JList<YamlDocumentModel> showList;
+    private JList<YamlDocEntry> showList;
     private EditorTextField showTextField;
 
     private final List<Object> values;
@@ -79,7 +79,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         label.setIcon(AllIcons.Actions.IntentionBulb);
         label.setBorder(JBUI.Borders.emptyBottom(8));
 
-        JComponent wrapComponent = UIManager.wrapListWithFilter(showList, YamlDocumentModel::getShortText, true);
+        JComponent wrapComponent = UIManager.wrapListWithFilter(showList, YamlDocEntry::getShortText, true);
         rebuildListWithFilter();
 
         JPanel firstPanel = new JPanel(new BorderLayout());
@@ -106,7 +106,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlEnum.DEFAULT.getId();
+        return UrlType.DEFAULT.getId();
     }
 
     @Override
@@ -120,7 +120,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
     }
 
     private boolean executeOkAction() {
-        YamlDocumentModel selectedValue = showList.getSelectedValue();
+        YamlDocEntry selectedValue = showList.getSelectedValue();
         return selectedValue != null;
     }
 
@@ -147,8 +147,8 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         }.installOn(showList);
     }
 
-    private DefaultListModel<YamlDocumentModel> fillHistoryListModel() {
-        List<YamlDocumentModel> models = YamlDocumentModel.of(values);
+    private DefaultListModel<YamlDocEntry> fillHistoryListModel() {
+        List<YamlDocEntry> models = YamlDocEntry.of(values);
         return JBList.createDefaultListModel(models);
     }
 
@@ -158,14 +158,14 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         }
     }
 
-    public YamlDocumentModel getSelectValue() {
+    public YamlDocEntry getSelectValue() {
         return showList.getSelectedValue();
     }
 
 
-    public static class IconListCellRenderer extends ColoredListCellRenderer<YamlDocumentModel> {
+    public static class IconListCellRenderer extends ColoredListCellRenderer<YamlDocEntry> {
         @Override
-        protected void customizeCellRenderer(@NotNull JList<? extends YamlDocumentModel> list, YamlDocumentModel value,
+        protected void customizeCellRenderer(@NotNull JList<? extends YamlDocEntry> list, YamlDocEntry value,
                                              int index, boolean selected, boolean hasFocus) {
             append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
             append(" " + value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
@@ -177,7 +177,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
     public class UpdateEditorListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            YamlDocumentModel selectedValue = showList.getSelectedValue();
+            YamlDocEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 showTextField.setText(selectedValue.getLongText());
             }

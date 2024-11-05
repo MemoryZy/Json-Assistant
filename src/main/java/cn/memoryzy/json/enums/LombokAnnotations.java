@@ -4,7 +4,7 @@ package cn.memoryzy.json.enums;
  * @author Memory
  * @since 2023/12/4
  */
-public enum LombokAnnotationEnum {
+public enum LombokAnnotations {
 
     DATA("lombok.Data"),
 
@@ -12,7 +12,7 @@ public enum LombokAnnotationEnum {
 
     private final String value;
 
-    LombokAnnotationEnum(String value) {
+    LombokAnnotations(String value) {
         this.value = value;
     }
 
