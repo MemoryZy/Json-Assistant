@@ -31,8 +31,8 @@ public class OnlineDocAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        JsonAssistantUtil.openOnlineDoc(e.getProject(), popupAction);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        JsonAssistantUtil.openOnlineDoc(event.getProject(), popupAction);
     }
 
 }

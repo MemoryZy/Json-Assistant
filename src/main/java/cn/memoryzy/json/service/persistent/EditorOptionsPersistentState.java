@@ -1,6 +1,6 @@
 package cn.memoryzy.json.service.persistent;
 
-import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
+import cn.memoryzy.json.enums.BackgroundColorPolicy;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -33,7 +33,7 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
     /**
      * 编辑器背景配色主题
      */
-    public BackgroundColorMatchingEnum backgroundColorMatchingEnum = BackgroundColorMatchingEnum.DEFAULT;
+    public BackgroundColorPolicy backgroundColorPolicy = BackgroundColorPolicy.DEFAULT;
 
     /**
      * 显示折叠轮廓
@@ -77,7 +77,7 @@ public class EditorOptionsPersistentState implements PersistentStateComponent<Ed
     public void loadState(@NotNull EditorOptionsPersistentState state) {
         this.importHistory = state.importHistory;
         this.displayLineNumbers = state.displayLineNumbers;
-        this.backgroundColorMatchingEnum = state.backgroundColorMatchingEnum;
+        this.backgroundColorPolicy = state.backgroundColorPolicy;
         this.foldingOutline = state.foldingOutline;
 
         this.recognizeOtherFormats = state.recognizeOtherFormats;

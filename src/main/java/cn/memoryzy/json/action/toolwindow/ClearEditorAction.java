@@ -5,7 +5,6 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
@@ -30,12 +29,15 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        WriteCommandAction.runWriteCommandAction(e.getProject(), () -> editor.getDocument().setText(""));
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        // WriteCommandAction.runWriteCommandAction(event.getProject(), () -> editor.getDocument().setText(""));
+
+
+
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(getEventProject(e) != null && StrUtil.isNotBlank(editor.getDocument().getText()));
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabled(getEventProject(event) != null && StrUtil.isNotBlank(editor.getDocument().getText()));
     }
 }

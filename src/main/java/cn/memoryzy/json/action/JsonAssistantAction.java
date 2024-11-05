@@ -2,14 +2,13 @@ package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.action.group.JsonAssistantPopupGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.formats.JsonFormatHandleModel;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -29,26 +28,20 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        new JsonAssistantPopupGroup(true).showPopupMenu(e);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        new JsonAssistantPopupGroup(true).showPopupMenu(event.getDataContext());
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
-        boolean isHasJsonStr = false;
-        Editor editor = PlatformUtil.getEditor(e);
-        Presentation presentation = e.getPresentation();
+    public void update(@NotNull AnActionEvent event) {
+        DataContext dataContext = event.getDataContext();
+        Presentation presentation = event.getPresentation();
         presentation.setVisible(false);
-        if (project != null && editor != null) {
-            isHasJsonStr = isOrHasJsonStr(project, editor);
-        }
-
-        presentation.setEnabled(isHasJsonStr);
-    }
-
-    public static boolean isOrHasJsonStr(Project project, Editor editor) {
-        return JsonFormatHandleModel.of(project, editor).isJsonStr();
+        presentation.setEnabled(
+                GlobalJsonConverter.validateEditorJson(
+                        getEventProject(event),
+                        PlatformUtil.getEditor(dataContext),
+                        dataContext));
     }
 
 }

@@ -28,7 +28,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
-        <toolWindow id="JsonAssistant.ToolWindow.JsonViewer"
+        <toolWindow id="JsonAssistant.ToolWindow.JsonAssistant"
                     factoryClass="cn.memoryzy.json.toolwindow.JsonAssistantToolWindowFactory"
                     anchor="right"
                     secondary="true"
@@ -46,7 +46,7 @@
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.EditorOptionsPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState"/>
-        <postStartupActivity implementation="cn.memoryzy.json.extension.PluginActivityManager"/>
+        <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
         
@@ -54,7 +54,7 @@
     </extensions>
 
     <applicationListeners>
-        <listener class="cn.memoryzy.json.extension.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+        <listener class="cn.memoryzy.json.service.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
     </applicationListeners>
 
     <actions>
@@ -63,6 +63,7 @@
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
         <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.action.JsonTextDiffAction"/>
         <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
+        <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
 
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>

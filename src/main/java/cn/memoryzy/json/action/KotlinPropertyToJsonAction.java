@@ -39,7 +39,7 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
     @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        PsiClass currentPsiClass = KotlinUtil.getPsiClass(event);
+        PsiClass currentPsiClass = KotlinUtil.getPsiClass(event.getDataContext());
         Map<String, Object> jsonMap = new TreeMap<>();
         // 忽略的属性
         Map<String, List<String>> ignoreMap = new HashMap<>();
@@ -77,8 +77,11 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent event) {
         // 设置可见性
-        e.getPresentation().setEnabledAndVisible(Objects.nonNull(e.getProject()) && KotlinUtil.isKtFile(e) && KotlinUtil.hasKtProperty(e));
+        event.getPresentation().setEnabledAndVisible(
+                Objects.nonNull(event.getProject())
+                        && KotlinUtil.isKtFile(event.getDataContext())
+                        && KotlinUtil.hasKtProperty(event.getDataContext()));
     }
 }

@@ -3,6 +3,7 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -43,25 +44,24 @@ public class EditInNewWindowAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getRequiredData(CommonDataKeys.PROJECT);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getRequiredData(CommonDataKeys.PROJECT);
         final FileEditorManager manager = FileEditorManager.getInstance(project);
-        VirtualFile virtualFile = getVirtualFile(e);
-        Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
+        VirtualFile virtualFile = getVirtualFile(project);
+        Content content = ToolWindowUtil.getSelectedContent(toolWindow);
         rename(project, virtualFile, content);
         JsonAssistantUtil.invokeMethod(manager, "openFileInNewWindow", virtualFile);
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(getEventProject(e) != null);
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabledAndVisible(getEventProject(event) != null);
     }
 
     @SuppressWarnings("DataFlowIssue")
-    public VirtualFile getVirtualFile(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
-        Content content = JsonAssistantUtil.getSelectedContent(toolWindow);
-        EditorEx editor = Optional.ofNullable(content).map(JsonAssistantUtil::getEditorOnContent).orElse(null);
+    public VirtualFile getVirtualFile(Project project) {
+        Content content = ToolWindowUtil.getSelectedContent(toolWindow);
+        EditorEx editor = Optional.ofNullable(content).map(ToolWindowUtil::getEditorOnContent).orElse(null);
         String text = editor == null ? "" : editor.getDocument().getText();
         return Optional.ofNullable(editor)
                 .map(Editor::getDocument)

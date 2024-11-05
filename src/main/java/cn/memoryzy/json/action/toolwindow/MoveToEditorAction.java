@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -40,15 +40,15 @@ public class MoveToEditorAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getProject();
         if (project == null) {
             return;
         }
 
-        Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
+        Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
         if (Objects.nonNull(selectedContent)) {
-            EditorEx editor = JsonAssistantUtil.getEditorOnContent(selectedContent);
+            EditorEx editor = ToolWindowUtil.getEditorOnContent(selectedContent);
             String text = Objects.nonNull(editor) ? editor.getDocument().getText() : "";
 
             VirtualFile virtualFile = Optional.ofNullable(editor)

@@ -6,12 +6,13 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
-import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
+import cn.memoryzy.json.enums.BackgroundColorPolicy;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.model.strategy.clipboard.ConversionContext;
+import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
+import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.component.ToolWindowPanel;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -71,7 +72,7 @@ public class JsonAssistantToolWindowComponentProvider {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
-        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout(), this.editor);
+        ToolWindowPanel rootPanel = new ToolWindowPanel(new BorderLayout(), this.editor);
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);
@@ -106,7 +107,7 @@ public class JsonAssistantToolWindowComponentProvider {
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
 
-        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.backgroundColorMatchingEnum);
+        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.backgroundColorPolicy);
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -141,8 +142,8 @@ public class JsonAssistantToolWindowComponentProvider {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
-                    ConversionContext context = new ConversionContext();
-                    jsonStr = ConversionContext.applyStrategies(context, clipboard);
+                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
+                    jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);
@@ -170,6 +171,7 @@ public class JsonAssistantToolWindowComponentProvider {
 
 
         // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
+        // TODO 如果 editor.setFile() 不行，就关闭初始选项卡，再创建一个新的，文本原样移动过去
 
         if (initWindow && persistentState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
@@ -177,8 +179,8 @@ public class JsonAssistantToolWindowComponentProvider {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
-                    ConversionContext context = new ConversionContext();
-                    String jsonStr = ConversionContext.applyStrategies(context, clipboard);
+                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
+                    String jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);
@@ -227,9 +229,9 @@ public class JsonAssistantToolWindowComponentProvider {
         });
     }
 
-    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, BackgroundColorMatchingEnum followEditorColor) {
+    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, BackgroundColorPolicy backgroundColorPolicy) {
         EditorColorsScheme scheme = defaultColorsScheme;
-        switch (followEditorColor) {
+        switch (backgroundColorPolicy) {
             case DEFAULT: {
                 // 改为新配色
                 scheme = ConsoleViewUtil.updateConsoleColorScheme(defaultColorsScheme);
@@ -272,7 +274,7 @@ public class JsonAssistantToolWindowComponentProvider {
             // 行号显示
             toggleLineNumbers(editor, persistentState.displayLineNumbers);
             // 配色切换
-            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.backgroundColorMatchingEnum);
+            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.backgroundColorPolicy);
             // 切换展示折叠区域
             toggleFoldingOutline(editor, persistentState.foldingOutline);
         }

@@ -33,14 +33,14 @@ public class JavaConstantExtractToJsonAction extends AnAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.extractor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.extractor.description"));
-        presentation.setIcon(JsonAssistantIcons.EXTRACT);
+        presentation.setIcon(JsonAssistantIcons.ESC);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = getEventProject(event);
         // 不做方法返回值的处理
-        PsiElement element = PlatformUtil.getPsiElementByOffset(e);
+        PsiElement element = PlatformUtil.getPsiElementByOffset(event.getDataContext());
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
 
@@ -61,7 +61,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
         if (!JsonUtil.isJsonStr(jsonStr)) return;
 
         try {
-            JsonAssistantUtil.addNewContentWithEditorContentIfNeeded(project, jsonStr, FileTypeHolder.JSON);
+            ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, jsonStr, FileTypeHolder.JSON);
         } catch (Exception ex) {
             PlatformUtil.setClipboard(jsonStr);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
@@ -70,9 +70,9 @@ public class JavaConstantExtractToJsonAction extends AnAction {
 
     @Override
     @SuppressWarnings("DuplicatedCode")
-    public void update(@NotNull AnActionEvent e) {
-        Project project = getEventProject(e);
-        PsiElement element = PlatformUtil.getPsiElementByOffset(e);
+    public void update(@NotNull AnActionEvent event) {
+        Project project = getEventProject(event);
+        PsiElement element = PlatformUtil.getPsiElementByOffset(event.getDataContext());
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
 
@@ -89,7 +89,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
             }
         }
 
-        e.getPresentation().setEnabledAndVisible(project != null && StrUtil.isNotBlank(jsonStr) && JsonUtil.isJsonStr(jsonStr));
+        event.getPresentation().setEnabledAndVisible(project != null && StrUtil.isNotBlank(jsonStr) && JsonUtil.isJsonStr(jsonStr));
     }
 
 

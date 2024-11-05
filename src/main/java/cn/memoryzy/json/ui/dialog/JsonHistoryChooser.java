@@ -2,12 +2,12 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
-import cn.memoryzy.json.enums.UrlEnum;
-import cn.memoryzy.json.model.HistoryModel;
+import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -46,7 +46,7 @@ import java.util.Objects;
 @SuppressWarnings("DuplicatedCode")
 public class JsonHistoryChooser extends DialogWrapper {
 
-    private JList<HistoryModel> showList;
+    private JList<HistoryEntry> showList;
     private EditorTextField showTextField;
     private final Project project;
     private final ToolWindowEx toolWindow;
@@ -88,7 +88,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         UIManager.updateEditorTextFieldColorsScheme(showTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
-        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, HistoryModel::getShortText, true));
+        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, HistoryEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
         rebuildListWithFilter();
 
@@ -111,7 +111,7 @@ public class JsonHistoryChooser extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlEnum.DEFAULT.getId();
+        return UrlType.DEFAULT.getId();
     }
 
     @Override
@@ -123,26 +123,23 @@ public class JsonHistoryChooser extends DialogWrapper {
     protected void doOKAction() {
         if (getOKAction().isEnabled()) {
             // 执行逻辑
-            if (executeOkAction()) {
-                close(OK_EXIT_CODE);
-            }
+            executeOkAction();
+            close(OK_EXIT_CODE);
         }
     }
 
-    private boolean executeOkAction() {
-        HistoryModel selectedValue = showList.getSelectedValue();
+    private void executeOkAction() {
+        HistoryEntry selectedValue = showList.getSelectedValue();
         if (selectedValue != null) {
-            Content selectedContent = JsonAssistantUtil.getSelectedContent(toolWindow);
+            Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
             if (Objects.nonNull(selectedContent)) {
-                EditorEx editor = JsonAssistantUtil.getEditorOnContent(selectedContent);
+                EditorEx editor = ToolWindowUtil.getEditorOnContent(selectedContent);
                 if (Objects.nonNull(editor)) {
                     WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(selectedValue.getLongText()));
                     toolWindow.show();
                 }
             }
         }
-
-        return true;
     }
 
     private void rebuildListWithFilter() {
@@ -168,16 +165,16 @@ public class JsonHistoryChooser extends DialogWrapper {
         }.installOn(showList);
     }
 
-    private DefaultListModel<HistoryModel> fillHistoryListModel() {
+    private DefaultListModel<HistoryEntry> fillHistoryListModel() {
         JsonHistoryPersistentState historyState = JsonHistoryPersistentState.getInstance(project);
         LimitedList historyList = historyState.getHistory();
-        List<HistoryModel> historyModels = HistoryModel.of(historyList);
-        return JBList.createDefaultListModel(historyModels);
+        List<HistoryEntry> historyEntries = HistoryEntry.of(historyList);
+        return JBList.createDefaultListModel(historyEntries);
     }
 
     private void selectFirstItemInList() {
         // 选中第一条
-        ListModel<HistoryModel> listModel = showList.getModel();
+        ListModel<HistoryEntry> listModel = showList.getModel();
         if (listModel.getSize() > 0) {
             showList.setSelectedIndex(0);
             enabledOkAction();
@@ -198,7 +195,7 @@ public class JsonHistoryChooser extends DialogWrapper {
                     int x = e.getX();
                     int y = e.getY();
 
-                    HistoryModel selectedValue = showList.getSelectedValue();
+                    HistoryEntry selectedValue = showList.getSelectedValue();
                     if (Objects.isNull(selectedValue)) {
                         int index = showList.locationToIndex(new Point(x, y));
                         if (index != -1) {
@@ -229,20 +226,20 @@ public class JsonHistoryChooser extends DialogWrapper {
         }
 
         @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            Project project = e.getProject();
+        public void actionPerformed(@NotNull AnActionEvent event) {
+            Project project = event.getProject();
             if (project == null) return;
             int selectedIndex = showList.getSelectedIndex();
-            HistoryModel selectedValue = showList.getSelectedValue();
+            HistoryEntry selectedValue = showList.getSelectedValue();
             if (selectedValue == null) return;
 
             JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
             LimitedList historyList = state.getHistory();
             historyList.remove(selectedValue.getIndex());
 
-            List<HistoryModel> historyModels = HistoryModel.of(historyList);
-            NameFilteringListModel<HistoryModel> listModel = (NameFilteringListModel<HistoryModel>) showList.getModel();
-            listModel.replaceAll(historyModels);
+            List<HistoryEntry> historyEntries = HistoryEntry.of(historyList);
+            NameFilteringListModel<HistoryEntry> listModel = (NameFilteringListModel<HistoryEntry>) showList.getModel();
+            listModel.replaceAll(historyEntries);
 
             int size = listModel.getSize();
             if (size == 0) {
@@ -262,9 +259,9 @@ public class JsonHistoryChooser extends DialogWrapper {
         }
     }
 
-    public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryModel> {
+    public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryEntry> {
         @Override
-        protected void customizeCellRenderer(@NotNull JList<? extends HistoryModel> list, HistoryModel value, int index, boolean selected, boolean hasFocus) {
+        protected void customizeCellRenderer(@NotNull JList<? extends HistoryEntry> list, HistoryEntry value, int index, boolean selected, boolean hasFocus) {
             append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
             append(" " + value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
             setIcon(AllIcons.FileTypes.Json);
@@ -275,7 +272,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     public class UpdateEditorListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            HistoryModel selectedValue = showList.getSelectedValue();
+            HistoryEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 showTextField.setText(selectedValue.getLongText());
             }

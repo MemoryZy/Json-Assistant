@@ -1,12 +1,11 @@
 package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.enums.FileTypeEnum;
+import cn.memoryzy.json.enums.FileTypes;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
@@ -53,12 +52,12 @@ public class PlatformUtil {
     /**
      * 获取结构化文件
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return 结构化文件
      */
-    public static PsiFile getPsiFile(AnActionEvent event) {
+    public static PsiFile getPsiFile(DataContext dataContext) {
         try {
-            return event.getData(CommonDataKeys.PSI_FILE);
+            return dataContext.getData(CommonDataKeys.PSI_FILE);
         } catch (Throwable e) {
             return null;
         }
@@ -82,9 +81,9 @@ public class PlatformUtil {
      *
      * @return Psi元素
      */
-    public static PsiElement getPsiElementByOffset(AnActionEvent e) {
-        PsiFile psiFile = PlatformUtil.getPsiFile(e);
-        Editor editor = PlatformUtil.getEditor(e);
+    public static PsiElement getPsiElementByOffset(DataContext dataContext) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
+        Editor editor = PlatformUtil.getEditor(dataContext);
         return (psiFile != null && editor != null) ? getPsiElementByOffset(editor, psiFile) : null;
     }
 
@@ -92,11 +91,11 @@ public class PlatformUtil {
     /**
      * 获取编辑器
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return 编辑器
      */
-    public static Editor getEditor(AnActionEvent event) {
-        return event.getData(CommonDataKeys.EDITOR);
+    public static Editor getEditor(DataContext dataContext) {
+        return dataContext.getData(CommonDataKeys.EDITOR);
     }
 
 
@@ -157,12 +156,12 @@ public class PlatformUtil {
         return CommonDataKeys.PROJECT.getData(dataContext);
     }
 
-    public static FileType getFileType(FileTypeEnum fileTypeEnum) {
+    public static FileType getFileType(FileTypes fileTypes) {
         FileType fileType = PlainTextFileType.INSTANCE;
-        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypeEnum.getFileTypeQualifiedName());
+        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getFileTypeQualifiedName());
 
         if (clz != null) {
-            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypeEnum.getFileTypeInstanceFieldName());
+            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypes.getFileTypeInstanceFieldName());
             if (instance instanceof FileType) {
                 fileType = (FileType) instance;
             }
@@ -171,12 +170,12 @@ public class PlatformUtil {
         return fileType;
     }
 
-    public static Language getLanguage(FileTypeEnum fileTypeEnum) {
+    public static Language getLanguage(FileTypes fileTypes) {
         Language language = PlainTextLanguage.INSTANCE;
-        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypeEnum.getLanguageQualifiedName());
+        Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getLanguageQualifiedName());
 
         if (clz != null) {
-            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypeEnum.getLanguageInstanceFieldName());
+            Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypes.getLanguageInstanceFieldName());
             if (instance instanceof Language) {
                 language = (Language) instance;
             }

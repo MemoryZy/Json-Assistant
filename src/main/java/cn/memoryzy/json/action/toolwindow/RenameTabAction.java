@@ -4,10 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -51,9 +48,9 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Component contextComponent = e.getData(PlatformDataKeys.CONTEXT_COMPONENT);
-        BaseLabel tabLabel = contextComponent instanceof BaseLabel ? (BaseLabel) contextComponent : e.getData(ToolWindowContentUi.SELECTED_CONTENT_TAB_LABEL);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Component contextComponent = event.getData(PlatformDataKeys.CONTEXT_COMPONENT);
+        BaseLabel tabLabel = contextComponent instanceof BaseLabel ? (BaseLabel) contextComponent : event.getData(ToolWindowContentUi.SELECTED_CONTENT_TAB_LABEL);
         if (tabLabel == null) return;
         Content content = tabLabel.getContent();
         showContentRenamePopup(tabLabel, Objects.requireNonNull(content));
@@ -109,31 +106,31 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        ToolWindow toolWindow = e.getDataContext().getData(PlatformDataKeys.TOOL_WINDOW);
+    public void update(@NotNull AnActionEvent event) {
+        Project project = event.getProject();
+        ToolWindow toolWindow = event.getDataContext().getData(PlatformDataKeys.TOOL_WINDOW);
         if (toolWindow == null) {
-            e.getPresentation().setEnabledAndVisible(false);
+            event.getPresentation().setEnabledAndVisible(false);
             return;
         }
 
-        Content content = getContextContent(e);
-        e.getPresentation().setEnabledAndVisible(project != null
-                && Objects.equals(PluginConstant.JSON_VIEWER_TOOLWINDOW_ID, toolWindow.getId())
+        Content content = getContextContent(event.getDataContext());
+        event.getPresentation().setEnabledAndVisible(project != null
+                && Objects.equals(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, toolWindow.getId())
                 && content != null);
     }
 
     @Nullable
-    private static Content getContextContent(@NotNull AnActionEvent e, @NotNull ToolWindow toolWindow) {
-        Content selectedContent = getContextContent(e);
+    private static Content getContextContent(@NotNull DataContext dataContext, @NotNull ToolWindow toolWindow) {
+        Content selectedContent = getContextContent(dataContext);
         if (selectedContent == null) {
             selectedContent = toolWindow.getContentManager().getSelectedContent();
         }
         return selectedContent;
     }
 
-    private static Content getContextContent(@NotNull AnActionEvent e) {
-        BaseLabel baseLabel = ObjectUtils.tryCast(e.getData(PlatformDataKeys.CONTEXT_COMPONENT), BaseLabel.class);
+    private static Content getContextContent(@NotNull DataContext dataContext) {
+        BaseLabel baseLabel = ObjectUtils.tryCast(dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT), BaseLabel.class);
         return baseLabel != null ? baseLabel.getContent() : null;
     }
 }

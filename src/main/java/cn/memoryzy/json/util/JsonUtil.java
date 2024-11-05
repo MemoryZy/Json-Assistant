@@ -14,7 +14,6 @@ import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -189,24 +188,6 @@ public class JsonUtil {
         }
 
         return includeJsonStr.substring(startIndex, endIndex + 1);
-    }
-
-    public static int findJsonOutsetCharacterOffset(String text) {
-        if (text == null || text.isEmpty()) {
-            // 返回 -1 表示文本为空或空字符串
-            return -1;
-        }
-
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            if (!Character.isWhitespace(c) && (Objects.equals(c, '{') || Objects.equals(c, '['))) {
-                // 返回第一个非空格字符的位置
-                return i;
-            }
-        }
-
-        // 如果所有字符都是空格，返回 -1
-        return -1;
     }
 
 }

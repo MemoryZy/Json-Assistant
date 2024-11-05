@@ -58,8 +58,8 @@ public class OpenSettingsAction extends DumbAwareAction implements CustomCompone
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), JsonAssistantBundle.message("setting.display.name"));
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        ShowSettingsUtil.getInstance().showSettingsDialog(event.getProject(), JsonAssistantBundle.message("setting.display.name"));
     }
 
     private String getShortcut() {

@@ -14,13 +14,13 @@ import java.util.*;
 public interface PluginConstant {
 
     String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
-    String JSON_VIEWER_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonViewer";
+    String JSON_ASSISTANT_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonAssistant";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     String LOMBOK_LIB = "org.projectlombok:lombok";
     String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
 
-    String JSON_VIEWER_TOOL_WINDOW_DISPLAY_NAME = "View";
+    String JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME = "View";
 
     String OUTLINE_PROPERTY = "JComponent.outline";
     String ERROR_VALUE = "error";

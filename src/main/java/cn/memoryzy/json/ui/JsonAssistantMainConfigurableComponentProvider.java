@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.BackgroundColorMatchingEnum;
+import cn.memoryzy.json.enums.BackgroundColorPolicy;
 import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
@@ -49,7 +49,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBCheckBox urlParamFormatsCb;
     private JPanel formatCbPanel;
     private JBLabel backgroundColorTitle;
-    private ComboBox<BackgroundColorMatchingEnum> backgroundColorBox;
+    private ComboBox<BackgroundColorPolicy> backgroundColorBox;
     private TitledSeparator windowAppearanceLabel;
     // endregion
 
@@ -105,7 +105,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
 
         backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
-        for (BackgroundColorMatchingEnum value : BackgroundColorMatchingEnum.values()) {
+        for (BackgroundColorPolicy value : BackgroundColorPolicy.values()) {
             backgroundColorBox.addItem(value);
         }
 
@@ -163,7 +163,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 外观
         importHistoryCb.setSelected(editorOptionsState.importHistory);
-        backgroundColorBox.setItem(editorOptionsState.backgroundColorMatchingEnum);
+        backgroundColorBox.setItem(editorOptionsState.backgroundColorPolicy);
         displayLineNumbersCb.setSelected(editorOptionsState.displayLineNumbers);
         foldingOutlineCb.setSelected(editorOptionsState.foldingOutline);
 
@@ -197,7 +197,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 外观
         boolean oldImportHistory = editorOptionsState.importHistory;
-        BackgroundColorMatchingEnum oldBackgroundColorMatchingEnum = editorOptionsState.backgroundColorMatchingEnum;
+        BackgroundColorPolicy oldBackgroundColorPolicy = editorOptionsState.backgroundColorPolicy;
         boolean oldDisplayLineNumbers = editorOptionsState.displayLineNumbers;
         boolean oldFoldingOutline = editorOptionsState.foldingOutline;
 
@@ -217,7 +217,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 外观
         boolean importHistory = importHistoryCb.isSelected();
-        BackgroundColorMatchingEnum backgroundColorMatchingEnum = backgroundColorBox.getItem();
+        BackgroundColorPolicy backgroundColorPolicy = backgroundColorBox.getItem();
         boolean displayLineNumbers = displayLineNumbersCb.isSelected();
         boolean foldingOutline = foldingOutlineCb.isSelected();
 
@@ -234,7 +234,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognitionJacksonAnnotation, recognitionJacksonAnnotation)
 
                 || !Objects.equals(oldImportHistory, importHistory)
-                || !Objects.equals(oldBackgroundColorMatchingEnum, backgroundColorMatchingEnum)
+                || !Objects.equals(oldBackgroundColorPolicy, backgroundColorPolicy)
                 || !Objects.equals(oldDisplayLineNumbers, displayLineNumbers)
                 || !Objects.equals(oldFoldingOutline, foldingOutline)
 
@@ -255,7 +255,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         editorOptionsState.importHistory = importHistoryCb.isSelected();
         editorOptionsState.displayLineNumbers = displayLineNumbersCb.isSelected();
         editorOptionsState.foldingOutline = foldingOutlineCb.isSelected();
-        editorOptionsState.backgroundColorMatchingEnum = backgroundColorBox.getItem();
+        editorOptionsState.backgroundColorPolicy = backgroundColorBox.getItem();
         // if (null != color && BackgroundColorMatchingEnum.CUSTOM.equals(colorBoxItem)) {
         //     editorOptionsState.customColor = color;
         // }

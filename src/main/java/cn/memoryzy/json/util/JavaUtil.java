@@ -8,11 +8,11 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.*;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.enums.JsonAnnotationEnum;
+import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import com.intellij.ide.highlighter.JavaFileType;
-import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
@@ -134,8 +134,8 @@ public class JavaUtil {
 
         // 因为 @JsonFormat 是独立注解，如果存在，则直接返回时间类型
         if (recognitionJacksonAnnotation) {
-            PsiAnnotation jacksonJsonPropertyAnnotation = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_PROPERTY.getValue());
-            PsiAnnotation jacksonFormatAnnotation = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_FORMAT.getValue());
+            PsiAnnotation jacksonJsonPropertyAnnotation = psiField.getAnnotation(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue());
+            PsiAnnotation jacksonFormatAnnotation = psiField.getAnnotation(JsonAnnotations.JACKSON_JSON_FORMAT.getValue());
 
             if (Objects.nonNull(jacksonFormatAnnotation)) {
                 // 获取 @JsonFormat 中的格式
@@ -165,8 +165,8 @@ public class JavaUtil {
 
         // 而 @JsonField 是集成注解，依靠属性分开功能
         if (recognitionFastJsonAnnotation) {
-            PsiAnnotation fastJsonFieldAnnotation = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON_JSON_FIELD.getValue());
-            PsiAnnotation fastJsonField2Annotation = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON2_JSON_FIELD.getValue());
+            PsiAnnotation fastJsonFieldAnnotation = psiField.getAnnotation(JsonAnnotations.FAST_JSON_JSON_FIELD.getValue());
+            PsiAnnotation fastJsonField2Annotation = psiField.getAnnotation(JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue());
 
             if (Objects.nonNull(fastJsonField2Annotation)) {
                 // 获取 @JsonField 中的格式
@@ -234,7 +234,7 @@ public class JavaUtil {
 
         // jackson 通过 @JsonIgnore 注解标记是否忽略序列化字段
         if (recognitionJacksonAnnotation) {
-            PsiAnnotation jacksonIgnore = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_IGNORE.getValue());
+            PsiAnnotation jacksonIgnore = psiField.getAnnotation(JsonAnnotations.JACKSON_JSON_IGNORE.getValue());
             if (Objects.nonNull(jacksonIgnore)) {
                 // 该字段需要忽略
                 return JsonAssistantPlugin.PLUGIN_ID_NAME;
@@ -244,8 +244,8 @@ public class JavaUtil {
         String annotationValue = "";
         if (recognitionFastJsonAnnotation) {
             // 检测是否含有 fastjson 注解
-            PsiAnnotation fastJsonJsonField = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON_JSON_FIELD.getValue());
-            PsiAnnotation fastJson2JsonField = psiField.getAnnotation(JsonAnnotationEnum.FAST_JSON2_JSON_FIELD.getValue());
+            PsiAnnotation fastJsonJsonField = psiField.getAnnotation(JsonAnnotations.FAST_JSON_JSON_FIELD.getValue());
+            PsiAnnotation fastJson2JsonField = psiField.getAnnotation(JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue());
 
             if (Objects.nonNull(fastJsonJsonField) || Objects.nonNull(fastJson2JsonField)) {
                 // 是否忽略序列化
@@ -267,7 +267,7 @@ public class JavaUtil {
 
         if (recognitionJacksonAnnotation) {
             // 检测是否含有 Jackson 注解
-            PsiAnnotation jacksonJsonProperty = psiField.getAnnotation(JsonAnnotationEnum.JACKSON_JSON_PROPERTY.getValue());
+            PsiAnnotation jacksonJsonProperty = psiField.getAnnotation(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue());
 
             if (Objects.nonNull(jacksonJsonProperty)) {
                 annotationValue = JavaUtil.getMemberValue(jacksonJsonProperty, "value");
@@ -384,25 +384,25 @@ public class JavaUtil {
     /**
      * 用两种方法获取PsiClass
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return Class
      */
-    public static PsiClass getPsiClass(AnActionEvent event) {
+    public static PsiClass getPsiClass(DataContext dataContext) {
         PsiClass psiClass = null;
 
         try {
             // 一个类中可能存在几个内部类
-            PsiClass[] psiClasses = getAllPsiClassByPsiFile(event);
+            PsiClass[] psiClasses = getAllPsiClassByPsiFile(dataContext);
 
             if (ArrayUtil.isEmpty(psiClasses)) {
-                return getCurrentPsiClassByOffset(event);
+                return getCurrentPsiClassByOffset(dataContext);
             } else {
                 // 单独Class
                 if (psiClasses.length == 1) {
                     psiClass = psiClasses[0];
                 } else {
                     // 偏移量获取
-                    PsiClass curClz = getCurrentPsiClassByOffset(event);
+                    PsiClass curClz = getCurrentPsiClassByOffset(dataContext);
                     if (Objects.nonNull(curClz)) {
                         psiClass = curClz;
                     } else {
@@ -420,12 +420,12 @@ public class JavaUtil {
     /**
      * 根据Java文件获取当前Class文件及所有内部类
      *
-     * @param event 事件信息
+     * @param dataContext 数据上下文
      * @return Class
      */
-    public static PsiClass[] getAllPsiClassByPsiFile(AnActionEvent event) {
+    public static PsiClass[] getAllPsiClassByPsiFile(DataContext dataContext) {
         List<PsiClass> psiClassList = new ArrayList<>();
-        PsiFile psiFile = PlatformUtil.getPsiFile(event);
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
 
         if (psiFile instanceof PsiJavaFile) {
             PsiJavaFile psiJavaFile = (PsiJavaFile) psiFile;
@@ -445,12 +445,12 @@ public class JavaUtil {
     /**
      * 根据编辑器的偏移量获取当前所在的Class文件（因为利用了编辑器，光标必须在类中，也就是类的上下作用域内）
      *
-     * @param event 事件信息
+     * @param dataContext 数据上下文信息
      * @return class
      */
-    public static PsiClass getCurrentPsiClassByOffset(AnActionEvent event) {
-        PsiFile psiFile = PlatformUtil.getPsiFile(event);
-        Editor editor = PlatformUtil.getEditor(event);
+    public static PsiClass getCurrentPsiClassByOffset(DataContext dataContext) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
+        Editor editor = PlatformUtil.getEditor(dataContext);
 
         if (Objects.nonNull(psiFile) && Objects.nonNull(editor) && (psiFile.getFileType() instanceof JavaFileType)) {
             return PsiTreeUtil.getParentOfType(PlatformUtil.getPsiElementByOffset(editor, psiFile), PsiClass.class);
@@ -483,24 +483,24 @@ public class JavaUtil {
     /**
      * 是否处于Java文件中
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return true -> 处于；false -> 不处于
      */
-    public static boolean isJavaFile(AnActionEvent event) {
+    public static boolean isJavaFile(DataContext dataContext) {
         // 获取当前选中的 PsiClass
-        PsiFile psiFile = event.getData(CommonDataKeys.PSI_FILE);
+        PsiFile psiFile = dataContext.getData(CommonDataKeys.PSI_FILE);
         return psiFile instanceof PsiJavaFile;
     }
 
     /**
      * 当前 Java 类中是否存在属性
      *
-     * @param event 事件源
+     * @param dataContext 数据上下文
      * @return true -> 存在；false -> 不存在
      */
-    public static boolean hasJavaProperty(AnActionEvent event) {
+    public static boolean hasJavaProperty(DataContext dataContext) {
         boolean enabled = false;
-        PsiClass psiClass = getPsiClass(event);
+        PsiClass psiClass = getPsiClass(dataContext);
         if (Objects.nonNull(psiClass)) {
             PsiField[] fields = getAllFieldFilterStatic(psiClass);
             enabled = ArrayUtil.isNotEmpty(fields);
@@ -615,7 +615,7 @@ public class JavaUtil {
             // 判断纯数字类型
             String numberType = NumberUtil.isNumber(str) ? Long.class.getSimpleName() : null;
             // 时间类型判断
-            return Objects.isNull(numberType) ? checkJsonDateType(str) : numberType;
+            return Objects.isNull(numberType) ? isDateType(str) : numberType;
 
         } else if (obj instanceof BigDecimal) {
             type = Double.class.getSimpleName();
@@ -638,13 +638,13 @@ public class JavaUtil {
     /**
      * 判断是否为时间类型
      *
-     * @param obj 参数
-     * @return 为时间类型返回Date、否则返回String
+     * @param str 参数
+     * @return 为时间类型返回 Date、否则返回 String
      */
-    private static String checkJsonDateType(String obj) {
+    private static String isDateType(String str) {
         String type = String.class.getSimpleName();
         try {
-            DateTime time = DateUtil.parse(obj);
+            DateTime time = DateUtil.parse(str);
             if (Objects.nonNull(time)) {
                 type = Date.class.getSimpleName();
             }
@@ -652,6 +652,7 @@ public class JavaUtil {
         }
         return type;
     }
+
 
     /**
      * 查找指定项目中的类。

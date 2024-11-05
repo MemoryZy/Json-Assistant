@@ -4,6 +4,7 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.ui.JsonPathComponentProvider;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
@@ -102,10 +103,10 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Project project = e.getProject();
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        Project project = event.getProject();
         if (project == null) return;
-        showComponentPopup(e, project);
+        showComponentPopup(project);
     }
 
     private String getShortcut() {
@@ -116,7 +117,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         return KeymapUtil.getShortcutsText(shortcuts);
     }
 
-    private void showComponentPopup(@NotNull AnActionEvent e, Project project) {
+    private void showComponentPopup(Project project) {
         JsonPathComponentProvider jsonPathComponentProvider = new JsonPathComponentProvider(project, editor);
         JPanel rootPanel = jsonPathComponentProvider.createRootPanel();
         JComponent expressionComboBoxTextField = jsonPathComponentProvider.getPathExpressionComboBoxTextField();
@@ -155,13 +156,13 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), expressionComboBoxTextField, popup);
 
         // 弹出
-        popup.show(calculatePopupLocation(e));
+        popup.show(calculatePopupLocation());
 
         // 弹出指引
         showGuidePopup(popup, expressionComboBoxTextField);
     }
 
-    private RelativePoint calculatePopupLocation(@NotNull AnActionEvent e) {
+    private RelativePoint calculatePopupLocation() {
         JComponent toolbar = simpleToolWindowPanel.getToolbar();
         Component[] components = Objects.requireNonNull(toolbar).getComponents();
         Component firstAction = components[0];
@@ -191,8 +192,10 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(getEventProject(e) != null && JsonAssistantUtil.isJsonOrExtract(editor.getDocument().getText()));
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabled(
+                GlobalJsonConverter.validateEditorJson(
+                        getEventProject(event), editor, event.getDataContext()));
     }
 
 }

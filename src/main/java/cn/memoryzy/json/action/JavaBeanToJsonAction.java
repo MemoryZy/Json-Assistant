@@ -50,7 +50,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         }
 
         // 获取当前类
-        PsiClass psiClass = JavaUtil.getPsiClass(event);
+        PsiClass psiClass = JavaUtil.getPsiClass(event.getDataContext());
         // JsonMap
         Map<String, Object> jsonMap = new TreeMap<>();
         // 忽略的属性
@@ -91,7 +91,10 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     @Override
     public void update(@NotNull AnActionEvent event) {
         // 设置可见性
-        event.getPresentation().setEnabledAndVisible(Objects.nonNull(event.getProject()) && JavaUtil.isJavaFile(event) && JavaUtil.hasJavaProperty(event));
+        event.getPresentation().setEnabledAndVisible(
+                Objects.nonNull(event.getProject())
+                        && JavaUtil.isJavaFile(event.getDataContext())
+                        && JavaUtil.hasJavaProperty(event.getDataContext()));
     }
 
 

@@ -2,7 +2,7 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiElement;
@@ -25,9 +25,9 @@ import java.util.Objects;
 public class KotlinUtil {
 
 
-    public static KtClass getKtClass(AnActionEvent e) {
-        PsiFile psiFile = PlatformUtil.getPsiFile(e);
-        Editor editor = PlatformUtil.getEditor(e);
+    public static KtClass getKtClass(DataContext dataContext) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
+        Editor editor = PlatformUtil.getEditor(dataContext);
 
         if (Objects.isNull(psiFile) || Objects.isNull(editor)) {
             return null;
@@ -42,12 +42,12 @@ public class KotlinUtil {
     /**
      * 获取当前光标所处范围的PsiClass
      */
-    public static PsiClass getPsiClass(AnActionEvent e) {
+    public static PsiClass getPsiClass(DataContext dataContext) {
         PsiClass currentPsiClass = null;
-        PsiFile psiFile = PlatformUtil.getPsiFile(e);
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
         if (psiFile instanceof KtFile) {
             KtFile ktFile = (KtFile) psiFile;
-            KtClass ktClass = getKtClass(e);
+            KtClass ktClass = getKtClass(dataContext);
             if (Objects.nonNull(ktClass)) {
                 String ktClassFqName = Objects.requireNonNull(ktClass.getFqName()).asString();
                 List<PsiClass> psiClassList = getAllClasses(ktFile);
@@ -65,14 +65,14 @@ public class KotlinUtil {
     }
 
 
-    public static boolean isKtFile(AnActionEvent e) {
-        PsiFile psiFile = PlatformUtil.getPsiFile(e);
+    public static boolean isKtFile(DataContext dataContext) {
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext);
         return psiFile instanceof KtFile;
     }
 
 
-    public static boolean hasKtProperty(AnActionEvent e) {
-        PsiClass psiClass = getPsiClass(e);
+    public static boolean hasKtProperty(DataContext dataContext) {
+        PsiClass psiClass = getPsiClass(dataContext);
         if (Objects.isNull(psiClass)) {
             return false;
         }

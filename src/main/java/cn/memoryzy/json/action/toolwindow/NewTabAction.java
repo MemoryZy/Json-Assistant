@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -35,7 +35,7 @@ public class NewTabAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        JsonAssistantUtil.addNewContent(e.getProject(), toolWindow, contentFactory, FileTypeHolder.JSON);
+    public void actionPerformed(@NotNull AnActionEvent event) {
+        ToolWindowUtil.addNewContent(event.getProject(), toolWindow, contentFactory, FileTypeHolder.JSON);
     }
 }

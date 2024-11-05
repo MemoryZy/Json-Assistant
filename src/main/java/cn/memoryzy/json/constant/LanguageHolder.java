@@ -1,6 +1,6 @@
 package cn.memoryzy.json.constant;
 
-import cn.memoryzy.json.enums.FileTypeEnum;
+import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.lang.Language;
 
@@ -10,14 +10,14 @@ import com.intellij.lang.Language;
  */
 public interface LanguageHolder {
 
-    Language JSON = PlatformUtil.getLanguage(FileTypeEnum.JSON);
+    Language JSON = PlatformUtil.getLanguage(FileTypes.JSON);
 
-    Language JSON5 = PlatformUtil.getLanguage(FileTypeEnum.JSON5);
+    Language JSON5 = PlatformUtil.getLanguage(FileTypes.JSON5);
 
-    Language XML = PlatformUtil.getLanguage(FileTypeEnum.XML);
+    Language XML = PlatformUtil.getLanguage(FileTypes.XML);
 
-    Language YAML = PlatformUtil.getLanguage(FileTypeEnum.YAML);
+    Language YAML = PlatformUtil.getLanguage(FileTypes.YAML);
 
-    Language TOML = PlatformUtil.getLanguage(FileTypeEnum.TOML);
+    Language TOML = PlatformUtil.getLanguage(FileTypes.TOML);
 
 }

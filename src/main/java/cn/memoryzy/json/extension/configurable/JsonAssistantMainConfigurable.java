@@ -1,7 +1,7 @@
 package cn.memoryzy.json.extension.configurable;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.UrlEnum;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.JsonAssistantMainConfigurableComponentProvider;
 import com.intellij.openapi.options.Configurable;
 import org.jetbrains.annotations.NonNls;
@@ -49,6 +49,6 @@ public class JsonAssistantMainConfigurable implements Configurable {
 
     @Override
     public @Nullable @NonNls String getHelpTopic() {
-        return UrlEnum.DEFAULT.getId();
+        return UrlType.DEFAULT.getId();
     }
 }

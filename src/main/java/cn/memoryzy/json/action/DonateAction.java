@@ -18,7 +18,7 @@ public class DonateAction extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(@NotNull AnActionEvent event) {
         new SupportDialog().show();
     }
 

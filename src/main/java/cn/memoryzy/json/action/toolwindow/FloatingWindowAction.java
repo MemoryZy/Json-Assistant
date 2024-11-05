@@ -27,12 +27,12 @@ public class FloatingWindowAction extends ToggleAction implements DumbAware {
     }
 
     @Override
-    public boolean isSelected(@NotNull AnActionEvent e) {
+    public boolean isSelected(@NotNull AnActionEvent event) {
         return Objects.equals(ToolWindowType.FLOATING, toolWindow.getType());
     }
 
     @Override
-    public void setSelected(@NotNull AnActionEvent e, boolean state) {
+    public void setSelected(@NotNull AnActionEvent event, boolean state) {
         if (state) {
             toolWindow.setType(ToolWindowType.FLOATING, null);
         } else {

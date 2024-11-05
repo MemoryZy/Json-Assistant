@@ -2,15 +2,13 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONNull;
-import cn.hutool.json.JSONObject;
+import cn.hutool.json.*;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonTreeNodeTypeEnum;
-import cn.memoryzy.json.enums.UrlEnum;
+import cn.memoryzy.json.enums.JsonTreeNodeType;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -98,7 +96,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlEnum.SITE_TREE.getId();
+        return UrlType.SITE_TREE.getId();
     }
 
     @Override
@@ -106,12 +104,19 @@ public class JsonStructureDialog extends DialogWrapper {
         ApplicationManager.getApplication().invokeLater(super::show);
     }
 
+
+    public static void show(String text) {
+        String jsonStr = JsonUtil.isJsonStr(text) ? text : JsonUtil.extractJsonStr(text);
+        new JsonStructureDialog(JSONUtil.parse(jsonStr, JsonUtil.HUTOOL_JSON_CONFIG)).show();
+    }
+
+
     public void convertToTreeNode(JSON json, JsonCollectInfoMutableTreeNode node) {
         if (json instanceof JSONObject) {
             JSONObject jsonObject = (JSONObject) json;
             // 为了确定图标
             if (Objects.isNull(node.getValueType())) {
-                node.setValueType(JsonTreeNodeTypeEnum.JSONObject);
+                node.setValueType(JsonTreeNodeType.JSONObject);
             }
 
             if (Objects.isNull(node.getCorrespondingValue())) {
@@ -127,12 +132,12 @@ public class JsonStructureDialog extends DialogWrapper {
 
                 if (value instanceof JSONObject) {
                     JSONObject jsonObjectValue = (JSONObject) value;
-                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeTypeEnum.JSONObject).setSize(jsonObjectValue.size());
+                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeType.JSONObject).setSize(jsonObjectValue.size());
                     convertToTreeNode(jsonObjectValue, childNode);
 
                 } else if (value instanceof JSONArray) {
                     JSONArray jsonArray = (JSONArray) value;
-                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeTypeEnum.JSONArray).setSize(jsonArray.size());
+                    childNode.setCorrespondingValue(value).setValueType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
                     for (int i = 0; i < jsonArray.size(); i++) {
                         Object el = jsonArray.get(i);
                         if (el instanceof JSONObject) {
@@ -140,7 +145,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
                                     "item" + i,
                                     el,
-                                    JsonTreeNodeTypeEnum.JSONObjectEl,
+                                    JsonTreeNodeType.JSONObjectEl,
                                     jsonObjectEl.size());
 
                             convertToTreeNode(jsonObjectEl, childNodeEl);
@@ -150,7 +155,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
                                     "item" + i,
                                     el,
-                                    JsonTreeNodeTypeEnum.JSONArrayEl,
+                                    JsonTreeNodeType.JSONArrayEl,
                                     jsonArrayEl.size());
 
                             convertToTreeNode(jsonArrayEl, childNodeEl);
@@ -166,7 +171,7 @@ public class JsonStructureDialog extends DialogWrapper {
                                 el = null;
                             }
 
-                            childNode.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeTypeEnum.JSONArrayEl));
+                            childNode.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeType.JSONArrayEl));
                         }
                     }
 
@@ -177,7 +182,7 @@ public class JsonStructureDialog extends DialogWrapper {
                     }
 
                     childNode.setCorrespondingValue(value)
-                            .setValueType(JsonTreeNodeTypeEnum.JSONObjectKey)
+                            .setValueType(JsonTreeNodeType.JSONObjectKey)
                             .setUserObject(key);
                 }
 
@@ -186,7 +191,7 @@ public class JsonStructureDialog extends DialogWrapper {
         } else if (json instanceof JSONArray) {
             JSONArray jsonArray = (JSONArray) json;
             // 为了确定图标
-            node.setValueType(JsonTreeNodeTypeEnum.JSONArray).setSize(jsonArray.size());
+            node.setValueType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
             if (Objects.isNull(node.getCorrespondingValue())) {
                 node.setCorrespondingValue(jsonArray);
             }
@@ -195,7 +200,7 @@ public class JsonStructureDialog extends DialogWrapper {
                 Object el = jsonArray.get(i);
                 if (el instanceof JSONObject) {
                     JSONObject jsonObject = (JSONObject) el;
-                    JsonCollectInfoMutableTreeNode childNode = new JsonCollectInfoMutableTreeNode("item" + i, el, JsonTreeNodeTypeEnum.JSONObjectEl, jsonObject.size());
+                    JsonCollectInfoMutableTreeNode childNode = new JsonCollectInfoMutableTreeNode("item" + i, el, JsonTreeNodeType.JSONObjectEl, jsonObject.size());
                     convertToTreeNode(jsonObject, childNode);
                     node.add(childNode);
                 } else if (el instanceof JSONArray) {
@@ -203,7 +208,7 @@ public class JsonStructureDialog extends DialogWrapper {
                     JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
                             "item" + i,
                             el,
-                            JsonTreeNodeTypeEnum.JSONArrayEl,
+                            JsonTreeNodeType.JSONArrayEl,
                             jsonArrayEl.size());
 
                     convertToTreeNode(jsonArrayEl, childNodeEl);
@@ -219,7 +224,7 @@ public class JsonStructureDialog extends DialogWrapper {
                         el = null;
                     }
 
-                    node.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeTypeEnum.JSONArrayEl));
+                    node.add(new JsonCollectInfoMutableTreeNode(obj).setCorrespondingValue(el).setValueType(JsonTreeNodeType.JSONArrayEl));
                 }
             }
         }
@@ -231,7 +236,7 @@ public class JsonStructureDialog extends DialogWrapper {
             @Override
             public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
                 JsonCollectInfoMutableTreeNode jsonCollectInfoMutableTreeNode = (JsonCollectInfoMutableTreeNode) value;
-                JsonTreeNodeTypeEnum nodeValueType = jsonCollectInfoMutableTreeNode.getValueType();
+                JsonTreeNodeType nodeValueType = jsonCollectInfoMutableTreeNode.getValueType();
 
                 String text = jsonCollectInfoMutableTreeNode.getUserObject().toString();
                 SimpleTextAttributes simpleTextAttributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
@@ -248,7 +253,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
                 Integer size = jsonCollectInfoMutableTreeNode.getSize();
                 Object correspondingValue = jsonCollectInfoMutableTreeNode.getCorrespondingValue();
-                JsonTreeNodeTypeEnum valueType = jsonCollectInfoMutableTreeNode.getValueType();
+                JsonTreeNodeType valueType = jsonCollectInfoMutableTreeNode.getValueType();
 
                 String squareBracketsStart = "";
                 String nodeTypeStr = "";
@@ -367,8 +372,8 @@ public class JsonStructureDialog extends DialogWrapper {
                     }
                 }
 
-                if (!Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType)) {
-                    append(Objects.equals(JsonTreeNodeTypeEnum.JSONObjectKey, nodeValueType) ? text + ": " : text, simpleTextAttributes);
+                if (!Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)) {
+                    append(Objects.equals(JsonTreeNodeType.JSONObjectKey, nodeValueType) ? text + ": " : text, simpleTextAttributes);
                 }
 
                 if (StrUtil.isNotBlank(squareBracketsStart)) append(squareBracketsStart, lightAttributes, false);
@@ -391,7 +396,7 @@ public class JsonStructureDialog extends DialogWrapper {
                         attributes = stringColorAttributes;
                     }
 
-                    append(jsonValue, attributes, Objects.equals(JsonTreeNodeTypeEnum.JSONArrayEl, nodeValueType));
+                    append(jsonValue, attributes, Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType));
                 }
 
                 setIcon(icon);
