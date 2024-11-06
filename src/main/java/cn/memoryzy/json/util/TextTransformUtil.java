@@ -123,9 +123,14 @@ public class TextTransformUtil {
     }
 
     public static void copyToClipboardAndShowNotification(Project project, String processedText) {
-        PlatformUtil.setClipboard(processedText);
-        Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
+        copyToClipboardAndShowNotification(project, processedText, JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"));
     }
+
+    public static void copyToClipboardAndShowNotification(Project project, String processedText, String message) {
+        PlatformUtil.setClipboard(processedText);
+        Notifications.showNotification(message, NotificationType.INFORMATION, project);
+    }
+
 
     /**
      * 去除选中

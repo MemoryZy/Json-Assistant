@@ -46,9 +46,6 @@ import java.util.Objects;
  */
 public class UIManager implements Disposable {
 
-    private UIManager() {
-    }
-
     public static UIManager getInstance() {
         return new UIManager();
     }
@@ -135,7 +132,7 @@ public class UIManager implements Disposable {
         });
     }
 
-    @SuppressWarnings("DuplicatedCode")
+    @SuppressWarnings({"DuplicatedCode", "deprecation"})
     public static void updateListColorsScheme(JList<?> list) {
         EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
         Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), new JBColor(UIUtil::getListForeground));
@@ -148,7 +145,7 @@ public class UIManager implements Disposable {
         editor.setColorsScheme(EditorColorsManager.getInstance().getGlobalScheme());
     }
 
-    @SuppressWarnings("DuplicatedCode")
+    @SuppressWarnings({"DuplicatedCode", "deprecation"})
     public static void updateEditorTextFieldColorsScheme(EditorTextField editorTextField) {
         EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
         Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), new JBColor(UIUtil::getTextFieldForeground));

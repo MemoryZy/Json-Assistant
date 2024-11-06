@@ -29,6 +29,7 @@ public class CopyValueAction extends DumbAwareAction {
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
@@ -36,14 +37,14 @@ public class CopyValueAction extends DumbAwareAction {
             for (TreePath path : paths) {
                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
                 // 获取value值，多个的话用其他处理方式
-                Object correspondingValue = node.getCorrespondingValue();
+                Object value = node.getValue();
                 JsonTreeNodeType nodeValueType = node.getValueType();
                 // 只有JSONArrayEl是没有Value的
                 if (Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)
                         || Objects.equals(JsonTreeNodeType.JSONObjectKey, nodeValueType)) {
-                    valueList.add(Objects.nonNull(correspondingValue) ? correspondingValue.toString() : "null");
+                    valueList.add(Objects.nonNull(value) ? value.toString() : "null");
                 } else {
-                    JSON json = (JSON) correspondingValue;
+                    JSON json = (JSON) value;
                     String item;
                     if (Objects.nonNull(json)) {
                         try {

@@ -52,7 +52,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
 
         if (Objects.nonNull(virtualFileWrapper)) {
             String text = StrUtil.trim(editor.getDocument().getText());
-            String jsonStr = (JsonUtil.isJsonStr(text)) ? text : JsonUtil.extractJsonStr(text);
+            String jsonStr = JsonUtil.ensureJson(text);
 
             File file = virtualFileWrapper.getFile();
             FileUtil.writeUtf8String(jsonStr, file);

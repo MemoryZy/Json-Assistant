@@ -119,7 +119,7 @@ public class JsonPathComponentProvider {
 
     public void handleJsonPathResult(String jsonStr) {
         String jsonPath = getPathExpression();
-        if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr) || !JsonUtil.isJsonStr(jsonStr)) {
+        if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr) || !JsonUtil.isJson(jsonStr)) {
             return;
         }
 

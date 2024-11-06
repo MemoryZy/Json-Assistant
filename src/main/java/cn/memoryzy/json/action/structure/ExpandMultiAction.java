@@ -37,7 +37,11 @@ public class ExpandMultiAction extends DumbAwareAction {
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        boolean enabled = false;
+        event.getPresentation().setEnabledAndVisible(isEnabled(tree));
+    }
+
+
+    public static boolean isEnabled(Tree tree) {
         TreePath[] paths = tree.getSelectionPaths();
         if (ArrayUtil.isNotEmpty(paths)) {
             for (TreePath path : paths) {
@@ -46,10 +50,10 @@ public class ExpandMultiAction extends DumbAwareAction {
                 if (Objects.equals(nodeValueType, JsonTreeNodeType.JSONObject)
                         || Objects.equals(nodeValueType, JsonTreeNodeType.JSONArray)
                         || Objects.equals(nodeValueType, JsonTreeNodeType.JSONObjectEl))
-                    enabled = true;
+                    return true;
             }
         }
 
-        event.getPresentation().setEnabledAndVisible(enabled);
+        return false;
     }
 }
