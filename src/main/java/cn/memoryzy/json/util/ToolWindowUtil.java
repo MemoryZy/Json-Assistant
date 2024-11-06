@@ -4,6 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.component.ToolWindowPanel;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
@@ -12,10 +14,14 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.openapi.wm.impl.content.BaseLabel;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
+import com.intellij.util.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.Objects;
 
 /**
@@ -141,5 +147,41 @@ public class ToolWindowUtil {
         return content;
     }
 
+    /**
+     * 通过当前处于焦点的组件获取选项卡对象，若未找到，则返回当前选定的选项卡
+     *
+     * @param dataContext 数据上下文
+     * @return 选项卡对象
+     */
+    public static Content getContextContent(@NotNull DataContext dataContext, @NotNull ToolWindow toolWindow) {
+        Content selectedContent = getContextContent(dataContext);
+        if (selectedContent == null) {
+            selectedContent = toolWindow.getContentManager().getSelectedContent();
+        }
+        return selectedContent;
+    }
+
+    /**
+     * 通过当前处于焦点的组件获取选项卡对象
+     *
+     * @param dataContext 数据上下文
+     * @return 选项卡对象
+     */
+    public static Content getContextContent(@NotNull DataContext dataContext) {
+        BaseLabel baseLabel = ObjectUtils.tryCast(dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT), BaseLabel.class);
+        return baseLabel != null ? baseLabel.getContent() : null;
+    }
+
+    public static JComponent getPrimaryComponentFromToolWindow(ToolWindow toolWindow) {
+        if (Objects.nonNull(toolWindow)) {
+            ContentManager contentManager = toolWindow.getContentManager();
+            Content content = contentManager.getContent(0);
+            if (Objects.nonNull(content)) {
+                return content.getComponent();
+            }
+        }
+
+        return null;
+    }
 
 }

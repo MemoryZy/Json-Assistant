@@ -161,7 +161,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JSONObject jsonObject;
 
         // 解析Json
-        if (!JsonUtil.isJsonStr(jsonText)) {
+        if (!JsonUtil.isJson(jsonText)) {
             jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
             return false;
         }
@@ -400,7 +400,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
             String json = jsonTextField.getText();
-            getOKAction().setEnabled(JsonUtil.isJsonStr(json));
+            getOKAction().setEnabled(JsonUtil.isJson(json));
         }
     }
 

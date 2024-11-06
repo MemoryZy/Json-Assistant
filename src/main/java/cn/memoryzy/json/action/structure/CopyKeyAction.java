@@ -48,17 +48,19 @@ public class CopyKeyAction extends DumbAwareAction {
 
     @Override
     public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabledAndVisible(isVisible(tree));
+    }
+
+    public static boolean isVisible(Tree tree) {
         TreePath[] paths = tree.getSelectionPaths();
-        boolean visible = true;
         if (Objects.nonNull(paths) && paths.length == 1) {
             TreePath path = paths[0];
             JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
             JsonTreeNodeType nodeValueType = node.getValueType();
-            if (Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)) {
-                visible = false;
-            }
+            return !Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType);
         }
 
-        event.getPresentation().setEnabledAndVisible(visible);
+        return true;
     }
+
 }

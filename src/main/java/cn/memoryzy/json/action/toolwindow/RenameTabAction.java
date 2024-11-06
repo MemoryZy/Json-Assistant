@@ -3,8 +3,12 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -18,12 +22,10 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.content.Content;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.StartupUiUtil;
 import com.intellij.util.ui.SwingHelper;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -114,23 +116,11 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
             return;
         }
 
-        Content content = getContextContent(event.getDataContext());
+        Content content = ToolWindowUtil.getContextContent(event.getDataContext());
         event.getPresentation().setEnabledAndVisible(project != null
                 && Objects.equals(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, toolWindow.getId())
                 && content != null);
     }
 
-    @Nullable
-    private static Content getContextContent(@NotNull DataContext dataContext, @NotNull ToolWindow toolWindow) {
-        Content selectedContent = getContextContent(dataContext);
-        if (selectedContent == null) {
-            selectedContent = toolWindow.getContentManager().getSelectedContent();
-        }
-        return selectedContent;
-    }
 
-    private static Content getContextContent(@NotNull DataContext dataContext) {
-        BaseLabel baseLabel = ObjectUtils.tryCast(dataContext.getData(PlatformDataKeys.CONTEXT_COMPONENT), BaseLabel.class);
-        return baseLabel != null ? baseLabel.getContent() : null;
-    }
 }

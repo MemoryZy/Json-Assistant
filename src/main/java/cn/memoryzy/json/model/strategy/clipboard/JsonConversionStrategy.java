@@ -1,6 +1,5 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.JsonUtil;
 
@@ -14,17 +13,12 @@ public class JsonConversionStrategy implements ClipboardTextConversionStrategy {
 
     @Override
     public boolean canConvert(String text) {
-        return JsonUtil.isJsonStr(text) || StrUtil.isNotBlank(JsonUtil.extractJsonStr(text));
+        return JsonUtil.canResolveToJson(text);
     }
 
     @Override
     public String convertToJson(String text) {
-        if (JsonUtil.isJsonStr(text)) {
-            return text;
-        }
-
-        text = JsonUtil.extractJsonStr(text);
-        return StrUtil.isNotBlank(text) ? text : null;
+        return JsonUtil.ensureJson(text);
     }
 
 }

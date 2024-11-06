@@ -30,6 +30,7 @@ public class CopyKeyValueAction extends DumbAwareAction {
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
@@ -37,7 +38,7 @@ public class CopyKeyValueAction extends DumbAwareAction {
             for (TreePath path : paths) {
                 JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
                 // 获取value值，多个的话用其他处理方式
-                Object correspondingValue = node.getCorrespondingValue();
+                Object value = node.getValue();
                 JsonTreeNodeType nodeValueType = node.getValueType();
 
                 String userObject = node.getUserObject().toString();
@@ -45,9 +46,9 @@ public class CopyKeyValueAction extends DumbAwareAction {
                 if (Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)) {
                     valueList.add(userObject);
                 } else if (Objects.equals(JsonTreeNodeType.JSONObjectKey, nodeValueType)) {
-                    valueList.add(userObject + ": " + (Objects.nonNull(correspondingValue) ? correspondingValue.toString() : "null"));
+                    valueList.add(userObject + ": " + (Objects.nonNull(value) ? value.toString() : "null"));
                 } else {
-                    JSON json = (JSON) correspondingValue;
+                    JSON json = (JSON) value;
                     String item;
                     if (Objects.nonNull(json)) {
                         try {
@@ -69,17 +70,6 @@ public class CopyKeyValueAction extends DumbAwareAction {
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        TreePath[] paths = tree.getSelectionPaths();
-        boolean visible = true;
-        if (Objects.nonNull(paths) && paths.length == 1) {
-            TreePath path = paths[0];
-            JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
-            JsonTreeNodeType nodeValueType = node.getValueType();
-            if (Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)) {
-                visible = false;
-            }
-        }
-
-        event.getPresentation().setEnabledAndVisible(visible);
+        event.getPresentation().setEnabledAndVisible(CopyKeyAction.isVisible(tree));
     }
 }

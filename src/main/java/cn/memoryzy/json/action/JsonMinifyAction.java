@@ -6,7 +6,6 @@ import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
  * @since 2024/6/21
  */
 public class JsonMinifyAction extends DumbAwareAction {
-    private static final Logger LOG = Logger.getInstance(JsonMinifyAction.class);
 
     public JsonMinifyAction() {
         super();

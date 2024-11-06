@@ -3,12 +3,14 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.util.*;
-import com.intellij.notification.NotificationType;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.PsiUtil;
+import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.ConstantExpressionEvaluator;
 import com.intellij.psi.impl.LanguageConstantExpressionEvaluator;
@@ -38,41 +40,23 @@ public class JavaConstantExtractToJsonAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        Project project = getEventProject(event);
-        // 不做方法返回值的处理
-        PsiElement element = PlatformUtil.getPsiElementByOffset(event.getDataContext());
-        PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
-        PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
-
-        String jsonStr = null;
-        if (null != psiField) {
-            String canonicalText = psiField.getType().getCanonicalText();
-            if (String.class.getName().equals(canonicalText)) {
-                jsonStr = computeConstantExpression(psiField);
-            }
-        } else if (null != localVariable) {
-            String canonicalText = localVariable.getType().getCanonicalText();
-            if (String.class.getName().equals(canonicalText)) {
-                jsonStr = computeConstantExpression(localVariable);
-            }
-        }
-
-        if (StrUtil.isBlank(jsonStr)) return;
-        if (!JsonUtil.isJsonStr(jsonStr)) return;
-
-        try {
-            ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, jsonStr, FileTypeHolder.JSON);
-        } catch (Exception ex) {
-            PlatformUtil.setClipboard(jsonStr);
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"), NotificationType.INFORMATION, project);
-        }
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), computeJson(event.getDataContext()), FileTypeHolder.JSON);
     }
 
     @Override
     @SuppressWarnings("DuplicatedCode")
     public void update(@NotNull AnActionEvent event) {
-        Project project = getEventProject(event);
-        PsiElement element = PlatformUtil.getPsiElementByOffset(event.getDataContext());
+        String json = computeJson(event.getDataContext());
+        event.getPresentation().setEnabledAndVisible(
+                getEventProject(event) != null
+                        && StrUtil.isNotBlank(json)
+                        && JsonUtil.isJson(json));
+    }
+
+
+    private String computeJson(DataContext dataContext) {
+        // 不做方法返回值的处理
+        PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
 
@@ -89,7 +73,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
             }
         }
 
-        event.getPresentation().setEnabledAndVisible(project != null && StrUtil.isNotBlank(jsonStr) && JsonUtil.isJsonStr(jsonStr));
+        return jsonStr;
     }
 
 

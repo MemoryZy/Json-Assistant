@@ -27,7 +27,7 @@ public class JsonUtil {
 
     public static final JSONConfig HUTOOL_JSON_CONFIG = JSONConfig.create().setStripTrailingZeros(false).setIgnoreNullValue(false);
 
-    public static boolean isJsonStr(String text) {
+    public static boolean isJson(String text) {
         try {
             JSONUtil.parse(text);
             JsonNode jsonNode = MAPPER.readTree(text);
@@ -72,7 +72,7 @@ public class JsonUtil {
         return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
     }
 
-    public static String toJsonStr(Object obj) {
+    public static String toJson(Object obj) {
         try {
             return MAPPER.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
@@ -89,6 +89,30 @@ public class JsonUtil {
         }
     }
 
+
+    /**
+     * 判断文本是否为 JSON，如果不是，那就尝试从文本中提取 JSON
+     * <p>如果给定的文本或提取的文本不是有效的 JSON，则返回 null</p>
+     *
+     * @param text 文本
+     * @return JSON字符串
+     */
+    public static String ensureJson(String text) {
+        return isJson(text) ? text : extractJson(text);
+    }
+
+
+    /**
+     * 判断是否能解析为 JSON
+     *
+     * @param text 文本
+     * @return 解析成功为 true，反之为 false
+     */
+    public static boolean canResolveToJson(String text) {
+        return isJson(text) || StrUtil.isNotBlank(extractJson(text));
+    }
+
+
     /**
      * 从给定的字符串中提取JSON字符串
      *
@@ -96,7 +120,7 @@ public class JsonUtil {
      * @return 提取的JSON字符串，如果给定的字符串为空或null，则返回空字符串
      */
     @SuppressWarnings("deprecation")
-    public static String extractJsonStr(String includeJsonStr) {
+    public static String extractJson(String includeJsonStr) {
         if (StrUtil.isBlank(includeJsonStr)) {
             return "";
         }
@@ -104,7 +128,7 @@ public class JsonUtil {
         try {
             // 转义判断
             String json = StringEscapeUtils.unescapeJson(includeJsonStr);
-            if (isJsonStr(json)) {
+            if (isJson(json)) {
                 return json;
             }
 
@@ -115,7 +139,7 @@ public class JsonUtil {
 
             json = extractJsonString(includeJsonStr);
             // 判断是否是JSON字符串
-            return isJsonStr(json) ? json : "";
+            return isJson(json) ? json : "";
         } catch (Exception e) {
             return "";
         }
@@ -141,7 +165,7 @@ public class JsonUtil {
         while (matcher.find()) {
             // 捕获整个匹配项
             String jsonString = matcher.group();
-            if (isJsonStr(jsonString)) {
+            if (isJson(jsonString)) {
                 jsonStrings.add(StrUtil.trim(jsonString));
             }
         }

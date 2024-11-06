@@ -32,9 +32,12 @@ public class JsonEscapeAction extends DumbAwareAction {
     @SuppressWarnings("deprecation")
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
-        String escapeJson = StringEscapeUtils.escapeJson(GlobalJsonConverter.parseJson(dataContext, PlatformUtil.getEditor(dataContext)));
+        String escapeJson = StringEscapeUtils.escapeJson(
+                GlobalJsonConverter.parseJson(dataContext, PlatformUtil.getEditor(dataContext)));
+        // 不对换行符进行转义，保留原本格式
+        String recoverEscapeJson = escapeJson.replace("\\n", "\n");
         TextTransformUtil.copyToClipboardAndShowNotification(getEventProject(event), escapeJson);
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), escapeJson, PlainTextFileType.INSTANCE);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), recoverEscapeJson, PlainTextFileType.INSTANCE);
     }
 
 }

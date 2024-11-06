@@ -39,13 +39,13 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
 
     @Override
     public boolean canConvert(String text) {
-        return JsonUtil.isJsonStr(text) || StrUtil.isNotBlank(extractJson(text));
+        return JsonUtil.isJson(text) || StrUtil.isNotBlank(extractJson(text));
     }
 
     @Override
     public String convertToJson() {
         String contentStr = getContent();
-        if (JsonUtil.isJsonStr(contentStr)) {
+        if (JsonUtil.isJson(contentStr)) {
             return contentStr;
         }
 
@@ -85,11 +85,11 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
 
             // 全部文本未超过 300 行，或者文件类型是指定类型，则解析提取 JSON
             if (lineCount < 300 || JsonAssistantUtil.isJsonFileType(fileType)) {
-                return JsonUtil.extractJsonStr(documentText);
+                return JsonUtil.extractJson(documentText);
             }
         }
 
-        return JsonUtil.extractJsonStr(text);
+        return JsonUtil.extractJson(text);
     }
 
 }

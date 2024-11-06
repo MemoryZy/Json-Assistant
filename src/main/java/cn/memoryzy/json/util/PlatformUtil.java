@@ -22,17 +22,13 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.ui.content.Content;
-import com.intellij.ui.content.ContentManager;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
 
 import javax.annotation.Nullable;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -184,17 +180,7 @@ public class PlatformUtil {
         return language;
     }
 
-    public static JComponent getMainComponentWithOpenToolWindow(ToolWindow toolWindow) {
-        if (Objects.nonNull(toolWindow)) {
-            ContentManager contentManager = toolWindow.getContentManager();
-            Content content = contentManager.getContent(0);
-            if (Objects.nonNull(content)) {
-                return content.getComponent();
-            }
-        }
 
-        return null;
-    }
 
     public static FileType getDocumentFileType(Project project, Document document) {
         if (project == null || null == document) return null;

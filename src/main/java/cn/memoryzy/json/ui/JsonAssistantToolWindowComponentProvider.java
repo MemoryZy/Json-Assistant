@@ -197,7 +197,7 @@ public class JsonAssistantToolWindowComponentProvider {
         String text = StrUtil.trim(editor.getDocument().getText());
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (JsonUtil.isJsonStr(text)) {
+            if (JsonUtil.isJson(text)) {
                 // 无元素，不添加
                 if (JsonUtil.isJsonArray(text)) {
                     JSONArray jsonArray = JSONUtil.parseArray(text);

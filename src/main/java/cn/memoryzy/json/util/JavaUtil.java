@@ -169,54 +169,48 @@ public class JavaUtil {
             PsiAnnotation fastJsonField2Annotation = psiField.getAnnotation(JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue());
 
             if (Objects.nonNull(fastJsonField2Annotation)) {
-                // 获取 @JsonField 中的格式
-                String format = StrUtil.trim(getMemberValue(fastJsonField2Annotation, "format"));
-                // format不为空，表示声明了属性
-                if (StrUtil.isNotBlank(format)) {
-                    try {
-                        String formatted = DateUtil.format(new Date(), format);
-                        // 防止 pattern 中出现 纯数字的情况
-                        if (!Objects.equals(format, formatted)) {
-                            return formatted;
-                        }
-                    } catch (Exception ignored) {
-                    }
-
-                    return DateUtil.now();
-                }
-
-                // defaultValue
-                String defaultValue = getMemberValue(fastJsonField2Annotation, "defaultValue");
-                if (StrUtil.isNotBlank(defaultValue)) {
-                    return defaultValue;
+                Object result = resolveFastJsonAnnotation(fastJsonField2Annotation);
+                if (Objects.nonNull(result)) {
+                    return result;
                 }
             }
 
             if (Objects.nonNull(fastJsonFieldAnnotation)) {
-                // 获取 @JsonFormat 中的格式
-                String format = StrUtil.trim(getMemberValue(fastJsonFieldAnnotation, "format"));
-                if (StrUtil.isNotBlank(format)) {
-                    try {
-                        String formatted = DateUtil.format(new Date(), format);
-                        // 防止 pattern 中出现 纯数字的情况
-                        if (!Objects.equals(format, formatted)) {
-                            return formatted;
-                        }
-                    } catch (Exception ignored) {
-                    }
-
-                    return DateUtil.now();
-                }
-
-                // defaultValue
-                String defaultValue = getMemberValue(fastJsonFieldAnnotation, "defaultValue");
-                if (StrUtil.isNotBlank(defaultValue)) {
-                    return defaultValue;
+                Object result = resolveFastJsonAnnotation(fastJsonFieldAnnotation);
+                if (Objects.nonNull(result)) {
+                    return result;
                 }
             }
         }
 
         return getDefaultValue(psiType, persistentState.includeRandomValues);
+    }
+
+
+    public static Object resolveFastJsonAnnotation(PsiAnnotation psiAnnotation) {
+        // 获取 @JsonField 中的格式
+        String format = StrUtil.trim(getMemberValue(psiAnnotation, "format"));
+        // format不为空，表示声明了属性
+        if (StrUtil.isNotBlank(format)) {
+            try {
+                String formatted = DateUtil.format(new Date(), format);
+                // 防止 pattern 中出现 纯数字的情况
+                if (!Objects.equals(format, formatted)) {
+                    return formatted;
+                }
+            } catch (Exception ignored) {
+            }
+
+            return DateUtil.now();
+        }
+
+        // defaultValue
+        String defaultValue = getMemberValue(psiAnnotation, "defaultValue");
+        if (StrUtil.isNotBlank(defaultValue)) {
+            return defaultValue;
+        }
+
+        return null;
     }
 
 

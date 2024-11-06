@@ -11,7 +11,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  */
 public class JsonCollectInfoMutableTreeNode extends DefaultMutableTreeNode {
 
-    private Object correspondingValue;
+    private Object value;
     private JsonTreeNodeType valueType;
     private Integer size;
 
@@ -19,19 +19,19 @@ public class JsonCollectInfoMutableTreeNode extends DefaultMutableTreeNode {
         super(userObject);
     }
 
-    public JsonCollectInfoMutableTreeNode(Object userObject, Object correspondingValue, JsonTreeNodeType valueType, Integer size) {
+    public JsonCollectInfoMutableTreeNode(Object userObject, Object value, JsonTreeNodeType valueType, Integer size) {
         super(userObject);
-        this.correspondingValue = correspondingValue;
+        this.value = value;
         this.valueType = valueType;
         this.size = size;
     }
 
-    public Object getCorrespondingValue() {
-        return correspondingValue;
+    public Object getValue() {
+        return value;
     }
 
-    public JsonCollectInfoMutableTreeNode setCorrespondingValue(Object correspondingValue) {
-        this.correspondingValue = correspondingValue;
+    public JsonCollectInfoMutableTreeNode setValue(Object value) {
+        this.value = value;
         return this;
     }
 
@@ -63,7 +63,7 @@ public class JsonCollectInfoMutableTreeNode extends DefaultMutableTreeNode {
             return getUserObject().toString();
         } else {
             // key-value
-            return getUserObject().toString() + ":" + correspondingValue;
+            return getUserObject().toString() + ":" + value;
         }
     }
 }
