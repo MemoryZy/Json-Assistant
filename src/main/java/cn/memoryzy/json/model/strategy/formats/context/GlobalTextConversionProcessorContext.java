@@ -5,6 +5,7 @@ import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.data.DocTextData;
 import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.data.SelectionData;
+import cn.memoryzy.json.model.strategy.formats.Json5ConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.JsonConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.TomlConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.UrlParamConversionProcessor;
@@ -136,7 +137,8 @@ public class GlobalTextConversionProcessorContext {
      */
     public static JsonConversionProcessor[] getJsonProcessors(DataContext dataContext, EditorData editorData, boolean needBeautify) {
         return new JsonConversionProcessor[]{
-                new JsonConversionProcessor(dataContext, editorData, needBeautify)
+                new JsonConversionProcessor(dataContext, editorData, needBeautify),
+                new Json5ConversionProcessor(editorData, needBeautify)
                 // 待添加其他格式，例如 JSON5
         };
     }

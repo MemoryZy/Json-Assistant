@@ -65,7 +65,7 @@ public class JsonHistoryChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON, project, "", true);
+        showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         showTextField.setFont(UIManager.consolasFont(14));
 
         showList = new JBList<>(fillHistoryListModel());

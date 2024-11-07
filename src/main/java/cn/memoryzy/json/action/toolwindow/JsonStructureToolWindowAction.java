@@ -37,7 +37,7 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalJsonConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorAllJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 

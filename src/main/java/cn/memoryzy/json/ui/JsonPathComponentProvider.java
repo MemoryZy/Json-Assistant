@@ -11,6 +11,7 @@ import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -59,7 +60,7 @@ public class JsonPathComponentProvider {
         this.project = project;
         this.action = () -> handleJsonPathResult(editor.getDocument().getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
-        this.showTextEditor = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
+        this.showTextEditor = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         this.showTextEditor.setFont(UIManager.consolasFont(14));
     }
 
@@ -119,11 +120,16 @@ public class JsonPathComponentProvider {
 
     public void handleJsonPathResult(String jsonStr) {
         String jsonPath = getPathExpression();
-        if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr) || !JsonUtil.isJson(jsonStr)) {
+        if (Objects.isNull(jsonPath)
+                || StrUtil.isBlank(jsonStr)
+                || !JsonUtil.isJson(jsonStr)
+                || !Json5Util.isJson5(jsonStr)) {
             return;
         }
 
         try {
+            // todo 如果是json5的话，先把json5转为json再执行
+
             Object result = JsonPath.read(jsonStr, jsonPath);
             String jsonResult;
             if (result instanceof Map || result instanceof Iterable) {

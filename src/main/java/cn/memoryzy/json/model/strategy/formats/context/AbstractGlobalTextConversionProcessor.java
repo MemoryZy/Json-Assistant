@@ -92,10 +92,10 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
     }
 
     /**
-     * 构建文件类型所代表的类型，默认 JSON 类型
+     * 构建文件类型所代表的类型，默认 JSON5 类型（JSON5类型亦支持普通JSON）
      */
     protected FileTypeData createFileTypeData() {
-        return new FileTypeData().setProcessedFileType(FileTypeHolder.JSON);
+        return new FileTypeData().setProcessedFileType(FileTypeHolder.JSON5);
     }
 
 

@@ -153,13 +153,16 @@ public class PlatformUtil {
     }
 
     public static FileType getFileType(FileTypes fileTypes) {
-        FileType fileType = PlainTextFileType.INSTANCE;
+        return getFileType(fileTypes, PlainTextFileType.INSTANCE);
+    }
+
+    public static FileType getFileType(FileTypes fileTypes, FileType fileType) {
         Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getFileTypeQualifiedName());
 
         if (clz != null) {
             Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypes.getFileTypeInstanceFieldName());
             if (instance instanceof FileType) {
-                fileType = (FileType) instance;
+                return (FileType) instance;
             }
         }
 
@@ -167,19 +170,21 @@ public class PlatformUtil {
     }
 
     public static Language getLanguage(FileTypes fileTypes) {
-        Language language = PlainTextLanguage.INSTANCE;
+        return getLanguage(fileTypes, PlainTextLanguage.INSTANCE);
+    }
+
+    public static Language getLanguage(FileTypes fileTypes, Language language) {
         Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getLanguageQualifiedName());
 
         if (clz != null) {
             Object instance = JsonAssistantUtil.readStaticFinalFieldValue(clz, fileTypes.getLanguageInstanceFieldName());
             if (instance instanceof Language) {
-                language = (Language) instance;
+                return (Language) instance;
             }
         }
 
         return language;
     }
-
 
 
     public static FileType getDocumentFileType(Project project, Document document) {

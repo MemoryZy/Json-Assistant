@@ -85,7 +85,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
-        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
+        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
@@ -158,28 +158,8 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return false;
         }
 
-        JSONObject jsonObject;
-
         // 解析Json
-        if (!JsonUtil.isJson(jsonText)) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
-            return false;
-        }
-
-        if (JsonUtil.isJsonArray(jsonText)) {
-            JSONArray jsonArray = JSONUtil.parseArray(jsonText);
-            // 数组为空
-            if (jsonArray.isEmpty()) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
-                return false;
-            }
-
-            jsonObject = jsonArray.getJSONObject(0);
-        } else if (JsonUtil.isJsonObject(jsonText)) {
-            jsonObject = JSONUtil.parseObj(jsonText);
-        } else {
-            jsonObject = null;
-        }
+        JSONObject jsonObject = resolveJson(jsonText);
 
         // 属性为空
         if (Objects.isNull(jsonObject) || jsonObject.isEmpty()) {
@@ -219,6 +199,60 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return true;
     }
 
+    private JSONObject resolveJson(String jsonText) {
+        // 解析Json及Json5
+        if (!JsonUtil.isJson(jsonText) && !Json5Util.isJson5(jsonText)) {
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+            return null;
+        }
+
+        // ----------------- 普通Json解析
+        if (JsonUtil.isJsonArray(jsonText)) {
+            JSONArray jsonArray = JSONUtil.parseArray(jsonText);
+            // 数组为空
+            if (jsonArray.isEmpty()) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
+            if (jsonArray.stream().anyMatch(el -> !(el instanceof Map))) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            return jsonArray.getJSONObject(0);
+        } else if (JsonUtil.isJsonObject(jsonText)) {
+            return JSONUtil.parseObj(jsonText);
+        }
+
+
+        // ----------------- Json5解析
+        if (Json5Util.isJson5Array(jsonText)) {
+            List<Object> list = Json5Util.toList(jsonText);
+            if (CollUtil.isEmpty(list)) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
+            if (list.stream().anyMatch(el -> !(el instanceof Map))) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            // 如果有值是Double类型，且值为Infinite或NaN，那么在JsonObject中无法识别，需要特殊处理
+            Json5Util.cleanMapList(list);
+            // 转为JsonObject
+            return new JSONObject(list.get(0));
+        } else if (Json5Util.isJson5Object(jsonText)) {
+            Map<String, Object> map = Json5Util.toMap(jsonText);
+            Json5Util.cleanMap(Objects.requireNonNull(map));
+            return new JSONObject(map);
+        }
+
+        return null;
+    }
 
     private void recursionAddProperty(JSONObject jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
         // 循环所有Json字段
@@ -400,7 +434,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
             String json = jsonTextField.getText();
-            getOKAction().setEnabled(JsonUtil.isJson(json));
+            getOKAction().setEnabled(JsonUtil.isJson(json) || Json5Util.isJson5(json));
         }
     }
 

@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -13,6 +14,7 @@ import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversion
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.ToolWindowPanel;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -45,6 +47,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -205,6 +209,16 @@ public class JsonAssistantToolWindowComponentProvider {
                 } else if (JsonUtil.isJsonObject(text)) {
                     JSONObject jsonObject = JSONUtil.parseObj(text);
                     if (jsonObject.isEmpty()) return;
+                }
+
+                historyList.add(text);
+            } else if (Json5Util.isJson5(text)) {
+                if (Json5Util.isJson5Array(text)) {
+                    List<Object> list = Json5Util.toList(text);
+                    if (CollUtil.isEmpty(list)) return;
+                } else if (Json5Util.isJson5Object(text)) {
+                    Map<String, Object> map = Json5Util.toMap(text);
+                    if (MapUtil.isEmpty(map)) return;
                 }
 
                 historyList.add(text);

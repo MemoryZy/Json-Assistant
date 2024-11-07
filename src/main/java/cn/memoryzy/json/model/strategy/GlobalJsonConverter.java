@@ -2,6 +2,7 @@ package cn.memoryzy.json.model.strategy;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.Json5ConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.JsonConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
@@ -85,6 +86,40 @@ public class GlobalJsonConverter {
 
 
     /**
+     * 解析文本并验证是否为 JSON/JSON5（从选中文本或全局文本中选取）
+     *
+     * @param project     项目
+     * @param editor      编辑器
+     * @param dataContext 上下文
+     * @return 若为 JSON 则为true；反之为 false
+     */
+    public static boolean validateEditorAllJson(Project project, Editor editor, @NotNull DataContext dataContext) {
+        if (project == null || editor == null) return false;
+        EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        if (editorData == null) return false;
+
+        JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyJsonProcessors(dataContext, editorData);
+        return GlobalTextConverter.validateEditorText(new GlobalTextConversionProcessorContext(), processors);
+    }
+
+    /**
+     * 解析文本并验证是否为 JSON5（从选中文本或全局文本中选取）
+     *
+     * @param project     项目
+     * @param editor      编辑器
+     * @return 若为 JSON5 则为true；反之为 false
+     */
+    public static boolean validateEditorJson5(Project project, Editor editor) {
+        if (project == null || editor == null) return false;
+        EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        if (editorData == null) return false;
+
+        JsonConversionProcessor[] processors = {new Json5ConversionProcessor(editorData, true)};
+        return GlobalTextConverter.validateEditorText(new GlobalTextConversionProcessorContext(), processors);
+    }
+
+
+    /**
      * 解析文本并验证是否为 JSON（从选中文本或全局文本中选取）
      *
      * @param project     项目
@@ -97,7 +132,7 @@ public class GlobalJsonConverter {
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
         if (editorData == null) return false;
 
-        JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyJsonProcessors(dataContext, editorData);
+        JsonConversionProcessor[] processors = {new JsonConversionProcessor(dataContext, editorData, true)};
         return GlobalTextConverter.validateEditorText(new GlobalTextConversionProcessorContext(), processors);
     }
 

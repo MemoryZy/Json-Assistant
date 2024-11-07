@@ -33,6 +33,8 @@ public class LimitedList extends AbstractList<String> {
 
     @Override
     public boolean add(String element) {
+        // TODO 判断为JSON还是JSON5
+
         if (!isContains(element)) {
             history.add(0, element);
             if (history.size() > limit) {

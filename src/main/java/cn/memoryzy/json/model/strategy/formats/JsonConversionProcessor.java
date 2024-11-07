@@ -26,15 +26,15 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
 
     private DataContext dataContext;
 
-    public JsonConversionProcessor(EditorData editorData, boolean needBeautify) {
+    protected JsonConversionProcessor(EditorData editorData, boolean needBeautify) {
         super(editorData, needBeautify);
+        setAllowedFileTypeQualifiedNames();
     }
 
     public JsonConversionProcessor(DataContext dataContext, EditorData editorData, boolean needBeautify) {
         super(editorData, needBeautify);
         this.dataContext = dataContext;
-        String[] fileTypes = {FileTypes.JSON.getFileTypeQualifiedName(), FileTypes.JSON5.getFileTypeQualifiedName()};
-        getFileTypeData().setAllowedFileTypeQualifiedNames(fileTypes);
+        setAllowedFileTypeQualifiedNames();
     }
 
     @Override
@@ -52,7 +52,6 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
         contentStr = extractJson(contentStr);
         return StrUtil.isNotBlank(contentStr) ? contentStr : null;
     }
-
 
 
     // -------------------------- Private Method -------------------------- //
@@ -90,6 +89,11 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
         }
 
         return JsonUtil.extractJson(text);
+    }
+
+    private void setAllowedFileTypeQualifiedNames() {
+        String[] fileTypes = {FileTypes.JSON.getFileTypeQualifiedName(), FileTypes.JSON5.getFileTypeQualifiedName()};
+        getFileTypeData().setAllowedFileTypeQualifiedNames(fileTypes);
     }
 
 }

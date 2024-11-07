@@ -68,6 +68,8 @@
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
         <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
+        <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
+        <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
 
         <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.action.OtherFormatsToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>

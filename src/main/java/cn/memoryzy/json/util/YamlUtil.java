@@ -16,7 +16,7 @@ public class YamlUtil {
 
     public static boolean isYaml(String text) {
         // yaml.load(text) 也可以解析 Json 格式数据，所以在此先判断是否为 Json
-        if (JsonUtil.canResolveToJson(text)) {
+        if (JsonUtil.canResolveToJson(text) || Json5Util.isJson5(text)) {
             return false;
         }
 

@@ -67,7 +67,7 @@ public class EditInNewWindowAction extends DumbAwareAction {
                 .map(Editor::getDocument)
                 .map(document -> PsiDocumentManager.getInstance(project).getPsiFile(document))
                 .map(PsiFile::getVirtualFile)
-                .orElse(new LightVirtualFile(content.getDisplayName(), FileTypeHolder.JSON, text));
+                .orElse(new LightVirtualFile(content.getDisplayName(), FileTypeHolder.JSON5, text));
     }
 
 

@@ -62,7 +62,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalJsonConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorAllJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 }

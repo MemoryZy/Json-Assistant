@@ -38,7 +38,7 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
         Presentation presentation = event.getPresentation();
         presentation.setVisible(false);
         presentation.setEnabled(
-                GlobalJsonConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorAllJson(
                         getEventProject(event),
                         PlatformUtil.getEditor(dataContext),
                         dataContext));

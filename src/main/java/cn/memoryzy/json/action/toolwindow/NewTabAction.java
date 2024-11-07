@@ -36,6 +36,6 @@ public class NewTabAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        ToolWindowUtil.addNewContent(event.getProject(), toolWindow, contentFactory, FileTypeHolder.JSON);
+        ToolWindowUtil.addNewContent(event.getProject(), toolWindow, contentFactory, FileTypeHolder.JSON5);
     }
 }

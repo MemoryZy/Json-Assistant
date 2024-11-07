@@ -81,7 +81,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
     public void update(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
         event.getPresentation().setEnabledAndVisible(
-                GlobalJsonConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorAllJson(
                         getEventProject(event),
                         PlatformUtil.getEditor(dataContext),
                         dataContext));
