@@ -1,6 +1,14 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 新增 URL Param 转为 JSON 文本。
+- 新增 JSON 转义功能。
+- 用户体验优化与改进。
+- BUG修复。
+- Added URL Param converted to JSON text.
+- Added JSON escape function.
+- User experience optimization and improvement.
+- BUG fixes.
 
 ## [1.6.7] - 2024-10-27
 

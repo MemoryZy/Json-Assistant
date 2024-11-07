@@ -36,11 +36,13 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 - JSON to JavaBean
 - Kotlin Properties to JSON
 - JSON Diff
+- JSON Escape
 - Extracting Java constants to JSON
 - Format Converters
   - JSON <-> XML
   - JSON <-> YAML
   - JSON <-> Toml
+  - JSON <- URL Param
 
 <br/>
 
