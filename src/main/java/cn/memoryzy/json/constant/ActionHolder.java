@@ -18,6 +18,7 @@ public interface ActionHolder {
     String TO_XML_ACTION_ID = "JsonAssistant.Action.ToXmlAction";
     String TO_YAML_ACTION_ID = "JsonAssistant.Action.ToYamlAction";
     String TO_TOML_ACTION_ID = "JsonAssistant.Action.ToTomlAction";
+    String TO_URL_PARAM_ACTION_ID = "JsonAssistant.Action.ToUrlParamAction";
     String JSON_ESCAPE_ACTION_ID = "JsonAssistant.Action.JsonEscapeAction";
 
     AnAction JSON_BEAUTIFY_ACTION = ActionManager.getInstance().getAction(JSON_BEAUTIFY_ACTION_ID);
@@ -29,6 +30,7 @@ public interface ActionHolder {
     AnAction TO_XML_ACTION = ActionManager.getInstance().getAction(TO_XML_ACTION_ID);
     AnAction TO_YAML_ACTION = ActionManager.getInstance().getAction(TO_YAML_ACTION_ID);
     AnAction TO_TOML_ACTION = ActionManager.getInstance().getAction(TO_TOML_ACTION_ID);
+    AnAction TO_URL_PARAM_ACTION = ActionManager.getInstance().getAction(TO_URL_PARAM_ACTION_ID);
     AnAction JSON_ESCAPE_ACTION = ActionManager.getInstance().getAction(JSON_ESCAPE_ACTION_ID);
 
 }

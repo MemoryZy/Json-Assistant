@@ -30,7 +30,7 @@
    - JSON <-> XML
    - JSON <-> YAML
    - JSON <-> Toml
-   - JSON <- URL Param
+   - JSON <-> URL Param
 
 
 <br/>

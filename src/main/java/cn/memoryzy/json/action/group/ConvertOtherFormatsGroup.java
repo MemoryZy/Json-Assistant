@@ -32,7 +32,8 @@ public class ConvertOtherFormatsGroup extends DefaultActionGroup implements Dumb
         return new AnAction[]{
                 ActionHolder.TO_XML_ACTION,
                 ActionHolder.TO_YAML_ACTION,
-                ActionHolder.TO_TOML_ACTION
+                ActionHolder.TO_TOML_ACTION,
+                ActionHolder.TO_URL_PARAM_ACTION
         };
     }
 
