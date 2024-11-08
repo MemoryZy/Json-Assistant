@@ -5,12 +5,11 @@ import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.data.DocTextData;
 import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.data.SelectionData;
-import cn.memoryzy.json.model.strategy.formats.Json5ConversionProcessor;
-import cn.memoryzy.json.model.strategy.formats.JsonConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.TomlConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.UrlParamConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.XmlConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.YamlConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.processor.json.*;
 import com.intellij.openapi.actionSystem.DataContext;
 
 /**
@@ -112,8 +111,11 @@ public class GlobalTextConversionProcessorContext {
      * @param editorData  编辑器信息
      * @return 美化 JSON 处理器列表
      */
-    public static JsonConversionProcessor[] getBeautifyJsonProcessors(DataContext dataContext, EditorData editorData) {
-        return getJsonProcessors(dataContext, editorData, true);
+    public static JsonConversionProcessor[] getBeautifyAllJsonProcessors(DataContext dataContext, EditorData editorData) {
+        return new JsonConversionProcessor[]{
+                JsonBeautifyConversionProcessor.newProcessor(dataContext, editorData),
+                Json5BeautifyConversionProcessor.newProcessor(editorData)
+        };
     }
 
     /**
@@ -123,25 +125,11 @@ public class GlobalTextConversionProcessorContext {
      * @param editorData  编辑器信息
      * @return 压缩 JSON 处理器列表
      */
-    public static JsonConversionProcessor[] getCompressJsonProcessors(DataContext dataContext, EditorData editorData) {
-        return getJsonProcessors(dataContext, editorData, false);
-    }
-
-    /**
-     * 获取通用 JSON 处理器列表
-     *
-     * @param dataContext  数据上下文
-     * @param editorData   编辑器信息
-     * @param needBeautify 是否需要美化
-     * @return 通用 JSON 处理器列表
-     */
-    public static JsonConversionProcessor[] getJsonProcessors(DataContext dataContext, EditorData editorData, boolean needBeautify) {
+    public static JsonConversionProcessor[] getCompressAllJsonProcessors(DataContext dataContext, EditorData editorData) {
         return new JsonConversionProcessor[]{
-                new JsonConversionProcessor(dataContext, editorData, needBeautify),
-                new Json5ConversionProcessor(editorData, needBeautify)
-                // 待添加其他格式，例如 JSON5
+                JsonMinifyConversionProcessor.newProcessor(dataContext, editorData),
+                Json5MinifyConversionProcessor.newProcessor(editorData)
         };
     }
-
 
 }

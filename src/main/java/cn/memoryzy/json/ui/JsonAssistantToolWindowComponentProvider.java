@@ -201,6 +201,7 @@ public class JsonAssistantToolWindowComponentProvider {
         String text = StrUtil.trim(editor.getDocument().getText());
 
         ApplicationManager.getApplication().invokeLater(() -> {
+            boolean isJson = true;
             if (JsonUtil.isJson(text)) {
                 // 无元素，不添加
                 if (JsonUtil.isJsonArray(text)) {
@@ -211,7 +212,6 @@ public class JsonAssistantToolWindowComponentProvider {
                     if (jsonObject.isEmpty()) return;
                 }
 
-                historyList.add(text);
             } else if (Json5Util.isJson5(text)) {
                 if (Json5Util.isJson5Array(text)) {
                     List<Object> list = Json5Util.toList(text);
@@ -221,8 +221,10 @@ public class JsonAssistantToolWindowComponentProvider {
                     if (MapUtil.isEmpty(map)) return;
                 }
 
-                historyList.add(text);
+                isJson = false;
             }
+
+            historyList.add(text, isJson);
         });
     }
 

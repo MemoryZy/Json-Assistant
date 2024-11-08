@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.strategy.formats;
+package cn.memoryzy.json.model.strategy.formats.processor.json;
 
 import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.util.Json5Util;
@@ -25,15 +25,6 @@ public class Json5ConversionProcessor extends JsonConversionProcessor {
 
     @Override
     public String postprocessing(String text) {
-        if (isNeedBeautify()) {
-            // 如果文本中存在\\n，这时格式化会出现问题
-            if (!text.contains("\\n")) {
-                text = Json5Util.formatJson5(text);
-            }
-        } else {
-            text = Json5Util.compressJson5(text);
-        }
-
-        return text;
+        return isNeedBeautify() ? Json5Util.formatJson5(text) : Json5Util.compressJson5(text);
     }
 }

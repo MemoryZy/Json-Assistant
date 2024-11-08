@@ -8,6 +8,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -105,8 +106,12 @@ public class JsonStructureDialog extends DialogWrapper {
     }
 
 
-    public static void show(String text) {
-        new JsonStructureDialog(JSONUtil.parse(JsonUtil.ensureJson(text), JsonUtil.HUTOOL_JSON_CONFIG)).show();
+    public static void show(String text, boolean isJson) {
+        JSON json = isJson
+                ? JSONUtil.parse(JsonUtil.ensureJson(text), JsonUtil.HUTOOL_JSON_CONFIG)
+                : Json5Util.toHuToolJson(text);
+
+        new JsonStructureDialog(json).show();
     }
 
 
@@ -143,6 +148,15 @@ public class JsonStructureDialog extends DialogWrapper {
                     // 若不是对象或数组，则不添加子集，直接同层级
                     if (value instanceof JSONNull) {
                         value = null;
+                    } else if (value instanceof Double) {
+                        // 这里有个需要特殊处理的Double类型，值为Infinite或NaN
+                        if (Objects.equals(Json5Util.POSITIVE_INFINITY, value)) {
+                            value = Double.POSITIVE_INFINITY;
+                        } else if (Objects.equals(Json5Util.NEGATIVE_INFINITY, value)) {
+                            value = Double.NEGATIVE_INFINITY;
+                        } else if (Objects.equals(Json5Util.NAN, value)) {
+                            value = Double.NaN;
+                        }
                     }
 
                     childNode.setValue(value)

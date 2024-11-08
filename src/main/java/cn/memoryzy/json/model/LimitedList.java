@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model;
 
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 
 import java.util.AbstractList;
@@ -31,25 +32,23 @@ public class LimitedList extends AbstractList<String> {
         return history.size();
     }
 
-    @Override
-    public boolean add(String element) {
-        // TODO 判断为JSON还是JSON5
+    public boolean add(String element, boolean isJson) {
+        return addJson(element, isJson);
+    }
 
-        if (!isContains(element)) {
+    private boolean addJson(String element, boolean isJson) {
+        if (!isContains(element, isJson)) {
             history.add(0, element);
             if (history.size() > limit) {
                 history.remove(history.size() - 1);
             }
         } else {
             String first = history.get(0);
-            if (!deserializeThenCompare(first, element)) {
-                deserializeCompareAndRemove(element);
+            if (!deserializeThenCompare(first, element, isJson)) {
+                deserializeCompareAndRemove(element, isJson);
                 history.add(0, element);
             }
         }
-
-        // TODO 要加添加时间的，直接在末尾加上特定的标志，从中提取时间。
-
         return true;
     }
 
@@ -63,10 +62,12 @@ public class LimitedList extends AbstractList<String> {
         return history.remove(index);
     }
 
-    private boolean isContains(String element) {
-        Object addObject = JsonUtil.toBean(element);
+    private boolean isContains(String element, boolean isJson) {
+        // 即便是JSON5，也转为JSON再比较
+        Object addObject = resolveJsonString(element, isJson);
+
         for (String oriElement : history) {
-            Object oriObject = JsonUtil.toBean(oriElement);
+            Object oriObject = resolveJsonString(oriElement, JsonUtil.isJson(oriElement));
             if (Objects.equals(addObject, oriObject)) {
                 return true;
             }
@@ -75,21 +76,27 @@ public class LimitedList extends AbstractList<String> {
         return false;
     }
 
-    private boolean deserializeThenCompare(String jsonStr1, String jsonStr2) {
-        Object object1 = JsonUtil.toBean(jsonStr1);
-        Object object2 = JsonUtil.toBean(jsonStr2);
+    private boolean deserializeThenCompare(String jsonStr1, String jsonStr2, boolean isValidJsonStr2) {
+        Object object1 = resolveJsonString(jsonStr1, JsonUtil.isJson(jsonStr1));
+        Object object2 = resolveJsonString(jsonStr2, isValidJsonStr2);
         return Objects.equals(object1, object2);
     }
 
-    private void deserializeCompareAndRemove(String element) {
-        Object addObject = JsonUtil.toBean(element);
+    private void deserializeCompareAndRemove(String element, boolean isJson) {
+        Object addObject = resolveJsonString(element, isJson);
         for (int i = history.size() - 1; i >= 0; i--) {
-            Object oriObject = JsonUtil.toBean(history.get(i));
+            String text = history.get(i);
+            Object oriObject = resolveJsonString(text, JsonUtil.isJson(text));
             if (Objects.equals(addObject, oriObject)) {
                 history.remove(i);
                 break;
             }
         }
+    }
+
+    private static Object resolveJsonString(String element, boolean isJson) {
+        // 即便是JSON5，也转为JSON再比较
+        return isJson ? JsonUtil.toBean(element) : JsonUtil.toBean(Json5Util.json5ToJson(element));
     }
 
 }

@@ -1,11 +1,9 @@
 package cn.memoryzy.json.action.transform;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.TextTransformUtil;
-import cn.memoryzy.json.util.YamlUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -30,25 +28,15 @@ public class ToJsonAction extends DumbAwareAction implements UpdateInBackground 
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
-        // TODO 待实现 json5 到 json
         DataContext dataContext = event.getDataContext();
-
-
-
-
-
-
-        String yamlStr;
-
-        yamlStr = YamlUtil.toYaml(
-                GlobalJsonConverter.parseJson(
-                        dataContext,
-                        PlatformUtil.getEditor(dataContext)));
-
-
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), yamlStr, FileTypeHolder.YAML);
-
+        GlobalJsonConverter.convertBetweenJsonAndJson5(
+                dataContext,
+                PlatformUtil.getEditor(dataContext),
+                Json5Util::json5ToJson,
+                JsonAssistantBundle.messageOnSystem("hint.selection.json5.to.json.text"),
+                JsonAssistantBundle.messageOnSystem("hint.global.json5.to.json.text"));
     }
 
     @Override
