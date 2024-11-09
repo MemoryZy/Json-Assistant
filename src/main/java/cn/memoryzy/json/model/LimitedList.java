@@ -32,21 +32,34 @@ public class LimitedList extends AbstractList<String> {
         return history.size();
     }
 
+    @Override
+    public boolean add(String element) {
+        return history.add(element);
+    }
+
+    @Override
+    public void add(int index, String element) {
+        history.add(index, element);
+    }
+
     public boolean add(String element, boolean isJson) {
         return addJson(element, isJson);
     }
 
     private boolean addJson(String element, boolean isJson) {
-        if (!isContains(element, isJson)) {
-            history.add(0, element);
+        // 即便是JSON5，也转为JSON再比较
+        Object addObject = resolveJsonString(element, isJson);
+
+        if (!isContains(addObject)) {
+            add(0, element);
             if (history.size() > limit) {
-                history.remove(history.size() - 1);
+                remove(history.size() - 1);
             }
         } else {
             String first = history.get(0);
-            if (!deserializeThenCompare(first, element, isJson)) {
-                deserializeCompareAndRemove(element, isJson);
-                history.add(0, element);
+            if (!deserializeThenCompare(first, addObject)) {
+                deserializeCompareAndRemove(addObject);
+                add(0, element);
             }
         }
         return true;
@@ -62,10 +75,7 @@ public class LimitedList extends AbstractList<String> {
         return history.remove(index);
     }
 
-    private boolean isContains(String element, boolean isJson) {
-        // 即便是JSON5，也转为JSON再比较
-        Object addObject = resolveJsonString(element, isJson);
-
+    private boolean isContains(Object addObject) {
         for (String oriElement : history) {
             Object oriObject = resolveJsonString(oriElement, JsonUtil.isJson(oriElement));
             if (Objects.equals(addObject, oriObject)) {
@@ -76,14 +86,11 @@ public class LimitedList extends AbstractList<String> {
         return false;
     }
 
-    private boolean deserializeThenCompare(String jsonStr1, String jsonStr2, boolean isValidJsonStr2) {
-        Object object1 = resolveJsonString(jsonStr1, JsonUtil.isJson(jsonStr1));
-        Object object2 = resolveJsonString(jsonStr2, isValidJsonStr2);
-        return Objects.equals(object1, object2);
+    private boolean deserializeThenCompare(String oriJsonStr, Object addObject) {
+        return Objects.equals(resolveJsonString(oriJsonStr, JsonUtil.isJson(oriJsonStr)), addObject);
     }
 
-    private void deserializeCompareAndRemove(String element, boolean isJson) {
-        Object addObject = resolveJsonString(element, isJson);
+    private void deserializeCompareAndRemove(Object addObject) {
         for (int i = history.size() - 1; i >= 0; i--) {
             String text = history.get(i);
             Object oriObject = resolveJsonString(text, JsonUtil.isJson(text));
