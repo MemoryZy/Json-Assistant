@@ -65,9 +65,9 @@ public class YamlUtil {
         return JsonUtil.toJson(obj);
     }
 
-    public static String toYaml(String jsonStr) {
+    public static String toYaml(String jsonStr, boolean isJson) {
         Yaml yaml = yaml();
-        Object obj = JsonUtil.toBean(jsonStr);
+        Object obj = isJson ? JsonUtil.toBean(jsonStr) : Json5Util.resolveJson5(jsonStr);
         return yaml.dump(obj);
     }
 

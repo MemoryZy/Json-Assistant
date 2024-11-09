@@ -29,8 +29,10 @@ public class XmlUtil {
         }
     }
 
-    public static String toXml(String jsonStr) throws Exception {
-        Object object = JsonUtil.MAPPER.readValue(jsonStr, Object.class);
+    public static String toXml(String jsonStr, boolean isJson) throws Exception {
+        Object object = isJson
+                ? JsonUtil.MAPPER.readValue(jsonStr, Object.class)
+                : Json5Util.resolveJson5(jsonStr);
         XmlMapper xmlMapper = new XmlMapper();
         return xmlMapper.writerWithDefaultPrettyPrinter()
                 .withRootName("root")

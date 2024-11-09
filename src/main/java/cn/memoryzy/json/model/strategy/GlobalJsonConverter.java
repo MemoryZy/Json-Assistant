@@ -194,6 +194,19 @@ public class GlobalJsonConverter {
     }
 
 
+    /**
+     * 判断解析结果是否为 JSON
+     * <p style="color: blue;">这是针对 {@link GlobalTextConversionProcessorContext#getProcessor()} 方法返回值来判断的</p>
+     * <p style="color: blue;">因为现在分为了 JSON 和 JSON5，并且此方法也只有两个选择，非 JSON 即 JSON5</p>
+     *
+     * @param processor 处理器
+     * @return true 为 JSON；反之为 JSON5
+     */
+    public static boolean isValidJson(AbstractGlobalTextConversionProcessor processor) {
+        return !(processor instanceof Json5ConversionProcessor);
+    }
+
+
     // -------------------------------------------------------------------------
 
 
