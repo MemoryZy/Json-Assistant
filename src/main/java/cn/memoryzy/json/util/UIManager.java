@@ -1,5 +1,7 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.ReflectUtil;
+import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
@@ -33,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
+import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -53,6 +56,8 @@ public class UIManager implements Disposable {
     @Override
     public void dispose() {
     }
+
+    public static final int MAX_COMMENT_WIDTH = 70;
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -188,10 +193,10 @@ public class UIManager implements Disposable {
     }
 
     public static void setCommentLabel(JLabel label, JCheckBox checkBox, String commentText) {
-        label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
-        label.setFont(ComponentPanelBuilder.getCommentFont(label.getFont()));
+        label.setForeground(ColorHolder.ContextHelp.FOREGROUND);
+        label.setFont(getCommentFont(label.getFont()));
         label.setBorder(getCommentBorder(checkBox));
-        setCommentText(label, commentText, true, ComponentPanelBuilder.MAX_COMMENT_WIDTH);
+        setCommentText(label, commentText, true, MAX_COMMENT_WIDTH);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -201,10 +206,10 @@ public class UIManager implements Disposable {
                                       int maxLineLength) {
         if (commentText != null) {
             @NonNls String css = "<head><style type=\"text/css\">\n" +
-                    "a, a:link {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.ENABLED) + ";}\n" +
-                    "a:visited {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.VISITED) + ";}\n" +
-                    "a:hover {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.HOVERED) + ";}\n" +
-                    "a:active {color:#" + ColorUtil.toHex(JBUI.CurrentTheme.Link.Foreground.PRESSED) + ";}\n" +
+                    "a, a:link {color:#" + ColorUtil.toHex(ColorHolder.Foreground.ENABLED) + ";}\n" +
+                    "a:visited {color:#" + ColorUtil.toHex(ColorHolder.Foreground.VISITED) + ";}\n" +
+                    "a:hover {color:#" + ColorUtil.toHex(ColorHolder.Foreground.HOVERED) + ";}\n" +
+                    "a:active {color:#" + ColorUtil.toHex(ColorHolder.Foreground.PRESSED) + ";}\n" +
                     //"body {background-color:#" + ColorUtil.toHex(JBColor.YELLOW) + ";}\n" + // Left for visual debugging
                     "</style>\n</head>";
             HtmlChunk text = HtmlChunk.raw(commentText);
@@ -255,6 +260,33 @@ public class UIManager implements Disposable {
      */
     public static Component getFocusComponent() {
         return IdeFocusManager.getGlobalInstance().getFocusOwner();
+    }
+
+    /**
+     * 获取注释字体
+     *
+     * @param font 字体
+     * @return 字体
+     */
+    public static Font getCommentFont(Font font) {
+        return new FontUIResource(fromResource("ContextHelp.fontSizeOffset", -2).derive(font));
+    }
+
+
+    // ---------------------------------------------------------------------------------
+
+    /**
+     * @return a new instance from resource integer that represents number of <code>large</code> (>0) or <code>small</code> (<0) operations
+     * over the current instance. Use custom minimum font size limit.
+     */
+    public static RelativeFont fromResource(@NonNls @NotNull String propertyName, int defaultOffset) {
+        RelativeFont normal = RelativeFont.NORMAL;
+        int offset = JBUI.getInt(propertyName, defaultOffset);
+        if (offset != 0) {
+            float multiplier = (float) Math.pow(1.09f, offset);
+            ReflectUtil.setFieldValue(normal, "mySize", multiplier);
+        }
+        return normal;
     }
 
 }

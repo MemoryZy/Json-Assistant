@@ -42,10 +42,11 @@ import java.util.Objects;
  * @since 2024/8/9
  */
 public class JsonPathAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
-    public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
     private final EditorEx editor;
     private final SimpleToolWindowPanel simpleToolWindowPanel;
+
+    public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
     public JsonPathAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
