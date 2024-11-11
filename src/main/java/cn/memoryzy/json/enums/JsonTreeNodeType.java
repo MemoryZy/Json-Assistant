@@ -19,16 +19,16 @@ public enum JsonTreeNodeType {
     /**
      * 数组下的对象类型
      */
-    JSONObjectEl,
+    JSONObjectElement,
 
     /**
      * 数组下的基本类型
      */
-    JSONArrayEl,
+    JSONArrayElement,
 
     /**
      * 普通对象下的普通类型
      */
-    JSONObjectKey
+    JSONObjectProperty
 
 }

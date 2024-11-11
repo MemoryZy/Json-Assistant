@@ -3,7 +3,7 @@ package cn.memoryzy.json.action.structure;
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.ui.component.node.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -49,7 +49,7 @@ public class ExpandMultiAction extends DumbAwareAction {
                 JsonTreeNodeType nodeValueType = node.getValueType();
                 if (Objects.equals(nodeValueType, JsonTreeNodeType.JSONObject)
                         || Objects.equals(nodeValueType, JsonTreeNodeType.JSONArray)
-                        || Objects.equals(nodeValueType, JsonTreeNodeType.JSONObjectEl))
+                        || Objects.equals(nodeValueType, JsonTreeNodeType.JSONObjectElement))
                     return true;
             }
         }

@@ -2,12 +2,14 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.*;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.model.deserialize.ArrayWrapper;
+import cn.memoryzy.json.model.deserialize.JsonWrapper;
+import cn.memoryzy.json.model.deserialize.ObjectWrapper;
+import cn.memoryzy.json.ui.component.node.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -43,11 +45,11 @@ import java.util.Objects;
 public class JsonStructureDialog extends DialogWrapper {
 
     private Tree tree;
-    private final JSON json;
+    private final JsonWrapper wrapper;
 
-    public JsonStructureDialog(JSON json) {
+    public JsonStructureDialog(JsonWrapper wrapper) {
         super((Project) null, true);
-        this.json = json;
+        this.wrapper = wrapper;
 
         setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("json.structure.window.title"));
@@ -58,7 +60,7 @@ public class JsonStructureDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         JsonCollectInfoMutableTreeNode rootNode = new JsonCollectInfoMutableTreeNode("root");
-        convertToTreeNode(json, rootNode);
+        convertToTreeNode(wrapper, rootNode);
         DefaultTreeModel model = new DefaultTreeModel(rootNode);
         // 构建树
         tree = new Tree(model);
@@ -107,17 +109,14 @@ public class JsonStructureDialog extends DialogWrapper {
 
 
     public static void show(String text, boolean isJson) {
-        JSON json = isJson
-                ? JSONUtil.parse(JsonUtil.ensureJson(text), JsonUtil.HUTOOL_JSON_CONFIG)
-                : Json5Util.toHuToolJson(text);
-
-        new JsonStructureDialog(json).show();
+        JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parse(text);
+        new JsonStructureDialog(jsonWrapper).show();
     }
 
 
-    public void convertToTreeNode(JSON json, JsonCollectInfoMutableTreeNode node) {
-        if (json instanceof JSONObject) {
-            JSONObject jsonObject = (JSONObject) json;
+    public void convertToTreeNode(JsonWrapper jsonWrapper, JsonCollectInfoMutableTreeNode node) {
+        if (jsonWrapper instanceof ObjectWrapper) {
+            ObjectWrapper jsonObject = (ObjectWrapper) jsonWrapper;
             // 为了确定图标
             if (Objects.isNull(node.getValueType())) {
                 node.setValueType(JsonTreeNodeType.JSONObject);
@@ -134,40 +133,27 @@ public class JsonStructureDialog extends DialogWrapper {
                 Object value = entry.getValue();
                 JsonCollectInfoMutableTreeNode childNode = new JsonCollectInfoMutableTreeNode(key);
 
-                if (value instanceof JSONObject) {
-                    JSONObject jsonObjectValue = (JSONObject) value;
-                    childNode.setValue(value).setValueType(JsonTreeNodeType.JSONObject).setSize(jsonObjectValue.size());
-                    convertToTreeNode(jsonObjectValue, childNode);
+                if (value instanceof ObjectWrapper) {
+                    ObjectWrapper nestedJsonObject = (ObjectWrapper) value;
+                    childNode.setValue(value).setValueType(JsonTreeNodeType.JSONObject).setSize(nestedJsonObject.size());
+                    convertToTreeNode(nestedJsonObject, childNode);
 
-                } else if (value instanceof JSONArray) {
-                    JSONArray jsonArray = (JSONArray) value;
+                } else if (value instanceof ArrayWrapper) {
+                    ArrayWrapper jsonArray = (ArrayWrapper) value;
                     childNode.setValue(value).setValueType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
                     handleJsonArray(childNode, jsonArray);
 
                 } else {
                     // 若不是对象或数组，则不添加子集，直接同层级
-                    if (value instanceof JSONNull) {
-                        value = null;
-                    } else if (value instanceof Double) {
-                        // 这里有个需要特殊处理的Double类型，值为Infinite或NaN
-                        if (Objects.equals(Json5Util.POSITIVE_INFINITY, value)) {
-                            value = Double.POSITIVE_INFINITY;
-                        } else if (Objects.equals(Json5Util.NEGATIVE_INFINITY, value)) {
-                            value = Double.NEGATIVE_INFINITY;
-                        } else if (Objects.equals(Json5Util.NAN, value)) {
-                            value = Double.NaN;
-                        }
-                    }
-
                     childNode.setValue(value)
-                            .setValueType(JsonTreeNodeType.JSONObjectKey)
+                            .setValueType(JsonTreeNodeType.JSONObjectProperty)
                             .setUserObject(key);
                 }
 
                 node.add(childNode);
             }
-        } else if (json instanceof JSONArray) {
-            JSONArray jsonArray = (JSONArray) json;
+        } else if (jsonWrapper instanceof ArrayWrapper) {
+            ArrayWrapper jsonArray = (ArrayWrapper) jsonWrapper;
             // 为了确定图标
             node.setValueType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
             if (Objects.isNull(node.getValue())) {
@@ -178,29 +164,23 @@ public class JsonStructureDialog extends DialogWrapper {
         }
     }
 
-    public void handleJsonArray(JsonCollectInfoMutableTreeNode childNode, JSONArray jsonArray) {
+    public void handleJsonArray(JsonCollectInfoMutableTreeNode childNode, ArrayWrapper jsonArray) {
         for (int i = 0; i < jsonArray.size(); i++) {
             Object el = jsonArray.get(i);
-            if (el instanceof JSONObject) {
-                JSONObject jsonObjectEl = (JSONObject) el;
-                JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
-                        "item" + i,
-                        el,
-                        JsonTreeNodeType.JSONObjectEl,
-                        jsonObjectEl.size());
+            if (el instanceof ObjectWrapper) {
+                ObjectWrapper jsonObjectElement = (ObjectWrapper) el;
+                JsonCollectInfoMutableTreeNode childNodeElement = new JsonCollectInfoMutableTreeNode(
+                        "item" + i, el, JsonTreeNodeType.JSONObjectElement, jsonObjectElement.size());
 
-                convertToTreeNode(jsonObjectEl, childNodeEl);
-                childNode.add(childNodeEl);
-            } else if (el instanceof JSONArray) {
-                JSONArray jsonArrayEl = (JSONArray) el;
-                JsonCollectInfoMutableTreeNode childNodeEl = new JsonCollectInfoMutableTreeNode(
-                        "item" + i,
-                        el,
-                        JsonTreeNodeType.JSONArrayEl,
-                        jsonArrayEl.size());
+                convertToTreeNode(jsonObjectElement, childNodeElement);
+                childNode.add(childNodeElement);
+            } else if (el instanceof ArrayWrapper) {
+                ArrayWrapper jsonArrayElement = (ArrayWrapper) el;
+                JsonCollectInfoMutableTreeNode childNodeElement = new JsonCollectInfoMutableTreeNode(
+                        "item" + i, el, JsonTreeNodeType.JSONArrayElement, jsonArrayElement.size());
 
-                convertToTreeNode(jsonArrayEl, childNodeEl);
-                childNode.add(childNodeEl);
+                convertToTreeNode(jsonArrayElement, childNodeElement);
+                childNode.add(childNodeElement);
             } else {
                 Object obj = el;
                 if (el instanceof String) {
@@ -208,11 +188,7 @@ public class JsonStructureDialog extends DialogWrapper {
                     obj = "\"" + str + "\"";
                 }
 
-                if (el instanceof JSONNull) {
-                    el = null;
-                }
-
-                childNode.add(new JsonCollectInfoMutableTreeNode(obj).setValue(el).setValueType(JsonTreeNodeType.JSONArrayEl));
+                childNode.add(new JsonCollectInfoMutableTreeNode(obj).setValue(el).setValueType(JsonTreeNodeType.JSONArrayElement));
             }
         }
     }
@@ -281,7 +257,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             break;
                         }
 
-                        case JSONObjectEl: {
+                        case JSONObjectElement: {
                             squareBracketsStart = " [";
                             nodeTypeStr = "array_object";
                             squareBracketsEnd = "]";
@@ -293,7 +269,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             break;
                         }
 
-                        case JSONArrayEl: {
+                        case JSONArrayElement: {
                             icon = JsonAssistantIcons.Structure.JSON_ITEM;
                             String valueStr;
                             if (Objects.isNull(nodeValue)) {
@@ -326,7 +302,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             break;
                         }
 
-                        case JSONObjectKey: {
+                        case JSONObjectProperty: {
                             String valueStr;
                             if (Objects.isNull(nodeValue)) {
                                 valueStr = "null";
@@ -360,8 +336,8 @@ public class JsonStructureDialog extends DialogWrapper {
                     }
                 }
 
-                if (!Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)) {
-                    append(Objects.equals(JsonTreeNodeType.JSONObjectKey, nodeValueType) ? text + ": " : text, simpleTextAttributes);
+                if (!Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeValueType)) {
+                    append(Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeValueType) ? text + ": " : text, simpleTextAttributes);
                 }
 
                 if (StrUtil.isNotBlank(squareBracketsStart)) append(squareBracketsStart, lightAttributes, false);
@@ -384,7 +360,7 @@ public class JsonStructureDialog extends DialogWrapper {
                         attributes = stringColorAttributes;
                     }
 
-                    append(jsonValue, attributes, Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType));
+                    append(jsonValue, attributes, Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeValueType));
                 }
 
                 setIcon(icon);

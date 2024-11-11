@@ -1,11 +1,11 @@
 package cn.memoryzy.json.model.strategy;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.data.DocTextData;
-import cn.memoryzy.json.model.data.EditorData;
-import cn.memoryzy.json.model.data.SelectionData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.model.strategy.formats.data.DocTextData;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.data.SelectionData;
 import com.intellij.openapi.editor.Caret;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;

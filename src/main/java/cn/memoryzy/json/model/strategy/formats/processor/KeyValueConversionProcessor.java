@@ -1,7 +1,7 @@
 package cn.memoryzy.json.model.strategy.formats.processor;
 
-import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 
 /**
  * @author Memory

@@ -2,8 +2,8 @@ package cn.memoryzy.json.model.strategy.formats.processor.json;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.FileTypes;
-import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;

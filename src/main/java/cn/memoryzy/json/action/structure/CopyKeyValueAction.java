@@ -1,13 +1,12 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSON;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.ui.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.model.deserialize.JsonWrapper;
+import cn.memoryzy.json.ui.component.node.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
@@ -42,24 +41,14 @@ public class CopyKeyValueAction extends DumbAwareAction {
                 JsonTreeNodeType nodeValueType = node.getValueType();
 
                 String userObject = node.getUserObject().toString();
-                // 只有JSONArrayEl是没有Value的
-                if (Objects.equals(JsonTreeNodeType.JSONArrayEl, nodeValueType)) {
+                // 只有JSONArrayElement是没有Value的
+                if (Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeValueType)) {
                     valueList.add(userObject);
-                } else if (Objects.equals(JsonTreeNodeType.JSONObjectKey, nodeValueType)) {
+                } else if (Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeValueType)) {
                     valueList.add(userObject + ": " + (Objects.nonNull(value) ? value.toString() : "null"));
                 } else {
-                    JSON json = (JSON) value;
-                    String item;
-                    if (Objects.nonNull(json)) {
-                        try {
-                            item = JsonUtil.MAPPER.writeValueAsString(json);
-                        } catch (JsonProcessingException ex) {
-                            item = json.toJSONString(2);
-                        }
-                    } else {
-                        item = "null";
-                    }
-
+                    JsonWrapper json = (JsonWrapper) value;
+                    String item = Objects.nonNull(json) ? JsonUtil.formatJson(json) : "null";
                     valueList.add(userObject + ": " + item);
                 }
             }

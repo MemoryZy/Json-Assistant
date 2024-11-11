@@ -103,7 +103,7 @@ public class LimitedList extends AbstractList<String> {
 
     private static Object resolveJsonString(String element, boolean isJson) {
         // 即便是JSON5，也转为JSON再比较
-        return isJson ? JsonUtil.toBean(element) : JsonUtil.toBean(Json5Util.json5ToJson(element));
+        return isJson ? JsonUtil.parse(element) : JsonUtil.parse(Json5Util.convertJson5ToJson(element));
     }
 
 }

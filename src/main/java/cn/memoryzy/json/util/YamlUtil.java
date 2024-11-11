@@ -62,12 +62,12 @@ public class YamlUtil {
     public static String toJson(String yamlStr) {
         Yaml yaml = yaml();
         Object obj = yaml.load(yamlStr);
-        return JsonUtil.toJson(obj);
+        return JsonUtil.toJsonStr(obj);
     }
 
     public static String toYaml(String jsonStr, boolean isJson) {
         Yaml yaml = yaml();
-        Object obj = isJson ? JsonUtil.toBean(jsonStr) : Json5Util.resolveJson5(jsonStr);
+        Object obj = isJson ? JsonUtil.parse(jsonStr) : Json5Util.parse(jsonStr);
         return yaml.dump(obj);
     }
 

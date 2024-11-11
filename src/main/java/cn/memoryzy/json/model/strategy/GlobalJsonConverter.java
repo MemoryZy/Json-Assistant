@@ -1,9 +1,9 @@
 package cn.memoryzy.json.model.strategy;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.processor.json.Json5ConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.json.JsonConversionProcessor;
 import cn.memoryzy.json.util.TextTransformUtil;

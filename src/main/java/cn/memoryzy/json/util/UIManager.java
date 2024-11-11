@@ -1,6 +1,5 @@
 package cn.memoryzy.json.util;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.icons.AllIcons;
@@ -56,8 +55,6 @@ public class UIManager implements Disposable {
     @Override
     public void dispose() {
     }
-
-    public static final int MAX_COMMENT_WIDTH = 70;
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -193,10 +190,10 @@ public class UIManager implements Disposable {
     }
 
     public static void setCommentLabel(JLabel label, JCheckBox checkBox, String commentText) {
-        label.setForeground(ColorHolder.ContextHelp.FOREGROUND);
+        label.setForeground(UIUtil.getContextHelpForeground());
         label.setFont(getCommentFont(label.getFont()));
         label.setBorder(getCommentBorder(checkBox));
-        setCommentText(label, commentText, true, MAX_COMMENT_WIDTH);
+        setCommentText(label, commentText, true, 70);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -269,24 +266,7 @@ public class UIManager implements Disposable {
      * @return 字体
      */
     public static Font getCommentFont(Font font) {
-        return new FontUIResource(fromResource("ContextHelp.fontSizeOffset", -2).derive(font));
-    }
-
-
-    // ---------------------------------------------------------------------------------
-
-    /**
-     * @return a new instance from resource integer that represents number of <code>large</code> (>0) or <code>small</code> (<0) operations
-     * over the current instance. Use custom minimum font size limit.
-     */
-    public static RelativeFont fromResource(@NonNls @NotNull String propertyName, int defaultOffset) {
-        RelativeFont normal = RelativeFont.NORMAL;
-        int offset = JBUI.getInt(propertyName, defaultOffset);
-        if (offset != 0) {
-            float multiplier = (float) Math.pow(1.09f, offset);
-            ReflectUtil.setFieldValue(normal, "mySize", multiplier);
-        }
-        return normal;
+        return new FontUIResource(font);
     }
 
 }

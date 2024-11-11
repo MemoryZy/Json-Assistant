@@ -1,10 +1,10 @@
 package cn.memoryzy.json.model.strategy.formats.processor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.data.ActionData;
-import cn.memoryzy.json.model.data.EditorData;
-import cn.memoryzy.json.model.data.MessageData;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.data.ActionData;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.data.MessageData;
 import cn.memoryzy.json.util.TextTransformUtil;
 import icons.JsonAssistantIcons;
 

@@ -3,12 +3,11 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.enums.BackgroundColorPolicy;
 import cn.memoryzy.json.model.LimitedList;
+import cn.memoryzy.json.model.deserialize.ArrayWrapper;
+import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
@@ -47,8 +46,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -189,7 +186,7 @@ public class JsonAssistantToolWindowComponentProvider {
                     if (StrUtil.isNotBlank(jsonStr)) {
                         jsonStr = JsonUtil.formatJson(jsonStr);
                         String finalJsonStr = jsonStr;
-                        WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(finalJsonStr));
+                        WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(Objects.requireNonNull(finalJsonStr)));
                     }
                 }
             }
@@ -204,21 +201,21 @@ public class JsonAssistantToolWindowComponentProvider {
             if (JsonUtil.isJson(text)) {
                 // 无元素，不添加
                 if (JsonUtil.isJsonArray(text)) {
-                    JSONArray jsonArray = JSONUtil.parseArray(text);
+                    ArrayWrapper jsonArray = JsonUtil.parseArray(text);
                     if (jsonArray.isEmpty()) return;
                 } else if (JsonUtil.isJsonObject(text)) {
-                    JSONObject jsonObject = JSONUtil.parseObj(text);
+                    ObjectWrapper jsonObject = JsonUtil.parseObject(text);
                     if (jsonObject.isEmpty()) return;
                 }
 
                 historyList.add(text, true);
             } else if (Json5Util.isJson5(text)) {
                 if (Json5Util.isJson5Array(text)) {
-                    List<Object> list = Json5Util.toList(text);
-                    if (CollUtil.isEmpty(list)) return;
+                    ArrayWrapper arrayWrapper = Json5Util.parseArray(text);
+                    if (CollUtil.isEmpty(arrayWrapper)) return;
                 } else if (Json5Util.isJson5Object(text)) {
-                    Map<String, Object> map = Json5Util.toMap(text);
-                    if (MapUtil.isEmpty(map)) return;
+                    ObjectWrapper objectWrapper = Json5Util.parseObject(text);
+                    if (MapUtil.isEmpty(objectWrapper)) return;
                 }
 
                 historyList.add(text, false);

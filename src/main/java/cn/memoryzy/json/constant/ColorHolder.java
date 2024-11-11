@@ -1,6 +1,5 @@
 package cn.memoryzy.json.constant;
 
-import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -12,10 +11,6 @@ import java.awt.*;
  * @since 2024/11/10
  */
 public interface ColorHolder {
-
-    interface ContextHelp {
-        @NotNull Color FOREGROUND = JBColor.namedColor("Label.infoForeground", new JBColor(Gray.x78, Gray.x8C));
-    }
 
     interface Foreground {
         @NotNull Color DISABLED = JBColor.namedColor("Link.disabledForeground", JBUI.CurrentTheme.Label.disabledForeground());

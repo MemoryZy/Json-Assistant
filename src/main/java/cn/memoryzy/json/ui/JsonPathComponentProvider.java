@@ -2,7 +2,6 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
@@ -120,20 +119,20 @@ public class JsonPathComponentProvider {
 
     public void handleJsonPathResult(String jsonStr) {
         String jsonPath = getPathExpression();
-        if (Objects.isNull(jsonPath)
-                || StrUtil.isBlank(jsonStr)
-                || !JsonUtil.isJson(jsonStr)
-                || !Json5Util.isJson5(jsonStr)) {
+        // 在update方法已经判断了是否为Json或Json5，无需再来一遍
+        if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr)) {
             return;
         }
 
         try {
-            // todo 如果是json5的话，先把json5转为json再执行
+            if (Json5Util.isJson5(jsonStr)) {
+                jsonStr = Json5Util.convertJson5ToJson(jsonStr);
+            }
 
             Object result = JsonPath.read(jsonStr, jsonPath);
             String jsonResult;
             if (result instanceof Map || result instanceof Iterable) {
-                jsonResult = JsonUtil.formatJson(JSONUtil.toJsonStr(result));
+                jsonResult = JsonUtil.formatJson(result);
             } else {
                 if (result == null) {
                     jsonResult = "null";

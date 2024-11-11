@@ -2,9 +2,9 @@ package cn.memoryzy.json.model.strategy.formats.context;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.TextResolveStatus;
-import cn.memoryzy.json.model.data.DocTextData;
-import cn.memoryzy.json.model.data.EditorData;
-import cn.memoryzy.json.model.data.SelectionData;
+import cn.memoryzy.json.model.strategy.formats.data.DocTextData;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.data.SelectionData;
 import cn.memoryzy.json.model.strategy.formats.processor.TomlConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.UrlParamConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.processor.XmlConversionProcessor;

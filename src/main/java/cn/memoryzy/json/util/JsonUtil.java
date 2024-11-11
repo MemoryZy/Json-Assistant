@@ -2,17 +2,23 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONConfig;
-import cn.hutool.json.JSONUtil;
+import cn.memoryzy.json.model.deserialize.ArrayWrapper;
+import cn.memoryzy.json.model.deserialize.JsonWrapper;
+import cn.memoryzy.json.model.deserialize.ObjectWrapper;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,15 +29,18 @@ import java.util.regex.Pattern;
  */
 public class JsonUtil {
 
-    public static final ObjectMapper MAPPER = new ObjectMapper();
-
-    public static final JSONConfig HUTOOL_JSON_CONFIG = JSONConfig.create().setStripTrailingZeros(false).setIgnoreNullValue(false);
+    /**
+     * 构建 JsonMapper（支持解析 '非数字NaN' 标识）
+     */
+    private static final JsonMapper MAPPER = JsonMapper.builder()
+            .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS)
+            .disable(JsonWriteFeature.WRITE_NAN_AS_STRINGS)
+            .build();
 
     public static boolean isJson(String text) {
         try {
-            JSONUtil.parse(text);
-            JsonNode jsonNode = MAPPER.readTree(text);
-            return jsonNode instanceof ArrayNode || jsonNode instanceof ObjectNode;
+            JsonNode node = MAPPER.readTree(text);
+            return node instanceof ArrayNode || node instanceof ObjectNode;
         } catch (Throwable e) {
             return false;
         }
@@ -41,7 +50,7 @@ public class JsonUtil {
         try {
             JsonNode jsonNode = MAPPER.readTree(json);
             return jsonNode instanceof ArrayNode;
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             return false;
         }
     }
@@ -50,15 +59,43 @@ public class JsonUtil {
         try {
             JsonNode jsonNode = MAPPER.readTree(json);
             return jsonNode instanceof ObjectNode;
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
+    public static JsonWrapper parse(String json) {
+        if (isJsonObject(json)) {
+            return parseObject(json);
+        } else if (isJsonArray(json)) {
+            return parseArray(json);
+        }
+        return null;
+    }
+
+    public static ObjectWrapper parseObject(String text) {
+        return new ObjectWrapper(toObject(ensureJson(text), LinkedHashMap.class));
+    }
+
+    public static ArrayWrapper parseArray(String text) {
+        return new ArrayWrapper(toObject(ensureJson(text), ArrayList.class));
+    }
+
 
     public static String formatJson(String jsonStr) {
-        JSON json = JSONUtil.parse(jsonStr, HUTOOL_JSON_CONFIG);
-        return json.toJSONString(2);
+        try {
+            return formatJson(MAPPER.readTree(jsonStr));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String formatJson(Object data) {
+        try {
+            return normalizeLineEndings(MAPPER.writer(new NoSpacePrettyPrinter()).writeValueAsString(data));
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -68,23 +105,22 @@ public class JsonUtil {
      * @return 压缩json
      * @throws JsonProcessingException 非法Json
      */
-    public static String compressJson(String jsonStr) throws JsonProcessingException {
-        return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
-    }
-
-    public static String toJson(Object obj) {
+    public static String compressJson(String jsonStr) {
         try {
-            return MAPPER.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+            return normalizeLineEndings(MAPPER.writeValueAsString(MAPPER.readTree(jsonStr)));
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static Object toBean(String jsonStr) {
+    public static String toJsonStr(Object obj) {
+        return formatJson(obj);
+    }
+
+    public static <T> T toObject(String jsonStr, Class<T> clz) {
         try {
-            JsonNode jsonNode = MAPPER.readTree(jsonStr);
-            return MAPPER.convertValue(jsonNode, Object.class);
-        } catch (JsonProcessingException e) {
+            return MAPPER.readValue(jsonStr, clz);
+        } catch (Exception e) {
             return null;
         }
     }
@@ -213,5 +249,40 @@ public class JsonUtil {
 
         return includeJsonStr.substring(startIndex, endIndex + 1);
     }
+
+
+    /**
+     * 去除\r相关
+     * {@link com.intellij.openapi.editor.Document} 对象不允许带有\r\n的字符设置，只允许\n
+     *
+     * @param text 文本
+     * @return 规范后的文本
+     */
+    public static String normalizeLineEndings(String text) {
+        return text.replaceAll("\\r\\n|\\r|\\n", "\n");
+    }
+
+
+    /**
+     * 使用默认的PrettyPrinter时，Key的后面总是会带一个空格，然后才是冒号，通过继承这个类做处理
+     */
+    private static class NoSpacePrettyPrinter extends DefaultPrettyPrinter {
+
+        public NoSpacePrettyPrinter() {
+            super();
+        }
+
+        @Override
+        public DefaultPrettyPrinter createInstance() {
+            return new NoSpacePrettyPrinter();
+        }
+
+        @Override
+        public void writeObjectFieldValueSeparator(JsonGenerator g) throws IOException {
+            // 将 "key" : "value" 变为 "key": "value"
+            g.writeRaw(": ");
+        }
+    }
+
 
 }

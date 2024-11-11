@@ -1,6 +1,6 @@
 package cn.memoryzy.json.model.strategy.formats.processor.json;
 
-import cn.memoryzy.json.model.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.util.Json5Util;
 
 /**
