@@ -6,7 +6,6 @@ import cn.memoryzy.json.model.deserialize.ArrayWrapper;
 import cn.memoryzy.json.model.deserialize.JsonWrapper;
 import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -37,6 +36,12 @@ public class JsonUtil {
             .disable(JsonWriteFeature.WRITE_NAN_AS_STRINGS)
             .build();
 
+    /**
+     * 检查字符串是否为JSON格式。
+     *
+     * @param text 待检查的字符串
+     * @return 如果字符串是有效的JSON则返回true，否则返回false
+     */
     public static boolean isJson(String text) {
         try {
             JsonNode node = MAPPER.readTree(text);
@@ -46,6 +51,13 @@ public class JsonUtil {
         }
     }
 
+
+    /**
+     * 检查字符串是否为JSON数组。
+     *
+     * @param json 待检查的字符串
+     * @return 如果字符串是有效的JSONArray则返回true，否则返回false
+     */
     public static boolean isJsonArray(String json) {
         try {
             JsonNode jsonNode = MAPPER.readTree(json);
@@ -55,6 +67,13 @@ public class JsonUtil {
         }
     }
 
+
+    /**
+     * 检查字符串是否为JSON对象。
+     *
+     * @param json 待检查的字符串
+     * @return 如果字符串是有效的JSONObject则返回true，否则返回false
+     */
     public static boolean isJsonObject(String json) {
         try {
             JsonNode jsonNode = MAPPER.readTree(json);
@@ -64,6 +83,12 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * 将字符串解析为JsonWrapper包装对象
+     *
+     * @param json json字符串
+     * @return JsonWrapper包装对象
+     */
     public static JsonWrapper parse(String json) {
         if (isJsonObject(json)) {
             return parseObject(json);
@@ -73,15 +98,33 @@ public class JsonUtil {
         return null;
     }
 
+    /**
+     * 将字符串解析为ObjectWrapper包装对象（对象）
+     *
+     * @param text json字符串
+     * @return ObjectWrapper包装对象
+     */
     public static ObjectWrapper parseObject(String text) {
         return new ObjectWrapper(toObject(ensureJson(text), LinkedHashMap.class));
     }
 
+    /**
+     * 将字符串解析为ArrayWrapper包装对象（数组）
+     *
+     * @param text json字符串
+     * @return ArrayWrapper包装对象
+     */
     public static ArrayWrapper parseArray(String text) {
         return new ArrayWrapper(toObject(ensureJson(text), ArrayList.class));
     }
 
 
+    /**
+     * 格式化Json字符串
+     *
+     * @param jsonStr json字符串
+     * @return 格式化后的json字符串
+     */
     public static String formatJson(String jsonStr) {
         try {
             return formatJson(MAPPER.readTree(jsonStr));
@@ -90,6 +133,13 @@ public class JsonUtil {
         }
     }
 
+
+    /**
+     * 格式化Json字符串
+     *
+     * @param data 对象
+     * @return 格式化后的json字符串
+     */
     public static String formatJson(Object data) {
         try {
             return normalizeLineEndings(MAPPER.writer(new NoSpacePrettyPrinter()).writeValueAsString(data));
@@ -98,12 +148,12 @@ public class JsonUtil {
         }
     }
 
+
     /**
      * 将Json压缩成一行
      *
      * @param jsonStr json字符串
      * @return 压缩json
-     * @throws JsonProcessingException 非法Json
      */
     public static String compressJson(String jsonStr) {
         try {
@@ -113,10 +163,25 @@ public class JsonUtil {
         }
     }
 
+
+    /**
+     * 将对象转换为JSON字符串
+     *
+     * @param obj 对象
+     * @return JSON字符串
+     */
     public static String toJsonStr(Object obj) {
         return formatJson(obj);
     }
 
+
+    /**
+     * 将JSON字符串转换为对象
+     *
+     * @param jsonStr JSON字符串
+     * @param clz     目标对象类型
+     * @return 目标对象
+     */
     public static <T> T toObject(String jsonStr, Class<T> clz) {
         try {
             return MAPPER.readValue(jsonStr, clz);
@@ -182,12 +247,24 @@ public class JsonUtil {
     }
 
 
+    /**
+     * 从给定的字符串中提取JSON字符串，使用正则表达式匹配
+     *
+     * @param includeJsonStr 包含JSON字符串的字符串
+     * @return 提取的JSON字符串，如果给定的字符串为空或null，则返回空字符串
+     */
     public static String extractJsonStringOnRegular(String includeJsonStr) {
         List<String> jsonStrings = findJsonStrings(includeJsonStr);
         return CollUtil.isNotEmpty(jsonStrings) ? jsonStrings.get(0) : "";
     }
 
 
+    /**
+     * 在给定的文本中查找所有可能的JSON字符串
+     *
+     * @param text 文本
+     * @return 所有可能的JSON字符串的列表
+     */
     public static List<String> findJsonStrings(String text) {
         List<String> jsonStrings = new ArrayList<>();
 
