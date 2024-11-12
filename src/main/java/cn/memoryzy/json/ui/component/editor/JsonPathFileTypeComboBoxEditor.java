@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui.component.editor;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -54,7 +55,7 @@ public class JsonPathFileTypeComboBoxEditor extends EditorComboBoxEditor {
         if (anObject == null) anObject = "";
         if (anObject.equals(getItem())) return;
         final String s = (String) anObject;
-        WriteCommandAction.writeCommandAction(project).run(() -> getDocument().setText(s));
+        WriteCommandAction.writeCommandAction(project).run(() -> PlatformUtil.setDocumentText(getDocument(), s));
 
         final Editor editor = getEditor();
         if (editor != null) editor.getCaretModel().moveToOffset(s.length());

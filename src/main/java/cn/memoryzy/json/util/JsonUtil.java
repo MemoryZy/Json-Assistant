@@ -8,6 +8,7 @@ import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -142,7 +143,7 @@ public class JsonUtil {
      */
     public static String formatJson(Object data) {
         try {
-            return normalizeLineEndings(MAPPER.writer(new NoSpacePrettyPrinter()).writeValueAsString(data));
+            return MAPPER.writer(new NoSpaceAndLFPrettyPrinter()).writeValueAsString(data);
         } catch (Exception e) {
             return null;
         }
@@ -157,7 +158,7 @@ public class JsonUtil {
      */
     public static String compressJson(String jsonStr) {
         try {
-            return normalizeLineEndings(MAPPER.writeValueAsString(MAPPER.readTree(jsonStr)));
+            return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
         } catch (Exception e) {
             return null;
         }
@@ -265,6 +266,7 @@ public class JsonUtil {
      * @param text 文本
      * @return 所有可能的JSON字符串的列表
      */
+    @SuppressWarnings("RegExpRedundantEscape")
     public static List<String> findJsonStrings(String text) {
         List<String> jsonStrings = new ArrayList<>();
 
@@ -329,29 +331,20 @@ public class JsonUtil {
 
 
     /**
-     * 去除\r相关
-     * {@link com.intellij.openapi.editor.Document} 对象不允许带有\r\n的字符设置，只允许\n
-     *
-     * @param text 文本
-     * @return 规范后的文本
-     */
-    public static String normalizeLineEndings(String text) {
-        return text.replaceAll("\\r\\n|\\r|\\n", "\n");
-    }
-
-
-    /**
      * 使用默认的PrettyPrinter时，Key的后面总是会带一个空格，然后才是冒号，通过继承这个类做处理
+     * <p>并且在Jackson生成的Json中换行符为系统默认的 \r\n 换行符，利用此类将其固定为 \n  <br/>
+     * （{@link com.intellij.openapi.editor.Document} 类不允许编辑器内出现\r）</p>
      */
-    private static class NoSpacePrettyPrinter extends DefaultPrettyPrinter {
+    private static class NoSpaceAndLFPrettyPrinter extends DefaultPrettyPrinter {
 
-        public NoSpacePrettyPrinter() {
+        public NoSpaceAndLFPrettyPrinter() {
             super();
+            super._objectIndenter = new DefaultIndenter("  ", "\n");
         }
 
         @Override
         public DefaultPrettyPrinter createInstance() {
-            return new NoSpacePrettyPrinter();
+            return new NoSpaceAndLFPrettyPrinter();
         }
 
         @Override

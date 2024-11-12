@@ -40,11 +40,11 @@ public class ToJsonAction extends DumbAwareAction implements UpdateInBackground 
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(@NotNull AnActionEvent event) {
         // 确保当前是JSON5
-        DataContext dataContext = e.getDataContext();
-        e.getPresentation().setEnabledAndVisible(
+        DataContext dataContext = event.getDataContext();
+        event.getPresentation().setEnabledAndVisible(
                 GlobalJsonConverter.validateEditorJson5(
-                        getEventProject(e), PlatformUtil.getEditor(dataContext)));
+                        getEventProject(event), PlatformUtil.getEditor(dataContext)));
     }
 }

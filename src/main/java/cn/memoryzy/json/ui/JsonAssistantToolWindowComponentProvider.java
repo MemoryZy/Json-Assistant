@@ -9,7 +9,9 @@ import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.model.deserialize.ArrayWrapper;
 import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
+import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
+import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.ToolWindowPanel;
@@ -147,7 +149,10 @@ public class JsonAssistantToolWindowComponentProvider {
                     jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
-                        jsonStr = JsonUtil.formatJson(jsonStr);
+                        ClipboardTextConversionStrategy strategy = context.getStrategy();
+                        jsonStr = (strategy instanceof Json5ConversionStrategy)
+                                ? Json5Util.formatJson5(jsonStr)
+                                : JsonUtil.formatJson(jsonStr);
                     }
                 }
             }
@@ -168,12 +173,6 @@ public class JsonAssistantToolWindowComponentProvider {
 
 
     private void pasteJsonToEditor() {
-        // TODO 配置开关加上 是否识别 JSON5
-
-
-        // TODO 工具窗口，JSON5切换 使用 editor.setFile(); 试试 （配置开关）
-        // TODO 如果 editor.setFile() 不行，就关闭初始选项卡，再创建一个新的，文本原样移动过去
-
         if (initWindow && persistentState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
@@ -184,9 +183,12 @@ public class JsonAssistantToolWindowComponentProvider {
                     String jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
-                        jsonStr = JsonUtil.formatJson(jsonStr);
-                        String finalJsonStr = jsonStr;
-                        WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(Objects.requireNonNull(finalJsonStr)));
+                        ClipboardTextConversionStrategy strategy = context.getStrategy();
+                        String formattedStr = (strategy instanceof Json5ConversionStrategy)
+                                ? Json5Util.formatJson5(jsonStr)
+                                : JsonUtil.formatJson(jsonStr);
+
+                        WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
                     }
                 }
             }
@@ -307,17 +309,20 @@ public class JsonAssistantToolWindowComponentProvider {
 
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
-            EditorSettings settings = editor.getSettings();
-            // 编辑器原来为空，新增不为空，表示新增
-            if (StrUtil.isBlank(event.getOldFragment()) && StrUtil.isNotBlank(event.getNewFragment())) {
-                if (!settings.isCaretRowShown()) {
-                    settings.setCaretRowShown(true);
+            try {
+                EditorSettings settings = editor.getSettings();
+                // 编辑器原来为空，新增不为空，表示新增
+                if (StrUtil.isBlank(event.getOldFragment()) && StrUtil.isNotBlank(event.getNewFragment())) {
+                    if (!settings.isCaretRowShown()) {
+                        settings.setCaretRowShown(true);
+                    }
+                } else if (StrUtil.isNotBlank(event.getOldFragment()) && StrUtil.isBlank(event.getNewFragment())) {
+                    // 编辑器原来不为空，新增为空，表示全部删除
+                    if (settings.isCaretRowShown()) {
+                        settings.setCaretRowShown(false);
+                    }
                 }
-            } else if (StrUtil.isNotBlank(event.getOldFragment()) && StrUtil.isBlank(event.getNewFragment())) {
-                // 编辑器原来不为空，新增为空，表示全部删除
-                if (settings.isCaretRowShown()) {
-                    settings.setCaretRowShown(false);
-                }
+            } catch (Error ignored) {
             }
         }
     }

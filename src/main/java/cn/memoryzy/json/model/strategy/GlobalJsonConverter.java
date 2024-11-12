@@ -73,11 +73,11 @@ public class GlobalJsonConverter {
     public static void convertBetweenJsonAndJson5(DataContext dataContext, Editor editor, Function<String, String> converter, String selectionMessage, String globalMessage) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String processedText = converter.apply(GlobalJsonConverter.parseJson(dataContext, context, editor));
+        String processedText = converter.apply(parseJson(dataContext, context, editor));
 
         if (StrUtil.isNotBlank(processedText)) {
             AbstractGlobalTextConversionProcessor processor = context.getProcessor();
-            GlobalJsonConverter.setHintMessage(processor, selectionMessage, globalMessage);
+            setHintMessage(processor, selectionMessage, globalMessage);
 
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();

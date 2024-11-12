@@ -233,4 +233,27 @@ public class PlatformUtil {
         return Locale.CHINESE.getLanguage().equals(locale.getLanguage())
                 && (Objects.equals(locale.getCountry(), "") || Objects.equals(locale.getCountry(), "CN"));
     }
+
+
+    /**
+     * 去除\r相关（{@link com.intellij.openapi.editor.Document} 中不允许带有\r\n的字符，只允许\n）
+     *
+     * @param text 文本
+     */
+    public static void setDocumentText(Document document, String text) {
+        text = normalizeLineEndings(text);
+        if (text == null) return;
+        document.setText(text);
+    }
+
+    /**
+     * 去除\r相关
+     *
+     * @param text 文本
+     * @return 规范后的文本
+     */
+    public static String normalizeLineEndings(String text) {
+        return text == null ? null : text.replaceAll("\\r\\n|\\r|\\n", "\n");
+    }
+
 }

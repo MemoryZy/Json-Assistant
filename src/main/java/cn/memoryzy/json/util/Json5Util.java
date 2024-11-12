@@ -4,9 +4,11 @@ import a2u.tn.utils.json.MapNavigator;
 import a2u.tn.utils.json.TnJson;
 import a2u.tn.utils.json.TnJsonBuilder;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.deserialize.ArrayWrapper;
 import cn.memoryzy.json.model.deserialize.JsonWrapper;
 import cn.memoryzy.json.model.deserialize.ObjectWrapper;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -167,7 +169,9 @@ public class Json5Util {
      */
     public static String toJson5Str(Object obj, TnJsonBuilder builder) {
         try {
-            return builder.buildJson(obj);
+            String json5 = builder.buildJson(obj);
+            // 还原被转为unicode的字符
+            return JsonAssistantUtil.unicodeToString(json5);
         } catch (Exception e) {
             return null;
         }
@@ -192,9 +196,24 @@ public class Json5Util {
      * @param text 文本
      * @return 若为对象，则返回 Map；若为 List，则返回 List；否则返回 null
      */
+    @SuppressWarnings("deprecation")
     public static Object resolveJson5(String text) {
+        if (StrUtil.isBlank(text)) return null;
+
+        Map<String, Object> map = null;
         try {
-            Map<String, Object> map = TnJson.parse(text);
+            map = TnJson.parse(text);
+        } catch (Exception ignored) {
+        }
+
+        try {
+            if (MapUtil.isEmpty(map)) {
+                // 尝试转义
+                text = StringEscapeUtils.unescapeJson(text);
+                // 再次解析
+                map = TnJson.parse(text);
+            }
+
             if (MapUtil.isNotEmpty(map)) {
                 // 若是 Array，那么 Map 中只会存在一个 key，且 key 为 list
                 if (map.size() == 1) {

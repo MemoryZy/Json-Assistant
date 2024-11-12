@@ -191,4 +191,21 @@ public class JsonAssistantUtil {
         return null;
     }
 
+
+    public static String unicodeToString(String unicodeString) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < unicodeString.length(); i++) {
+            if (i + 5 < unicodeString.length() && unicodeString.charAt(i) == '\\' && unicodeString.charAt(i + 1) == 'u') {
+                // 判断是否是 Unicode 编码
+                String hexCode = unicodeString.substring(i + 2, i + 6);
+                int codePoint = Integer.parseInt(hexCode, 16);
+                sb.append(Character.toChars(codePoint));
+                i += 5; // 跳过 Unicode 编码
+            } else {
+                sb.append(unicodeString.charAt(i));
+            }
+        }
+        return sb.toString();
+    }
+
 }

@@ -44,7 +44,9 @@ public class ClipboardTextConversionContext {
      * @return 策略处理器列表
      */
     public static List<ClipboardTextConversionStrategy> getProcessors() {
-        List<ClipboardTextConversionStrategy> conversionStrategies = Lists.newArrayList(new JsonConversionStrategy());
+        List<ClipboardTextConversionStrategy> conversionStrategies = Lists.newArrayList();
+        conversionStrategies.add(new JsonConversionStrategy());
+        conversionStrategies.add(new Json5ConversionStrategy());
 
         if (STATE.recognizeXmlFormat) {
             conversionStrategies.add(new XmlConversionStrategy());
