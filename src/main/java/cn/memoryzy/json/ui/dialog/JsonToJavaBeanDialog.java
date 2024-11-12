@@ -4,14 +4,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.model.deserialize.ArrayWrapper;
+import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.util.UIManager;
@@ -85,7 +84,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
-        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
+        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
@@ -158,28 +157,8 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return false;
         }
 
-        JSONObject jsonObject;
-
         // 解析Json
-        if (!JsonUtil.isJson(jsonText)) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
-            return false;
-        }
-
-        if (JsonUtil.isJsonArray(jsonText)) {
-            JSONArray jsonArray = JSONUtil.parseArray(jsonText);
-            // 数组为空
-            if (jsonArray.isEmpty()) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
-                return false;
-            }
-
-            jsonObject = jsonArray.getJSONObject(0);
-        } else if (JsonUtil.isJsonObject(jsonText)) {
-            jsonObject = JSONUtil.parseObj(jsonText);
-        } else {
-            jsonObject = null;
-        }
+        ObjectWrapper jsonObject = resolveJson(jsonText);
 
         // 属性为空
         if (Objects.isNull(jsonObject) || jsonObject.isEmpty()) {
@@ -219,16 +198,66 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return true;
     }
 
+    private ObjectWrapper resolveJson(String jsonText) {
+        // 解析Json及Json5
+        if (!JsonUtil.isJson(jsonText) && !Json5Util.isJson5(jsonText)) {
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+            return null;
+        }
 
-    private void recursionAddProperty(JSONObject jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
+        // ----------------- 普通Json解析
+        if (JsonUtil.isJsonArray(jsonText)) {
+            ArrayWrapper jsonArray = JsonUtil.parseArray(jsonText);
+            // 数组为空
+            if (jsonArray.isEmpty()) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
+            if (jsonArray.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            return (ObjectWrapper) jsonArray.get(0);
+        } else if (JsonUtil.isJsonObject(jsonText)) {
+            return JsonUtil.parseObject(jsonText);
+        }
+
+
+        // ----------------- Json5解析
+        if (Json5Util.isJson5Array(jsonText)) {
+            ArrayWrapper arrayWrapper = Json5Util.parseArray(jsonText);
+            if (CollUtil.isEmpty(arrayWrapper)) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
+            if (arrayWrapper.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                return null;
+            }
+
+            // 转为JsonObject
+            return (ObjectWrapper) arrayWrapper.get(0);
+        } else if (Json5Util.isJson5Object(jsonText)) {
+            return Json5Util.parseObject(jsonText);
+        }
+
+        return null;
+    }
+
+    private void recursionAddProperty(ObjectWrapper jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
         // 循环所有Json字段
-        for (Map.Entry<String, Object> entry : jsonObject) {
+        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
 
-            // ------------- 如果value是JsonObject，表示是对象
-            if (value instanceof JSONObject) {
-                JSONObject childJsonObject = (JSONObject) value;
+            // ------------- 如果value是ObjectWrapper，表示是对象
+            if (value instanceof ObjectWrapper) {
+                ObjectWrapper childJsonObject = (ObjectWrapper) value;
                 // 如果是对象，则还需要创建内部类
                 PsiClass innerClass = factory.createClass(StrUtil.upperFirst(key));
 
@@ -249,13 +278,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
                 // 添加到Class
                 psiClass.add(psiField);
-            } else if (value instanceof JSONArray) {
-                JSONArray jsonArray = (JSONArray) value;
+            } else if (value instanceof ArrayWrapper) {
+                ArrayWrapper jsonArray = (ArrayWrapper) value;
                 if (CollUtil.isNotEmpty(jsonArray)) {
                     String innerClassName;
                     Object element = jsonArray.get(0);
-                    if (element instanceof JSONObject) {
-                        JSONObject jsonObj = (JSONObject) element;
+                    if (element instanceof ObjectWrapper) {
+                        ObjectWrapper jsonObj = (ObjectWrapper) element;
                         // 对象值
                         innerClassName = StrUtil.upperFirst(key + "Bean");
                         // 如果是对象，则还需要创建内部类
@@ -400,7 +429,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
             String json = jsonTextField.getText();
-            getOKAction().setEnabled(JsonUtil.isJson(json));
+            getOKAction().setEnabled(JsonUtil.isJson(json) || Json5Util.isJson5(json));
         }
     }
 

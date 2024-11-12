@@ -2,7 +2,6 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
@@ -11,9 +10,8 @@ import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
-import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -59,7 +57,7 @@ public class JsonPathComponentProvider {
         this.project = project;
         this.action = () -> handleJsonPathResult(editor.getDocument().getText());
         this.pathExpressionComboBoxTextField = createJsonPathTextField(project);
-        this.showTextEditor = new CustomizedLanguageTextEditor(LanguageHolder.JSON, project, "", true);
+        this.showTextEditor = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         this.showTextEditor.setFont(UIManager.consolasFont(14));
     }
 
@@ -119,15 +117,20 @@ public class JsonPathComponentProvider {
 
     public void handleJsonPathResult(String jsonStr) {
         String jsonPath = getPathExpression();
-        if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr) || !JsonUtil.isJson(jsonStr)) {
+        // 在update方法已经判断了是否为Json或Json5，无需再来一遍
+        if (Objects.isNull(jsonPath) || StrUtil.isBlank(jsonStr)) {
             return;
         }
 
         try {
+            if (Json5Util.isJson5(jsonStr)) {
+                jsonStr = Json5Util.convertJson5ToJson(jsonStr);
+            }
+
             Object result = JsonPath.read(jsonStr, jsonPath);
             String jsonResult;
             if (result instanceof Map || result instanceof Iterable) {
-                jsonResult = JsonUtil.formatJson(JSONUtil.toJsonStr(result));
+                jsonResult = JsonUtil.formatJson(result);
             } else {
                 if (result == null) {
                     jsonResult = "null";
@@ -138,6 +141,8 @@ public class JsonPathComponentProvider {
                 }
             }
 
+            // 去除\r
+            jsonResult = PlatformUtil.normalizeLineEndings(jsonResult);
             showTextEditor.setText(jsonResult);
 
             // 添加至历史记录
@@ -203,6 +208,7 @@ public class JsonPathComponentProvider {
 
     public void addJSONPathToHistory(String expression) {
         expression = StrUtil.trim(expression);
+        expression = PlatformUtil.normalizeLineEndings(expression);
 
         ArrayDeque<String> history = new ArrayDeque<>(getExpressionHistory());
         if (!history.contains(expression)) {

@@ -1,7 +1,6 @@
 package cn.memoryzy.json.action;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.json.JSONUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
 import cn.memoryzy.json.util.*;
@@ -57,9 +56,9 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         }
 
         // 将Map转换为Json
-        String jsonStr = JSONUtil.toJsonStr(jsonMap, JsonUtil.HUTOOL_JSON_CONFIG);
+        String jsonStr = JsonUtil.formatJson(jsonMap);
         // 添加至剪贴板
-        PlatformUtil.setClipboard(JsonUtil.formatJson(jsonStr));
+        PlatformUtil.setClipboard(jsonStr);
 
         Set<Map.Entry<String, List<String>>> entries = ignoreMap.entrySet();
         // 移除 value 为空列表的键值对

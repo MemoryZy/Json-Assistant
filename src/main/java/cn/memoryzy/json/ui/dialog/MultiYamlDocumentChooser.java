@@ -5,6 +5,7 @@ import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -179,7 +180,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         public void valueChanged(ListSelectionEvent e) {
             YamlDocEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
-                showTextField.setText(selectedValue.getLongText());
+                showTextField.setText(PlatformUtil.normalizeLineEndings(selectedValue.getLongText()));
             }
         }
     }

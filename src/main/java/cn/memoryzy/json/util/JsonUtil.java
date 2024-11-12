@@ -2,17 +2,23 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSON;
-import cn.hutool.json.JSONConfig;
-import cn.hutool.json.JSONUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import cn.memoryzy.json.model.deserialize.ArrayWrapper;
+import cn.memoryzy.json.model.deserialize.JsonWrapper;
+import cn.memoryzy.json.model.deserialize.ObjectWrapper;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
+import com.fasterxml.jackson.core.json.JsonWriteFeature;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,68 +29,164 @@ import java.util.regex.Pattern;
  */
 public class JsonUtil {
 
-    public static final ObjectMapper MAPPER = new ObjectMapper();
+    /**
+     * 构建 JsonMapper（支持解析 '非数字NaN' 标识）
+     */
+    private static final JsonMapper MAPPER = JsonMapper.builder()
+            .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS)
+            .disable(JsonWriteFeature.WRITE_NAN_AS_STRINGS)
+            .build();
 
-    public static final JSONConfig HUTOOL_JSON_CONFIG = JSONConfig.create().setStripTrailingZeros(false).setIgnoreNullValue(false);
-
+    /**
+     * 检查字符串是否为JSON格式。
+     *
+     * @param text 待检查的字符串
+     * @return 如果字符串是有效的JSON则返回true，否则返回false
+     */
     public static boolean isJson(String text) {
         try {
-            JSONUtil.parse(text);
-            JsonNode jsonNode = MAPPER.readTree(text);
-            return jsonNode instanceof ArrayNode || jsonNode instanceof ObjectNode;
+            JsonNode node = MAPPER.readTree(text);
+            return node instanceof ArrayNode || node instanceof ObjectNode;
         } catch (Throwable e) {
             return false;
         }
     }
 
+
+    /**
+     * 检查字符串是否为JSON数组。
+     *
+     * @param json 待检查的字符串
+     * @return 如果字符串是有效的JSONArray则返回true，否则返回false
+     */
     public static boolean isJsonArray(String json) {
         try {
             JsonNode jsonNode = MAPPER.readTree(json);
             return jsonNode instanceof ArrayNode;
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
+
+    /**
+     * 检查字符串是否为JSON对象。
+     *
+     * @param json 待检查的字符串
+     * @return 如果字符串是有效的JSONObject则返回true，否则返回false
+     */
     public static boolean isJsonObject(String json) {
         try {
             JsonNode jsonNode = MAPPER.readTree(json);
             return jsonNode instanceof ObjectNode;
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
-
-    public static String formatJson(String jsonStr) {
-        JSON json = JSONUtil.parse(jsonStr, HUTOOL_JSON_CONFIG);
-        return json.toJSONString(2);
+    /**
+     * 将字符串解析为JsonWrapper包装对象
+     *
+     * @param json json字符串
+     * @return JsonWrapper包装对象
+     */
+    public static JsonWrapper parse(String json) {
+        if (isJsonObject(json)) {
+            return parseObject(json);
+        } else if (isJsonArray(json)) {
+            return parseArray(json);
+        }
+        return null;
     }
+
+    /**
+     * 将字符串解析为ObjectWrapper包装对象（对象）
+     *
+     * @param text json字符串
+     * @return ObjectWrapper包装对象
+     */
+    public static ObjectWrapper parseObject(String text) {
+        return new ObjectWrapper(toObject(ensureJson(text), LinkedHashMap.class));
+    }
+
+    /**
+     * 将字符串解析为ArrayWrapper包装对象（数组）
+     *
+     * @param text json字符串
+     * @return ArrayWrapper包装对象
+     */
+    public static ArrayWrapper parseArray(String text) {
+        return new ArrayWrapper(toObject(ensureJson(text), ArrayList.class));
+    }
+
+
+    /**
+     * 格式化Json字符串
+     *
+     * @param jsonStr json字符串
+     * @return 格式化后的json字符串
+     */
+    public static String formatJson(String jsonStr) {
+        try {
+            return formatJson(MAPPER.readTree(jsonStr));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * 格式化Json字符串
+     *
+     * @param data 对象
+     * @return 格式化后的json字符串
+     */
+    public static String formatJson(Object data) {
+        try {
+            return MAPPER.writer(new NoSpaceAndLFPrettyPrinter()).writeValueAsString(data);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
     /**
      * 将Json压缩成一行
      *
      * @param jsonStr json字符串
      * @return 压缩json
-     * @throws JsonProcessingException 非法Json
      */
-    public static String compressJson(String jsonStr) throws JsonProcessingException {
-        return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
-    }
-
-    public static String toJson(Object obj) {
+    public static String compressJson(String jsonStr) {
         try {
-            return MAPPER.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
+            return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static Object toBean(String jsonStr) {
+
+    /**
+     * 将对象转换为JSON字符串
+     *
+     * @param obj 对象
+     * @return JSON字符串
+     */
+    public static String toJsonStr(Object obj) {
+        return formatJson(obj);
+    }
+
+
+    /**
+     * 将JSON字符串转换为对象
+     *
+     * @param jsonStr JSON字符串
+     * @param clz     目标对象类型
+     * @return 目标对象
+     */
+    public static <T> T toObject(String jsonStr, Class<T> clz) {
         try {
-            JsonNode jsonNode = MAPPER.readTree(jsonStr);
-            return MAPPER.convertValue(jsonNode, Object.class);
-        } catch (JsonProcessingException e) {
+            return MAPPER.readValue(jsonStr, clz);
+        } catch (Exception e) {
             return null;
         }
     }
@@ -146,12 +248,25 @@ public class JsonUtil {
     }
 
 
+    /**
+     * 从给定的字符串中提取JSON字符串，使用正则表达式匹配
+     *
+     * @param includeJsonStr 包含JSON字符串的字符串
+     * @return 提取的JSON字符串，如果给定的字符串为空或null，则返回空字符串
+     */
     public static String extractJsonStringOnRegular(String includeJsonStr) {
         List<String> jsonStrings = findJsonStrings(includeJsonStr);
         return CollUtil.isNotEmpty(jsonStrings) ? jsonStrings.get(0) : "";
     }
 
 
+    /**
+     * 在给定的文本中查找所有可能的JSON字符串
+     *
+     * @param text 文本
+     * @return 所有可能的JSON字符串的列表
+     */
+    @SuppressWarnings("RegExpRedundantEscape")
     public static List<String> findJsonStrings(String text) {
         List<String> jsonStrings = new ArrayList<>();
 
@@ -213,5 +328,31 @@ public class JsonUtil {
 
         return includeJsonStr.substring(startIndex, endIndex + 1);
     }
+
+
+    /**
+     * 使用默认的PrettyPrinter时，Key的后面总是会带一个空格，然后才是冒号，通过继承这个类做处理
+     * <p>并且在Jackson生成的Json中换行符为系统默认的 \r\n 换行符，利用此类将其固定为 \n  <br/>
+     * （{@link com.intellij.openapi.editor.Document} 类不允许编辑器内出现\r）</p>
+     */
+    private static class NoSpaceAndLFPrettyPrinter extends DefaultPrettyPrinter {
+
+        public NoSpaceAndLFPrettyPrinter() {
+            super();
+            super._objectIndenter = new DefaultIndenter("  ", "\n");
+        }
+
+        @Override
+        public DefaultPrettyPrinter createInstance() {
+            return new NoSpaceAndLFPrettyPrinter();
+        }
+
+        @Override
+        public void writeObjectFieldValueSeparator(JsonGenerator g) throws IOException {
+            // 将 "key" : "value" 变为 "key": "value"
+            g.writeRaw(": ");
+        }
+    }
+
 
 }

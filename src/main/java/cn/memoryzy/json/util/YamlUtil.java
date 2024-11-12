@@ -16,7 +16,7 @@ public class YamlUtil {
 
     public static boolean isYaml(String text) {
         // yaml.load(text) 也可以解析 Json 格式数据，所以在此先判断是否为 Json
-        if (JsonUtil.canResolveToJson(text)) {
+        if (JsonUtil.canResolveToJson(text) || Json5Util.isJson5(text)) {
             return false;
         }
 
@@ -62,12 +62,12 @@ public class YamlUtil {
     public static String toJson(String yamlStr) {
         Yaml yaml = yaml();
         Object obj = yaml.load(yamlStr);
-        return JsonUtil.toJson(obj);
+        return JsonUtil.toJsonStr(obj);
     }
 
-    public static String toYaml(String jsonStr) {
+    public static String toYaml(String jsonStr, boolean isJson) {
         Yaml yaml = yaml();
-        Object obj = JsonUtil.toBean(jsonStr);
+        Object obj = isJson ? JsonUtil.parse(jsonStr) : Json5Util.parse(jsonStr);
         return yaml.dump(obj);
     }
 

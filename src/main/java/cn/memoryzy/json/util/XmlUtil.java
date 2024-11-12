@@ -29,8 +29,10 @@ public class XmlUtil {
         }
     }
 
-    public static String toXml(String jsonStr) throws Exception {
-        Object object = JsonUtil.MAPPER.readValue(jsonStr, Object.class);
+    public static String toXml(String jsonStr, boolean isJson) throws Exception {
+        Object object = isJson
+                ? JsonUtil.parse(jsonStr)
+                : Json5Util.parse(jsonStr);
         XmlMapper xmlMapper = new XmlMapper();
         return xmlMapper.writerWithDefaultPrettyPrinter()
                 .withRootName("root")
@@ -41,7 +43,7 @@ public class XmlUtil {
         try {
             ObjectMapper xmlMapper = new XmlMapper();
             JsonNode jsonNode = xmlMapper.readTree(xmlStr.getBytes(StandardCharsets.UTF_8));
-            return JsonUtil.MAPPER.writeValueAsString(jsonNode);
+            return JsonUtil.toJsonStr(jsonNode);
         } catch (Exception e) {
             return null;
         }

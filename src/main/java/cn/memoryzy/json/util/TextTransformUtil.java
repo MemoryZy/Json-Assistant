@@ -1,12 +1,12 @@
 package cn.memoryzy.json.util;
 
-import cn.hutool.json.JSONObject;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.TextResolveStatus;
-import cn.memoryzy.json.model.data.EditorData;
-import cn.memoryzy.json.model.data.MessageData;
-import cn.memoryzy.json.model.data.SelectionData;
+import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
+import cn.memoryzy.json.model.strategy.formats.data.MessageData;
+import cn.memoryzy.json.model.strategy.formats.data.SelectionData;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -211,7 +211,7 @@ public class TextTransformUtil {
             }
 
             // 转换为JSON
-            return new JSONObject(params).toJSONString(2);
+            return new ObjectWrapper(params).toString();
         } catch (Exception e) {
             // LOG.error("Error parsing URL parameters", e);
             return null;

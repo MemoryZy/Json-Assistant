@@ -42,10 +42,11 @@ import java.util.Objects;
  * @since 2024/8/9
  */
 public class JsonPathAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
-    public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
     private final EditorEx editor;
     private final SimpleToolWindowPanel simpleToolWindowPanel;
+
+    public static final String JSON_PATH_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathGuide";
 
     public JsonPathAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
@@ -105,7 +106,6 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        if (project == null) return;
         showComponentPopup(project);
     }
 
@@ -118,9 +118,9 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     }
 
     private void showComponentPopup(Project project) {
-        JsonPathComponentProvider jsonPathComponentProvider = new JsonPathComponentProvider(project, editor);
-        JPanel rootPanel = jsonPathComponentProvider.createRootPanel();
-        JComponent expressionComboBoxTextField = jsonPathComponentProvider.getPathExpressionComboBoxTextField();
+        JsonPathComponentProvider provider = new JsonPathComponentProvider(project, editor);
+        JPanel rootPanel = provider.createRootPanel();
+        JComponent expressionComboBoxTextField = provider.getPathExpressionComboBoxTextField();
 
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         boolean hasShown = propertiesComponent.getBoolean(JSON_PATH_GUIDE_KEY, false);
@@ -144,15 +144,15 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .createPopup();
 
         // Enter
-        DumbAwareAction.create(event -> jsonPathComponentProvider.getAction().run())
+        DumbAwareAction.create(event -> provider.getAction().run())
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), expressionComboBoxTextField, popup);
 
         // Alt+向上箭头
-        DumbAwareAction.create(event -> jsonPathComponentProvider.searchHistory(true))
+        DumbAwareAction.create(event -> provider.searchHistory(true))
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), expressionComboBoxTextField, popup);
 
         // Alt+向下箭头
-        DumbAwareAction.create(event -> jsonPathComponentProvider.searchHistory(false))
+        DumbAwareAction.create(event -> provider.searchHistory(false))
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), expressionComboBoxTextField, popup);
 
         // 弹出
@@ -194,7 +194,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalJsonConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorAllJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 

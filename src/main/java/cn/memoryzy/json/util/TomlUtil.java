@@ -1,7 +1,5 @@
 package cn.memoryzy.json.util;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 
@@ -22,18 +20,18 @@ public class TomlUtil {
         }
     }
 
-    public static boolean canConvertToToml(String jsonStr) {
-        return !JsonUtil.isJsonArray(jsonStr);
+    public static boolean canConvertToToml(String jsonStr, boolean isJson) {
+        return isJson ? (!JsonUtil.isJsonArray(jsonStr)) : (!Json5Util.isJson5Array(jsonStr));
     }
 
     public static String toJson(String tomlStr) {
         Toml toml = new Toml().read(tomlStr);
         Map<String, Object> map = toml.toMap();
-        return JSONUtil.toJsonStr(map);
+        return JsonUtil.toJsonStr(map);
     }
 
-    public static String toToml(String jsonStr) {
-        JSONObject jsonObject = JSONUtil.parseObj(jsonStr);
+    public static String toToml(String jsonStr, boolean isJson) {
+        Object jsonObject = isJson ? JsonUtil.parseObject(jsonStr) : Json5Util.parseObject(jsonStr);
         // 单纯的 List 类型无法转换
         return new TomlWriter().write(jsonObject);
     }

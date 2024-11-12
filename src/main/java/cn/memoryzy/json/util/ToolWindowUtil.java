@@ -46,11 +46,11 @@ public class ToolWindowUtil {
         EditorEx editor = getEditorOnContent(mainContent);
 
         if (StrUtil.isBlank(Objects.requireNonNull(editor).getDocument().getText())) {
-            WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(processedText));
+            WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), processedText));
         } else {
             Content content = addNewContent(project, toolWindow, contentFactory, editorFileType);
             EditorEx editorEx = getEditorOnContent(content);
-            WriteCommandAction.runWriteCommandAction(project, () -> Objects.requireNonNull(editorEx).getDocument().setText(processedText));
+            WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(Objects.requireNonNull(editorEx).getDocument(), processedText));
         }
 
         toolWindow.show();

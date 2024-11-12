@@ -6,6 +6,7 @@ jackson-dataformat-xml = "2.16.1"
 json-path = "2.9.0"
 commons-lang3 = "3.16.0"
 toml4j = "0.7.2"
+tnjson = "2.0"
 
 # plugins
 dokka = "1.8.10"
@@ -22,6 +23,7 @@ dataformat = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataf
 jsonpath = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "json-path" }
 commonlang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons-lang3" }
 toml4j = { group = "com.moandjiezana.toml", name = "toml4j", version.ref = "toml4j" }
+tnjson = { group = "com.github.anymaker", name = "tnjson", version.ref = "tnjson" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

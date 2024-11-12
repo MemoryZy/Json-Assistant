@@ -55,7 +55,7 @@ public class MoveToEditorAction extends DumbAwareAction {
                     .map(Editor::getDocument)
                     .map(document -> PsiDocumentManager.getInstance(project).getPsiFile(document))
                     .map(PsiFile::getVirtualFile)
-                    .orElse(new LightVirtualFile(selectedContent.getDisplayName(), FileTypeHolder.JSON, text));
+                    .orElse(new LightVirtualFile(selectedContent.getDisplayName(), FileTypeHolder.JSON5, text));
 
             EditInNewWindowAction.rename(project, virtualFile, selectedContent);
             FileEditorManager.getInstance(project).openFile(virtualFile, true);

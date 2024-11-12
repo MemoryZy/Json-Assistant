@@ -3,10 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.PsiUtil;
-import cn.memoryzy.json.util.TextTransformUtil;
+import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -40,7 +37,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), computeJson(event.getDataContext()), FileTypeHolder.JSON);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), computeJson(event.getDataContext()), FileTypeHolder.JSON5);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class JavaConstantExtractToJsonAction extends AnAction {
         event.getPresentation().setEnabledAndVisible(
                 getEventProject(event) != null
                         && StrUtil.isNotBlank(json)
-                        && JsonUtil.isJson(json));
+                        && (JsonUtil.isJson(json) || Json5Util.isJson5(json)));
     }
 
 

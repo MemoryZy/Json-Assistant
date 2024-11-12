@@ -2,7 +2,6 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -33,7 +32,7 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
         GlobalJsonConverter.parseAndProcessJson(
-                dataContext, PlatformUtil.getEditor(dataContext), false,
+                dataContext, editor, false,
                 JsonAssistantBundle.messageOnSystem("hint.selection.json.minify.text"),
                 JsonAssistantBundle.messageOnSystem("hint.global.json.minify.text"));
     }
@@ -41,7 +40,7 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
-                GlobalJsonConverter.validateEditorJson(
+                GlobalJsonConverter.validateEditorAllJson(
                         getEventProject(event), editor, event.getDataContext()));
     }
 }
