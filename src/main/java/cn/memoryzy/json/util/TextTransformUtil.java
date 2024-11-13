@@ -1,5 +1,6 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.deserialize.ObjectWrapper;
@@ -20,13 +21,12 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.util.Urls;
+import org.apache.commons.lang3.StringUtils;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Memory
@@ -216,6 +216,26 @@ public class TextTransformUtil {
             // LOG.error("Error parsing URL parameters", e);
             return null;
         }
+    }
+
+    public static String jsonToUrlParams(String json, boolean isJson) {
+        // JsonMap中跳过Map、List、null、长文本String
+        ObjectWrapper objectWrapper = isJson ? JsonUtil.parseObject(json) : Json5Util.parseObject(json);
+        Map<String, String> params = new LinkedHashMap<>();
+        for (Map.Entry<String, Object> entry : objectWrapper.entrySet()) {
+            Object value = entry.getValue();
+            if ((value instanceof Map) || (value instanceof List) || Objects.isNull(value)
+                    || (value instanceof String && ((String) value).length() > 500)
+                    || (value instanceof String && StrUtil.isBlank((CharSequence) value))) {
+                continue;
+            }
+
+            params.put(entry.getKey(), value.toString());
+        }
+
+        String frontUrl = cn.memoryzy.json.constant.Urls.FRONT_URL;
+        String external = Urls.newFromEncoded(frontUrl).addParameters(params).toExternalForm();
+        return StringUtils.removeStart(external, frontUrl + "?");
     }
 
 

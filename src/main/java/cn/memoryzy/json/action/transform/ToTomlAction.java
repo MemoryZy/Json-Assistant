@@ -57,9 +57,13 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        DataContext dataContext = event.getDataContext();
+        event.getPresentation().setEnabled(canConvertToTomlOrUrlParam(event.getDataContext()));
+    }
+
+    public static boolean canConvertToTomlOrUrlParam(DataContext dataContext) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
-        event.getPresentation().setEnabled(TomlUtil.canConvertToToml(json, GlobalJsonConverter.isValidJson(context.getProcessor())));
+        return TomlUtil.canConvertToToml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
     }
+
 }

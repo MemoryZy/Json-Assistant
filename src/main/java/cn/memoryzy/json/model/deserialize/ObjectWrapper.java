@@ -14,6 +14,7 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
 
     @SuppressWarnings("unchecked")
     public ObjectWrapper(Object source) {
+        super();
         if (!(source instanceof Map)) {
             throw new IllegalArgumentException("source is not a Map");
         }

@@ -9,10 +9,7 @@ import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -21,6 +18,7 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Memory
@@ -44,12 +42,28 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        if (Objects.isNull(project)) {
-            return;
-        }
-
         // 获取当前类
         PsiClass psiClass = JavaUtil.getPsiClass(event.getDataContext());
+        // 执行操作
+        convertAttributesToJsonAndNotify(project, psiClass, JsonUtil::formatJson, LOG);
+    }
+
+
+    @Override
+    public void update(@NotNull AnActionEvent event) {
+        // 设置可见性
+        event.getPresentation().setEnabledAndVisible(isEnable(getEventProject(event), event.getDataContext()));
+    }
+
+
+    /**
+     * 将 Java 属性转换为 JSON/JSON5 并复制到剪贴板，同时显示忽略的字段（如果有的话）
+     *
+     * @param project       项目对象
+     * @param psiClass      当前类对象
+     * @param jsonConverter JSON 转换器
+     */
+    public static void convertAttributesToJsonAndNotify(Project project, PsiClass psiClass, Function<Map<String, Object>, String> jsonConverter, Logger log) {
         // JsonMap
         Map<String, Object> jsonMap = new TreeMap<>();
         // 忽略的属性
@@ -61,12 +75,13 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
             // 递归添加所有属性，包括嵌套属性
             JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, persistentState);
         } catch (Error e) {
-            LOG.error(e);
+            log.error(e);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.json.serialize.recursion"), NotificationType.ERROR, project);
             return;
         }
 
-        String jsonStr = JsonUtil.formatJson(jsonMap);
+        // 执行转换
+        String jsonStr = jsonConverter.apply(jsonMap);
 
         // 添加至剪贴板
         PlatformUtil.setClipboard(jsonStr);
@@ -87,13 +102,8 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     }
 
 
-    @Override
-    public void update(@NotNull AnActionEvent event) {
-        // 设置可见性
-        event.getPresentation().setEnabledAndVisible(
-                Objects.nonNull(event.getProject())
-                        && JavaUtil.isJavaFile(event.getDataContext())
-                        && JavaUtil.hasJavaProperty(event.getDataContext()));
+    public static boolean isEnable(Project project, DataContext dataContext) {
+        return Objects.nonNull(project) && JavaUtil.isJavaFile(dataContext) && JavaUtil.hasJavaProperty(dataContext);
     }
 
 
