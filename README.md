@@ -43,6 +43,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - JSON <-> XML
   - JSON <-> YAML
   - JSON <-> Toml
+  - JSON <-> Properties
   - JSON <-> URL Param
 
 <br/>

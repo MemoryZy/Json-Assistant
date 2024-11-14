@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.formats.context;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.strategy.formats.data.ActionData;
@@ -61,7 +62,7 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
 
     public final String convert(String text) {
         try {
-            if (canConvert(text)) {
+            if (StrUtil.isNotBlank(text) && canConvert(text)) {
                 // 设置内容
                 setContent(text);
                 // 执行前置逻辑

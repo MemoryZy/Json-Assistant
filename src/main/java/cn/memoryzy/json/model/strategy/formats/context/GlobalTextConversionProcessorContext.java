@@ -5,10 +5,7 @@ import cn.memoryzy.json.enums.TextResolveStatus;
 import cn.memoryzy.json.model.strategy.formats.data.DocTextData;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.SelectionData;
-import cn.memoryzy.json.model.strategy.formats.processor.TomlConversionProcessor;
-import cn.memoryzy.json.model.strategy.formats.processor.UrlParamConversionProcessor;
-import cn.memoryzy.json.model.strategy.formats.processor.XmlConversionProcessor;
-import cn.memoryzy.json.model.strategy.formats.processor.YamlConversionProcessor;
+import cn.memoryzy.json.model.strategy.formats.processor.*;
 import cn.memoryzy.json.model.strategy.formats.processor.json.*;
 import com.intellij.openapi.actionSystem.DataContext;
 
@@ -42,7 +39,7 @@ public class GlobalTextConversionProcessorContext {
 
         String result;
         if (selectionData.isHasSelection()) {
-            result = processor.convert(selectedText);
+            result = processor.convert(StrUtil.trim(selectedText));
             if (StrUtil.isNotBlank(result)) {
                 processor.setTextResolveStatus(TextResolveStatus.SELECTED_SUCCESS);
                 return result;
@@ -53,7 +50,7 @@ public class GlobalTextConversionProcessorContext {
             }
         }
 
-        result = processor.convert(documentText);
+        result = processor.convert(StrUtil.trim(documentText));
         processor.setTextResolveStatus(StrUtil.isNotBlank(result)
                 ? TextResolveStatus.GLOBAL_SUCCESS
                 : TextResolveStatus.RESOLVE_FAILED);
@@ -76,10 +73,10 @@ public class GlobalTextConversionProcessorContext {
         try {
             if (selectionData.isHasSelection()) {
                 // 如果选择了文本，通过匹配则返回 true；若没通过匹配，则跳过，选择下一个处理器
-                return processor.canConvert(selectedText);
+                return processor.canConvert(StrUtil.trim(selectedText));
             }
 
-            return processor.canConvert(documentText);
+            return processor.canConvert(StrUtil.trim(documentText));
         } catch (Exception e) {
             return false;
         }
@@ -99,7 +96,8 @@ public class GlobalTextConversionProcessorContext {
                 new XmlConversionProcessor(editorData),
                 new YamlConversionProcessor(editorData),
                 new TomlConversionProcessor(editorData),
-                new UrlParamConversionProcessor(editorData)
+                new UrlParamConversionProcessor(editorData),
+                new PropertiesConversionProcessor(editorData),
                 // 待实现其他的处理器
         };
     }

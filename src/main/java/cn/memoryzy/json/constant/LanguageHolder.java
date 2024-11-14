@@ -20,4 +20,6 @@ public interface LanguageHolder {
 
     Language TOML = PlatformUtil.getLanguage(FileTypes.TOML);
 
+    Language PROPERTIES = PlatformUtil.getLanguage(FileTypes.PROPERTIES);
+
 }

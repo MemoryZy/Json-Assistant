@@ -1,9 +1,7 @@
 package cn.memoryzy.json.util;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.TextResolveStatus;
-import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.MessageData;
@@ -21,12 +19,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.util.Urls;
-import org.apache.commons.lang3.StringUtils;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -187,56 +182,6 @@ public class TextTransformUtil {
         return null != LangDataKeys.CONSOLE_VIEW.getData(dataContext);
     }
 
-
-    public static String urlParamsToJson(String url) {
-        try {
-            // 去掉URL中的协议、主机名等部分，只保留查询字符串
-            String query = new java.net.URL(url).getQuery();
-            if (query == null || query.isEmpty()) {
-                return null;
-            }
-
-            // 解析查询字符串
-            Map<String, Object> params = new LinkedHashMap<>();
-            String[] pairs = query.split("&");
-            for (String pair : pairs) {
-                int index = pair.indexOf("=");
-                if (index > 0 && index < pair.length() - 1) {
-                    String key = URLDecoder.decode(pair.substring(0, index), StandardCharsets.UTF_8);
-                    String value = URLDecoder.decode(pair.substring(index + 1), StandardCharsets.UTF_8);
-
-                    // 判断是否为数字、时间、布尔类型
-                    params.put(key, JsonAssistantUtil.detectType(value));
-                }
-            }
-
-            // 转换为JSON
-            return new ObjectWrapper(params).toString();
-        } catch (Exception e) {
-            // LOG.error("Error parsing URL parameters", e);
-            return null;
-        }
-    }
-
-    public static String jsonToUrlParams(String json, boolean isJson) {
-        // JsonMap中跳过Map、List、null、长文本String
-        ObjectWrapper objectWrapper = isJson ? JsonUtil.parseObject(json) : Json5Util.parseObject(json);
-        Map<String, String> params = new LinkedHashMap<>();
-        for (Map.Entry<String, Object> entry : objectWrapper.entrySet()) {
-            Object value = entry.getValue();
-            if ((value instanceof Map) || (value instanceof List) || Objects.isNull(value)
-                    || (value instanceof String && ((String) value).length() > 500)
-                    || (value instanceof String && StrUtil.isBlank((CharSequence) value))) {
-                continue;
-            }
-
-            params.put(entry.getKey(), value.toString());
-        }
-
-        String frontUrl = cn.memoryzy.json.constant.Urls.FRONT_URL;
-        String external = Urls.newFromEncoded(frontUrl).addParameters(params).toExternalForm();
-        return StringUtils.removeStart(external, frontUrl + "?");
-    }
 
 
     // public static String keyValuePairsToJson(String keyValue) {

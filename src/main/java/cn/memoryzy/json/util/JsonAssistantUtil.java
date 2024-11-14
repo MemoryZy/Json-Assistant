@@ -5,20 +5,10 @@ import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
-import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.enums.FileTypes;
-import com.intellij.ide.BrowserUtil;
-import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.project.Project;
-import com.intellij.util.ui.UIUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -83,43 +73,24 @@ public class JsonAssistantUtil {
     }
 
 
-    public static void openOnlineDoc(Project project, boolean useHtmlEditor) {
-        String url = Urls.OVERVIEW;
-        boolean darkTheme = UIUtil.isUnderDarcula();
-        Map<String, String> parameters = darkTheme ? Map.of("theme", "dark") : Map.of("theme", "light");
-        url = com.intellij.util.Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();
-
-        if (PlatformUtil.canBrowseInHTMLEditor() && useHtmlEditor) {
-            String timeoutContent = HtmlConstant.TIMEOUT_HTML
-                    .replace("__THEME__", darkTheme ? "theme-dark" : "")
-                    .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.title"))
-                    .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.message"))
-                    .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.action", url));
-
-            if (Urls.isReachable()) {
-                HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("html.editor.quick.start.title"), url, timeoutContent);
-                return;
-            }
-        }
-
-        BrowserUtil.browse(url);
-    }
-
-    public static boolean isJsonFileType(FileType fileType) {
-        return isAssignFileType(fileType, FileTypes.JSON.getFileTypeQualifiedName())
-                || isAssignFileType(fileType, FileTypes.JSON5.getFileTypeQualifiedName());
-    }
-
-    public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
-        return fileType != null && Objects.equals(fileTypeClassName, fileType.getClass().getName());
-    }
-
     /**
      * 判断一个字符是否是中文字符（基本汉字范围）
      */
     private static boolean isChineseCharacter(char c) {
         return (c >= '一' && c <= '\u9FFF');
     }
+
+
+    /**
+     * 去除\r相关
+     *
+     * @param text 文本
+     * @return 规范后的文本
+     */
+    public static String normalizeLineEndings(String text) {
+        return text == null ? null : text.replaceAll("\\r\\n|\\r|\\n", "\n");
+    }
+
 
     /**
      * 判断文本中是否存在多个中文字符

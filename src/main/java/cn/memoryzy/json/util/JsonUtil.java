@@ -191,6 +191,9 @@ public class JsonUtil {
         }
     }
 
+    public static boolean isNotJsonArray(String jsonStr, boolean isJson) {
+        return isJson ? (!JsonUtil.isJsonArray(jsonStr)) : (!Json5Util.isJson5Array(jsonStr));
+    }
 
     /**
      * 判断文本是否为 JSON，如果不是，那就尝试从文本中提取 JSON

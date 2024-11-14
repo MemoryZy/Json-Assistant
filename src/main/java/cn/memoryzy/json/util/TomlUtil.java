@@ -20,10 +20,6 @@ public class TomlUtil {
         }
     }
 
-    public static boolean canConvertToToml(String jsonStr, boolean isJson) {
-        return isJson ? (!JsonUtil.isJsonArray(jsonStr)) : (!Json5Util.isJson5Array(jsonStr));
-    }
-
     public static String toJson(String tomlStr) {
         Toml toml = new Toml().read(tomlStr);
         Map<String, Object> map = toml.toMap();

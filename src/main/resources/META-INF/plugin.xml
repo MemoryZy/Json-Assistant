@@ -20,6 +20,7 @@
     <!-- 低版本的 IDE 无法加载 org.toml.lang，如 2020.3.1 -->
     <depends optional="true" config-file="optional/plugin-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="optional/plugin-yaml.xml">org.jetbrains.plugins.yaml</depends>
+    <depends optional="true" config-file="optional/plugin-properties.xml">com.intellij.properties</depends>
 
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
 
@@ -69,6 +70,7 @@
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
         <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
         <action id="JsonAssistant.Action.ToUrlParamAction" class="cn.memoryzy.json.action.transform.ToUrlParamAction"/>
+        <action id="JsonAssistant.Action.ToPropertiesAction" class="cn.memoryzy.json.action.transform.ToPropertiesAction"/>
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
 

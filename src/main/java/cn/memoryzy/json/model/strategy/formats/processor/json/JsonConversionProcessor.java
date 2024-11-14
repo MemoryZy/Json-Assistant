@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
-import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -83,7 +82,7 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
             FileType fileType = PlatformUtil.getDocumentFileType(project, document);
 
             // 全部文本未超过 300 行，或者文件类型是指定类型，则解析提取 JSON
-            if (lineCount < 300 || JsonAssistantUtil.isJsonFileType(fileType)) {
+            if (lineCount < 300 || PlatformUtil.isJsonFileType(fileType)) {
                 return JsonUtil.extractJson(documentText);
             }
         }

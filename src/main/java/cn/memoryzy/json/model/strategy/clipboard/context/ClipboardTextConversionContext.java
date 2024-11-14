@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard.context;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.strategy.clipboard.*;
 import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
 import com.google.common.collect.Lists;
@@ -28,6 +29,7 @@ public class ClipboardTextConversionContext {
 
     public String convert(String text) {
         try {
+            text = StrUtil.trim(text);
             if (strategy != null && strategy.canConvert(text)) {
                 return strategy.convertToJson(text);
             }

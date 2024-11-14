@@ -31,6 +31,7 @@
    - JSON <-> XML
    - JSON <-> YAML
    - JSON <-> Toml
+   - JSON <-> Properties
    - JSON <-> URL Param
 
 

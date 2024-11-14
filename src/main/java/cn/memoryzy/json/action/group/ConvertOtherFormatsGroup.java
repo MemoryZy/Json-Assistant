@@ -35,6 +35,7 @@ public class ConvertOtherFormatsGroup extends DefaultActionGroup implements Dumb
                 ActionHolder.TO_TOML_ACTION,
                 ActionHolder.TO_JSON5_ACTION,
                 ActionHolder.TO_JSON_ACTION,
+                ActionHolder.TO_PROPERTIES_ACTION,
                 ActionHolder.TO_URL_PARAM_ACTION
         };
     }

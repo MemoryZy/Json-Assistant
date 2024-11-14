@@ -1,7 +1,11 @@
 package cn.memoryzy.json.util;
 
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
@@ -13,6 +17,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
@@ -27,6 +32,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
+import com.intellij.util.ui.UIUtil;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -36,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -156,7 +163,7 @@ public class PlatformUtil {
         return getFileType(fileTypes, PlainTextFileType.INSTANCE);
     }
 
-    public static FileType getFileType(FileTypes fileTypes, FileType fileType) {
+    public static FileType getFileType(FileTypes fileTypes, FileType defaultFileType) {
         Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getFileTypeQualifiedName());
 
         if (clz != null) {
@@ -166,14 +173,14 @@ public class PlatformUtil {
             }
         }
 
-        return fileType;
+        return defaultFileType;
     }
 
     public static Language getLanguage(FileTypes fileTypes) {
         return getLanguage(fileTypes, PlainTextLanguage.INSTANCE);
     }
 
-    public static Language getLanguage(FileTypes fileTypes, Language language) {
+    public static Language getLanguage(FileTypes fileTypes, Language defaultLanguage) {
         Class<?> clz = JsonAssistantUtil.getClassByName(fileTypes.getLanguageQualifiedName());
 
         if (clz != null) {
@@ -183,7 +190,7 @@ public class PlatformUtil {
             }
         }
 
-        return language;
+        return defaultLanguage;
     }
 
 
@@ -241,19 +248,41 @@ public class PlatformUtil {
      * @param text 文本
      */
     public static void setDocumentText(Document document, String text) {
-        text = normalizeLineEndings(text);
+        text = JsonAssistantUtil.normalizeLineEndings(text);
         if (text == null) return;
         document.setText(text);
     }
 
-    /**
-     * 去除\r相关
-     *
-     * @param text 文本
-     * @return 规范后的文本
-     */
-    public static String normalizeLineEndings(String text) {
-        return text == null ? null : text.replaceAll("\\r\\n|\\r|\\n", "\n");
+
+    public static void openOnlineDoc(Project project, boolean useHtmlEditor) {
+        String url = Urls.OVERVIEW;
+        boolean darkTheme = UIUtil.isUnderDarcula();
+        Map<String, String> parameters = darkTheme ? Map.of("theme", "dark") : Map.of("theme", "light");
+        url = com.intellij.util.Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();
+
+        if (PlatformUtil.canBrowseInHTMLEditor() && useHtmlEditor) {
+            String timeoutContent = HtmlConstant.TIMEOUT_HTML
+                    .replace("__THEME__", darkTheme ? "theme-dark" : "")
+                    .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.title"))
+                    .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.message"))
+                    .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.action", url));
+
+            if (Urls.isReachable()) {
+                HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("html.editor.quick.start.title"), url, timeoutContent);
+                return;
+            }
+        }
+
+        BrowserUtil.browse(url);
+    }
+
+    public static boolean isJsonFileType(FileType fileType) {
+        return isAssignFileType(fileType, FileTypes.JSON.getFileTypeQualifiedName())
+                || isAssignFileType(fileType, FileTypes.JSON5.getFileTypeQualifiedName());
+    }
+
+    public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
+        return fileType != null && Objects.equals(fileTypeClassName, fileType.getClass().getName());
     }
 
 }

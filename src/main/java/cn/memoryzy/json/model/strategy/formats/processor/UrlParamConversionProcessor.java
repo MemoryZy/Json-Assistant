@@ -5,7 +5,7 @@ import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConvers
 import cn.memoryzy.json.model.strategy.formats.data.ActionData;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.MessageData;
-import cn.memoryzy.json.util.TextTransformUtil;
+import cn.memoryzy.json.util.DataConverter;
 import icons.JsonAssistantIcons;
 
 /**
@@ -20,12 +20,12 @@ public class UrlParamConversionProcessor extends AbstractGlobalTextConversionPro
 
     @Override
     public boolean canConvert(String text) throws Exception {
-        return null != TextTransformUtil.urlParamsToJson(text);
+        return null != DataConverter.urlParamsToJson(text);
     }
 
     @Override
     public String convertToJson() throws Exception {
-        return TextTransformUtil.urlParamsToJson(getContent());
+        return DataConverter.urlParamsToJson(getContent());
     }
 
 

@@ -7,6 +7,7 @@ import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -275,7 +276,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         public void valueChanged(ListSelectionEvent e) {
             HistoryEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
-                showTextField.setText(PlatformUtil.normalizeLineEndings(selectedValue.getLongText()));
+                showTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getLongText()));
             }
         }
     }

@@ -6,13 +6,13 @@
         </action>
 
         <action id="JsonAssistant.Action.JsonToJavaBeanAction" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
-        <action id="JsonAssistant.Action.JsonExtractorAction" class="cn.memoryzy.json.action.JavaConstantExtractToJsonAction"/>
+        <action id="JsonAssistant.Action.JavaConstantToJsonAction" class="cn.memoryzy.json.action.JavaConstantToJsonAction"/>
 
         <group id="JsonAssistant.Group.JavaBeanToJsonGroup">
             <separator/>
             <reference ref="JsonAssistant.Action.JavaBeanToJsonAction"/>
             <separator/>
-            <reference ref="JsonAssistant.Action.JsonExtractorAction"/>
+            <reference ref="JsonAssistant.Action.JavaConstantToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>

@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.util.DataConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import cn.memoryzy.json.util.TomlUtil;
@@ -57,13 +58,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(canConvertToTomlOrUrlParam(event.getDataContext()));
-    }
-
-    public static boolean canConvertToTomlOrUrlParam(DataContext dataContext) {
-        GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
-        return TomlUtil.canConvertToToml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+        event.getPresentation().setEnabled(DataConverter.isNotJsonArray(event.getDataContext()));
     }
 
 }

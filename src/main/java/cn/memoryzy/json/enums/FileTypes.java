@@ -11,7 +11,8 @@ public enum FileTypes {
     JSONPATH("com.intellij.jsonpath.JsonPathFileType", "INSTANCE", "com.intellij.jsonpath.JsonPathLanguage", "INSTANCE"),
     XML("com.intellij.ide.highlighter.XmlFileType", "INSTANCE", "com.intellij.lang.xml.XMLLanguage", "INSTANCE"),
     YAML("org.jetbrains.yaml.YAMLFileType", "YML", "org.jetbrains.yaml.YAMLLanguage", "INSTANCE"),
-    TOML("org.toml.lang.psi.TomlFileType", "INSTANCE", "org.toml.lang.TomlLanguage", "INSTANCE");
+    TOML("org.toml.lang.psi.TomlFileType", "INSTANCE", "org.toml.lang.TomlLanguage", "INSTANCE"),
+    PROPERTIES("com.intellij.lang.properties.PropertiesFileType", "INSTANCE", "com.intellij.lang.properties.PropertiesLanguage", "INSTANCE");
 
     private final String fileTypeQualifiedName;
     private final String fileTypeInstanceFieldName;

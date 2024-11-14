@@ -22,4 +22,6 @@ public interface FileTypeHolder {
 
     FileType TOML = PlatformUtil.getFileType(FileTypes.TOML);
 
+    FileType PROPERTIES = PlatformUtil.getFileType(FileTypes.PROPERTIES);
+
 }

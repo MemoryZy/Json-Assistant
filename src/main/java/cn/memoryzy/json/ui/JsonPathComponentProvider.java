@@ -10,8 +10,10 @@ import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathExtendableComboBoxEditor;
 import cn.memoryzy.json.ui.component.editor.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
-import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -142,7 +144,7 @@ public class JsonPathComponentProvider {
             }
 
             // 去除\r
-            jsonResult = PlatformUtil.normalizeLineEndings(jsonResult);
+            jsonResult = JsonAssistantUtil.normalizeLineEndings(jsonResult);
             showTextEditor.setText(jsonResult);
 
             // 添加至历史记录
@@ -208,7 +210,7 @@ public class JsonPathComponentProvider {
 
     public void addJSONPathToHistory(String expression) {
         expression = StrUtil.trim(expression);
-        expression = PlatformUtil.normalizeLineEndings(expression);
+        expression = JsonAssistantUtil.normalizeLineEndings(expression);
 
         ArrayDeque<String> history = new ArrayDeque<>(getExpressionHistory());
         if (!history.contains(expression)) {

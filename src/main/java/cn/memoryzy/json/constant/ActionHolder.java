@@ -20,6 +20,7 @@ public interface ActionHolder {
     String TO_YAML_ACTION_ID = "JsonAssistant.Action.ToYamlAction";
     String TO_TOML_ACTION_ID = "JsonAssistant.Action.ToTomlAction";
     String TO_URL_PARAM_ACTION_ID = "JsonAssistant.Action.ToUrlParamAction";
+    String TO_PROPERTIES_ACTION_ID = "JsonAssistant.Action.ToPropertiesAction";
     String TO_JSON5_ACTION_ID = "JsonAssistant.Action.ToJson5Action";
     String TO_JSON_ACTION_ID = "JsonAssistant.Action.ToJsonAction";
 
@@ -34,6 +35,7 @@ public interface ActionHolder {
     AnAction TO_YAML_ACTION = ActionManager.getInstance().getAction(TO_YAML_ACTION_ID);
     AnAction TO_TOML_ACTION = ActionManager.getInstance().getAction(TO_TOML_ACTION_ID);
     AnAction TO_URL_PARAM_ACTION = ActionManager.getInstance().getAction(TO_URL_PARAM_ACTION_ID);
+    AnAction TO_PROPERTIES_ACTION = ActionManager.getInstance().getAction(TO_PROPERTIES_ACTION_ID);
     AnAction TO_JSON5_ACTION = ActionManager.getInstance().getAction(TO_JSON5_ACTION_ID);
     AnAction TO_JSON_ACTION = ActionManager.getInstance().getAction(TO_JSON_ACTION_ID);
 

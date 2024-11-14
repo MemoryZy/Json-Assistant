@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -21,7 +21,7 @@ public class QuickStartAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        JsonAssistantUtil.openOnlineDoc(event.getProject(), true);
+        PlatformUtil.openOnlineDoc(event.getProject(), true);
     }
 
 }
