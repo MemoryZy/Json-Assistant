@@ -42,7 +42,7 @@ public class ToXmlAction extends DumbAwareAction {
         String xmlStr;
         try {
             GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-            String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
+            String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
             // 处理不同的 Json 类型
             xmlStr = XmlUtil.toXml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
             xmlStr = xmlStr.replaceAll("\r\n", "\n");

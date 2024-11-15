@@ -1,6 +1,7 @@
 package cn.memoryzy.json.model.strategy.formats.data;
 
 import com.intellij.openapi.editor.Caret;
+import com.intellij.openapi.editor.Editor;
 
 /**
  * Editor 相关信息
@@ -25,6 +26,10 @@ public class EditorData {
      */
     private SelectionData selectionData;
 
+    /**
+     * 当前编辑器
+     */
+    private Editor editor;
 
 
     // ----------------------- GETTER/SETTER -----------------------
@@ -53,6 +58,15 @@ public class EditorData {
 
     public EditorData setSelectionData(SelectionData selectionData) {
         this.selectionData = selectionData;
+        return this;
+    }
+
+    public Editor getEditor() {
+        return editor;
+    }
+
+    public EditorData setEditor(Editor editor) {
+        this.editor = editor;
         return this;
     }
 }

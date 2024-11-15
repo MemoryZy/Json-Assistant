@@ -6,8 +6,6 @@ import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConvers
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileTypes.FileType;
@@ -23,16 +21,8 @@ import java.util.Objects;
  */
 public class JsonConversionProcessor extends AbstractGlobalTextConversionProcessor {
 
-    private DataContext dataContext;
-
-    protected JsonConversionProcessor(EditorData editorData, boolean needBeautify) {
+    public JsonConversionProcessor(EditorData editorData, boolean needBeautify) {
         super(editorData, needBeautify);
-        setAllowedFileTypeQualifiedNames();
-    }
-
-    public JsonConversionProcessor(DataContext dataContext, EditorData editorData, boolean needBeautify) {
-        super(editorData, needBeautify);
-        this.dataContext = dataContext;
         setAllowedFileTypeQualifiedNames();
     }
 
@@ -62,21 +52,12 @@ public class JsonConversionProcessor extends AbstractGlobalTextConversionProcess
      * @return 提取出的文本
      */
     private String extractJson(String text) {
-        if (Objects.isNull(dataContext)) {
-            return null;
-        }
-
         // 是否使用全局文本做匹配
         String documentText = editorData.getDocTextData().getDocumentText();
         if (Objects.equals(documentText, text)) {
             // 效率优化（防止全部文本过多）
-            Project project = CommonDataKeys.PROJECT.getData(dataContext);
-            Editor editor = CommonDataKeys.EDITOR.getData(dataContext);
-            // 如果未找到编辑器，则不开启提取 JSON 功能
-            if (Objects.isNull(editor)) {
-                return null;
-            }
-
+            Editor editor = editorData.getEditor();
+            Project project = editor.getProject();
             Document document = editor.getDocument();
             int lineCount = document.getLineCount();
             FileType fileType = PlatformUtil.getDocumentFileType(project, document);

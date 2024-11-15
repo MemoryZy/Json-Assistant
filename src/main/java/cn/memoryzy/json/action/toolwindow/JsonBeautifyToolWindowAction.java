@@ -41,9 +41,7 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(
-                GlobalJsonConverter.validateEditorAllJson(
-                        getEventProject(event), editor, event.getDataContext()));
+        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor));
     }
 
 }

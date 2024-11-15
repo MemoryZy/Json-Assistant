@@ -6,7 +6,11 @@ import cn.memoryzy.json.model.strategy.formats.data.ActionData;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.MessageData;
 import cn.memoryzy.json.util.DataConverter;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
 
 /**
  * @author Memory
@@ -20,10 +24,8 @@ public class PropertiesConversionProcessor extends AbstractGlobalTextConversionP
 
     @Override
     public boolean canConvert(String text) {
-        // TODO 判断是否处于Properties内
-
-
-        return DataConverter.canPropertiesBeConvertedToJson(text);
+        // 增加前置条件：只有在Properties文件内才判断
+        return isPropertiesFileContext() && DataConverter.canPropertiesBeConvertedToJson(text);
     }
 
     @Override
@@ -47,6 +49,20 @@ public class PropertiesConversionProcessor extends AbstractGlobalTextConversionP
         return super.createMessageData()
                 .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.properties.to.json.text"))
                 .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.properties.to.json.text"));
+    }
+
+
+    /**
+     * 判断是否处于Properties文件内
+     *
+     * @return 如果处于Properties文件内，返回true，否则返回false
+     */
+    private boolean isPropertiesFileContext() {
+        // 判断是否处于Properties内（Properties解析太宽泛了，需加以限制）
+        Editor editor = editorData.getEditor();
+        Project project = editor.getProject();
+        FileType fileType = PlatformUtil.getDocumentFileType(project, editor.getDocument());
+        return PlatformUtil.isPropertiesFileType(fileType);
     }
 
 }

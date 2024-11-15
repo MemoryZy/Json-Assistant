@@ -2,15 +2,16 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.util.Urls;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.StringReader;
-import java.net.URLDecoder;
+import java.net.URI;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -20,6 +21,12 @@ import java.util.*;
  */
 public class DataConverter {
 
+    /**
+     * 判断给定的字符串是否可以转换为Properties对象。
+     *
+     * @param properties 要检查的字符串
+     * @return 如果字符串可以转换为Properties对象，则返回true，否则返回false
+     */
     public static boolean canPropertiesBeConvertedToJson(String properties) {
         if (JsonUtil.canResolveToJson(properties) || Json5Util.isJson5(properties)) {
             return false;
@@ -28,10 +35,25 @@ public class DataConverter {
         return MapUtil.isNotEmpty(map);
     }
 
+
+    /**
+     * 将Properties格式的字符串转换为JSON字符串。
+     *
+     * @param properties Properties格式的字符串
+     * @return JSON字符串
+     */
     public static String propertiesToJson(String properties) {
-        return new ObjectWrapper(resolveProperties(properties)).toString();
+        return JsonUtil.formatJson(resolveProperties(properties));
     }
 
+
+    /**
+     * 将JSON字符串转换为Properties格式的字符串。
+     *
+     * @param json   JSON字符串
+     * @param isJson 是否为Json5格式
+     * @return Properties格式的字符串
+     */
     public static String jsonToProperties(String json, boolean isJson) {
         ObjectWrapper objectWrapper = isJson ? JsonUtil.parseObject(json) : Json5Util.parseObject(json);
         objectWrapper.entrySet().removeIf(entry -> shouldSkipValue(entry.getValue(), false));
@@ -39,6 +61,13 @@ public class DataConverter {
         return mapToPropertiesFormat(objectWrapper);
     }
 
+
+    /**
+     * 解析Properties字符串，并返回一个Map。
+     *
+     * @param property Properties字符串
+     * @return 解析后的Map
+     */
     public static Map<String, Object> resolveProperties(String property) {
         try (StringReader reader = new StringReader(property)) {
             Map<String, Object> paramMap = new LinkedHashMap<>();
@@ -62,6 +91,7 @@ public class DataConverter {
 
         return null;
     }
+
 
     /**
      * 将Map转换为 Properties 格式的字符串。
@@ -87,6 +117,14 @@ public class DataConverter {
         return result.toString();
     }
 
+
+    /**
+     * 将URL参数转换为JSON字符串。
+     *
+     * @param url URL参数
+     * @return JSON字符串
+     */
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     public static String urlParamsToJson(String url) {
         try {
             String query = parseQuery(url);
@@ -100,46 +138,28 @@ public class DataConverter {
             for (String pair : pairs) {
                 int index = pair.indexOf("=");
                 if (index > 0 && index < pair.length() - 1) {
-                    String key = URLDecoder.decode(pair.substring(0, index), StandardCharsets.UTF_8);
-                    String value = URLDecoder.decode(pair.substring(index + 1), StandardCharsets.UTF_8);
-
+                    String key = StrUtil.trim(pair.substring(0, index));
+                    String value = StrUtil.trim(pair.substring(index + 1));
                     // 判断是否为数字、时间、布尔类型
                     params.put(key, JsonAssistantUtil.detectType(value));
                 }
             }
 
             // 转换为JSON
-            return new ObjectWrapper(params).toString();
+            return params.isEmpty() ? null : JsonUtil.formatJson(params);
         } catch (Exception e) {
             return null;
         }
     }
 
-    private static String parseQuery(String urlStr) {
-        try {
-            // 尝试解析完整的URL
-            return new java.net.URL(urlStr).getQuery();
-        } catch (Exception e) {
-            // 如果有多行，不符合条件
-            if (urlStr.contains("\n")) {
-                return null;
-            }
 
-            // 有多种可能，一种：?开头、没有?开头
-            if (urlStr.charAt(0) == '?') {
-                return urlStr;
-            } else {
-                if (urlStr.contains(" =") || urlStr.contains("= ")
-                        || urlStr.contains(" &") || urlStr.contains("& ")) {
-                    return null;
-                }
-
-                return urlStr;
-            }
-        }
-    }
-
-
+    /**
+     * 将JSON字符串转换为URL参数。
+     *
+     * @param json   JSON字符串
+     * @param isJson 是否为Json格式，否则为Json5格式
+     * @return URL参数
+     */
     public static String jsonToUrlParams(String json, boolean isJson) {
         // JsonMap中跳过Map、List、null、长文本String
         ObjectWrapper objectWrapper = isJson ? JsonUtil.parseObject(json) : Json5Util.parseObject(json);
@@ -153,9 +173,46 @@ public class DataConverter {
             params.put(entry.getKey(), value.toString());
         }
 
-        String frontUrl = cn.memoryzy.json.constant.Urls.FRONT_URL;
-        String external = Urls.newFromEncoded(frontUrl).addParameters(params).toExternalForm();
-        return StringUtils.removeStart(external, frontUrl + "?");
+        return URLUtil.buildQuery(params, StandardCharsets.UTF_8);
+    }
+
+
+    /**
+     * 从URL字符串中解析查询字符串。
+     *
+     * @param urlStr URL字符串
+     * @return 解析后的查询字符串，如果解析失败，返回null
+     */
+    private static String parseQuery(String urlStr) {
+        try {
+            // 尝试解析完整的URL
+            return urlStr.contains("\n") ? null : parseAndValidateUrl(urlStr);
+        } catch (Exception e) {
+            // 解析失败后，尝试加上?
+            if (urlStr.charAt(0) != '?') {
+                urlStr = "?" + urlStr;
+            }
+
+            urlStr = cn.memoryzy.json.constant.Urls.FRONT_URL + urlStr;
+
+            try {
+                return parseAndValidateUrl(urlStr);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 解析并验证URL，并返回查询字符串。
+     *
+     * @param urlStr 要解析的URL字符串
+     * @return 解析后的查询字符串，如果解析失败，返回null
+     */
+    public static String parseAndValidateUrl(String urlStr) {
+        URL urlForHttp = URLUtil.toUrlForHttp(urlStr);
+        URI uri = URLUtil.toURI(urlForHttp);
+        return uri.getQuery();
     }
 
 
@@ -187,7 +244,7 @@ public class DataConverter {
      */
     public static boolean isNotJsonArray(DataContext dataContext) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
+        String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
         return JsonUtil.isNotJsonArray(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
     }
 

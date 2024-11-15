@@ -105,7 +105,7 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
     }
 
     @Override
-    public String postprocessing(String text) throws Exception {
+    public String postprocessing(String text) {
         return needBeautify ? JsonUtil.formatJson(text) : JsonUtil.compressJson(text);
     }
 

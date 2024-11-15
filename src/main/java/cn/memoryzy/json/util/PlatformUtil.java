@@ -276,11 +276,34 @@ public class PlatformUtil {
         BrowserUtil.browse(url);
     }
 
+    /**
+     * 判断是否是JSON文件类型
+     *
+     * @param fileType 文件类型
+     * @return 是JSON文件类型返回true，否则返回false
+     */
     public static boolean isJsonFileType(FileType fileType) {
         return isAssignFileType(fileType, FileTypes.JSON.getFileTypeQualifiedName())
                 || isAssignFileType(fileType, FileTypes.JSON5.getFileTypeQualifiedName());
     }
 
+    /**
+     * 判断是否是Properties文件类型
+     *
+     * @param fileType 文件类型
+     * @return 是Properties文件类型返回true，否则返回false
+     */
+    public static boolean isPropertiesFileType(FileType fileType) {
+        return isAssignFileType(fileType, FileTypes.PROPERTIES.getFileTypeQualifiedName());
+    }
+
+    /**
+     * 判断是否是某个文件类型
+     *
+     * @param fileType          文件类型
+     * @param fileTypeClassName 文件类型类名
+     * @return 是指定文件类型返回true，否则返回false
+     */
     public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
         return fileType != null && Objects.equals(fileTypeClassName, fileType.getClass().getName());
     }

@@ -44,7 +44,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
         String tomlStr;
         try {
             GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-            String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
+            String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
             // 处理不同的 Json 类型
             tomlStr = TomlUtil.toToml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
         } catch (Exception ex) {

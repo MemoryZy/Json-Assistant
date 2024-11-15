@@ -210,7 +210,8 @@ public class JsonAssistantToolWindowComponentProvider {
                     if (jsonObject.isEmpty()) return;
                 }
 
-                historyList.add(text, true);
+                String formattedJson = JsonUtil.formatJson(text);
+                historyList.add(formattedJson, true);
             } else if (Json5Util.isJson5(text)) {
                 if (Json5Util.isJson5Array(text)) {
                     ArrayWrapper arrayWrapper = Json5Util.parseArray(text);
@@ -220,7 +221,8 @@ public class JsonAssistantToolWindowComponentProvider {
                     if (MapUtil.isEmpty(objectWrapper)) return;
                 }
 
-                historyList.add(text, false);
+                String formattedJson = Json5Util.formatJson5(text);
+                historyList.add(formattedJson, false);
             }
         });
     }

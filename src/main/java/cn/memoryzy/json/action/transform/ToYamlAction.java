@@ -42,7 +42,7 @@ public class ToYamlAction extends DumbAwareAction {
         String yamlStr;
         try {
             GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-            String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
+            String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
             // 处理不同的 Json 类型
             yamlStr = YamlUtil.toYaml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
         } catch (Exception ex) {

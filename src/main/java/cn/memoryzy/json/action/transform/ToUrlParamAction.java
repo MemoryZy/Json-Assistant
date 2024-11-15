@@ -34,7 +34,7 @@ public class ToUrlParamAction extends DumbAwareAction implements UpdateInBackgro
         // JsonMap中跳过Map、List、null、长文本String
         DataContext dataContext = event.getDataContext();
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
+        String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
         String urlParamStr = DataConverter.jsonToUrlParams(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
         TextTransformUtil.copyToClipboardAndShowNotification(getEventProject(event), urlParamStr);
     }

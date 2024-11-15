@@ -31,7 +31,7 @@ public class JsonStructureAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String json = GlobalJsonConverter.parseJson(dataContext, context, PlatformUtil.getEditor(dataContext));
+        String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
         JsonStructureDialog.show(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
     }
 

@@ -11,7 +11,6 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -38,8 +37,8 @@ public class GlobalJsonConverter {
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
 
         JsonConversionProcessor[] processors = needBeautify
-                ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(dataContext, editorData)
-                : GlobalTextConversionProcessorContext.getCompressAllJsonProcessors(dataContext, editorData);
+                ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData)
+                : GlobalTextConversionProcessorContext.getCompressAllJsonProcessors(editorData);
 
         setHintMessage(processors, selectionMessage, globalMessage);
 
@@ -73,7 +72,7 @@ public class GlobalJsonConverter {
     public static void convertBetweenJsonAndJson5(DataContext dataContext, Editor editor, Function<String, String> converter, String selectionMessage, String globalMessage) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String processedText = converter.apply(parseJson(dataContext, context, editor));
+        String processedText = converter.apply(parseJson(context, editor));
 
         if (StrUtil.isNotBlank(processedText)) {
             AbstractGlobalTextConversionProcessor processor = context.getProcessor();
@@ -93,17 +92,16 @@ public class GlobalJsonConverter {
     /**
      * 从编辑器解析 JSON 文本
      *
-     * @param dataContext  数据上下文
      * @param editor       编辑器
      * @param needBeautify 需要美化为 true，压缩为 false
      * @return JSON 文本
      */
-    public static String parseJson(DataContext dataContext, Editor editor, boolean needBeautify) {
+    public static String parseJson(Editor editor, boolean needBeautify) {
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
 
         JsonConversionProcessor[] processors = needBeautify
-                ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(dataContext, editorData)
-                : GlobalTextConversionProcessorContext.getCompressAllJsonProcessors(dataContext, editorData);
+                ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData)
+                : GlobalTextConversionProcessorContext.getCompressAllJsonProcessors(editorData);
 
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         return parseJson(context, processors);
@@ -112,25 +110,20 @@ public class GlobalJsonConverter {
     /**
      * 从编辑器解析 JSON 文本（默认不关注格式化或压缩）
      *
-     * @param dataContext 数据上下文
      * @param editor      编辑器
      * @return JSON 文本
      */
-    public static String parseJson(DataContext dataContext, Editor editor) {
-        return parseJson(dataContext, GlobalTextConverter.resolveEditor(editor));
-    }
-
-    public static String parseJson(DataContext dataContext, EditorData editorData) {
+    public static String parseJson(Editor editor) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        return parseJson(dataContext, context, editorData);
+        return parseJson(context, editor);
     }
 
-    public static String parseJson(DataContext dataContext, GlobalTextConversionProcessorContext context, Editor editor) {
-        return parseJson(dataContext, context, GlobalTextConverter.resolveEditor(editor));
+    public static String parseJson(GlobalTextConversionProcessorContext context, Editor editor) {
+        return parseJson(context, GlobalTextConverter.resolveEditor(editor));
     }
 
-    public static String parseJson(DataContext dataContext, GlobalTextConversionProcessorContext context, EditorData editorData) {
-        JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(dataContext, editorData);
+    public static String parseJson(GlobalTextConversionProcessorContext context, EditorData editorData) {
+        JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData);
         return GlobalTextConverter.applyConversionProcessors(context, processors);
     }
 
@@ -147,15 +140,14 @@ public class GlobalJsonConverter {
      *
      * @param project     项目
      * @param editor      编辑器
-     * @param dataContext 上下文
      * @return 若为 JSON 则为true；反之为 false
      */
-    public static boolean validateEditorAllJson(Project project, Editor editor, @NotNull DataContext dataContext) {
+    public static boolean validateEditorAllJson(Project project, Editor editor) {
         if (project == null || editor == null) return false;
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
         if (editorData == null) return false;
 
-        JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(dataContext, editorData);
+        JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData);
         return GlobalTextConverter.validateEditorText(new GlobalTextConversionProcessorContext(), processors);
     }
 
@@ -181,15 +173,14 @@ public class GlobalJsonConverter {
      *
      * @param project     项目
      * @param editor      编辑器
-     * @param dataContext 上下文
      * @return 若为 JSON 则为true；反之为 false
      */
-    public static boolean validateEditorJson(Project project, Editor editor, @NotNull DataContext dataContext) {
+    public static boolean validateEditorJson(Project project, Editor editor) {
         if (project == null || editor == null) return false;
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
         if (editorData == null) return false;
 
-        JsonConversionProcessor[] processors = {new JsonConversionProcessor(dataContext, editorData, true)};
+        JsonConversionProcessor[] processors = {new JsonConversionProcessor(editorData, true)};
         return GlobalTextConverter.validateEditorText(new GlobalTextConversionProcessorContext(), processors);
     }
 

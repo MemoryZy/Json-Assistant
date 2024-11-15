@@ -17,6 +17,9 @@ import com.intellij.openapi.ui.panel.ComponentPanelBuilder;
 import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.IdeFrame;
+import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.wm.impl.FloatingDecoratorMarker;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.ListWithFilter;
@@ -251,12 +254,57 @@ public class UIManager implements Disposable {
     }
 
     /**
-     * 获取当前取得焦点的组件
+     * 获取当前取得焦点的组件(需要在EDT线程内执行（例如Action.actionPerformed内）)
      *
      * @return 组件
      */
     public static Component getFocusComponent() {
-        return IdeFocusManager.getGlobalInstance().getFocusOwner();
+        Component component = IdeFocusManager.getGlobalInstance().getFocusOwner();
+        return Objects.nonNull(component) ? component : Objects.requireNonNull(getFocusedComponent());
+    }
+
+    public static @Nullable Component getFocusedComponent() {
+        WindowManager windowManager = WindowManager.getInstance();
+
+        Window activeWindow = windowManager.getMostRecentFocusedWindow();
+        if (activeWindow == null) {
+            activeWindow = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+            if (activeWindow == null) {
+                activeWindow = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusedWindow();
+                if (activeWindow == null) return null;
+            }
+        }
+
+        // In case we have an active floating toolwindow and some component in another window focused,
+        // we want this other component to receive key events.
+        // Walking up the window ownership hierarchy from the floating toolwindow would have led us to the main IdeFrame
+        // whereas we want to be able to type in other frames as well.
+        if (activeWindow instanceof FloatingDecoratorMarker) {
+            IdeFocusManager ideFocusManager = IdeFocusManager.findInstanceByComponent(activeWindow);
+            IdeFrame lastFocusedFrame = ideFocusManager.getLastFocusedFrame();
+            JComponent frameComponent = lastFocusedFrame != null ? lastFocusedFrame.getComponent() : null;
+            Window lastFocusedWindow = frameComponent != null ? SwingUtilities.getWindowAncestor(frameComponent) : null;
+            boolean toolWindowIsNotFocused = windowManager.getFocusedComponent(activeWindow) == null;
+            if (toolWindowIsNotFocused && lastFocusedWindow != null) {
+                activeWindow = lastFocusedWindow;
+            }
+        }
+
+        // try to find first parent window that has focus
+        Window window = activeWindow;
+        Component focusedComponent = null;
+        while (window != null) {
+            focusedComponent = windowManager.getFocusedComponent(window);
+            if (focusedComponent != null) {
+                break;
+            }
+            window = window.getOwner();
+        }
+        if (focusedComponent == null) {
+            focusedComponent = activeWindow;
+        }
+
+        return focusedComponent;
     }
 
     /**

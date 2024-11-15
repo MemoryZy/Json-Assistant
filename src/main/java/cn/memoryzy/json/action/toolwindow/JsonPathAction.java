@@ -193,9 +193,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(
-                GlobalJsonConverter.validateEditorAllJson(
-                        getEventProject(event), editor, event.getDataContext()));
+        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor));
     }
 
 }

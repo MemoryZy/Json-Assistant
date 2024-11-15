@@ -99,15 +99,19 @@ public class GlobalTextConverter {
         if (StrUtil.isBlank(documentText) && StrUtil.isBlank(selectedText)) return null;
 
         DocTextData docTextData = new DocTextData()
-                .setSelectedText(selectedText)
-                .setDocumentText(documentText);
+                .setSelectedText(StrUtil.trim(selectedText))
+                .setDocumentText(StrUtil.trim(documentText));
 
         SelectionData selectionData = new SelectionData()
                 .setHasSelection(StrUtil.isNotBlank(selectedText))
                 .setStartOffset(startOffset)
                 .setEndOffset(endOffset);
 
-        return new EditorData().setPrimaryCaret(primaryCaret).setDocTextData(docTextData).setSelectionData(selectionData);
+        return new EditorData()
+                .setEditor(editor)
+                .setPrimaryCaret(primaryCaret)
+                .setDocTextData(docTextData)
+                .setSelectionData(selectionData);
     }
 
 }

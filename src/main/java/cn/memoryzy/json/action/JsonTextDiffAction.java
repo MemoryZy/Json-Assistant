@@ -39,9 +39,7 @@ public class JsonTextDiffAction extends DumbAwareAction {
         Project project = event.getProject();
         DataContext dataContext = event.getDataContext();
 
-        String leftJsonStr = StrUtil.trim(
-                GlobalJsonConverter.parseJson(
-                        dataContext, PlatformUtil.getEditor(dataContext), true));
+        String leftJsonStr = StrUtil.trim(GlobalJsonConverter.parseJson(PlatformUtil.getEditor(dataContext), true));
 
         FileType fileType = FileTypeHolder.JSON5;
         DocumentContent leftDocumentContent = DiffContentFactory.getInstance().createEditable(project, leftJsonStr, fileType);
