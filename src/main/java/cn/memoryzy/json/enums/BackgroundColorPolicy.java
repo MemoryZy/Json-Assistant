@@ -1,5 +1,7 @@
 package cn.memoryzy.json.enums;
 
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+
 /**
  * 窗口背景色调整策略
  *
@@ -7,24 +9,24 @@ package cn.memoryzy.json.enums;
  * @since 2024/11/1
  */
 public enum BackgroundColorPolicy {
-    DEFAULT("默认"),
-    FOLLOW_MAIN_EDITOR("跟随主编辑器"),
+    DEFAULT("setting.component.background.color.item.default.text"),
+    FOLLOW_MAIN_EDITOR("setting.component.background.color.item.follow.main.editor.text"),
     // CUSTOM("自定义")
 
     ;
 
-    private final String name;
+    private final String key;
 
-    BackgroundColorPolicy(String name) {
-        this.name = name;
+    BackgroundColorPolicy(String key) {
+        this.key = key;
     }
 
-    public String getName() {
-        return name;
+    public String getKey() {
+        return key;
     }
 
     @Override
     public String toString() {
-        return name;
+        return JsonAssistantBundle.messageOnSystem(key);
     }
 }

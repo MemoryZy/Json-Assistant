@@ -27,7 +27,7 @@ public class OnlineDocAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(popupAction ? JsonAssistantBundle.message("action.online.doc.override.text") : JsonAssistantBundle.message("action.online.doc.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.online.doc.description"));
-        presentation.setIcon(popupAction ? AllIcons.Actions.Help : JsonAssistantIcons.BOOK);
+        presentation.setIcon(popupAction ? AllIcons.Actions.Help : JsonAssistantIcons.BOOK_READER);
     }
 
     @Override

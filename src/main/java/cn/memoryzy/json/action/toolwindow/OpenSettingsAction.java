@@ -2,7 +2,10 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.ide.HelpTooltip;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.keymap.KeymapUtil;
@@ -31,7 +34,6 @@ public class OpenSettingsAction extends DumbAwareAction implements CustomCompone
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.open.settings.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.open.settings.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SETTINGS);
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt S"), toolWindow.getComponent());
     }
 
     @Override

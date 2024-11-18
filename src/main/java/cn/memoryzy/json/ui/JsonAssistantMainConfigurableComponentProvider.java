@@ -51,6 +51,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel backgroundColorTitle;
     private ComboBox<BackgroundColorPolicy> backgroundColorBox;
     private TitledSeparator windowAppearanceLabel;
+    private JBLabel backgroundColorDesc;
     // endregion
 
     private final EditorOptionsPersistentState editorOptionsState = EditorOptionsPersistentState.getInstance();
@@ -109,6 +110,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
             backgroundColorBox.addItem(value);
         }
 
+        UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
         displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
         foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
     }

@@ -32,6 +32,9 @@ import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
+import com.intellij.openapi.editor.colors.EditorFontType;
+import com.intellij.openapi.editor.colors.FontPreferences;
+import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -43,6 +46,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
+import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -249,14 +253,65 @@ public class JsonAssistantToolWindowComponentProvider {
         switch (backgroundColorPolicy) {
             case DEFAULT: {
                 // 改为新配色
+
+
                 scheme = ConsoleViewUtil.updateConsoleColorScheme(defaultColorsScheme);
                 if (UISettings.getInstance().getPresentationMode()) {
+                    // 设置为演示模式的字体大小
                     scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
                 }
                 break;
             }
             case FOLLOW_MAIN_EDITOR: {
                 // 跟随IDE配色
+                scheme = new DelegateColorScheme(scheme) {
+                    @Override
+                    public @NotNull Color getDefaultBackground() {
+                        return JBColor.namedColor("FileColor.Blue", new JBColor(0xeaf6ff, 0x4f556b));
+                    }
+
+                    @Override
+                    public @NotNull FontPreferences getFontPreferences() {
+                        return getConsoleFontPreferences();
+                    }
+
+                    @Override
+                    public int getEditorFontSize() {
+                        return getConsoleFontSize();
+                    }
+
+                    @Override
+                    public float getEditorFontSize2D() {
+                        return getConsoleFontSize2D();
+                    }
+
+                    @Override
+                    public String getEditorFontName() {
+                        return getConsoleFontName();
+                    }
+
+                    @Override
+                    public float getLineSpacing() {
+                        return getConsoleLineSpacing();
+                    }
+
+                    @Override
+                    public @NotNull Font getFont(EditorFontType key) {
+                        return super.getFont(EditorFontType.getConsoleType(key));
+                    }
+
+                    @Override
+                    public void setEditorFontSize(int fontSize) {
+                        setConsoleFontSize(fontSize);
+                    }
+
+                    @Override
+                    public void setEditorFontSize(float fontSize) {
+                        setConsoleFontSize(fontSize);
+                    }
+                };
+
+                // JBColor.namedColor("FileColor.Blue", new JBColor(0xeaf6ff, 0x4f556b))
                 break;
             }
         }
