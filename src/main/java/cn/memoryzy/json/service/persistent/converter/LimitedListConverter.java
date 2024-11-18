@@ -3,7 +3,7 @@ package cn.memoryzy.json.service.persistent.converter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.model.deserialize.ArrayWrapper;
+import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.diagnostic.Logger;

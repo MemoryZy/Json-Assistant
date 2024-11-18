@@ -3,9 +3,9 @@ package cn.memoryzy.json.util;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
-import cn.memoryzy.json.model.deserialize.ObjectWrapper;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import com.intellij.openapi.actionSystem.DataContext;
 import org.apache.commons.lang.StringUtils;
 

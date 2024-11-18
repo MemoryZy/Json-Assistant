@@ -2,9 +2,9 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.deserialize.ArrayWrapper;
-import cn.memoryzy.json.model.deserialize.JsonWrapper;
-import cn.memoryzy.json.model.deserialize.ObjectWrapper;
+import cn.memoryzy.json.model.wrapper.ArrayWrapper;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
@@ -158,11 +158,27 @@ public class JsonUtil {
      */
     public static String compressJson(String jsonStr) {
         try {
-            return MAPPER.writeValueAsString(MAPPER.readTree(jsonStr));
+            return compressJson(MAPPER.readTree(jsonStr));
         } catch (Exception e) {
             return null;
         }
     }
+
+
+    /**
+     * 将Json压缩成一行
+     *
+     * @param data 对象
+     * @return 压缩json
+     */
+    public static String compressJson(Object data) {
+        try {
+            return MAPPER.writeValueAsString(data);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 
 
     /**

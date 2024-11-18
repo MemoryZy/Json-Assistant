@@ -25,6 +25,7 @@ public class EditorBackgroundColorScheme extends DelegateColorScheme {
     public static final String violetColor = "Violet";
     public static final String yellowColor = "Yellow";
     public static final String grayColor = "Gray";
+    public static final String customColor = "Custom";
 
     public static final Map<String, Color> ourDefaultColors = Map.of(
             whiteColor, new JBColor(0xffffff, 0x1e1f22),

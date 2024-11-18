@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.deserialize;
+package cn.memoryzy.json.model.wrapper;
 
 import cn.memoryzy.json.util.JsonUtil;
 

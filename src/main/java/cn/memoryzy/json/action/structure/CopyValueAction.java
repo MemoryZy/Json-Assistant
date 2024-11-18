@@ -3,7 +3,7 @@ package cn.memoryzy.json.action.structure;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.model.deserialize.JsonWrapper;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.component.node.JsonCollectInfoMutableTreeNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
