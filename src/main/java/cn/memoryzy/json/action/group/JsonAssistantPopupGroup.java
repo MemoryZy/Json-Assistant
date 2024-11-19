@@ -30,8 +30,8 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         setPopup(true);
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.assistant.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.assistant.description"));
+        presentation.setText(JsonAssistantBundle.message("action.main.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.main.description"));
         presentation.setIcon(JsonAssistantIcons.BOX);
         this.actionEventPopup = false;
     }
@@ -47,7 +47,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
     public void showPopupMenu(DataContext dataContext) {
         ListPopup popup = JBPopupFactory.getInstance()
-                .createActionGroupPopup(JsonAssistantBundle.message("menu.popup.title"),
+                .createActionGroupPopup(JsonAssistantBundle.message("popup.menu.title"),
                         this, dataContext, JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING, true);
         popup.showInBestPositionFor(dataContext);
     }

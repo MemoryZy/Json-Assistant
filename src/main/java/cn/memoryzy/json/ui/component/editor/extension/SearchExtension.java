@@ -25,7 +25,7 @@ public class SearchExtension implements ExtendableTextComponent.Extension {
 
     @Override
     public String getTooltip() {
-        return JsonAssistantBundle.messageOnSystem("search.extension.tooltip");
+        return JsonAssistantBundle.messageOnSystem("tooltip.search.extension");
     }
 
     @Override

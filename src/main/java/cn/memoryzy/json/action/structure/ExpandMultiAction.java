@@ -18,8 +18,8 @@ public class ExpandMultiAction extends DumbAwareAction {
     private final Tree tree;
 
     public ExpandMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.expand.multi.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.structure.window.expand.multi.description"),
+        super(JsonAssistantBundle.message("action.structure.expand.multi.text"),
+                JsonAssistantBundle.messageOnSystem("action.structure.expand.multi.description"),
                 null);
         this.tree = tree;
     }

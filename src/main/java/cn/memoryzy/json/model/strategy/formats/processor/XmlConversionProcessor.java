@@ -42,8 +42,8 @@ public class XmlConversionProcessor extends AbstractGlobalTextConversionProcesso
     @Override
     protected MessageData createMessageData() {
         return super.createMessageData()
-                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.xml.to.json.text"))
-                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.xml.to.json.text"));
+                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.xml.to.json"))
+                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.xml.to.json"));
     }
 
 }

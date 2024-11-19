@@ -23,8 +23,8 @@ public class JsonEscapeAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.escape.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.escape.description"));
+        presentation.setText(JsonAssistantBundle.message("action.escape.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.escape.description"));
         presentation.setIcon(JsonAssistantIcons.CONVERSION);
     }
 

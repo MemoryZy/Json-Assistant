@@ -47,8 +47,8 @@ public class PropertiesConversionProcessor extends AbstractGlobalTextConversionP
     @Override
     protected MessageData createMessageData() {
         return super.createMessageData()
-                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.properties.to.json.text"))
-                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.properties.to.json.text"));
+                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.properties.to.json"))
+                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.properties.to.json"));
     }
 
 

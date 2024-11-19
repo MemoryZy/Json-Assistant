@@ -45,7 +45,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
         String docText = editor.getDocument().getText();
         String extension = JsonUtil.canResolveToJson(docText) ? "json" : "json5";
         FileChooserFactory chooserFactory = FileChooserFactory.getInstance();
-        FileSaverDescriptor saverDescriptor = new FileSaverDescriptor(JsonAssistantBundle.messageOnSystem("dialog.file.save.json.title"), "", extension);
+        FileSaverDescriptor saverDescriptor = new FileSaverDescriptor(JsonAssistantBundle.messageOnSystem("dialog.save.json.title"), "", extension);
         FileSaverDialog saverDialog = chooserFactory.createSaveFileDialog(saverDescriptor, project);
         VirtualFileWrapper virtualFileWrapper = saverDialog.save("export." + extension);
 

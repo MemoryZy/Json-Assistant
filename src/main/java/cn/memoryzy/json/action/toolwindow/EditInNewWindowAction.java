@@ -38,8 +38,8 @@ public class EditInNewWindowAction extends DumbAwareAction {
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.edit.in.new.window.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.edit.in.new.window.description"));
+        presentation.setText(JsonAssistantBundle.message("action.edit.new.window.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.edit.new.window.description"));
         registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl alt M"), toolWindow.getComponent());
     }
 

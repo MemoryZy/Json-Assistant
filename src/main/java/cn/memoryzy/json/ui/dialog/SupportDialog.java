@@ -44,7 +44,7 @@ public class SupportDialog extends DialogWrapper {
         super((Project) null);
         setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.support.support.header"));
-        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.support.ok.text"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.support.ok"));
         init();
     }
 
@@ -65,13 +65,13 @@ public class SupportDialog extends DialogWrapper {
         donateContent.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
 
         wechatLabel.setIcon(JsonAssistantIcons.WECHAT_PAY);
-        wechatLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.wechat.pay.text")));
+        wechatLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.wechat")));
 
         alipayLabel.setIcon(JsonAssistantIcons.ALIPAY);
-        alipayLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.alipay.text")));
+        alipayLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.alipay")));
 
         donateNote.setIcon(JsonAssistantIcons.LABEL);
-        donateNote.setText(JsonAssistantBundle.messageOnSystem("dialog.support.donate.link.text"));
+        donateNote.setText(JsonAssistantBundle.messageOnSystem("dialog.support.donate.link"));
 
         return rootPanel;
     }
@@ -86,7 +86,7 @@ public class SupportDialog extends DialogWrapper {
 
                 JBPopupFactory.getInstance()
                         .createHtmlTextBalloonBuilder(
-                                JsonAssistantBundle.messageOnSystem("dialog.support.donate.note.text",
+                                JsonAssistantBundle.messageOnSystem("dialog.support.donate.note",
                                         UrlType.MAIL.getId(), Urls.EMAIL_LINK),
                                 null,
                                 JBUI.CurrentTheme.NotificationInfo.backgroundColor(),

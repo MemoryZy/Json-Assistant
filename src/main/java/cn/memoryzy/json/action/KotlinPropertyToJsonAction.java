@@ -24,8 +24,8 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.kt.class.property.to.json.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.kt.class.property.to.json.description"));
+        presentation.setText(JsonAssistantBundle.message("action.kotlin.serialize.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.kotlin.serialize.description"));
         presentation.setIcon(JsonAssistantIcons.JSON);
     }
 

@@ -45,8 +45,8 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.rename.view.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.rename.view.description"));
+        presentation.setText(JsonAssistantBundle.message("action.rename.tab.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.rename.tab.description"));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         JBTextField textField = new JBTextField(content.getDisplayName());
         textField.selectAll();
 
-        JBLabel label = new JBLabel(JsonAssistantBundle.message("balloon.rename.view.label.text"));
+        JBLabel label = new JBLabel(JsonAssistantBundle.message("popup.rename.view.label.text"));
         label.setFont(StartupUiUtil.getLabelFont().deriveFont(Font.BOLD));
 
         JPanel panel = SwingHelper.newLeftAlignedVerticalPanel(label, Box.createVerticalStrut(JBUI.scale(2)), textField);

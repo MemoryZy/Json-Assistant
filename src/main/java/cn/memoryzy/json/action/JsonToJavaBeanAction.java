@@ -41,8 +41,8 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.to.javabean.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.javabean.description"));
+        presentation.setText(JsonAssistantBundle.message("action.deserialize.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.deserialize.description"));
         presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
     }
 

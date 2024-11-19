@@ -89,16 +89,16 @@ public class Notifications {
     @SuppressWarnings({"deprecation", "DuplicatedCode"})
     public static void showWelcomeNotification(Project project) {
         Notification notification = Notifications.BALLOON_LOG_GROUP
-                .createNotification(JsonAssistantBundle.messageOnSystem("notify.welcome.content",
+                .createNotification(JsonAssistantBundle.messageOnSystem("notification.welcome.content",
                                 Urls.GITHUB_LINK,
                                 UrlType.SPONSOR.getId()
                         ) + "<br/>",
                         NotificationType.INFORMATION)
-                .setTitle(JsonAssistantBundle.messageOnSystem("notify.welcome.title", JsonAssistantPlugin.getVersion()))
+                .setTitle(JsonAssistantBundle.messageOnSystem("notification.welcome.title", JsonAssistantPlugin.getVersion()))
                 .setImportant(true)
                 .setListener(new NotificationListenerImpl())
                 .addAction(new QuickStartAction())
-                .addAction(new DonateAction(JsonAssistantBundle.messageOnSystem("action.welcome.donate.text")));
+                .addAction(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.welcome.text")));
 
         IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
         if (window != null) {
@@ -125,16 +125,16 @@ public class Notifications {
             changeNotes = PlatformUtil.isChineseLocale() ? pair.left : pair.right;
         }
 
-        String content = JsonAssistantBundle.messageOnSystem("notify.welcome.content", Urls.GITHUB_LINK, UrlType.SPONSOR.getId());
-        content += "<br/>" + JsonAssistantBundle.messageOnSystem("notify.update.content", changeNotes);
+        String content = JsonAssistantBundle.messageOnSystem("notification.welcome.content", Urls.GITHUB_LINK, UrlType.SPONSOR.getId());
+        content += "<br/>" + JsonAssistantBundle.messageOnSystem("notification.update.content", changeNotes);
 
         Notification notification = Notifications.BALLOON_LOG_GROUP
                 .createNotification(content, NotificationType.INFORMATION)
-                .setTitle(JsonAssistantBundle.messageOnSystem("notify.update.title", JsonAssistantPlugin.getVersion()))
+                .setTitle(JsonAssistantBundle.messageOnSystem("notification.update.title", JsonAssistantPlugin.getVersion()))
                 .setImportant(true)
                 .setListener(new NotificationListenerImpl())
                 .addAction(new QuickStartAction())
-                .addAction(new DonateAction(JsonAssistantBundle.messageOnSystem("action.welcome.donate.text")));
+                .addAction(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.welcome.text")));
 
         IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
         if (window != null) {

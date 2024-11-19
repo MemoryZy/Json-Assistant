@@ -20,8 +20,8 @@ public class JsonBeautifyAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.beautify.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.beautify.description"));
+        presentation.setText(JsonAssistantBundle.message("action.beautify.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.beautify.description"));
         presentation.setIcon(JsonAssistantIcons.DIZZY_STAR);
     }
 
@@ -30,8 +30,8 @@ public class JsonBeautifyAction extends DumbAwareAction {
         DataContext dataContext = event.getDataContext();
         GlobalJsonConverter.parseAndProcessJson(
                 dataContext, PlatformUtil.getEditor(dataContext), true,
-                JsonAssistantBundle.messageOnSystem("hint.selection.json.beautify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.global.json.beautify.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.beautify"),
+                JsonAssistantBundle.messageOnSystem("hint.global.beautify"));
     }
 
 }

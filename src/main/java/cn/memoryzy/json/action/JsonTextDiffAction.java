@@ -29,8 +29,8 @@ public class JsonTextDiffAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.text.diff.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.text.diff.description"));
+        presentation.setText(JsonAssistantBundle.message("action.text.diff.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.text.diff.description"));
         presentation.setIcon(JsonAssistantIcons.DIFF);
     }
 

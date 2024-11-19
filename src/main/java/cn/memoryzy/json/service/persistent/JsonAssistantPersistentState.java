@@ -29,19 +29,19 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
      * 属性序列化设置项
      */
     @Attribute(converter = AttributeSerializationStateConverter.class)
-    public AttributeSerializationState attributeSerializationState;
+    public AttributeSerializationState attributeSerializationState = new AttributeSerializationState();
 
     /**
      * 编辑器外观设置项
      */
     @Attribute(converter = EditorAppearanceStateConverter.class)
-    public EditorAppearanceState editorAppearanceState;
+    public EditorAppearanceState editorAppearanceState = new EditorAppearanceState();
 
     /**
      * 编辑器行为设置项
      */
     @Attribute(converter = EditorBehaviorStateConverter.class)
-    public EditorBehaviorState editorBehaviorState;
+    public EditorBehaviorState editorBehaviorState = new EditorBehaviorState();
 
 
     @Override

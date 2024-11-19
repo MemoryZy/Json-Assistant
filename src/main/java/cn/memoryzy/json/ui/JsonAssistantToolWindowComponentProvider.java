@@ -4,7 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
-import cn.memoryzy.json.enums.BackgroundColorPolicy;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.BackgroundColorScheme;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
@@ -12,15 +13,17 @@ import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversion
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
+import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
+import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
+import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.component.ToolWindowPanel;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.execution.impl.ConsoleViewUtil;
-import com.intellij.ide.ui.UISettings;
+import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -32,9 +35,6 @@ import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.colors.EditorFontType;
-import com.intellij.openapi.editor.colors.FontPreferences;
-import com.intellij.openapi.editor.colors.impl.DelegateColorScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -46,8 +46,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
-import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -64,7 +65,8 @@ public class JsonAssistantToolWindowComponentProvider {
     private final FileType editorFileType;
     private final boolean initWindow;
     private final JsonHistoryPersistentState historyState;
-    private final EditorOptionsPersistentState persistentState;
+    private final EditorBehaviorState editorBehaviorState;
+    private final EditorAppearanceState editorAppearanceState;
     private EditorEx editor;
 
     public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initWindow) {
@@ -72,7 +74,9 @@ public class JsonAssistantToolWindowComponentProvider {
         this.editorFileType = editorFileType;
         this.initWindow = initWindow;
         this.historyState = JsonHistoryPersistentState.getInstance(project);
-        this.persistentState = EditorOptionsPersistentState.getInstance();
+        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+        this.editorBehaviorState = persistentState.editorBehaviorState;
+        this.editorAppearanceState = persistentState.editorAppearanceState;
     }
 
     public JComponent createRootPanel() {
@@ -91,17 +95,19 @@ public class JsonAssistantToolWindowComponentProvider {
     }
 
     private TextEditor createEditorComponent() {
-        String initText = getInitText();
+        ImmutablePair<Boolean, String> pair = getInitText();
+        boolean nonNull = Objects.nonNull(pair);
+        String initText = nonNull ? pair.right : "";
         TextEditor textEditor = UIManager.createDefaultTextEditor(project, editorFileType, initText);
         EditorEx editor = (EditorEx) textEditor.getEditor();
 
         EditorSettings settings = editor.getSettings();
         // 行号显示
-        settings.setLineNumbersShown(persistentState.displayLineNumbers);
+        settings.setLineNumbersShown(editorAppearanceState.displayLineNumbers);
         // 设置显示的缩进导轨
         settings.setIndentGuidesShown(true);
         // 折叠块显示
-        settings.setFoldingOutlineShown(persistentState.foldingOutline);
+        settings.setFoldingOutlineShown(editorAppearanceState.foldingOutline);
         // 折叠块、行号所展示的区域
         settings.setLineMarkerAreaShown(false);
         // 显示设置插入符行（光标选中行会变黄）
@@ -114,7 +120,8 @@ public class JsonAssistantToolWindowComponentProvider {
         // 设置绘画背景
         gutterComponentEx.setPaintBackground(false);
 
-        toggleColorSchema(editor, editor.getColorsScheme(), persistentState.backgroundColorPolicy);
+        // 指定配色方案
+        toggleColorSchema(editor, editor.getColorsScheme(), editorAppearanceState);
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -123,6 +130,12 @@ public class JsonAssistantToolWindowComponentProvider {
 
         JComponent component = textEditor.getComponent();
         component.setFont(UIManager.consolasFont(15));
+
+        if (nonNull && StrUtil.isNotBlank(initText)) {
+            hintEditor(500, pair.left
+                    ? JsonAssistantBundle.messageOnSystem("hint.paste.json")
+                    : JsonAssistantBundle.messageOnSystem("hint.import.json"));
+        }
 
         return textEditor;
     }
@@ -142,10 +155,17 @@ public class JsonAssistantToolWindowComponentProvider {
         return toolbar.getComponent();
     }
 
-    private String getInitText() {
+
+    /**
+     * 获取初始化文本
+     *
+     * @return left: 是否为剪贴板数据；right: 初始化文本
+     */
+    private ImmutablePair<Boolean, String> getInitText() {
         if (initWindow) {
+            boolean pasteData = false;
             String jsonStr = "";
-            if (persistentState.recognizeOtherFormats) {
+            if (editorBehaviorState.recognizeOtherFormats) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
@@ -153,6 +173,7 @@ public class JsonAssistantToolWindowComponentProvider {
                     jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(jsonStr)) {
+                        pasteData = true;
                         ClipboardTextConversionStrategy strategy = context.getStrategy();
                         jsonStr = (strategy instanceof Json5ConversionStrategy)
                                 ? Json5Util.formatJson5(jsonStr)
@@ -161,7 +182,7 @@ public class JsonAssistantToolWindowComponentProvider {
                 }
             }
 
-            if (StrUtil.isBlank(jsonStr) && persistentState.importHistory) {
+            if (StrUtil.isBlank(jsonStr) && editorBehaviorState.importHistory) {
                 JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
                 LimitedList history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
@@ -169,15 +190,15 @@ public class JsonAssistantToolWindowComponentProvider {
                 }
             }
 
-            return StrUtil.isNotBlank(jsonStr) ? jsonStr : "";
+            return ImmutablePair.of(pasteData, StrUtil.isNotBlank(jsonStr) ? jsonStr : "");
         }
 
-        return "";
+        return null;
     }
 
 
     private void pasteJsonToEditor() {
-        if (initWindow && persistentState.recognizeOtherFormats) {
+        if (initWindow && editorBehaviorState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = PlatformUtil.getClipboard();
@@ -193,10 +214,24 @@ public class JsonAssistantToolWindowComponentProvider {
                                 : JsonUtil.formatJson(jsonStr);
 
                         WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
+
+                        // 提示粘贴成功的消息
+                        hintEditor(400, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
                     }
                 }
             }
         }
+    }
+
+    private void hintEditor(long millis, String msg) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            try {
+                Thread.sleep(millis);
+            } catch (InterruptedException ignored) {
+            }
+
+            HintManager.getInstance().showInformationHint(editor, msg);
+        });
     }
 
     private void addJsonToHistory() {
@@ -248,76 +283,52 @@ public class JsonAssistantToolWindowComponentProvider {
         });
     }
 
-    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, BackgroundColorPolicy backgroundColorPolicy) {
+    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, EditorAppearanceState appearanceState) {
         EditorColorsScheme scheme = defaultColorsScheme;
-        switch (backgroundColorPolicy) {
-            case DEFAULT: {
-                // 改为新配色
-
-
-                scheme = ConsoleViewUtil.updateConsoleColorScheme(defaultColorsScheme);
-                if (UISettings.getInstance().getPresentationMode()) {
-                    // 设置为演示模式的字体大小
-                    scheme.setEditorFontSize(UISettings.getInstance().getPresentationModeFontSize());
-                }
+        BackgroundColorScheme colorScheme = appearanceState.backgroundColorScheme;
+        switch (colorScheme) {
+            case Default: {
+                // 保持默认
                 break;
             }
-            case FOLLOW_MAIN_EDITOR: {
-                // 跟随IDE配色
-                scheme = new DelegateColorScheme(scheme) {
-                    @Override
-                    public @NotNull Color getDefaultBackground() {
-                        return JBColor.namedColor("FileColor.Blue", new JBColor(0xeaf6ff, 0x4f556b));
-                    }
+            case Classic:
+            case Blue:
+            case Green:
+            case Orange:
+            case Rose:
+            case Violet:
+            case Yellow:
+            case Gray: {
+                // 判断是否已经是指定的颜色，防止每次都设置
+                Color color = colorScheme.getColor();
+                Color backgroundColor = editor.getBackgroundColor();
+                if (Objects.equals(backgroundColor, color)) {
+                    return;
+                }
 
-                    @Override
-                    public @NotNull FontPreferences getFontPreferences() {
-                        return getConsoleFontPreferences();
-                    }
+                scheme = new EditorBackgroundScheme(scheme, color);
+                break;
+            }
+            case Custom: {
+                // 判断是否已经是指定的颜色，防止每次都设置
+                Color backgroundColor = editor.getBackgroundColor();
+                Color color = UIUtil.isUnderDarcula() ? appearanceState.customDarkcolor : appearanceState.customLightColor;
+                if (Objects.equals(backgroundColor, color)) {
+                    return;
+                }
 
-                    @Override
-                    public int getEditorFontSize() {
-                        return getConsoleFontSize();
-                    }
+                // 如果设置了颜色，那就更换颜色
+                if (null != color) {
+                    scheme = new EditorBackgroundScheme(scheme, color);
+                }
 
-                    @Override
-                    public float getEditorFontSize2D() {
-                        return getConsoleFontSize2D();
-                    }
-
-                    @Override
-                    public String getEditorFontName() {
-                        return getConsoleFontName();
-                    }
-
-                    @Override
-                    public float getLineSpacing() {
-                        return getConsoleLineSpacing();
-                    }
-
-                    @Override
-                    public @NotNull Font getFont(EditorFontType key) {
-                        return super.getFont(EditorFontType.getConsoleType(key));
-                    }
-
-                    @Override
-                    public void setEditorFontSize(int fontSize) {
-                        setConsoleFontSize(fontSize);
-                    }
-
-                    @Override
-                    public void setEditorFontSize(float fontSize) {
-                        setConsoleFontSize(fontSize);
-                    }
-                };
-
-                // JBColor.namedColor("FileColor.Blue", new JBColor(0xeaf6ff, 0x4f556b))
                 break;
             }
         }
 
         editor.setColorsScheme(scheme);
     }
+
 
     public static void toggleFoldingOutline(EditorEx editor, boolean show) {
         EditorSettings settings = editor.getSettings();
@@ -342,11 +353,11 @@ public class JsonAssistantToolWindowComponentProvider {
             // 获取剪贴板的 JSON 并设置到编辑器内
             pasteJsonToEditor();
             // 行号显示
-            toggleLineNumbers(editor, persistentState.displayLineNumbers);
+            toggleLineNumbers(editor, editorAppearanceState.displayLineNumbers);
             // 配色切换
-            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), persistentState.backgroundColorPolicy);
+            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), editorAppearanceState);
             // 切换展示折叠区域
-            toggleFoldingOutline(editor, persistentState.foldingOutline);
+            toggleFoldingOutline(editor, editorAppearanceState.foldingOutline);
         }
 
         @Override

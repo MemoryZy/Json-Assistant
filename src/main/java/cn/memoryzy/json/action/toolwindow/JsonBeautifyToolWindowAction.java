@@ -25,8 +25,8 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
         this.editor = editor;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.beautify.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.beautify.description"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.beautify.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.beautify.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.PENCIL_STAR);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt B"), simpleToolWindowPanel);
     }
@@ -35,8 +35,8 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
     public void actionPerformed(@NotNull AnActionEvent event) {
         GlobalJsonConverter.parseAndProcessJson(
                 event.getDataContext(), editor, true,
-                JsonAssistantBundle.messageOnSystem("hint.selection.json.beautify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.global.json.beautify.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.beautify"),
+                JsonAssistantBundle.messageOnSystem("hint.global.beautify"));
     }
 
     @Override

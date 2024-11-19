@@ -64,7 +64,7 @@ public class JsonPathComponentProvider {
     }
 
     public JPanel createRootPanel() {
-        JBLabel tipLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.history.tip"));
+        JBLabel tipLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.json.path.history.hint"));
         tipLabel.setHorizontalAlignment(SwingConstants.RIGHT);
         tipLabel.setForeground(JBColor.GRAY);
         tipLabel.setFont(JBUI.Fonts.smallFont());
@@ -75,7 +75,7 @@ public class JsonPathComponentProvider {
         firstPanel.add(tipLabel, BorderLayout.SOUTH);
 
         JPanel secondPanel = new JPanel(new BorderLayout());
-        JBLabel resultLabel = new JBLabel(" " + JsonAssistantBundle.messageOnSystem("dialog.json.path.separate.label.text"));
+        JBLabel resultLabel = new JBLabel(" " + JsonAssistantBundle.messageOnSystem("popup.jsonpath.separate.label"));
         secondPanel.add(resultLabel, BorderLayout.NORTH);
         secondPanel.add(showTextEditor, BorderLayout.CENTER);
 
@@ -111,7 +111,7 @@ public class JsonPathComponentProvider {
 
         comboBox.setEditor(jsonPathNestedComboBoxEditor);
         comboBox.setEditable(true);
-        comboBox.setToolTipText(JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content"));
+        comboBox.setToolTipText(JsonAssistantBundle.messageOnSystem("popup.jsonpath.guide.content"));
         jsonPathNestedComboBoxEditor.setItem(null);
 
         return comboBox;

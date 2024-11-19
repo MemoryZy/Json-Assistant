@@ -52,7 +52,7 @@ public class JsonStructureDialog extends DialogWrapper {
         this.wrapper = wrapper;
 
         setModal(false);
-        setTitle(JsonAssistantBundle.messageOnSystem("json.structure.window.title"));
+        setTitle(JsonAssistantBundle.messageOnSystem("dialog.structure.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.ok.button"));
         init();
     }
@@ -238,7 +238,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             nodeTypeStr = "object";
                             squareBracketsEnd = "]";
                             sizeStrPre = " (";
-                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "json.structure.window.size.obj.text.singular" : "json.structure.window.size.obj.text.plural");
+                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.obj.singular.text" : "dialog.structure.size.obj.plural.text");
                             sizeStrPost = ")";
 
                             icon = JsonAssistantIcons.Structure.JSON_OBJECT;
@@ -250,7 +250,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             nodeTypeStr = "array";
                             squareBracketsEnd = "]";
                             sizeStrPre = " (";
-                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "json.structure.window.size.array.text.singular" : "json.structure.window.size.array.text.plural");
+                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.array.singular.text" : "dialog.structure.size.array.plural.text");
                             sizeStrPost = ")";
 
                             icon = JsonAssistantIcons.Structure.JSON_ARRAY;
@@ -262,7 +262,7 @@ public class JsonStructureDialog extends DialogWrapper {
                             nodeTypeStr = "array_object";
                             squareBracketsEnd = "]";
                             sizeStrPre = " (";
-                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "json.structure.window.size.obj.text.singular" : "json.structure.window.size.obj.text.plural");
+                            sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.obj.singular.text" : "dialog.structure.size.obj.plural.text");
                             sizeStrPost = ")";
 
                             icon = JsonAssistantIcons.Structure.JSON_OBJECT_ITEM;

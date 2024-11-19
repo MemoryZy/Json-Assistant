@@ -22,8 +22,8 @@ public class JsonStructureAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.structure.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.structure.description"));
+        presentation.setText(JsonAssistantBundle.message("action.structure.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.description"));
         presentation.setIcon(JsonAssistantIcons.STRUCTURE);
     }
 

@@ -32,8 +32,8 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.history.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.history.description"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.history.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.history.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.HISTORY);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt H"), toolWindow.getComponent());
     }
@@ -49,10 +49,10 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
                     new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
                             .setShortcut(getShortcut())
-                            .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.json.history.action.description"))
+                            .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.history.description"))
                             .installOn(this);
                 } else {
-                    setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.history.action.description"));
+                    setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.history.description"));
                 }
             }
         };

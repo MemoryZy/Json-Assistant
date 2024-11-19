@@ -50,7 +50,7 @@ public class GlobalJsonConverter {
             AbstractGlobalTextConversionProcessor processor = context.getProcessor();
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();
-            boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor.getDocument(), hasSelection, allowedFileTypeQualifiedNames);
+            boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, allowedFileTypeQualifiedNames);
             TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite);
         }
     }
@@ -80,7 +80,7 @@ public class GlobalJsonConverter {
 
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();
-            boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor.getDocument(), hasSelection, allowedFileTypeQualifiedNames);
+            boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, allowedFileTypeQualifiedNames);
             TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite);
         }
     }

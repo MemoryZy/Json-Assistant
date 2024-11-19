@@ -9,7 +9,7 @@ import cn.hutool.core.util.*;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
-import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
+import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -47,7 +47,7 @@ public class JavaUtil {
      * @param persistentState 持久化配置
      */
     public static void recursionAddProperty(Project project, PsiClass psiClass, Map<String, Object> jsonMap,
-                                            Map<String, List<String>> ignoreMap, AttributeSerializationPersistentState persistentState) {
+                                            Map<String, List<String>> ignoreMap, AttributeSerializationState persistentState) {
         // 获取该类所有字段
         PsiField[] allFields = JavaUtil.getAllFieldFilterStatic(psiClass);
         List<String> fieldNameList = new ArrayList<>();
@@ -127,7 +127,7 @@ public class JavaUtil {
         }
     }
 
-    private static Object getDefaultValue(PsiField psiField, PsiType psiType, AttributeSerializationPersistentState persistentState) {
+    private static Object getDefaultValue(PsiField psiField, PsiType psiType, AttributeSerializationState persistentState) {
         // 如果是加了时间序列化注解，但是类型不属于时间相关类型，那注解不生效
         boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;
         boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
@@ -221,7 +221,7 @@ public class JavaUtil {
      * @param persistentState 持久化配置
      * @return 键名（如果是{@link JsonAssistantPlugin#PLUGIN_ID_NAME}）则表示忽略该字段
      */
-    private static String getAnnotationJsonKeyName(PsiField psiField, AttributeSerializationPersistentState persistentState) {
+    private static String getAnnotationJsonKeyName(PsiField psiField, AttributeSerializationState persistentState) {
         // ---------------------------------- 获取注解判断是否忽略序列化
         boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
         boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;

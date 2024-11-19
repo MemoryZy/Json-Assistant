@@ -18,8 +18,8 @@ public class JavaBeanToJson5Action extends AnAction implements UpdateInBackgroun
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.javabean.to.json5.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.javabean.to.json5.description"));
+        presentation.setText(JsonAssistantBundle.message("action.serialize.json5.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.serialize.json5.description"));
         presentation.setIcon(JsonAssistantIcons.JSON);
     }
 

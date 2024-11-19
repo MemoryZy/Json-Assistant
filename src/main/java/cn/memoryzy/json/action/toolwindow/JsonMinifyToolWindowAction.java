@@ -22,8 +22,8 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
         this.editor = editor;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.minify.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.minify.description"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.minify.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.minify.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.MINIFY);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt C"), simpleToolWindowPanel);
     }
@@ -33,8 +33,8 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
         DataContext dataContext = event.getDataContext();
         GlobalJsonConverter.parseAndProcessJson(
                 dataContext, editor, false,
-                JsonAssistantBundle.messageOnSystem("hint.selection.json.minify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.global.json.minify.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.minify"),
+                JsonAssistantBundle.messageOnSystem("hint.global.minify"));
     }
 
     @Override

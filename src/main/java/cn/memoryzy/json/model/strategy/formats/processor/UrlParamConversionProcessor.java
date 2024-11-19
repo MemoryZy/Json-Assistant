@@ -42,8 +42,8 @@ public class UrlParamConversionProcessor extends AbstractGlobalTextConversionPro
     @Override
     protected MessageData createMessageData() {
         return super.createMessageData()
-                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.url.param.to.json.text"))
-                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.url.param.to.json.text"));
+                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.url.param.to.json"))
+                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.url.param.to.json"));
     }
 
 }

@@ -19,8 +19,8 @@ public class JsonMinifyAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.minify.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.minify.description"));
+        presentation.setText(JsonAssistantBundle.message("action.minify.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.minify.description"));
     }
 
     @Override
@@ -28,8 +28,8 @@ public class JsonMinifyAction extends DumbAwareAction {
         DataContext dataContext = event.getDataContext();
         GlobalJsonConverter.parseAndProcessJson(
                 dataContext, PlatformUtil.getEditor(dataContext), false,
-                JsonAssistantBundle.messageOnSystem("hint.selection.json.minify.text"),
-                JsonAssistantBundle.messageOnSystem("hint.global.json.minify.text"));
+                JsonAssistantBundle.messageOnSystem("hint.selection.minify"),
+                JsonAssistantBundle.messageOnSystem("hint.global.minify"));
     }
 
 }

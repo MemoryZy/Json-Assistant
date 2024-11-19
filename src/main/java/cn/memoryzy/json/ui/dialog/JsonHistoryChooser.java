@@ -58,9 +58,9 @@ public class JsonHistoryChooser extends DialogWrapper {
         this.project = project;
         this.toolWindow = toolWindow;
 
-        setTitle(JsonAssistantBundle.messageOnSystem("json.history.window.title"));
-        setOKButtonText(JsonAssistantBundle.messageOnSystem("json.history.window.ok.button.text"));
-        setCancelButtonText(JsonAssistantBundle.messageOnSystem("json.history.window.cancel.button.text"));
+        setTitle(JsonAssistantBundle.messageOnSystem("dialog.history.title"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.history.ok"));
+        setCancelButtonText(JsonAssistantBundle.messageOnSystem("dialog.history.cancel"));
         disabledOkAction();
         init();
     }
@@ -75,7 +75,7 @@ public class JsonHistoryChooser extends DialogWrapper {
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());
-        ((JBList<?>) showList).setEmptyText(JsonAssistantBundle.messageOnSystem("json.history.window.empty.text"));
+        ((JBList<?>) showList).setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
 
         // 初始化右键弹出菜单
         initRightMousePopupMenu();
@@ -223,7 +223,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     public class RemoveListElementAction extends DumbAwareAction {
 
         public RemoveListElementAction() {
-            super(JsonAssistantBundle.message("action.json.history.window.remove.text"), JsonAssistantBundle.messageOnSystem("action.json.history.window.remove.description"), null);
+            super(JsonAssistantBundle.message("action.history.remove.text"), JsonAssistantBundle.messageOnSystem("action.history.remove.description"), null);
             registerCustomShortcutSet(CustomShortcutSet.fromString("DELETE"), showList);
         }
 

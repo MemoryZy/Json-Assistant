@@ -30,8 +30,8 @@ public class JavaConstantToJsonAction extends AnAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.extractor.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.extractor.description"));
+        presentation.setText(JsonAssistantBundle.message("action.extractor.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.extractor.description"));
         presentation.setIcon(JsonAssistantIcons.ESC);
     }
 

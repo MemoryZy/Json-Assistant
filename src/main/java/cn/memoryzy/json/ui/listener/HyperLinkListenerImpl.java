@@ -49,7 +49,7 @@ public class HyperLinkListenerImpl extends HyperlinkAdapter {
         PlatformUtil.setClipboard(url);
         Component component = e.getInputEvent().getComponent();
         JBPopupFactory.getInstance()
-                .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.support.share.text"),
+                .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.support.share"),
                         null,
                         JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
                         null)

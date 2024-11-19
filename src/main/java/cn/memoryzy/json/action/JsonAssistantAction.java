@@ -22,8 +22,8 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.json.assistant.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.assistant.description"));
+        presentation.setText(JsonAssistantBundle.message("action.main.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.main.description"));
         presentation.setIcon(JsonAssistantIcons.BOX);
     }
 

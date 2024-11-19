@@ -263,12 +263,12 @@ public class PlatformUtil {
         if (PlatformUtil.canBrowseInHTMLEditor() && useHtmlEditor) {
             String timeoutContent = HtmlConstant.TIMEOUT_HTML
                     .replace("__THEME__", darkTheme ? "theme-dark" : "")
-                    .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.title"))
-                    .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.message"))
-                    .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.editor.timeout.action", url));
+                    .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.timeout.title"))
+                    .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.timeout.message"))
+                    .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.timeout.action", url));
 
             if (Urls.isReachable()) {
-                HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("html.editor.quick.start.title"), url, timeoutContent);
+                HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("open.html.quick.start.title"), url, timeoutContent);
                 return;
             }
         }

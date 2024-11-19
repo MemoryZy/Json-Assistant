@@ -15,8 +15,8 @@ public class RemoveTreeNodeAction extends DumbAwareAction {
     private final Tree tree;
 
     public RemoveTreeNodeAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.remove.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.structure.window.remove.description"),
+        super(JsonAssistantBundle.message("action.structure.remove.text"),
+                JsonAssistantBundle.messageOnSystem("action.structure.remove.description"),
                 null);
         this.tree = tree;
     }

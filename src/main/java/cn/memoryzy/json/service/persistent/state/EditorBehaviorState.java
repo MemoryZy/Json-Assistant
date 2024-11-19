@@ -13,6 +13,9 @@ public class EditorBehaviorState {
      */
     public boolean importHistory = false;
 
+
+    // ---------------------------------
+
     /**
      * 自动识别并转换其他格式数据（总开关）
      */

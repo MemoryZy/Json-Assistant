@@ -3,7 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.service.persistent.AttributeSerializationPersistentState;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.util.JavaUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.Notifications;
@@ -32,8 +32,8 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.javabean.to.json.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.javabean.to.json.description"));
+        presentation.setText(JsonAssistantBundle.message("action.serialize.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.serialize.description"));
         presentation.setIcon(JsonAssistantIcons.JSON);
     }
 
@@ -69,14 +69,14 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         // 忽略的属性
         Map<String, List<String>> ignoreMap = new HashMap<>();
         // 相关配置
-        AttributeSerializationPersistentState persistentState = AttributeSerializationPersistentState.getInstance();
+        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, persistentState);
+            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, persistentState.attributeSerializationState);
         } catch (Error e) {
             log.error(e);
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.json.serialize.recursion"), NotificationType.ERROR, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("error.serialize.recursion"), NotificationType.ERROR, project);
             return;
         }
 
@@ -92,12 +92,12 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
 
         if (CollUtil.isNotEmpty(entries)) {
             Notifications.showFullNotification(
-                    JsonAssistantBundle.messageOnSystem("tip.json.serialize.ignore.title"),
+                    JsonAssistantBundle.messageOnSystem("notification.serialize.ignore.title"),
                     generateNotificationContent(entries),
                     NotificationType.INFORMATION,
                     project);
         } else {
-            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("tip.json.serialize.copy"), NotificationType.INFORMATION, project);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notification.serialize.copy"), NotificationType.INFORMATION, project);
         }
     }
 

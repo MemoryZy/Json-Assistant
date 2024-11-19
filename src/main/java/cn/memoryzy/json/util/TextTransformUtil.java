@@ -7,6 +7,7 @@ import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.MessageData;
 import cn.memoryzy.json.model.strategy.formats.data.SelectionData;
 import com.intellij.codeInsight.hint.HintManager;
+import com.intellij.execution.impl.ConsoleViewUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -118,7 +119,7 @@ public class TextTransformUtil {
     }
 
     public static void copyToClipboardAndShowNotification(Project project, String processedText) {
-        copyToClipboardAndShowNotification(project, processedText, JsonAssistantBundle.messageOnSystem("tip.no.write.json.copy.text"));
+        copyToClipboardAndShowNotification(project, processedText, JsonAssistantBundle.messageOnSystem("notification.copy.to.clipboard"));
     }
 
     public static void copyToClipboardAndShowNotification(Project project, String processedText, String message) {
@@ -143,16 +144,17 @@ public class TextTransformUtil {
      * 判断当前文档是否允许写入
      *
      * @param dataContext                   操作数据上下文
-     * @param document                      文档对象
+     * @param editor                        编辑器
      * @param hasSelection                  当前是否选中文本区域
      * @param allowedFileTypeQualifiedNames 允许写入的文件类型（多）
      * @return 允许写入为 true；反之为 false
      */
-    public static boolean canWriteToDocument(DataContext dataContext, Document document, boolean hasSelection, String... allowedFileTypeQualifiedNames) {
+    public static boolean canWriteToDocument(DataContext dataContext, Editor editor, boolean hasSelection, String... allowedFileTypeQualifiedNames) {
+        Document document = editor.getDocument();
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
 
         // 文档不可写 或 文档属于控制台文档，则不允许写入
-        if (!document.isWritable() || isConsoleDocument(dataContext)) {
+        if (!document.isWritable() || isConsoleDocument(dataContext, editor)) {
             return false;
         }
 
@@ -176,33 +178,11 @@ public class TextTransformUtil {
      * 判断当前是否处于控制台文档内
      *
      * @param dataContext 操作数据上下文
+     * @param editor
      * @return 处于控制台文档内为 true；反之为 false
      */
-    public static boolean isConsoleDocument(DataContext dataContext) {
-        return null != LangDataKeys.CONSOLE_VIEW.getData(dataContext);
+    public static boolean isConsoleDocument(DataContext dataContext, Editor editor) {
+        return ConsoleViewUtil.isConsoleViewEditor(editor) || null != LangDataKeys.CONSOLE_VIEW.getData(dataContext);
     }
-
-
-
-    // public static String keyValuePairsToJson(String keyValue) {
-    //     Map<String, String> params = new HashMap<>();
-    //     String[] lines = keyValue.split("\\n");
-    //
-    //     for (String line : lines) {
-    //         // 使用正则表达式匹配 ":" 或 "="
-    //         String[] parts = line.split("[:=]", 2);
-    //         if (parts.length == 2) {
-    //             String key = parts[0].trim();
-    //             String value = parts[1].trim();
-    //
-    //             // 判断键是否为数字或布尔值
-    //             if (Objects.isNull(getNumber(key)) && Objects.isNull(getBoolean(key))) {
-    //                 params.put(key, value);
-    //             }
-    //         }
-    //     }
-    //
-    //
-    // }
 
 }

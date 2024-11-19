@@ -1,6 +1,6 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.enums.BackgroundColorPolicy2;
+import cn.memoryzy.json.enums.BackgroundColorScheme;
 import cn.memoryzy.json.model.deserializer.ColorDeserializer;
 import cn.memoryzy.json.model.serializer.ColorSerializer;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -23,9 +23,17 @@ public class EditorAppearanceState {
     public boolean displayLineNumbers = false;
 
     /**
+     * 显示折叠轮廓
+     */
+    public boolean foldingOutline = PlatformUtil.isNewUi();
+
+
+    // ----------------------------------------------------
+
+    /**
      * 编辑器背景配色名称（指定颜色或自定义）
      */
-    public BackgroundColorPolicy2 backgroundColorPolicy;
+    public BackgroundColorScheme backgroundColorScheme = BackgroundColorScheme.Default;
 
     /**
      * 当选中自定义项时，用户指定的颜色（亮色）
@@ -40,10 +48,5 @@ public class EditorAppearanceState {
     @JsonSerialize(using = ColorSerializer.class)
     @JsonDeserialize(using = ColorDeserializer.class)
     public Color customDarkcolor;
-
-    /**
-     * 显示折叠轮廓
-     */
-    public boolean foldingOutline = PlatformUtil.isNewUi();
 
 }

@@ -70,9 +70,9 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.directory = directory;
         this.module = module;
 
-        setTitle(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.title"));
-        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.ok.button"));
-        setCancelButtonText(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.cancel.button"));
+        setTitle(JsonAssistantBundle.messageOnSystem("dialog.deserialize.title"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.deserialize.ok"));
+        setCancelButtonText(JsonAssistantBundle.messageOnSystem("dialog.deserialize.cancel"));
         getOKAction().setEnabled(false);
         init();
     }
@@ -80,13 +80,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         classNameTextField = new JBTextField();
-        JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.label.class.name.text"));
+        JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.deserialize.label.class.name"));
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
-        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
+        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
 
@@ -133,7 +133,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         String jsonText = StrUtil.trim(jsonTextField.getText());
         if (StringUtils.isBlank(jsonText)) {
             // 为空则提示
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
             return false;
         }
 
@@ -153,7 +153,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         // 判断文件是否已经存在
         if (directory.findFile(className + ".java") != null) {
             // 提示
-            classNameErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.already.exists.text", className));
+            classNameErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.already.exists", className));
             return false;
         }
 
@@ -162,7 +162,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         // 属性为空
         if (Objects.isNull(jsonObject) || jsonObject.isEmpty()) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
             return false;
         }
 
@@ -201,7 +201,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     private ObjectWrapper resolveJson(String jsonText) {
         // 解析Json及Json5
         if (!JsonUtil.isJson(jsonText) && !Json5Util.isJson5(jsonText)) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
             return null;
         }
 
@@ -210,13 +210,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             ArrayWrapper jsonArray = JsonUtil.parseArray(jsonText);
             // 数组为空
             if (jsonArray.isEmpty()) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
                 return null;
             }
 
             // 判断：如果Array中除了对象类型还有其他的，那么提示错误
             if (jsonArray.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
                 return null;
             }
 
@@ -230,13 +230,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         if (Json5Util.isJson5Array(jsonText)) {
             ArrayWrapper arrayWrapper = Json5Util.parseArray(jsonText);
             if (CollUtil.isEmpty(arrayWrapper)) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
                 return null;
             }
 
             // 判断：如果Array中除了对象类型还有其他的，那么提示错误
             if (arrayWrapper.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.invalid.json.text"));
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
                 return null;
             }
 
@@ -330,7 +330,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 try {
                     psiField = factory.createFieldFromText(fieldText, psiClass);
                 } catch (IncorrectOperationException e) {
-                    Notifications.showLogNotification(JsonAssistantBundle.messageOnSystem("notify.json.to.javabean.incorrect.field.text", key), NotificationType.ERROR, project);
+                    Notifications.showLogNotification(JsonAssistantBundle.messageOnSystem("error.deserialize.incorrect.field", key), NotificationType.ERROR, project);
                     throw e;
                 }
 
@@ -404,12 +404,12 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         public String getErrorText(String inputString) {
             if (!inputString.isEmpty() && !PsiNameHelper.getInstance(project).isQualifiedName(inputString)) {
                 // return JavaErrorBundle.message("create.class.action.this.not.valid.java.qualified.name");
-                return JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.illegal.class.name.text");
+                return JsonAssistantBundle.messageOnSystem("error.illegal.class.name");
             }
             String shortName = StringUtil.getShortName(inputString);
             if (HighlightClassUtil.isRestrictedIdentifier(shortName, level)) {
                 // return JavaErrorBundle.message("restricted.identifier", shortName);
-                return JsonAssistantBundle.messageOnSystem("dialog.json.deserialize.tip.not.applicable.class.name.text", shortName);
+                return JsonAssistantBundle.messageOnSystem("error.not.applicable.class.name", shortName);
             }
             return null;
         }

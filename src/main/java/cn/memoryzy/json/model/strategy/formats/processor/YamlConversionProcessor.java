@@ -72,8 +72,8 @@ public class YamlConversionProcessor extends AbstractGlobalTextConversionProcess
     @Override
     protected MessageData createMessageData() {
         return super.createMessageData()
-                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.yaml.to.json.text"))
-                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.yaml.to.json.text"));
+                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.yaml.to.json"))
+                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.yaml.to.json"));
     }
 
 

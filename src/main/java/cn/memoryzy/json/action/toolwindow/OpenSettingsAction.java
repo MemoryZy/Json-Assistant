@@ -5,14 +5,10 @@ import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.keymap.KeymapUtil;
-import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.util.ui.JBUI;
@@ -46,11 +42,10 @@ public class OpenSettingsAction extends DumbAwareAction implements CustomCompone
                     // noinspection DialogTitleCapitalization
                     new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
-                            .setShortcut(getShortcut())
-                            .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.open.settings.action.description"))
+                            .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.open.settings.description"))
                             .installOn(this);
                 } else {
-                    setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.open.settings.action.description"));
+                    setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.open.settings.description"));
                 }
             }
         };
@@ -64,11 +59,4 @@ public class OpenSettingsAction extends DumbAwareAction implements CustomCompone
         ShowSettingsUtil.getInstance().showSettingsDialog(event.getProject(), JsonAssistantBundle.message("setting.display.name"));
     }
 
-    private String getShortcut() {
-        Shortcut[] shortcuts = getShortcutSet().getShortcuts();
-        if (shortcuts.length == 0) {
-            return (SystemInfo.isMac ? MacKeymapUtil.OPTION : "Alt") + "+S";
-        }
-        return KeymapUtil.getShortcutsText(shortcuts);
-    }
 }

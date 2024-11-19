@@ -42,8 +42,8 @@ public class TomlConversionProcessor extends AbstractGlobalTextConversionProcess
     @Override
     protected MessageData createMessageData() {
         return super.createMessageData()
-                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.toml.to.json.text"))
-                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.toml.to.json.text"));
+                .setSelectionConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.selection.toml.to.json"))
+                .setGlobalConvertSuccessMessage(JsonAssistantBundle.messageOnSystem("hint.global.toml.to.json"));
     }
 
 }

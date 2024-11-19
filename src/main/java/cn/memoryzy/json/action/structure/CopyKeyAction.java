@@ -20,8 +20,8 @@ public class CopyKeyAction extends DumbAwareAction {
     private final Tree tree;
 
     public CopyKeyAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.json.structure.window.copy.key.text"),
-                JsonAssistantBundle.messageOnSystem("action.json.structure.window.copy.key.description"),
+        super(JsonAssistantBundle.message("action.structure.copy.key.text"),
+                JsonAssistantBundle.messageOnSystem("action.structure.copy.key.description"),
                 null);
         this.tree = tree;
     }

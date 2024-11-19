@@ -46,9 +46,9 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         super((Project) null, true);
         this.values = values;
 
-        setTitle(JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.title"));
-        setOKButtonText(JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.ok.button.text"));
-        setCancelButtonText(JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.cancel.button.text"));
+        setTitle(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.title"));
+        setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.ok"));
+        setCancelButtonText(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.cancel"));
         init();
     }
 
@@ -76,7 +76,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         JBLabel label = new JBLabel();
         label.setForeground(JBColor.GRAY);
         label.setFont(JBFont.label().deriveFont(12F));
-        label.setText(JsonAssistantBundle.messageOnSystem("multi.yaml.document.chooser.window.tip"));
+        label.setText(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint"));
         label.setIcon(AllIcons.Actions.IntentionBulb);
         label.setBorder(JBUI.Borders.emptyBottom(8));
 

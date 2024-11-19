@@ -54,8 +54,8 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.path.filter.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.path.filter.description"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.jsonpath.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.jsonpath.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt P"), simpleToolWindowPanel);
     }
@@ -71,17 +71,17 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                     HelpTooltip helpTooltip = new HelpTooltip()
                             .setTitle(getTemplatePresentation().getText())
                             .setShortcut(getShortcut())
-                            .setDescription(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"));
+                            .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.json.path.description"));
 
                     setExternalLink(helpTooltip);
                     helpTooltip.installOn(this);
                 } else {
-                    setToolTipText(JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.description"));
+                    setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.json.path.description"));
                 }
             }
 
             private void setExternalLink(HelpTooltip helpTooltip) {
-                String name = JsonAssistantBundle.messageOnSystem("help.tooltip.json.path.action.link");
+                String name = JsonAssistantBundle.messageOnSystem("tooltip.json.path.link");
                 Runnable action = () -> BrowserUtil.browse(Urls.JSONPATH_EXPRESS_DESCRIPTION);
                 boolean external = true;
 
@@ -128,8 +128,8 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(rootPanel, hasShown ? expressionComboBoxTextField : null)
                 .setFocusable(true)
-                .setTitle(JsonAssistantBundle.messageOnSystem("popup.json.path.filter.on.text.field.title"))
-                .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("popup.json.path.filter.cancel.btn.tooltip"), AllIcons.General.HideToolWindow))
+                .setTitle(JsonAssistantBundle.messageOnSystem("popup.jsonpath.title"))
+                .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("tooltip.json.path.cancel"), AllIcons.General.HideToolWindow))
                 .setShowShadow(true)
                 .setShowBorder(true)
                 .setModalContext(false)
@@ -173,7 +173,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
         boolean hasShown = propertiesComponent.getBoolean(JSON_PATH_GUIDE_KEY, false);
         if (!hasShown) {
-            String message = JsonAssistantBundle.messageOnSystem("balloon.json.path.guide.popup.content");
+            String message = JsonAssistantBundle.messageOnSystem("popup.jsonpath.guide.content");
             JBPopupFactory.getInstance()
                     .createHtmlTextBalloonBuilder(message, null, JBColor.white, null)
                     .setShadow(true)

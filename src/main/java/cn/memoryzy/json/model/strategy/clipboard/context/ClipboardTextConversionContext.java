@@ -2,7 +2,8 @@ package cn.memoryzy.json.model.strategy.clipboard.context;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.strategy.clipboard.*;
-import cn.memoryzy.json.service.persistent.EditorOptionsPersistentState;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.List;
  * @since 2024/10/31
  */
 public class ClipboardTextConversionContext {
-    private static final EditorOptionsPersistentState STATE = EditorOptionsPersistentState.getInstance();
+    private static final EditorBehaviorState STATE = JsonAssistantPersistentState.getInstance().editorBehaviorState;
 
     private ClipboardTextConversionStrategy strategy;
 

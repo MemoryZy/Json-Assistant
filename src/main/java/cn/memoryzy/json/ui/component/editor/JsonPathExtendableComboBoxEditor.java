@@ -27,7 +27,7 @@ public class JsonPathExtendableComboBoxEditor extends BasicComboBoxEditor {
     public JTextField createEditorComponent() {
         ExtendableTextField editor = new ExtendableTextField(20);
         editor.addExtension(new SearchExtension(action));
-        editor.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.json.path.text.field.placeholder"));
+        editor.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.json.path.placeholder"));
         editor.setFont(font);
         editor.setBorder(null);
         return editor;
