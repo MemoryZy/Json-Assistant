@@ -5,6 +5,7 @@ import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentListener;
@@ -95,7 +96,11 @@ public class UIManager implements Disposable {
     }
 
     public static void addErrorBorder(JComponent component) {
+        // 这行的作用是给文本框外部变为红色
         component.putClientProperty(PluginConstant.OUTLINE_PROPERTY, PluginConstant.ERROR_VALUE);
+        // 重新计算布局
+        component.revalidate();
+        // 重新渲染组件
         component.repaint();
     }
 
@@ -115,6 +120,7 @@ public class UIManager implements Disposable {
                 Object outlineValue = target.getClientProperty(PluginConstant.OUTLINE_PROPERTY);
                 if (Objects.equals(outlineValue, PluginConstant.ERROR_VALUE)) {
                     target.putClientProperty(PluginConstant.OUTLINE_PROPERTY, null);
+                    target.revalidate();
                     target.repaint();
                 }
             }
@@ -128,6 +134,7 @@ public class UIManager implements Disposable {
                 Object outlineValue = target.getClientProperty(PluginConstant.OUTLINE_PROPERTY);
                 if (Objects.equals(outlineValue, PluginConstant.ERROR_VALUE)) {
                     target.putClientProperty(PluginConstant.OUTLINE_PROPERTY, null);
+                    target.revalidate();
                     target.repaint();
                 }
             }
@@ -312,6 +319,12 @@ public class UIManager implements Disposable {
      */
     public static Font getCommentFont(Font font) {
         return new FontUIResource(font);
+    }
+
+
+    public static void repaintEditor(Editor editor) {
+        editor.getComponent().revalidate();
+        editor.getComponent().repaint();
     }
 
 }

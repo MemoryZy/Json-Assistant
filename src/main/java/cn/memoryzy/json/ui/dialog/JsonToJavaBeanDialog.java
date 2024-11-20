@@ -89,6 +89,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
+        jsonTextField.addNotify();
 
         classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
         jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);

@@ -1,8 +1,12 @@
 package cn.memoryzy.json.enums;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.ui.JBColor;
+import com.intellij.util.ui.UIUtil;
 
 import java.awt.*;
 import java.util.Objects;
@@ -21,7 +25,7 @@ public enum BackgroundColorScheme {
     /**
      * 经典主题（黑白）
      */
-    Classic("setting.component.background.color.classic.text", new JBColor(0xffffff, 0x1e1f22)),
+    Classic("setting.component.background.color.classic.text", null),
 
     /**
      * 蓝色主题
@@ -64,24 +68,31 @@ public enum BackgroundColorScheme {
     Custom("setting.component.background.color.custom.text", null);
 
 
-    private final String nameKey;
+    private final String key;
     private final Color color;
 
-    BackgroundColorScheme(String nameKey, Color color) {
-        this.nameKey = nameKey;
+    BackgroundColorScheme(String key, Color color) {
+        this.key = key;
         this.color = color;
     }
 
     public Color getColor() {
-        return Objects.equals(Default, this)
-                // 获取全局背景色
-                ? EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground()
-                : color;
+        if (Objects.equals(Default, this)) {
+            return EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground();
+        } else if (Objects.equals(Classic, this)) {
+            return PlatformUtil.isNewUi() ? new JBColor(0xffffff, 0x1e1f22) : new JBColor(0xffffff, 0x2b2b2b);
+        } else if (Objects.equals(Custom, this)) {
+            JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+            EditorAppearanceState appearanceState = persistentState.editorAppearanceState;
+            return UIUtil.isUnderDarcula() ? appearanceState.customDarkcolor : appearanceState.customLightColor;
+        }
+
+        return color;
     }
 
     @Override
     public String toString() {
-        return JsonAssistantBundle.messageOnSystem(nameKey);
+        return JsonAssistantBundle.messageOnSystem(key);
     }
 
 }

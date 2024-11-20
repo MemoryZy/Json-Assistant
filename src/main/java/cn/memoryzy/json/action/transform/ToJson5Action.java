@@ -24,7 +24,7 @@ public class ToJson5Action extends DumbAwareAction implements UpdateInBackground
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.json5.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.json5.description"));
-        presentation.setIcon(AllIcons.FileTypes.JsonSchema);
+        presentation.setIcon(AllIcons.FileTypes.Json);
     }
 
     @Override

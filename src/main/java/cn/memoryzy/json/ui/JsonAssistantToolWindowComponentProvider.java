@@ -30,6 +30,7 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
@@ -37,6 +38,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
+import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.editor.ex.FocusChangeListener;
@@ -47,7 +49,6 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,6 +61,7 @@ import java.util.Objects;
  * @since 2024/8/6
  */
 public class JsonAssistantToolWindowComponentProvider {
+    private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
 
     private final Project project;
     private final FileType editorFileType;
@@ -187,6 +189,7 @@ public class JsonAssistantToolWindowComponentProvider {
                 LimitedList history = state.getHistory();
                 if (CollUtil.isNotEmpty(history)) {
                     jsonStr = history.get(0);
+                    jsonStr = LimitedList.readAndRemoveInsertTime(jsonStr).left;
                 }
             }
 
@@ -284,49 +287,26 @@ public class JsonAssistantToolWindowComponentProvider {
     }
 
     public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, EditorAppearanceState appearanceState) {
-        EditorColorsScheme scheme = defaultColorsScheme;
         BackgroundColorScheme colorScheme = appearanceState.backgroundColorScheme;
-        switch (colorScheme) {
-            case Default: {
-                // 保持默认
-                break;
+        if (BackgroundColorScheme.Default.equals(colorScheme)) {
+            // 默认的话，按照默认颜色
+            Color oriColor = editor.getBackgroundColor();
+            Color newColor = defaultColorsScheme.getDefaultBackground();
+
+            if (!Objects.equals(oriColor, newColor)) {
+                // 需设置一遍将颜色变更回来
+                editor.setColorsScheme(defaultColorsScheme);
             }
-            case Classic:
-            case Blue:
-            case Green:
-            case Orange:
-            case Rose:
-            case Violet:
-            case Yellow:
-            case Gray: {
-                // 判断是否已经是指定的颜色，防止每次都设置
-                Color color = colorScheme.getColor();
-                Color backgroundColor = editor.getBackgroundColor();
-                if (Objects.equals(backgroundColor, color)) {
-                    return;
-                }
-
-                scheme = new EditorBackgroundScheme(scheme, color);
-                break;
-            }
-            case Custom: {
-                // 判断是否已经是指定的颜色，防止每次都设置
-                Color backgroundColor = editor.getBackgroundColor();
-                Color color = UIUtil.isUnderDarcula() ? appearanceState.customDarkcolor : appearanceState.customLightColor;
-                if (Objects.equals(backgroundColor, color)) {
-                    return;
-                }
-
-                // 如果设置了颜色，那就更换颜色
-                if (null != color) {
-                    scheme = new EditorBackgroundScheme(scheme, color);
-                }
-
-                break;
+        } else {
+            // 其他的按照自身设定的颜色来操作
+            // 判断是否已经是指定的颜色，防止每次都设置
+            Color newColor = colorScheme.getColor();
+            Color oriColor = editor.getBackgroundColor();
+            // 新颜色不为空，且不等于原先的旧颜色
+            if (Objects.nonNull(newColor) && !Objects.equals(oriColor, newColor)) {
+                editor.setColorsScheme(new EditorBackgroundScheme(defaultColorsScheme, newColor));
             }
         }
-
-        editor.setColorsScheme(scheme);
     }
 
 
@@ -370,6 +350,7 @@ public class JsonAssistantToolWindowComponentProvider {
 
     private static class DocumentListenerImpl implements DocumentListener {
         private final EditorEx editor;
+        private int lastLineCount = 0;
 
         public DocumentListenerImpl(EditorEx editor) {
             this.editor = editor;
@@ -378,6 +359,7 @@ public class JsonAssistantToolWindowComponentProvider {
         @Override
         public void documentChanged(@NotNull DocumentEvent event) {
             try {
+                // -------------- 开启/关闭光标行
                 EditorSettings settings = editor.getSettings();
                 // 编辑器原来为空，新增不为空，表示新增
                 if (StrUtil.isBlank(event.getOldFragment()) && StrUtil.isNotBlank(event.getNewFragment())) {
@@ -390,7 +372,17 @@ public class JsonAssistantToolWindowComponentProvider {
                         settings.setCaretRowShown(false);
                     }
                 }
-            } catch (Error ignored) {
+
+                // -------------- 重新绘制
+                DocumentEx document = editor.getDocument();
+                int newLineCount = document.getLineCount();
+                if (lastLineCount != newLineCount) {
+                    lastLineCount = newLineCount;
+                    UIManager.repaintEditor(editor);
+                }
+
+            } catch (Error error) {
+                LOG.warn(error);
             }
         }
     }

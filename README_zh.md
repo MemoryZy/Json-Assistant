@@ -23,7 +23,7 @@
   - 更名选项卡
   - 移动至主编辑器
   - 用新窗口打开选项卡
-  - JSONPath　查询
+  - JSONPath 查询
   - JSON 历史记录
   - JSON 导出
 - JSON 美化

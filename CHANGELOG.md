@@ -5,12 +5,14 @@
 - 新增 URL 参数 与 JSON 互转。
 - 新增 Properties 格式参数与 JSON 互转。
 - 新增 JSON 转义功能。
+- 新增工具窗口背景色自定义功能。
 - 用户体验优化与改进。
 - BUG修复。
 - Full support for [JSON5](https://json5.org/).
 - Added URL parameter interconversion with JSON.
 - Added the Properties format parameter to interconvert with JSON.
 - Added JSON escape function.
+- Added the tool window background color customization function.
 - User experience optimization and improvement.
 - BUG fixes.
 

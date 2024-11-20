@@ -12,6 +12,10 @@ import java.util.Map;
  */
 public class ObjectWrapper extends LinkedHashMap<String, Object> implements JsonWrapper {
 
+    public ObjectWrapper() {
+        super();
+    }
+
     @SuppressWarnings("unchecked")
     public ObjectWrapper(Object source) {
         super();

@@ -1,6 +1,5 @@
 package cn.memoryzy.json.ui.decorator;
 
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.ValidationInfo;
@@ -104,10 +103,7 @@ public class TextEditorErrorPopupDecorator {
     }
 
     public void setErrorBorder() {
-        // 这行的作用是给文本框外部变为红色
-        myTextField.putClientProperty(PluginConstant.OUTLINE_PROPERTY, PluginConstant.ERROR_VALUE);
-        // 重新渲染组件
-        myTextField.repaint();
+        UIManager.addErrorBorder(myTextField);
     }
 
 }

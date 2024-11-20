@@ -15,6 +15,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -69,6 +71,8 @@ public class JsonHistoryChooser extends DialogWrapper {
     protected @Nullable JComponent createCenterPanel() {
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         showTextField.setFont(UIManager.consolasFont(14));
+        // 通知创建Editor
+        showTextField.addNotify();
 
         showList = new JBList<>(fillHistoryListModel());
         showList.setFont(UIManager.jetBrainsMonoFont(13));
@@ -272,11 +276,22 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     public class UpdateEditorListSelectionListener implements ListSelectionListener {
+        private int lastLineCount = 0;
+
         @Override
         public void valueChanged(ListSelectionEvent e) {
             HistoryEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 showTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getLongText()));
+
+                // -------------- 重新绘制
+                Document document = showTextField.getDocument();
+                int newLineCount = document.getLineCount();
+                if (lastLineCount != newLineCount) {
+                    lastLineCount = newLineCount;
+                    Editor editor = showTextField.getEditor();
+                    UIManager.repaintEditor(Objects.requireNonNull(editor));
+                }
             }
         }
     }
