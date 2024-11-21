@@ -17,6 +17,7 @@ public class DonateAction extends DumbAwareAction {
         super(text, JsonAssistantBundle.messageOnSystem("action.donate.description"), JsonAssistantIcons.DONATE);
     }
 
+    
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         new SupportDialog().show();
