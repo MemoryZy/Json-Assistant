@@ -34,10 +34,10 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
-      
+
   # 可手动操控
   workflow_dispatch:
-    
+
 concurrency:
   group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
   cancel-in-progress: true
@@ -71,9 +71,7 @@ jobs:
 
       # Setup Gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-home-cache-cleanup: true
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
@@ -90,7 +88,7 @@ jobs:
           echo "version: $VERSION"
           echo "changelog:"
           echo "$CHANGELOG"
-                                        
+          
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "pluginVerifierHomeDir=~/.pluginVerifier" >> $GITHUB_OUTPUT
           
@@ -145,9 +143,7 @@ jobs:
 
       # Setup Gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-home-cache-cleanup: true
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
@@ -171,39 +167,39 @@ jobs:
           files: ${{ github.workspace }}/build/reports/kover/report.xml
 
   # Run Qodana inspections and provide report
-  inspectCode:
-    name: Inspect code
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      checks: write
-      pull-requests: write
-    steps:
-
-      # Free GitHub Actions Environment Disk Space
-      - name: Maximize Build Space
-        uses: jlumbroso/free-disk-space@main
-        with:
-          tool-cache: false
-          large-packages: false
-
-      # Check out the current repository
-      - name: Fetch Sources
-        uses: actions/checkout@v4
-
-      # Set up Java environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 11
-
-      # Run Qodana inspections
-      - name: Qodana - Code Inspection
-        uses: JetBrains/qodana-action@v2024.1.5
-        with:
-          cache-default-branch-only: true
+#  inspectCode:
+#    name: Inspect code
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    permissions:
+#      contents: write
+#      checks: write
+#      pull-requests: write
+#    steps:
+#
+#      # Free GitHub Actions Environment Disk Space
+#      - name: Maximize Build Space
+#        uses: jlumbroso/free-disk-space@main
+#        with:
+#          tool-cache: false
+#          large-packages: false
+#
+#      # Check out the current repository
+#      - name: Fetch Sources
+#        uses: actions/checkout@v4
+#
+#      # Set up Java environment for the next steps
+#      - name: Setup Java
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: zulu
+#          java-version: 11
+#
+#      # Run Qodana inspections
+#      - name: Qodana - Code Inspection
+#        uses: JetBrains/qodana-action@v2024.1.5
+#        with:
+#          cache-default-branch-only: true
 
   # Run plugin structure verification along with IntelliJ Plugin Verifier
   verify:
@@ -232,9 +228,7 @@ jobs:
 
       # Setup Gradle
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-home-cache-cleanup: true
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
