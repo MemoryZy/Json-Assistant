@@ -1,6 +1,6 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.enums.BackgroundColorScheme;
+import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.model.deserializer.ColorDeserializer;
 import cn.memoryzy.json.model.serializer.ColorSerializer;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -33,7 +33,7 @@ public class EditorAppearanceState {
     /**
      * 编辑器背景配色名称（指定颜色或自定义）
      */
-    public BackgroundColorScheme backgroundColorScheme = BackgroundColorScheme.Default;
+    public ColorScheme colorScheme = ColorScheme.Default;
 
     /**
      * 当选中自定义项时，用户指定的颜色（亮色）

@@ -5,7 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.BackgroundColorScheme;
+import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.model.LimitedList;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
@@ -287,8 +287,8 @@ public class JsonAssistantToolWindowComponentProvider {
     }
 
     public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, EditorAppearanceState appearanceState) {
-        BackgroundColorScheme colorScheme = appearanceState.backgroundColorScheme;
-        if (BackgroundColorScheme.Default.equals(colorScheme)) {
+        ColorScheme colorScheme = appearanceState.colorScheme;
+        if (ColorScheme.Default.equals(colorScheme)) {
             // 默认的话，按照默认颜色
             Color oriColor = editor.getBackgroundColor();
             Color newColor = defaultColorsScheme.getDefaultBackground();

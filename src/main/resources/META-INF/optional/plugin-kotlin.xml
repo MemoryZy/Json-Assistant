@@ -1,4 +1,9 @@
 <idea-plugin>
+    <!-- 兼容性处理 -->
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK1="true" supportsK2="true"/>
+    </extensions>
+
     <actions>
         <action id="JsonAssistant.Action.KotlinPropertyToJsonAction" class="cn.memoryzy.json.action.KotlinPropertyToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>

@@ -322,9 +322,23 @@ public class UIManager implements Disposable {
     }
 
 
+    /**
+     * 重绘编辑器
+     *
+     * @param editor 编辑器
+     */
     public static void repaintEditor(Editor editor) {
-        editor.getComponent().revalidate();
-        editor.getComponent().repaint();
+        repaintComponent(editor.getComponent());
+    }
+
+    /**
+     * 重绘组件
+     *
+     * @param component 组件
+     */
+    public static void repaintComponent(JComponent component) {
+        component.revalidate();
+        component.repaint();
     }
 
 }

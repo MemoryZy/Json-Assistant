@@ -15,7 +15,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/11/18
  */
-public enum BackgroundColorScheme {
+public enum ColorScheme {
 
     /**
      * 跟随全局背景色
@@ -71,7 +71,7 @@ public enum BackgroundColorScheme {
     private final String key;
     private final Color color;
 
-    BackgroundColorScheme(String key, Color color) {
+    ColorScheme(String key, Color color) {
         this.key = key;
         this.color = color;
     }
