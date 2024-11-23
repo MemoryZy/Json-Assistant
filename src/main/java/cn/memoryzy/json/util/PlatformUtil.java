@@ -136,7 +136,14 @@ public class PlatformUtil {
 
     public static boolean isNewUi() {
         int baselineVersion = ApplicationInfo.getInstance().getBuild().getBaselineVersion();
-        return baselineVersion >= 222 && Registry.is("ide.experimental.ui", true);
+        boolean isBeNewUi = true;
+        try {
+            isBeNewUi = Registry.is("ide.experimental.ui", true);
+        } catch (Exception e) {
+            LOG.warn(e);
+        }
+
+        return baselineVersion >= 222 && isBeNewUi;
     }
 
     /**

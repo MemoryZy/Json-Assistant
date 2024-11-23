@@ -11,7 +11,6 @@ import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -43,17 +42,13 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
         ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
             @Override
             protected void updateToolTipText() {
-                if (Registry.is("ide.helptooltip.enabled")) {
-                    HelpTooltip.dispose(this);
-                    // noinspection DialogTitleCapitalization
-                    new HelpTooltip()
-                            .setTitle(getTemplatePresentation().getText())
-                            .setShortcut(getShortcut())
-                            .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.history.description"))
-                            .installOn(this);
-                } else {
-                    setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.history.description"));
-                }
+                HelpTooltip.dispose(this);
+                // noinspection DialogTitleCapitalization
+                new HelpTooltip()
+                        .setTitle(getTemplatePresentation().getText())
+                        .setShortcut(getShortcut())
+                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.history.description"))
+                        .installOn(this);
             }
         };
 

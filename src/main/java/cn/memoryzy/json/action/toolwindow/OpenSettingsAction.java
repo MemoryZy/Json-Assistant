@@ -9,7 +9,6 @@ import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -37,16 +36,12 @@ public class OpenSettingsAction extends DumbAwareAction implements CustomCompone
         ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
             @Override
             protected void updateToolTipText() {
-                if (Registry.is("ide.helptooltip.enabled")) {
-                    HelpTooltip.dispose(this);
-                    // noinspection DialogTitleCapitalization
-                    new HelpTooltip()
-                            .setTitle(getTemplatePresentation().getText())
-                            .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.open.settings.description"))
-                            .installOn(this);
-                } else {
-                    setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.open.settings.description"));
-                }
+                HelpTooltip.dispose(this);
+                // noinspection DialogTitleCapitalization
+                new HelpTooltip()
+                        .setTitle(getTemplatePresentation().getText())
+                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.open.settings.description"))
+                        .installOn(this);
             }
         };
 

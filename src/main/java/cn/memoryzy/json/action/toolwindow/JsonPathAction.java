@@ -25,7 +25,6 @@ import com.intellij.openapi.ui.popup.IconButton;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.util.registry.Registry;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.JBUI;
@@ -65,19 +64,15 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
             @Override
             protected void updateToolTipText() {
-                if (Registry.is("ide.helptooltip.enabled")) {
-                    HelpTooltip.dispose(this);
-                    // noinspection DialogTitleCapitalization
-                    HelpTooltip helpTooltip = new HelpTooltip()
-                            .setTitle(getTemplatePresentation().getText())
-                            .setShortcut(getShortcut())
-                            .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.json.path.description"));
+                HelpTooltip.dispose(this);
+                // noinspection DialogTitleCapitalization
+                HelpTooltip helpTooltip = new HelpTooltip()
+                        .setTitle(getTemplatePresentation().getText())
+                        .setShortcut(getShortcut())
+                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.json.path.description"));
 
-                    setExternalLink(helpTooltip);
-                    helpTooltip.installOn(this);
-                } else {
-                    setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.json.path.description"));
-                }
+                setExternalLink(helpTooltip);
+                helpTooltip.installOn(this);
             }
 
             private void setExternalLink(HelpTooltip helpTooltip) {
