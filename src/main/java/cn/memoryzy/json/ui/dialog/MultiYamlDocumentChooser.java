@@ -70,8 +70,8 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         // 默认选中第一条
         selectFirstItemInList();
 
-        UIManager.updateListColorsScheme(showList);
-        UIManager.updateEditorTextFieldColorsScheme(showTextField);
+        UIManager.updateComponentColorsScheme(showList);
+        UIManager.updateComponentColorsScheme(showTextField);
 
         JBLabel label = new JBLabel();
         label.setForeground(JBColor.GRAY);

@@ -24,6 +24,7 @@ public interface PluginConstant {
 
     String OUTLINE_PROPERTY = "JComponent.outline";
     String ERROR_VALUE = "error";
+    String UNKNOWN = "unknown";
 
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),

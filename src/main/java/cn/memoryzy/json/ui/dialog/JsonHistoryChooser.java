@@ -90,8 +90,8 @@ public class JsonHistoryChooser extends DialogWrapper {
         // 默认选中第一条
         selectFirstItemInList();
 
-        UIManager.updateListColorsScheme(showList);
-        UIManager.updateEditorTextFieldColorsScheme(showTextField);
+        UIManager.updateComponentColorsScheme(showList);
+        UIManager.updateComponentColorsScheme(showTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
         borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, HistoryEntry::getShortText, true));

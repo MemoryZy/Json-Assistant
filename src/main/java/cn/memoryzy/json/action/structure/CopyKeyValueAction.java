@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.component.node.JsonCollectInfoMutableTreeNode;
+import cn.memoryzy.json.ui.component.node.JsonTreeNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,16 +35,16 @@ public class CopyKeyValueAction extends DumbAwareAction {
         if (paths != null) {
             List<String> valueList = new ArrayList<>();
             for (TreePath path : paths) {
-                JsonCollectInfoMutableTreeNode node = (JsonCollectInfoMutableTreeNode) path.getLastPathComponent();
+                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
                 // 获取value值，多个的话用其他处理方式
                 Object value = node.getValue();
-                JsonTreeNodeType nodeValueType = node.getValueType();
+                JsonTreeNodeType nodeType = node.getNodeType();
 
                 String userObject = node.getUserObject().toString();
                 // 只有JSONArrayElement是没有Value的
-                if (Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeValueType)) {
+                if (Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType)) {
                     valueList.add(userObject);
-                } else if (Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeValueType)) {
+                } else if (Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeType)) {
                     valueList.add(userObject + ": " + (Objects.nonNull(value) ? value.toString() : "null"));
                 } else {
                     JsonWrapper json = (JsonWrapper) value;

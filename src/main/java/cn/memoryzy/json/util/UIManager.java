@@ -19,11 +19,13 @@ import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.ui.*;
+import com.intellij.ui.ColorUtil;
+import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.EditorTextField;
+import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Function;
-import com.intellij.util.ObjectUtils;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -141,26 +143,14 @@ public class UIManager implements Disposable {
         });
     }
 
-    @SuppressWarnings({"DuplicatedCode", "deprecation"})
-    public static void updateListColorsScheme(JList<?> list) {
+    public static void updateComponentColorsScheme(JComponent component) {
         EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), new JBColor(UIUtil::getListForeground));
-        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), new JBColor(UIUtil::getListBackground));
-        list.setForeground(fg);
-        list.setBackground(bg);
+        component.setForeground(scheme.getDefaultForeground());
+        component.setBackground(scheme.getDefaultBackground());
     }
 
     public static void updateEditorColorsScheme(EditorEx editor) {
         editor.setColorsScheme(EditorColorsManager.getInstance().getGlobalScheme());
-    }
-
-    @SuppressWarnings({"DuplicatedCode", "deprecation"})
-    public static void updateEditorTextFieldColorsScheme(EditorTextField editorTextField) {
-        EditorColorsScheme scheme = EditorColorsManager.getInstance().getGlobalScheme();
-        Color fg = ObjectUtils.chooseNotNull(scheme.getDefaultForeground(), new JBColor(UIUtil::getTextFieldForeground));
-        Color bg = ObjectUtils.chooseNotNull(scheme.getDefaultBackground(), new JBColor(UIUtil::getTextFieldBackground));
-        editorTextField.setForeground(fg);
-        editorTextField.setBackground(bg);
     }
 
     public static <T> JComponent wrapListWithFilter(@NotNull JList<? extends T> list,

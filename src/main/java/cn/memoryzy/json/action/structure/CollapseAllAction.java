@@ -10,25 +10,44 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import java.util.Enumeration;
 
 public class CollapseAllAction extends DumbAwareActionButton {
+
+    /**
+     * 树
+     */
     private final Tree tree;
 
-    public CollapseAllAction(Tree tree, JRootPane rootPane) {
+    /**
+     * 是否包含根节点，如果为 true，则折叠所有节点，否则只折叠二级及以下节点
+     */
+    private final boolean includeRoot;
+
+    public CollapseAllAction(Tree tree, JRootPane rootPane, boolean includeRoot) {
         super(JsonAssistantBundle.message("action.collapse.all.text"),
                 JsonAssistantBundle.messageOnSystem("action.collapse.all.description"),
                 JsonAssistantIcons.Structure.INTELLIJ_COLLAPSE_ALL);
 
         this.tree = tree;
-
+        this.includeRoot = includeRoot;
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), rootPane);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
-        UIManager.collapseAll(tree, new TreePath(root));
+        if (includeRoot) {
+            UIManager.collapseAll(tree, new TreePath(root));
+        } else {
+            // 折叠二级节点
+            for (Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+                UIManager.collapseAll(tree, new TreePath(node.getPath()));
+            }
+        }
     }
 }
