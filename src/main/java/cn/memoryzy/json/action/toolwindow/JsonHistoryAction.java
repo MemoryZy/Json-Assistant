@@ -5,6 +5,7 @@ import cn.memoryzy.json.action.notification.IgnoreAction;
 import cn.memoryzy.json.action.notification.RecoverAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
+import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.ui.dialog.JsonHistoryChooser;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.Notifications;
@@ -106,16 +107,23 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
             }
 
             ArrayWrapper array = JsonUtil.parseArray(oriHistory);
+            if (array.isEmpty()) {
+                return;
+            }
 
+            for (Object data : array) {
+                ObjectWrapper objectWrapper = JsonUtil.parseObject((String) data);
 
+                System.out.println();
+            }
 
             // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
 
-            //
+            // 添加进去后，删除旧版本记录
 
             Notifications.showFullNotification(
                     "Json Assistant",
-                    "检测到旧版本中存在 20 条历史记录，是否将记录导入到新版本中？",
+                    JsonAssistantBundle.messageOnSystem("notification.recover.content", 90),
                     NotificationType.INFORMATION,
                     project,
                     Lists.newArrayList(new RecoverAction(), new IgnoreAction()));
