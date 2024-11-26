@@ -5,6 +5,8 @@ import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
+import com.intellij.conversion.ComponentManagerSettings;
+import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.scratch.ScratchFileService;
@@ -14,6 +16,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -27,6 +30,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.project.ProjectKt;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -40,6 +44,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
@@ -313,6 +318,21 @@ public class PlatformUtil {
      */
     public static boolean isAssignFileType(FileType fileType, String fileTypeClassName) {
         return fileType != null && Objects.equals(fileTypeClassName, fileType.getClass().getName());
+    }
+
+    /**
+     * 获取项目数据管理（misc.xml）
+     *
+     * @param project 项目
+     * @return misc.xml文件管理
+     */
+    public static ComponentManagerSettings getProjectDataManagerSettings(Project project) {
+        // String basePath = project.getBasePath();
+        IProjectStore store = ProjectKt.getStateStore(project);
+        Path projectBasePath = store.getProjectBasePath();
+
+        ConversionContextImpl conversionContext = new ConversionContextImpl(projectBasePath);
+        return conversionContext.getProjectRootManagerSettings();
     }
 
 }

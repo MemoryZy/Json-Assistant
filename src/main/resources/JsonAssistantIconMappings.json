@@ -8,6 +8,7 @@
       "esc.svg": "icons/esc.svg",
       "book_page.svg": "icons/book_page.svg",
       "book_reader.svg": "icons/book_reader.svg",
+      "group.svg": "icons/group.svg",
       "fileTypes": {
         "toml.svg": "icons/fileTypes/toml-file.svg",
         "url.svg": "icons/fileTypes/url.svg",

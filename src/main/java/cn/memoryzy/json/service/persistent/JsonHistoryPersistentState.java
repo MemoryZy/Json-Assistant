@@ -1,9 +1,10 @@
 package cn.memoryzy.json.service.persistent;
 
-import cn.memoryzy.json.model.LimitedList;
-import cn.memoryzy.json.service.persistent.converter.LimitedListConverter;
+import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
@@ -13,19 +14,18 @@ import java.util.Objects;
 
 /**
  * @author Memory
- * @since 2024/7/22
+ * @since 2024/11/25
  */
-@State(name = "JsonAssistantJsonHistory")
+@State(name = "JsonAssistantHistoryState", storages = {@Storage(value = "JsonAssistantHistoryState.xml")})
 public class JsonHistoryPersistentState implements PersistentStateComponent<JsonHistoryPersistentState> {
-
-    public static final int HISTORY_LIMIT = 25;
+    public static final int LIMIT = 25;
 
     public static JsonHistoryPersistentState getInstance(Project project) {
         return project.getService(JsonHistoryPersistentState.class);
     }
 
-    @Attribute(converter = LimitedListConverter.class)
-    public LimitedList historyList;
+    @Attribute(converter = HistoryLimitedListConverter.class)
+    public HistoryLimitedList history;
 
     @Override
     public @Nullable JsonHistoryPersistentState getState() {
@@ -34,13 +34,14 @@ public class JsonHistoryPersistentState implements PersistentStateComponent<Json
 
     @Override
     public void loadState(@NotNull JsonHistoryPersistentState state) {
-        this.historyList = state.historyList;
+        this.history = state.history;
     }
 
-    public LimitedList getHistory() {
-        if (Objects.isNull(historyList)) {
-            historyList = new LimitedList(HISTORY_LIMIT);
+    public HistoryLimitedList getHistory() {
+        if (Objects.isNull(this.history)) {
+            this.history = new HistoryLimitedList(LIMIT);
         }
-        return historyList;
+
+        return this.history;
     }
 }

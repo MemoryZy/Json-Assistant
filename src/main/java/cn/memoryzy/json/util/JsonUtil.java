@@ -207,6 +207,15 @@ public class JsonUtil {
         }
     }
 
+    public static <T> T convertValue(Object obj, Class<T> clz) {
+        try {
+            return MAPPER.convertValue(obj, clz);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+
     public static boolean isNotJsonArray(String jsonStr, boolean isJson) {
         return isJson ? (!JsonUtil.isJsonArray(jsonStr)) : (!Json5Util.isJson5Array(jsonStr));
     }

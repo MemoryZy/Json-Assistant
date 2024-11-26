@@ -6,12 +6,15 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.model.LimitedList;
+import cn.memoryzy.json.enums.TextSourceType;
+import cn.memoryzy.json.model.EditorInitData;
+import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
@@ -19,11 +22,8 @@ import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.component.ToolWindowPanel;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.codeInsight.hint.HintManager;
+import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -49,7 +49,6 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.util.ui.JBUI;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -65,16 +64,16 @@ public class JsonAssistantToolWindowComponentProvider {
 
     private final Project project;
     private final FileType editorFileType;
-    private final boolean initWindow;
+    private final boolean initTab;
     private final JsonHistoryPersistentState historyState;
     private final EditorBehaviorState editorBehaviorState;
     private final EditorAppearanceState editorAppearanceState;
     private EditorEx editor;
 
-    public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initWindow) {
+    public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initTab) {
         this.project = project;
         this.editorFileType = editorFileType;
-        this.initWindow = initWindow;
+        this.initTab = initTab;
         this.historyState = JsonHistoryPersistentState.getInstance(project);
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
         this.editorBehaviorState = persistentState.editorBehaviorState;
@@ -97,10 +96,12 @@ public class JsonAssistantToolWindowComponentProvider {
     }
 
     private TextEditor createEditorComponent() {
-        ImmutablePair<Boolean, String> pair = getInitText();
-        boolean nonNull = Objects.nonNull(pair);
-        String initText = nonNull ? pair.right : "";
-        TextEditor textEditor = UIManager.createDefaultTextEditor(project, editorFileType, initText);
+        EditorInitData initData = getInitData();
+        boolean hasText = initData.isHasText();
+        String jsonString = initData.getJsonString();
+        TextSourceType sourceType = initData.getSourceType();
+
+        TextEditor textEditor = UIManager.createDefaultTextEditor(project, editorFileType, jsonString);
         EditorEx editor = (EditorEx) textEditor.getEditor();
 
         EditorSettings settings = editor.getSettings();
@@ -113,7 +114,7 @@ public class JsonAssistantToolWindowComponentProvider {
         // 折叠块、行号所展示的区域
         settings.setLineMarkerAreaShown(false);
         // 显示设置插入符行（光标选中行会变黄）
-        settings.setCaretRowShown(StrUtil.isNotBlank(initText));
+        settings.setCaretRowShown(hasText);
 
         ErrorStripeEditorCustomization.DISABLED.customize(editor);
         Objects.requireNonNull(SpellCheckingEditorCustomizationProvider.getInstance().getDisabledCustomization()).customize(editor);
@@ -133,8 +134,8 @@ public class JsonAssistantToolWindowComponentProvider {
         JComponent component = textEditor.getComponent();
         component.setFont(UIManager.consolasFont(15));
 
-        if (nonNull && StrUtil.isNotBlank(initText)) {
-            hintEditor(500, pair.left
+        if (hasText) {
+            hintEditor(500, TextSourceType.FROM_CLIPBOARD.equals(sourceType)
                     ? JsonAssistantBundle.messageOnSystem("hint.paste.json")
                     : JsonAssistantBundle.messageOnSystem("hint.import.json"));
         }
@@ -161,47 +162,45 @@ public class JsonAssistantToolWindowComponentProvider {
     /**
      * 获取初始化文本
      *
-     * @return left: 是否为剪贴板数据；right: 初始化文本
+     * @return 初始化文本详细信息
      */
-    private ImmutablePair<Boolean, String> getInitText() {
-        if (initWindow) {
-            boolean pasteData = false;
-            String jsonStr = "";
+    private EditorInitData getInitData() {
+        String jsonString = "";
+        TextSourceType sourceType = null;
+
+        if (initTab) {
             if (editorBehaviorState.recognizeOtherFormats) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
                     ClipboardTextConversionContext context = new ClipboardTextConversionContext();
-                    jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
+                    String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
-                    if (StrUtil.isNotBlank(jsonStr)) {
-                        pasteData = true;
+                    if (StrUtil.isNotBlank(processedText)) {
+                        sourceType = TextSourceType.FROM_CLIPBOARD;
                         ClipboardTextConversionStrategy strategy = context.getStrategy();
-                        jsonStr = (strategy instanceof Json5ConversionStrategy)
-                                ? Json5Util.formatJson5(jsonStr)
-                                : JsonUtil.formatJson(jsonStr);
+                        jsonString = (strategy instanceof Json5ConversionStrategy)
+                                ? Json5Util.formatJson5(processedText)
+                                : JsonUtil.formatJson(processedText);
                     }
                 }
             }
 
-            if (StrUtil.isBlank(jsonStr) && editorBehaviorState.importHistory) {
-                JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
-                LimitedList history = state.getHistory();
-                if (CollUtil.isNotEmpty(history)) {
-                    jsonStr = history.get(0);
-                    jsonStr = LimitedList.readAndRemoveInsertTime(jsonStr).left;
+            if (editorBehaviorState.importHistory && StrUtil.isBlank(jsonString)) {
+                HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(project).getHistory();
+                if (CollUtil.isNotEmpty(historyList)) {
+                    sourceType = TextSourceType.FROM_HISTORY;
+                    jsonString = historyList.getFirst().getJsonString();
                 }
             }
-
-            return ImmutablePair.of(pasteData, StrUtil.isNotBlank(jsonStr) ? jsonStr : "");
         }
 
-        return null;
+        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, sourceType);
     }
 
 
     private void pasteJsonToEditor() {
-        if (initWindow && editorBehaviorState.recognizeOtherFormats) {
+        if (initTab && editorBehaviorState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = PlatformUtil.getClipboard();
@@ -233,38 +232,42 @@ public class JsonAssistantToolWindowComponentProvider {
             } catch (InterruptedException ignored) {
             }
 
-            HintManager.getInstance().showInformationHint(editor, msg);
+            HintUtil.showInformationHint(editor, msg);
         });
     }
 
     private void addJsonToHistory() {
-        LimitedList historyList = historyState.getHistory();
+        HistoryLimitedList historyList = historyState.getHistory();
         String text = StrUtil.trim(editor.getDocument().getText());
 
         ApplicationManager.getApplication().invokeLater(() -> {
+            JsonWrapper jsonWrapper = null;
             if (JsonUtil.isJson(text)) {
                 // 无元素，不添加
                 if (JsonUtil.isJsonArray(text)) {
                     ArrayWrapper jsonArray = JsonUtil.parseArray(text);
+                    jsonWrapper = jsonArray;
                     if (jsonArray.isEmpty()) return;
                 } else if (JsonUtil.isJsonObject(text)) {
                     ObjectWrapper jsonObject = JsonUtil.parseObject(text);
+                    jsonWrapper = jsonObject;
                     if (jsonObject.isEmpty()) return;
                 }
 
-                String formattedJson = JsonUtil.formatJson(text);
-                historyList.add(formattedJson, true);
             } else if (Json5Util.isJson5(text)) {
                 if (Json5Util.isJson5Array(text)) {
-                    ArrayWrapper arrayWrapper = Json5Util.parseArray(text);
-                    if (CollUtil.isEmpty(arrayWrapper)) return;
+                    ArrayWrapper jsonArray = Json5Util.parseArray(text);
+                    jsonWrapper = jsonArray;
+                    if (CollUtil.isEmpty(jsonArray)) return;
                 } else if (Json5Util.isJson5Object(text)) {
-                    ObjectWrapper objectWrapper = Json5Util.parseObject(text);
-                    if (MapUtil.isEmpty(objectWrapper)) return;
+                    ObjectWrapper jsonObject = Json5Util.parseObject(text);
+                    jsonWrapper = jsonObject;
+                    if (MapUtil.isEmpty(jsonObject)) return;
                 }
+            }
 
-                String formattedJson = Json5Util.formatJson5(text);
-                historyList.add(formattedJson, false);
+            if (Objects.nonNull(jsonWrapper)) {
+                historyList.add(project, jsonWrapper);
             }
         });
     }
@@ -386,6 +389,5 @@ public class JsonAssistantToolWindowComponentProvider {
             }
         }
     }
-
 
 }

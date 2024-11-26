@@ -1,6 +1,6 @@
 package cn.memoryzy.json.toolwindow;
 
-import cn.memoryzy.json.action.DonateAction;
+import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
@@ -74,6 +74,9 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
 
         // 验证地址可达性
         Urls.verifyReachable();
+
+        // 兼容旧版本历史记录数据
+        JsonHistoryAction.compatibilityHistory(project);
     }
 
 }

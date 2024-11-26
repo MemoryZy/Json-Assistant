@@ -1,8 +1,8 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.DonateAction;
-import cn.memoryzy.json.action.QuickStartAction;
+import cn.memoryzy.json.action.notification.DonateAction;
+import cn.memoryzy.json.action.notification.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
@@ -12,6 +12,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
 import com.intellij.notification.impl.NotificationFullContent;
 import com.intellij.notification.impl.NotificationsManagerImpl;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.wm.IdeFrame;
@@ -83,6 +84,14 @@ public class Notifications {
      */
     public static void showFullNotification(String title, String content, NotificationType notificationType, Project project) {
         new FullContentNotification(BALLOON_LOG_GROUP.getDisplayId(), title, content, notificationType).notify(project);
+    }
+
+    /**
+     * 展示不被折叠的通知
+     */
+    public static void showFullNotification(String title, String content, NotificationType notificationType,
+                                            Project project, Collection<? extends @NotNull AnAction> actions) {
+        new FullContentNotification(BALLOON_LOG_GROUP.getDisplayId(), title, content, notificationType).addActions(actions).notify(project);
     }
 
 

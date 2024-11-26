@@ -1,11 +1,22 @@
 package cn.memoryzy.json.action.toolwindow;
 
+import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.action.notification.IgnoreAction;
+import cn.memoryzy.json.action.notification.RecoverAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.ui.dialog.JsonHistoryChooser;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.Notifications;
+import cn.memoryzy.json.util.PlatformUtil;
+import com.google.common.collect.Lists;
+import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.ide.HelpTooltip;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -14,6 +25,7 @@ import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
+import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -74,4 +86,42 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
         return KeymapUtil.getShortcutsText(shortcuts);
     }
 
+
+    /**
+     * 兼容旧版本的历史记录数据
+     *
+     * @param project 项目
+     */
+    public static void compatibilityHistory(Project project) {
+        // 历史记录检测
+        ApplicationManager.getApplication().invokeLater(() -> {
+            ComponentManagerSettings projectDataManagerSettings = PlatformUtil.getProjectDataManagerSettings(project);
+            // 获取之前版本历史记录的 State Key
+            Element historyElement = projectDataManagerSettings.getComponentElement("JsonAssistantJsonHistory");
+            // 获取属性值
+            String oriHistory = (historyElement == null) ? null : historyElement.getAttributeValue("historyList");
+
+            if (StrUtil.isBlank(oriHistory) && JsonUtil.isJsonArray(oriHistory)) {
+                return;
+            }
+
+            ArrayWrapper array = JsonUtil.parseArray(oriHistory);
+
+
+
+            // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
+
+            //
+
+            Notifications.showFullNotification(
+                    "Json Assistant",
+                    "检测到旧版本中存在 20 条历史记录，是否将记录导入到新版本中？",
+                    NotificationType.INFORMATION,
+                    project,
+                    Lists.newArrayList(new RecoverAction(), new IgnoreAction()));
+        });
+
+    }
+
 }
+

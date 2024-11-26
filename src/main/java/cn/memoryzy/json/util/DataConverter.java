@@ -186,7 +186,7 @@ public class DataConverter {
     private static String parseQuery(String urlStr) {
         try {
             // 尝试解析完整的URL
-            return urlStr.contains("\n") ? null : parseAndValidateUrl(urlStr);
+            return urlStr.contains("\n") || urlStr.contains(" ") ? null : parseAndValidateUrl(urlStr);
         } catch (Exception e) {
             // 解析失败后，尝试加上?
             if (urlStr.charAt(0) != '?') {

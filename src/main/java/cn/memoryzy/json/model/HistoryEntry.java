@@ -1,69 +1,142 @@
 package cn.memoryzy.json.model;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.memoryzy.json.model.serializer.LocalDateTimeTypeHandler;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import com.intellij.openapi.editor.actions.ContentChooser;
-import com.intellij.openapi.util.text.StringUtil;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import cn.memoryzy.json.util.JsonUtil;
+import com.intellij.openapi.project.Project;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
+ * 历史记录对象
+ *
  * @author Memory
- * @since 2024/8/11
+ * @since 2024/11/25
  */
 public class HistoryEntry {
 
-    private final int index;
-    private final String shortText;
-    private final String longText;
-    private final LocalDateTime insertTime;
+    public static final String insertTimeConstant = "insertTime";
 
-    public HistoryEntry(int index, String shortText, String longText, LocalDateTime insertTime) {
-        this.index = index;
+    /**
+     * 历史记录Id
+     */
+    private Integer id;
+
+    /**
+     * 历史记录短文本（展示）
+     */
+    private String shortText;
+
+    /**
+     * 历史记录原文
+     */
+    private String jsonString;
+
+    /**
+     * 历史记录解析后的对象
+     */
+    private JsonWrapper jsonWrapper;
+
+    /**
+     * 历史记录插入时间
+     */
+    private LocalDateTime insertTime;
+
+
+    // region 构造方法及Getter、Setter方法
+    public HistoryEntry() {
+    }
+
+    public HistoryEntry(Integer id, JsonWrapper jsonWrapper) {
+        this(id, jsonWrapper.toJsonString(), jsonWrapper);
+    }
+
+    public HistoryEntry(Integer id, String jsonString, JsonWrapper jsonWrapper) {
+        this.id = id;
+        this.shortText = getShortText(jsonWrapper);
+        this.jsonString = jsonString;
+        this.jsonWrapper = jsonWrapper;
+        this.insertTime = LocalDateTime.now();
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setShortText(String shortText) {
         this.shortText = shortText;
-        this.longText = longText;
+    }
+
+    public void setJsonString(String jsonString) {
+        this.jsonString = jsonString;
+    }
+
+    public void setJsonWrapper(JsonWrapper jsonWrapper) {
+        this.jsonWrapper = jsonWrapper;
+    }
+
+    public void setInsertTime(LocalDateTime insertTime) {
         this.insertTime = insertTime;
     }
 
-    public int getIndex() {
-        return index;
+    public Integer getId() {
+        return id;
     }
 
     public String getShortText() {
         return shortText;
     }
 
-    public String getLongText() {
-        return longText;
+    public String getJsonString() {
+        return jsonString;
+    }
+
+    public JsonWrapper getJsonWrapper() {
+        return jsonWrapper;
     }
 
     public LocalDateTime getInsertTime() {
         return insertTime;
     }
+    // endregion
 
-    @Override
-    public String toString() {
-        return shortText;
+    /**
+     * 转为 Json5（供 JsonSerializer 的 addObj 方法调用）
+     *
+     * @return Json5
+     */
+    public String toJson() {
+        Map<String, Object> map = BeanUtil.beanToMap(this);
+        return Json5Util.toJson5Str(map, Json5Util.COMPACT_JSON5.handleType(new LocalDateTimeTypeHandler()));
     }
 
-    public static List<HistoryEntry> of(List<String> historyList) {
-        List<HistoryEntry> models = new ArrayList<>();
-        for (int i = 0; i < historyList.size(); i++) {
-            String jsonStr = historyList.get(i);
-            // 解析添加时间
-            ImmutablePair<String, LocalDateTime> pair = LimitedList.readAndRemoveInsertTime(jsonStr);
+    public static HistoryEntry fromMap(Map<String, Object> map) {
+        // 替换时间类型（加快转换速度）
+        String insertTime = (String) map.get(insertTimeConstant);
+        map.put(insertTimeConstant, LocalDateTimeUtil.parse(insertTime, DatePattern.NORM_DATETIME_PATTERN));
+        return BeanUtil.toBean(map, HistoryEntry.class);
+    }
 
-            jsonStr = pair.left;
-            LocalDateTime insertTime = pair.right;
 
-            String truncatedText = JsonAssistantUtil.truncateText(jsonStr, 80, "...");
-            truncatedText = StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);
-            models.add(new HistoryEntry(i, truncatedText, jsonStr, insertTime));
-        }
+    private static String getShortText(JsonWrapper jsonWrapper) {
+        String jsonString = JsonUtil.compressJson(jsonWrapper);
+        return JsonAssistantUtil.truncateText(Objects.requireNonNull(jsonString), 80, "...");
+        // return StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);
+    }
 
-        return models;
+    public static int calculateId(Project project) {
+        JsonHistoryPersistentState persistentState2 = JsonHistoryPersistentState.getInstance(project);
+        HistoryLimitedList historyList = persistentState2.getHistory();
+        Integer id = historyList.stream().map(HistoryEntry::getId).max(Integer::compareTo).orElse(-1);
+        return id + 1;
     }
 
 }

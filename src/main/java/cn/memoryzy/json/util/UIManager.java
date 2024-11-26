@@ -38,6 +38,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -83,6 +84,29 @@ public class UIManager implements Disposable {
         tree.expandPath(parent);
     }
 
+    /**
+     * 展开二级节点（适用于root节点隐藏的情况）
+     *
+     * @param tree 树
+     */
+    public static void expandSecondaryNode(Tree tree) {
+        TreeNode root = (TreeNode) tree.getModel().getRoot();
+        expandSecondaryNode(tree, root);
+    }
+
+    /**
+     * 展开二级节点（适用于root节点隐藏的情况）
+     *
+     * @param tree 树
+     * @param root 根节点
+     */
+    public static void expandSecondaryNode(Tree tree, TreeNode root) {
+        // 展开二级节点
+        for (Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+            UIManager.expandAll(tree, new TreePath(node.getPath()));
+        }
+    }
 
     public static void collapseAll(Tree tree, TreePath parent) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();
@@ -96,6 +120,31 @@ public class UIManager implements Disposable {
 
         tree.collapsePath(parent);
     }
+
+    /**
+     * 折叠二级节点（适用于root节点隐藏的情况）
+     *
+     * @param tree 树
+     */
+    public static void collapseSecondaryNode(Tree tree) {
+        TreeNode root = (TreeNode) tree.getModel().getRoot();
+        collapseSecondaryNode(tree, root);
+    }
+
+    /**
+     * 折叠二级节点（适用于root节点隐藏的情况）
+     *
+     * @param tree 树
+     * @param root 根节点
+     */
+    public static void collapseSecondaryNode(Tree tree, TreeNode root) {
+        // 折叠二级节点
+        for (Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
+            UIManager.collapseAll(tree, new TreePath(node.getPath()));
+        }
+    }
+
 
     public static void addErrorBorder(JComponent component) {
         // 这行的作用是给文本框外部变为红色

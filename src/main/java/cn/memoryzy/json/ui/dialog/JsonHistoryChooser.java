@@ -1,12 +1,20 @@
 package cn.memoryzy.json.ui.dialog;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.memoryzy.json.action.structure.CollapseAllAction;
+import cn.memoryzy.json.action.structure.ExpandAllAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.HistoryEntry;
-import cn.memoryzy.json.model.LimitedList;
+import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
+import cn.memoryzy.json.ui.component.PupopMenuMouseAdapter;
 import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.ui.component.node.HistoryTreeNode;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
@@ -23,25 +31,24 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.*;
-import com.intellij.ui.components.JBList;
 import com.intellij.ui.content.Content;
-import com.intellij.ui.speedSearch.ListWithFilter;
-import com.intellij.ui.speedSearch.NameFilteringListModel;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.*;
 import java.awt.event.MouseEvent;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Memory
@@ -50,7 +57,7 @@ import java.util.Objects;
 @SuppressWarnings("DuplicatedCode")
 public class JsonHistoryChooser extends DialogWrapper {
 
-    private JList<HistoryEntry> showList;
+    private Tree tree;
     private EditorTextField showTextField;
     private final Project project;
     private final ToolWindowEx toolWindow;
@@ -74,45 +81,92 @@ public class JsonHistoryChooser extends DialogWrapper {
         // 通知创建Editor
         showTextField.addNotify();
 
-        showList = new JBList<>(fillHistoryListModel());
-        showList.setFont(UIManager.jetBrainsMonoFont(13));
-        showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        showList.addListSelectionListener(new UpdateEditorListSelectionListener());
-        showList.setCellRenderer(new IconListCellRenderer());
-        ((JBList<?>) showList).setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
+        tree = new Tree(buildTreeModel());
+        tree.setDragEnabled(true);
+        tree.setExpandableItemsEnabled(true);
+        tree.setRootVisible(false);
+        tree.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
+        tree.setFont(UIManager.jetBrainsMonoFont(13));
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setCellRenderer(new StyleTreeCellRenderer());
+        tree.addTreeSelectionListener(new UpdateEditorTreeSelectionListener());
+        tree.addMouseListener(new PupopMenuMouseAdapter(tree, buildRightMousePopupMenu()));
 
-        // 初始化右键弹出菜单
-        initRightMousePopupMenu();
-        // 初始化鼠标左键双击事件
-        initLeftMouseDoubleClickListener();
+        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree)
+                .addExtraAction(new ExpandAllAction(tree, this.getRootPane(), false))
+                .addExtraAction(new CollapseAllAction(tree, this.getRootPane(), false));
+
         // 初始化回车事件
-        initEnterListener();
-        // 默认选中第一条
-        selectFirstItemInList();
+        DumbAwareAction.create(event -> doOKAction())
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), tree, getDisposable());
 
-        UIManager.updateComponentColorsScheme(showList);
+        // 初始化鼠标左键双击事件
+        new DoubleClickListener() {
+            @Override
+            protected boolean onDoubleClick(@NotNull MouseEvent e) {
+                doOKAction();
+                return true;
+            }
+        }.installOn(tree);
+
         UIManager.updateComponentColorsScheme(showTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
-        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, HistoryEntry::getShortText, true));
+        borderLayoutPanel.addToCenter(decorator.createPanel());
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
-        rebuildListWithFilter();
 
-        JBSplitter splitter = new JBSplitter(true, 0.3f);
+        JBSplitter splitter = new JBSplitter(true, 0.4f);
         splitter.setFirstComponent(borderLayoutPanel);
         splitter.setSecondComponent(showTextField);
-
-        ScrollingUtil.installActions(showList);
-        ScrollingUtil.ensureSelectionExists(showList);
-
-        splitter.setPreferredSize(JBUI.size(500, 500));
+        splitter.setPreferredSize(JBUI.size(550, 570));
 
         return splitter;
     }
 
+    private TreeModel buildTreeModel() {
+        return new DefaultTreeModel(buildRootNode(JsonHistoryPersistentState.getInstance(project).getHistory()));
+    }
+
+    private TreeNode buildRootNode(HistoryLimitedList historyList) {
+        HistoryTreeNode rootNode = new HistoryTreeNode();
+        Map<String, List<HistoryEntry>> historyGroup = historyList.stream().collect(Collectors.groupingBy(el -> {
+            String formatted = LocalDateTimeUtil.format(el.getInsertTime(), DatePattern.NORM_DATE_FORMATTER);
+            return formatted != null ? formatted : PluginConstant.UNKNOWN;
+        }));
+
+        List<Map.Entry<String, List<HistoryEntry>>> entryList = historyGroup.entrySet().stream()
+                .sorted(Comparator.comparing(el ->
+                        PluginConstant.UNKNOWN.equals(el.getKey())
+                                ? LocalDate.MIN
+                                : LocalDate.parse(el.getKey(), DatePattern.NORM_DATE_FORMATTER)))
+                .collect(Collectors.toList());
+
+        Collections.reverse(entryList);
+        for (Map.Entry<String, List<HistoryEntry>> entry : entryList) {
+            String key = entry.getKey();
+            List<HistoryEntry> value = entry.getValue();
+
+            // 排序List
+            value.sort(Comparator.comparing(HistoryEntry::getInsertTime));
+
+            // Map第一层是组节点
+            HistoryTreeNode groupNode = new HistoryTreeNode(null, key, value.size(), HistoryTreeNodeType.GROUP);
+
+            // 添加底层数据节点
+            for (HistoryEntry historyEntry : value) {
+                // Map第二层是具体数据节点
+                groupNode.add(new HistoryTreeNode(historyEntry, null, null, HistoryTreeNodeType.NODE));
+            }
+
+            rootNode.add(groupNode);
+        }
+
+        return rootNode;
+    }
+
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
-        return showList;
+        return tree;
     }
 
     @Override
@@ -135,85 +189,29 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
     private void executeOkAction() {
-        HistoryEntry selectedValue = showList.getSelectedValue();
-        if (selectedValue != null) {
-            Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
-            if (Objects.nonNull(selectedContent)) {
-                EditorEx editor = ToolWindowUtil.getEditorOnContent(selectedContent);
-                if (Objects.nonNull(editor)) {
-                    WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), selectedValue.getLongText()));
-                    toolWindow.show();
-                }
-            }
-        }
-    }
-
-    private void rebuildListWithFilter() {
-        ListWithFilter<?> listWithFilter = ComponentUtil.getParentOfType(ListWithFilter.class, showList);
-        if (listWithFilter != null) {
-            listWithFilter.getSpeedSearch().update();
-            if (showList.getModel().getSize() == 0) listWithFilter.resetFilter();
-        }
-    }
-
-    private void initEnterListener() {
-        DumbAwareAction.create(event -> doOKAction())
-                .registerCustomShortcutSet(CustomShortcutSet.fromString("ENTER"), showList, getDisposable());
-    }
-
-    private void initLeftMouseDoubleClickListener() {
-        new DoubleClickListener() {
-            @Override
-            protected boolean onDoubleClick(@NotNull MouseEvent e) {
-                doOKAction();
-                return true;
-            }
-        }.installOn(showList);
-    }
-
-    private DefaultListModel<HistoryEntry> fillHistoryListModel() {
-        JsonHistoryPersistentState historyState = JsonHistoryPersistentState.getInstance(project);
-        LimitedList historyList = historyState.getHistory();
-        List<HistoryEntry> historyEntries = HistoryEntry.of(historyList);
-        return JBList.createDefaultListModel(historyEntries);
-    }
-
-    private void selectFirstItemInList() {
-        // 选中第一条
-        ListModel<HistoryEntry> listModel = showList.getModel();
-        if (listModel.getSize() > 0) {
-            showList.setSelectedIndex(0);
-            enabledOkAction();
-        }
-    }
-
-    private void initRightMousePopupMenu() {
-        DefaultActionGroup group = new DefaultActionGroup();
-        group.add(new RemoveListElementAction());
-
-        ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
-        JPopupMenu popupMenu = actionPopupMenu.getComponent();
-
-        showList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (SwingUtilities.isRightMouseButton(e)) {
-                    int x = e.getX();
-                    int y = e.getY();
-
-                    HistoryEntry selectedValue = showList.getSelectedValue();
-                    if (Objects.isNull(selectedValue)) {
-                        int index = showList.locationToIndex(new Point(x, y));
-                        if (index != -1) {
-                            showList.setSelectedIndex(index);
-                            popupMenu.show(showList, x, y);
-                        }
-                    } else {
-                        popupMenu.show(showList, x, y);
+        TreePath selectionPath = tree.getSelectionPath();
+        if (selectionPath != null) {
+            HistoryTreeNode treeNode = (HistoryTreeNode) selectionPath.getLastPathComponent();
+            if (HistoryTreeNodeType.NODE.equals(treeNode.getNodeType())) {
+                HistoryEntry entry = treeNode.getValue();
+                Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
+                if (Objects.nonNull(selectedContent)) {
+                    EditorEx editor = ToolWindowUtil.getEditorOnContent(selectedContent);
+                    if (Objects.nonNull(editor)) {
+                        WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), entry.getJsonString()));
+                        toolWindow.show();
                     }
                 }
             }
-        });
+        }
+    }
+
+    private JPopupMenu buildRightMousePopupMenu() {
+        DefaultActionGroup group = new DefaultActionGroup();
+        group.add(new RemoveNodeAction());
+
+        ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
+        return actionPopupMenu.getComponent();
     }
 
     public void disabledOkAction() {
@@ -224,65 +222,103 @@ public class JsonHistoryChooser extends DialogWrapper {
         getOKAction().setEnabled(true);
     }
 
-    public class RemoveListElementAction extends DumbAwareAction {
 
-        public RemoveListElementAction() {
-            super(JsonAssistantBundle.message("action.history.remove.text"), JsonAssistantBundle.messageOnSystem("action.history.remove.description"), null);
-            registerCustomShortcutSet(CustomShortcutSet.fromString("DELETE"), showList);
+    public class RemoveNodeAction extends DumbAwareAction {
+
+        public RemoveNodeAction() {
+            super(JsonAssistantBundle.message("action.structure.remove.text"), JsonAssistantBundle.messageOnSystem("action.structure.remove.description"), null);
+            registerCustomShortcutSet(CustomShortcutSet.fromString("DELETE"), tree);
         }
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent event) {
             Project project = event.getProject();
             if (project == null) return;
-            int selectedIndex = showList.getSelectedIndex();
-            HistoryEntry selectedValue = showList.getSelectedValue();
-            if (selectedValue == null) return;
 
-            JsonHistoryPersistentState state = JsonHistoryPersistentState.getInstance(project);
-            LimitedList historyList = state.getHistory();
-            historyList.remove(selectedValue.getIndex());
+            // 刷新Tree
+            TreePath selectionPath = tree.getSelectionPath();
+            if (selectionPath != null) {
+                // 获取将要删除的历史记录Id列表
+                List<Integer> deletionList = getDeletionList(selectionPath);
+                // 获取历史记录列表
+                HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(project).getHistory();
+                // 删除真实数据
+                historyList.removeById(deletionList.toArray(new Integer[0]));
 
-            List<HistoryEntry> historyEntries = HistoryEntry.of(historyList);
-            NameFilteringListModel<HistoryEntry> listModel = (NameFilteringListModel<HistoryEntry>) showList.getModel();
-            listModel.replaceAll(historyEntries);
+                // 重新构建树节点
+                TreeNode rootNode = buildRootNode(historyList);
+                ((DefaultTreeModel) tree.getModel()).setRoot(rootNode);
+                UIManager.expandSecondaryNode(tree, rootNode);
 
-            int size = listModel.getSize();
-            if (size == 0) {
-                showTextField.setText("");
-                disabledOkAction();
+                // 当不存在数据了，清除编辑框文本，禁用按钮
+                if (rootNode.getChildCount() == 0) {
+                    showTextField.setText("");
+                    disabledOkAction();
+                }
+            }
+        }
+
+        /**
+         * 获取删除列表（Id）
+         *
+         * @param selectionPath 选择的路径
+         * @return 将要删除的历史记录Id列表
+         */
+        @NotNull
+        private List<Integer> getDeletionList(TreePath selectionPath) {
+            HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
+
+            // 如果类型是组，那么删除组节点及以下的数据，如果类型是具体数据，那么删除具体数据节点
+            List<Integer> deletionList = new ArrayList<>();
+            if (HistoryTreeNodeType.GROUP.equals(node.getNodeType())) {
+                Enumeration<TreeNode> children = node.children();
+                while (children.hasMoreElements()) {
+                    HistoryTreeNode treeNode = (HistoryTreeNode) children.nextElement();
+                    deletionList.add(treeNode.getValue().getId());
+                }
+            } else {
+                deletionList.add(node.getValue().getId());
             }
 
-            // 选中被删除元素的前一个元素
-            if (selectedIndex > 0) {
-                showList.setSelectedIndex(selectedIndex - 1);
-            } else if (size > 0) {
-                // 如果还有元素，选中第一个元素
-                showList.setSelectedIndex(0);
-            }
-
-            rebuildListWithFilter();
+            return deletionList;
         }
     }
 
-    public static class IconListCellRenderer extends ColoredListCellRenderer<HistoryEntry> {
+
+    public static class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
         @Override
-        protected void customizeCellRenderer(@NotNull JList<? extends HistoryEntry> list, HistoryEntry value, int index, boolean selected, boolean hasFocus) {
-            append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
-            append(" " + value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
-            setIcon(AllIcons.FileTypes.Json);
-            SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
+        public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            HistoryTreeNode treeNode = (HistoryTreeNode) value;
+            HistoryTreeNodeType nodeType = treeNode.getNodeType();
+
+            if (HistoryTreeNodeType.NODE.equals(nodeType)) {
+                setIcon(AllIcons.FileTypes.Json);
+                append(treeNode.toString());
+            } else {
+                setIcon(JsonAssistantIcons.GROUP);
+                append(treeNode + " (" + treeNode.getSize() + ")");
+            }
+
+            SpeedSearchUtil.applySpeedSearchHighlighting(tree, this, true, selected);
         }
     }
 
-    public class UpdateEditorListSelectionListener implements ListSelectionListener {
+
+    public class UpdateEditorTreeSelectionListener implements TreeSelectionListener {
         private int lastLineCount = 0;
 
         @Override
-        public void valueChanged(ListSelectionEvent e) {
-            HistoryEntry selectedValue = showList.getSelectedValue();
-            if (selectedValue != null) {
-                showTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getLongText()));
+        public void valueChanged(TreeSelectionEvent e) {
+            TreePath selectionPath = tree.getSelectionPath();
+            if (selectionPath != null) {
+                HistoryTreeNode treeNode = (HistoryTreeNode) Objects.requireNonNull(selectionPath).getLastPathComponent();
+                if (HistoryTreeNodeType.GROUP.equals(treeNode.getNodeType())) {
+                    showTextField.setText("");
+                    disabledOkAction();
+                } else {
+                    showTextField.setText(JsonAssistantUtil.normalizeLineEndings(treeNode.getValue().getJsonString()));
+                    enabledOkAction();
+                }
 
                 // -------------- 重新绘制
                 Document document = showTextField.getDocument();
@@ -295,4 +331,5 @@ public class JsonHistoryChooser extends DialogWrapper {
             }
         }
     }
+
 }

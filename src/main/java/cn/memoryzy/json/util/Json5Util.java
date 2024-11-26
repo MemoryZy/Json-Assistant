@@ -25,12 +25,12 @@ public class Json5Util {
     /**
      * Json5格式化、单引号包裹字符串、保持null元素（若允许多行文本，在编辑器会有展示问题）
      */
-    private static final TnJsonBuilder FORMAT_JSON5 = TnJson.builder().readable().formated().withoutKeyQuote().singleQuote().keepNull()/*.allowMultiRowString()*/;
+    public static final TnJsonBuilder FORMAT_JSON5 = TnJson.builder().readable().formated().withoutKeyQuote().singleQuote().keepNull()/*.allowMultiRowString()*/;
 
     /**
-     * Json5压缩、保持null元素
+     * Json5压缩、保持null元素、单引号包裹字符串
      */
-    private static final TnJsonBuilder COMPACT_JSON5 = TnJson.builder().readable().withoutKeyQuote().singleQuote().keepNull();
+    public static final TnJsonBuilder COMPACT_JSON5 = TnJson.builder().readable().withoutKeyQuote().singleQuote().keepNull();
 
 
     /**
@@ -87,6 +87,9 @@ public class Json5Util {
         return toJson5Str(tryResolveJson5(json), COMPACT_JSON5);
     }
 
+    public static String compressJson5(Object data) {
+        return toJson5Str(data, COMPACT_JSON5);
+    }
 
     /**
      * 解析Json5文本，若解析失败，返回null
@@ -161,15 +164,15 @@ public class Json5Util {
 
 
     /**
-     * 将Json5对象转换为Json文本
+     * 将对象转换为Json文本
      *
-     * @param obj     Json5对象
+     * @param data    对象
      * @param builder 构建器
      * @return Json文本
      */
-    public static String toJson5Str(Object obj, TnJsonBuilder builder) {
+    public static String toJson5Str(Object data, TnJsonBuilder builder) {
         try {
-            String json5 = builder.buildJson(obj);
+            String json5 = builder.buildJson(data);
             // 还原被转为unicode的字符
             return JsonAssistantUtil.unicodeToString(json5);
         } catch (Exception e) {

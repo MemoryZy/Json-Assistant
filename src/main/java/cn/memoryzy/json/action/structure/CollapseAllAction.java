@@ -10,10 +10,8 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.util.Enumeration;
 
 public class CollapseAllAction extends DumbAwareActionButton {
 
@@ -43,11 +41,7 @@ public class CollapseAllAction extends DumbAwareActionButton {
         if (includeRoot) {
             UIManager.collapseAll(tree, new TreePath(root));
         } else {
-            // 折叠二级节点
-            for (Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-                UIManager.collapseAll(tree, new TreePath(node.getPath()));
-            }
+            UIManager.collapseSecondaryNode(tree, root);
         }
     }
 }
