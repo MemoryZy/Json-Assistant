@@ -78,4 +78,31 @@ public class JsonTreeNode extends DefaultMutableTreeNode {
             return getUserObject().toString() + ":" + value;
         }
     }
+
+    /**
+     * 更新节点及其所有父节点的 size
+     */
+    public void updateSize() {
+        if (JsonTreeNodeType.JSONObject.equals(nodeType)
+                || JsonTreeNodeType.JSONArray.equals(nodeType)
+                || JsonTreeNodeType.JSONObjectElement.equals(nodeType)) {
+            int newSize = getChildCount();
+            if (newSize != this.size) {
+                this.size = newSize;
+                JsonTreeNode parent = (JsonTreeNode) getParent();
+                if (parent != null) {
+                    parent.updateSize();
+                }
+            }
+        }
+    }
+
+    /**
+     * 删除节点并更新父节点及其祖先节点的 size
+     */
+    public void removeAndUpdateSize(JsonTreeNode child) {
+        remove(child);
+        updateSize();
+    }
+
 }

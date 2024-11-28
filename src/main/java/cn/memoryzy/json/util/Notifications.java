@@ -47,6 +47,8 @@ public class Notifications {
 
     public static final NotificationGroup BALLOON_LOG_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin Log");
 
+    public static final NotificationGroup STICKY_LOG_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin Sticky Log");
+
     /**
      * 展示通知（瞬态通知）
      */
@@ -89,9 +91,9 @@ public class Notifications {
     /**
      * 展示不被折叠的通知
      */
-    public static void showFullNotification(String title, String content, NotificationType notificationType,
-                                            Project project, Collection<? extends @NotNull AnAction> actions) {
-        new FullContentNotification(BALLOON_LOG_GROUP.getDisplayId(), title, content, notificationType).addActions(actions).notify(project);
+    public static void showFullStickyNotification(String title, String content, NotificationType notificationType,
+                                                  Project project, Collection<? extends @NotNull AnAction> actions) {
+        new FullContentNotification(STICKY_LOG_GROUP.getDisplayId(), title, content, notificationType).addActions(actions).notify(project);
     }
 
 

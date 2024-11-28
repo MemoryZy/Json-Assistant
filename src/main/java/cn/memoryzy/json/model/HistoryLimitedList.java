@@ -19,7 +19,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
         this.limit = limit;
     }
 
-    public boolean add(Project project, JsonWrapper jsonWrapper) {
+    public HistoryEntry add(Project project, JsonWrapper jsonWrapper) {
         HistoryEntry historyEntry = new HistoryEntry(HistoryEntry.calculateId(project), jsonWrapper);
         // 判断 Json 记录是否已经存在于记录内
         if (!exists(jsonWrapper)) {
@@ -37,7 +37,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
             }
         }
 
-        return true;
+        return historyEntry;
     }
 
     @Override
@@ -90,7 +90,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
      *
      * @param addElement 要添加的元素
      */
-    private boolean exists(JsonWrapper addElement) {
+    public boolean exists(JsonWrapper addElement) {
         return this.stream().anyMatch(el -> Objects.equals(addElement, el.getJsonWrapper()));
     }
 

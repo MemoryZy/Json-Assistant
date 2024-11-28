@@ -14,6 +14,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.GsonBuilder;
+import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
@@ -28,6 +30,8 @@ import java.util.regex.Pattern;
  * @since 2024/6/20
  */
 public class JsonUtil {
+
+    private static final Logger LOG = Logger.getInstance(JsonUtil.class);
 
     /**
      * 构建 JsonMapper（支持解析 '非数字NaN' 标识）
@@ -128,8 +132,9 @@ public class JsonUtil {
      */
     public static String formatJson(String jsonStr) {
         try {
-            return formatJson(MAPPER.readTree(jsonStr));
+            return formatJson(MAPPER.readValue(jsonStr, Object.class));
         } catch (Exception e) {
+            LOG.error("Formatting failure", e);
             return null;
         }
     }
@@ -143,8 +148,17 @@ public class JsonUtil {
      */
     public static String formatJson(Object data) {
         try {
-            return MAPPER.writer(new NoSpaceAndLFPrettyPrinter()).writeValueAsString(data);
+            if (data instanceof JsonNode) {
+                return MAPPER.writer(new NoSpaceAndLFPrettyPrinter()).writeValueAsString(data);
+            }
+
+            return new GsonBuilder()
+                    .serializeSpecialFloatingPointValues()
+                    .setPrettyPrinting()
+                    .create()
+                    .toJson(data);
         } catch (Exception e) {
+            LOG.error("Formatting failure", e);
             return null;
         }
     }
@@ -160,6 +174,7 @@ public class JsonUtil {
         try {
             return compressJson(MAPPER.readTree(jsonStr));
         } catch (Exception e) {
+            LOG.error("Compression failure", e);
             return null;
         }
     }
@@ -175,10 +190,10 @@ public class JsonUtil {
         try {
             return MAPPER.writeValueAsString(data);
         } catch (Exception e) {
+            LOG.error("Compression failure", e);
             return null;
         }
     }
-
 
 
     /**
@@ -206,15 +221,6 @@ public class JsonUtil {
             return null;
         }
     }
-
-    public static <T> T convertValue(Object obj, Class<T> clz) {
-        try {
-            return MAPPER.convertValue(obj, clz);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
-
 
     public static boolean isNotJsonArray(String jsonStr, boolean isJson) {
         return isJson ? (!JsonUtil.isJsonArray(jsonStr)) : (!Json5Util.isJson5Array(jsonStr));

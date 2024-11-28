@@ -147,7 +147,7 @@ public class JsonHistoryChooser extends DialogWrapper {
             List<HistoryEntry> value = entry.getValue();
 
             // 排序List
-            value.sort(Comparator.comparing(HistoryEntry::getInsertTime));
+            value.sort(Comparator.comparing(HistoryEntry::getInsertTime).reversed());
 
             // Map第一层是组节点
             HistoryTreeNode groupNode = new HistoryTreeNode(null, key, value.size(), HistoryTreeNodeType.GROUP);
@@ -223,7 +223,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
 
-    public class RemoveNodeAction extends DumbAwareAction {
+    class RemoveNodeAction extends DumbAwareAction {
 
         public RemoveNodeAction() {
             super(JsonAssistantBundle.message("action.structure.remove.text"), JsonAssistantBundle.messageOnSystem("action.structure.remove.description"), null);
@@ -238,38 +238,57 @@ public class JsonHistoryChooser extends DialogWrapper {
             // 刷新Tree
             TreePath selectionPath = tree.getSelectionPath();
             if (selectionPath != null) {
-                // 获取将要删除的历史记录Id列表
-                List<Integer> deletionList = getDeletionList(selectionPath);
+                // 记录树节点展开状态
+                Map<TreePath, Boolean> expandedStates = UIManager.recordExpandedStates(tree);
+
+                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+                HistoryTreeNode oriRootNode = (HistoryTreeNode) model.getRoot();
+
+                HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
+                HistoryTreeNode parent = (HistoryTreeNode) node.getParent();
+                final String parentName = parent.toString();
+                final int nodeIndex = parent.getIndex(node);
+
+                List<Integer> deletionList = new ArrayList<>();
+                boolean isNodeDeletion = appendDeletionListAndNodeType(node, deletionList);
+
+                // 如果删除的节点只有它一个元素，那么则删除父节点，并将焦点切换到旁边的节点
+                int groupIndex = -1;
+                if (isNodeDeletion) {
+                    groupIndex = oriRootNode.getIndex(parent);
+                }
+
                 // 获取历史记录列表
                 HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(project).getHistory();
                 // 删除真实数据
                 historyList.removeById(deletionList.toArray(new Integer[0]));
 
                 // 重新构建树节点
-                TreeNode rootNode = buildRootNode(historyList);
-                ((DefaultTreeModel) tree.getModel()).setRoot(rootNode);
-                UIManager.expandSecondaryNode(tree, rootNode);
+                TreeNode newRootNode = buildRootNode(historyList);
+                model.setRoot(newRootNode);
 
                 // 当不存在数据了，清除编辑框文本，禁用按钮
-                if (rootNode.getChildCount() == 0) {
+                if (newRootNode.getChildCount() == 0) {
                     showTextField.setText("");
                     disabledOkAction();
+                } else {
+                    chooseNextNodeAfterRemoval(isNodeDeletion, newRootNode, parentName, nodeIndex, groupIndex);
                 }
+
+                restoreExpandedStates(expandedStates, newRootNode);
             }
         }
 
         /**
-         * 获取删除列表（Id）
+         * 补充将要删除的Id列表，并且返回删除的是否为节点类型
          *
-         * @param selectionPath 选择的路径
-         * @return 将要删除的历史记录Id列表
+         * @param node         选中节点
+         * @param deletionList 将要删除的Id列表
+         * @return 是否为节点类型，true为节点类型，否则为组类型
          */
-        @NotNull
-        private List<Integer> getDeletionList(TreePath selectionPath) {
-            HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
-
+        private boolean appendDeletionListAndNodeType(HistoryTreeNode node, List<Integer> deletionList) {
+            boolean isNodeDeletion = false;
             // 如果类型是组，那么删除组节点及以下的数据，如果类型是具体数据，那么删除具体数据节点
-            List<Integer> deletionList = new ArrayList<>();
             if (HistoryTreeNodeType.GROUP.equals(node.getNodeType())) {
                 Enumeration<TreeNode> children = node.children();
                 while (children.hasMoreElements()) {
@@ -277,15 +296,109 @@ public class JsonHistoryChooser extends DialogWrapper {
                     deletionList.add(treeNode.getValue().getId());
                 }
             } else {
+                isNodeDeletion = true;
                 deletionList.add(node.getValue().getId());
             }
 
-            return deletionList;
+            return isNodeDeletion;
+        }
+
+        private void chooseNextNodeAfterRemoval(boolean isNodeDeletion, TreeNode newRootNode, String parentName, int nodeIndex, int groupIndex) {
+            HistoryTreeNode child;
+            int selectIndex = (nodeIndex > 0) ? nodeIndex - 1 : 0;
+            // 如果是删除节点，那就计算索引
+            if (isNodeDeletion) {
+                // 1.1 根据名称匹配现在的组
+                TreeNode parentNode = null;
+                Enumeration<? extends TreeNode> children = newRootNode.children();
+                while (children.hasMoreElements()) {
+                    TreeNode treeNode = children.nextElement();
+                    if (Objects.equals(treeNode.toString(), parentName)) {
+                        parentNode = treeNode;
+                        break;
+                    }
+                }
+
+                //  1.删除的是最后一个节点，整个组都删除，那就将焦点切换到旁边组节点
+                if (parentNode == null) {
+                    // 因为当前选中的是节点类型，所以先获取父节点（组），再计算组在root内的索引
+                    int groupSelectIndex = (groupIndex > 0) ? groupIndex - 1 : 0;
+                    // 获取旁边的组节点
+                    HistoryTreeNode childGroup = (HistoryTreeNode) newRootNode.getChildAt(groupSelectIndex);
+                    // 获取节点的路径
+                    TreePath path = new TreePath(childGroup.getPath());
+                    // 选中节点
+                    tree.setSelectionPath(path);
+                    // 滚动到选中的节点
+                    tree.scrollPathToVisible(path);
+                    return;
+                }
+
+                //  2.删除的是组内的任一节点，那么就计算索引，然后选中旁边的节点
+                //  ? 选中被删除元素的前一个元素 : 选中第一个元素
+                child = (HistoryTreeNode) parentNode.getChildAt(selectIndex);
+            } else {
+                // 如果是删除组，那就找到旁边节点（也根据索引），选中并展开
+                child = (HistoryTreeNode) newRootNode.getChildAt(selectIndex);
+            }
+
+            // 获取节点的路径
+            TreePath path = new TreePath(child.getPath());
+            // 选中节点
+            tree.setSelectionPath(path);
+            // 滚动到选中的节点
+            tree.scrollPathToVisible(path);
+        }
+
+        /**
+         * 根据名称展开节点
+         *
+         * @param expandedStates 展开节点记录
+         * @param newRootNode    新的Root节点
+         */
+        private void restoreExpandedStates(Map<TreePath, Boolean> expandedStates, TreeNode newRootNode) {
+            // 恢复树节点展开状态（这里根据名称来实现展开）
+            List<HistoryTreeNode> childList = new ArrayList<>();
+            Enumeration<? extends TreeNode> children = newRootNode.children();
+            while (children.hasMoreElements()) {
+                TreeNode treeNode = children.nextElement();
+                childList.add((HistoryTreeNode) treeNode);
+            }
+
+            // 遍历之前记录的展开节点
+            for (Map.Entry<TreePath, Boolean> entry : expandedStates.entrySet()) {
+                if (entry.getValue()) {
+                    TreePath path = null;
+                    TreeNode keyNode = (TreeNode) entry.getKey().getLastPathComponent();
+                    // 获取展开节点的展示名称，根节点为null
+                    String groupName = keyNode.toString();
+                    // 跳过根节点
+                    if (groupName == null) {
+                        continue;
+                    }
+
+                    // 遍历二级节点
+                    for (HistoryTreeNode treeNode : childList) {
+                        // 二级节点展示名称
+                        String nodeString = treeNode.toString();
+                        // 匹配名称
+                        if (Objects.equals(groupName, nodeString)) {
+                            path = new TreePath(treeNode.getPath());
+                            break;
+                        }
+                    }
+
+                    // 实现展开
+                    if (path != null) {
+                        tree.expandPath(path);
+                    }
+                }
+            }
         }
     }
 
 
-    public static class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
+    static class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
         @Override
         public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             HistoryTreeNode treeNode = (HistoryTreeNode) value;
@@ -304,7 +417,7 @@ public class JsonHistoryChooser extends DialogWrapper {
     }
 
 
-    public class UpdateEditorTreeSelectionListener implements TreeSelectionListener {
+    class UpdateEditorTreeSelectionListener implements TreeSelectionListener {
         private int lastLineCount = 0;
 
         @Override

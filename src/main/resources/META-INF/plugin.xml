@@ -29,6 +29,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="JsonAssistant Plugin Sticky Log" isLogByDefault="true"/>
         <toolWindow id="JsonAssistant.ToolWindow.JsonAssistant"
                     factoryClass="cn.memoryzy.json.toolwindow.JsonAssistantToolWindowFactory"
                     anchor="right"
@@ -49,7 +50,7 @@
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
-        
+
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
 

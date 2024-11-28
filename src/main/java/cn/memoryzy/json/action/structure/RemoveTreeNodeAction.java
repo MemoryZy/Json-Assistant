@@ -1,14 +1,16 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.ui.component.node.JsonTreeNode;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.util.Map;
 
 public class RemoveTreeNodeAction extends DumbAwareAction {
 
@@ -25,13 +27,22 @@ public class RemoveTreeNodeAction extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
+            // 记录树节点展开状态
+            Map<TreePath, Boolean> expandedStates = UIManager.recordExpandedStates(tree);
+
             for (TreePath path : paths) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                if (node.getParent() != null) {
-                    ((DefaultMutableTreeNode) node.getParent()).remove(node);
+                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonTreeNode parent = (JsonTreeNode) node.getParent();
+                if (parent != null) {
+                    parent.removeAndUpdateSize(node);
                 }
             }
+
             ((DefaultTreeModel) tree.getModel()).reload();
+
+            // 恢复树节点展开状态
+            UIManager.restoreExpandedStates(tree, expandedStates);
         }
     }
+
 }

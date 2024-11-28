@@ -12,6 +12,7 @@ public class ArrayWrapper extends ArrayList<Object> implements JsonWrapper {
 
     @SuppressWarnings("unchecked")
     public ArrayWrapper(Object source) {
+        super();
         if (!(source instanceof Collection)) {
             throw new IllegalArgumentException("source is not a Collection");
         }

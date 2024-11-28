@@ -43,6 +43,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -145,6 +147,37 @@ public class UIManager implements Disposable {
         }
     }
 
+    /**
+     * 记录树的节点展开状态
+     *
+     * @param tree 树实例
+     * @return 包含节点路径和展开状态的 Map
+     */
+    public static Map<TreePath, Boolean> recordExpandedStates(JTree tree) {
+        Map<TreePath, Boolean> expandedStates = new HashMap<>();
+        Enumeration<TreePath> paths = tree.getExpandedDescendants(new TreePath(tree.getModel().getRoot()));
+        if (paths != null) {
+            while (paths.hasMoreElements()) {
+                TreePath path = paths.nextElement();
+                expandedStates.put(path, true);
+            }
+        }
+        return expandedStates;
+    }
+
+    /**
+     * 恢复树的节点展开状态
+     *
+     * @param tree           树实例
+     * @param expandedStates 包含节点路径和展开状态的 Map
+     */
+    public static void restoreExpandedStates(JTree tree, Map<TreePath, Boolean> expandedStates) {
+        for (Map.Entry<TreePath, Boolean> entry : expandedStates.entrySet()) {
+            if (entry.getValue()) {
+                tree.expandPath(entry.getKey());
+            }
+        }
+    }
 
     public static void addErrorBorder(JComponent component) {
         // 这行的作用是给文本框外部变为红色
