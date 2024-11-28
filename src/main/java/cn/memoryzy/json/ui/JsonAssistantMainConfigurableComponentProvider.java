@@ -2,10 +2,12 @@ package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
+import cn.memoryzy.json.enums.HistoryViewType;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.ui.color.CircleIcon;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.util.UIManager;
@@ -15,6 +17,7 @@ import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBRadioButton;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -61,6 +64,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private ComboBox<ColorScheme> backgroundColorBox;
     private TitledSeparator windowAppearanceLabel;
     private JBLabel backgroundColorDesc;
+    private TitledSeparator historyLabel;
+    private JBLabel historyStyleTitle;
+    private JBRadioButton historyTree;
+    private JBRadioButton historyList;
     // endregion
 
     // 区分亮暗，防止配置界面还存在时，主题被切换
@@ -78,6 +85,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         applyToolWindowBehaviorChunk();
         applyToolWindowAppearanceChunk();
         applyDonateLinkChunk();
+        applyHistoryChunk();
 
         addSwitchListener();
         setRenderer();
@@ -130,6 +138,16 @@ public class JsonAssistantMainConfigurableComponentProvider {
         UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
         displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
         foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
+    }
+
+    private void applyHistoryChunk() {
+        historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
+        historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
+        historyTree.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.tree.text"));
+        historyList.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.list.text"));
+        ButtonGroup group = new ButtonGroup();
+        group.add(historyTree);
+        group.add(historyList);
     }
 
     private void addSwitchListener() {
@@ -261,6 +279,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
         displayLineNumbersCb.setSelected(editorAppearanceState.displayLineNumbers);
         foldingOutlineCb.setSelected(editorAppearanceState.foldingOutline);
 
+        // 历史记录
+        HistoryState historyState = persistentState.historyState;
+        if (historyState.historyViewType == HistoryViewType.TREE) {
+            historyTree.setSelected(true);
+        } else {
+            historyList.setSelected(true);
+        }
+
         if (recognizeOtherFormats) {
             UIManager.controlEnableCheckBox(xmlFormatsCb, true);
             UIManager.controlEnableCheckBox(yamlFormatsCb, true);
@@ -311,6 +337,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
         Color oldDarkcolor = editorAppearanceState.customDarkcolor;
         Color oldLightColor = editorAppearanceState.customLightColor;
 
+        // 历史记录
+        HistoryState historyState = persistentState.historyState;
+        HistoryViewType oldHistoryViewType = historyState.historyViewType;
+
         // ----------------------------------------------------------------------
 
         // 属性序列化
@@ -331,6 +361,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newRecognizeTomlFormat = tomlFormatsCb.isSelected();
         boolean newRecognizeUrlParamFormat = urlParamFormatsCb.isSelected();
 
+        // 历史记录
+        HistoryViewType newHistoryViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
+
         // 比较是否更改
         return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
                 || !Objects.equals(oldRecognitionFastJsonAnnotation, newRecognitionFastJsonAnnotation)
@@ -349,7 +382,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognizeXmlFormat, newRecognizeXmlFormat)
                 || !Objects.equals(oldRecognizeYamlFormat, newRecognizeYamlFormat)
                 || !Objects.equals(oldRecognizeTomlFormat, newRecognizeTomlFormat)
-                || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat);
+                || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
+                || !Objects.equals(oldHistoryViewType, newHistoryViewType);
     }
 
     public void apply() {
@@ -367,6 +401,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
         editorBehaviorState.recognizeYamlFormat = yamlFormatsCb.isSelected();
         editorBehaviorState.recognizeTomlFormat = tomlFormatsCb.isSelected();
         editorBehaviorState.recognizeUrlParamFormat = urlParamFormatsCb.isSelected();
+
+        // 历史记录
+        HistoryState historyState = persistentState.historyState;
+        historyState.historyViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
 
         // 外观
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;

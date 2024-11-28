@@ -20,9 +20,6 @@ public class EditorAppearanceStateConverter extends Converter<EditorAppearanceSt
     @Override
     public @Nullable String toString(@NotNull EditorAppearanceState value) {
         // Jackson无法序列化Color类，需手动转换
-
-
-
         return JsonUtil.compressJson(value);
     }
 

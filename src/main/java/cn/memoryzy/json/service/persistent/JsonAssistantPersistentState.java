@@ -3,9 +3,11 @@ package cn.memoryzy.json.service.persistent;
 import cn.memoryzy.json.service.persistent.converter.AttributeSerializationStateConverter;
 import cn.memoryzy.json.service.persistent.converter.EditorAppearanceStateConverter;
 import cn.memoryzy.json.service.persistent.converter.EditorBehaviorStateConverter;
+import cn.memoryzy.json.service.persistent.converter.HistoryStateConverter;
 import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
@@ -43,6 +45,10 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
     @Attribute(converter = EditorBehaviorStateConverter.class)
     public EditorBehaviorState editorBehaviorState = new EditorBehaviorState();
 
+    @Attribute(converter = HistoryStateConverter.class)
+    public HistoryState historyState = new HistoryState();
+
+
 
     @Override
     public @Nullable JsonAssistantPersistentState getState() {
@@ -54,5 +60,6 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
         this.attributeSerializationState = state.attributeSerializationState;
         this.editorAppearanceState = state.editorAppearanceState;
         this.editorBehaviorState = state.editorBehaviorState;
+        this.historyState = state.historyState;
     }
 }
