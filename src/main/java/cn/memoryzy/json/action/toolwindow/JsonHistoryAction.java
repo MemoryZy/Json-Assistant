@@ -2,11 +2,15 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.HistoryViewType;
 import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.ui.dialog.JsonHistoryChooser;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.ui.dialog.JsonHistoryListChooser;
+import cn.memoryzy.json.ui.dialog.JsonHistoryTreeChooser;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.Notifications;
@@ -49,6 +53,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
     private static final Logger LOG = Logger.getInstance(JsonHistoryAction.class);
 
     private final ToolWindowEx toolWindow;
+    private final JsonAssistantPersistentState persistenceState = JsonAssistantPersistentState.getInstance();
 
     public JsonHistoryAction(ToolWindowEx toolWindow) {
         super();
@@ -87,7 +92,12 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
             return;
         }
 
-        new JsonHistoryChooser(project, toolWindow).show();
+        HistoryState historyState = persistenceState.historyState;
+        if (historyState.historyViewType == HistoryViewType.TREE) {
+            new JsonHistoryTreeChooser(project, toolWindow).show();
+        } else {
+            new JsonHistoryListChooser(project, toolWindow).show();
+        }
     }
 
     private String getShortcut() {
@@ -161,11 +171,11 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
                 return;
             }
 
-            NotificationAction importAction = NotificationAction.createExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
-                    (event, notification) -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
+            NotificationAction importAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
+                    () -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
 
-            NotificationAction ignoreAction = NotificationAction.createExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
-                    (event, notification) -> ignoreRecords(path, rootElement, historyElement));
+            NotificationAction ignoreAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
+                    () -> ignoreRecords(path, rootElement, historyElement));
 
             ArrayList<NotificationAction> notificationActions = Lists.newArrayList(importAction, ignoreAction);
 

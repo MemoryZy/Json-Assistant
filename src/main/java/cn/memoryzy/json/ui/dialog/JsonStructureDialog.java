@@ -8,8 +8,8 @@ import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.ui.component.PupopMenuMouseAdapter;
 import cn.memoryzy.json.ui.component.node.JsonTreeNode;
+import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.UIManager;
@@ -65,7 +65,7 @@ public class JsonStructureDialog extends DialogWrapper {
         tree.setExpandableItemsEnabled(true);
         tree.setFont(UIManager.jetBrainsMonoFont(12));
         tree.setCellRenderer(new StyleTreeCellRenderer());
-        tree.addMouseListener(new PupopMenuMouseAdapter(tree, buildRightMousePopupMenu()));
+        tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
 
         // 触发快速检索
         new TreeSpeedSearch(tree);

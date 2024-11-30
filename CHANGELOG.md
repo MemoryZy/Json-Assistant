@@ -6,7 +6,7 @@
 - 新增 URL 参数 与 JSON 互转。
 - 新增 Properties 格式参数与 JSON 互转。
 - 新增 JSON 转义功能。
-- 重构历史记录相关操作，按日期分组查看记录。
+- 增加树状历史记录视图，可按日期分组查看记录。
 - 新增工具窗口背景色自定义功能。
 - 兼容2024.3版本。
 - 用户体验优化与改进。
@@ -16,7 +16,7 @@
 - Added URL parameter interconversion with JSON.
 - Added the Properties format parameter to interconvert with JSON.
 - Added JSON escape function.
-- Reconstruct operations related to historical records and view records in groups by date.
+- Added a tree history view to view records grouped by date.
 - Added the tool window background color customization function.
 - Compatible with version 2024.3.
 - User experience optimization and improvement.

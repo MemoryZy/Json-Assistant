@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.component;
+package cn.memoryzy.json.ui.listener;
 
 import cn.hutool.core.util.ArrayUtil;
 import com.intellij.ui.treeStructure.Tree;
@@ -12,12 +12,12 @@ import java.awt.event.MouseEvent;
  * @author Memory
  * @since 2024/11/23
  */
-public class PupopMenuMouseAdapter extends MouseAdapter {
+public class TreeRightClickPopupMenuMouseAdapter extends MouseAdapter {
 
     private final Tree tree;
     private final JPopupMenu popupMenu;
 
-    public PupopMenuMouseAdapter(Tree tree, JPopupMenu popupMenu) {
+    public TreeRightClickPopupMenuMouseAdapter(Tree tree, JPopupMenu popupMenu) {
         this.tree = tree;
         this.popupMenu = popupMenu;
     }

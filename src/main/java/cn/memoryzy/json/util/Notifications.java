@@ -40,14 +40,16 @@ import java.util.stream.Collectors;
  */
 public class Notifications {
 
+    private static final NotificationGroupManager NOTIFICATION_GROUP_MANAGER = NotificationGroupManager.getInstance();
+
     /**
      * 获取注册的通知组
      */
-    public static final NotificationGroup BALLOON_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin");
+    public static final NotificationGroup BALLOON_GROUP = NOTIFICATION_GROUP_MANAGER.getNotificationGroup("JsonAssistant Plugin");
 
-    public static final NotificationGroup BALLOON_LOG_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin Log");
+    public static final NotificationGroup BALLOON_LOG_GROUP = NOTIFICATION_GROUP_MANAGER.getNotificationGroup("JsonAssistant Plugin Log");
 
-    public static final NotificationGroup STICKY_LOG_GROUP = NotificationGroupManager.getInstance().getNotificationGroup("JsonAssistant Plugin Sticky Log");
+    public static final NotificationGroup STICKY_LOG_GROUP = NOTIFICATION_GROUP_MANAGER.getNotificationGroup("JsonAssistant Plugin Sticky Log");
 
     /**
      * 展示通知（瞬态通知）
@@ -91,9 +93,12 @@ public class Notifications {
     /**
      * 展示不被折叠的通知
      */
+    @SuppressWarnings("removal")
     public static void showFullStickyNotification(String title, String content, NotificationType notificationType,
-                                                  Project project, Collection<? extends @NotNull AnAction> actions) {
-        new FullContentNotification(STICKY_LOG_GROUP.getDisplayId(), title, content, notificationType).addActions(actions).notify(project);
+                                                  Project project, List<? extends @NotNull AnAction> actions) {
+        FullContentNotification notification = new FullContentNotification(STICKY_LOG_GROUP.getDisplayId(), title, content, notificationType);
+        notification.addActions(actions);
+        notification.notify(project);
     }
 
 

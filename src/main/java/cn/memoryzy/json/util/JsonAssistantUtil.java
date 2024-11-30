@@ -9,6 +9,9 @@ import cn.hutool.core.util.StrUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -177,6 +180,19 @@ public class JsonAssistantUtil {
             }
         }
         return sb.toString();
+    }
+
+    public static <T> List<T> enumerationToList(Enumeration<T> enumeration) {
+        List<T> result = new ArrayList<>();
+        if (Objects.isNull(enumeration)) {
+            return result;
+        }
+
+        while (enumeration.hasMoreElements()) {
+            result.add(enumeration.nextElement());
+        }
+
+        return result;
     }
 
 }

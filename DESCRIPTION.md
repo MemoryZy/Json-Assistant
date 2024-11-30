@@ -11,7 +11,6 @@
 ## Key Features
 - Support [JSON5](https://json5.org/)
 - JSON Window (Multi-Tab)
-   - Add Tab
    - Rename Tab
    - Move Tab to Editor
    - Move Tab to New Window
