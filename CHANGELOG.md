@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.7.2] - 2024-11-30
+
 - 完全支持 [JSON5](https://json5.org/)。
 - 解决 [#31](https://github.com/MemoryZy/Json-Assistant/issues/31) 问题。
 - 新增 URL 参数 与 JSON 互转。
@@ -208,7 +211,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.7...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.2...HEAD
+[1.7.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.7...v1.7.2
 [1.6.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.5...v1.6.7
 [1.6.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.0...v1.6.5
 [1.6.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.5.1...v1.6.0
