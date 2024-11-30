@@ -93,11 +93,10 @@ public class Notifications {
     /**
      * 展示不被折叠的通知
      */
-    @SuppressWarnings("removal")
     public static void showFullStickyNotification(String title, String content, NotificationType notificationType,
                                                   Project project, List<? extends @NotNull AnAction> actions) {
         FullContentNotification notification = new FullContentNotification(STICKY_LOG_GROUP.getDisplayId(), title, content, notificationType);
-        notification.addActions(actions);
+        actions.forEach(notification::addAction);
         notification.notify(project);
     }
 
