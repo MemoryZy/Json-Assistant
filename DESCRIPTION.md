@@ -33,5 +33,9 @@
    - JSON <-> Properties
    - JSON <-> URL Param
 
-
 <br/>
+
+## Getting Started
+When in or selecting JSON data, you can press the shortcut key `Alt+K` or right-click and choose `Json Assistant` to bring up the action menu.
+
+For more operations, please refer to the [plugin documentation](https://json.memoryzy.cn/overview).

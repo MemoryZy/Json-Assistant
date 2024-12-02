@@ -48,7 +48,10 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 <br/>
 
 ## Getting Started 🚀
-Refer to the plugin [documentation][plugin:docs].
+When in or selecting JSON data, you can press the shortcut key `Alt+K` or right-click and choose `Json Assistant` to bring up the action menu.
+
+For more operations, please refer to the [plugin documentation][plugin:docs].
+
 
 <br/>
 

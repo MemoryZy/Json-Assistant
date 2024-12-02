@@ -44,7 +44,9 @@
 <br/>
 
 ## 快速开始 🚀
-请参阅 [插件文档][plugin:docs]。
+当处于或选中 JSON 数据时，可通过按下快捷键 `Alt+K` 或右键选择 `Json Assistant` 唤出操作菜单。
+
+更多操作请参阅 [插件文档][plugin:docs]。
 
 <br/>
 
