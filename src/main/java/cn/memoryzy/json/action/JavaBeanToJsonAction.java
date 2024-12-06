@@ -65,9 +65,9 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
      */
     public static void convertAttributesToJsonAndNotify(Project project, PsiClass psiClass, Function<Map<String, Object>, String> jsonConverter, Logger log) {
         // JsonMap
-        Map<String, Object> jsonMap = new TreeMap<>();
+        Map<String, Object> jsonMap = new LinkedHashMap<>();
         // 忽略的属性
-        Map<String, List<String>> ignoreMap = new HashMap<>();
+        Map<String, List<String>> ignoreMap = new LinkedHashMap<>();
         // 相关配置
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
 

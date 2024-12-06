@@ -42,8 +42,9 @@ public class JsonTextDiffAction extends DumbAwareAction {
         String leftJsonStr = StrUtil.trim(GlobalJsonConverter.parseJson(PlatformUtil.getEditor(dataContext), true));
 
         FileType fileType = FileTypeHolder.JSON5;
-        DocumentContent leftDocumentContent = DiffContentFactory.getInstance().createEditable(project, leftJsonStr, fileType);
-        DocumentContent rightDocumentContent = DiffContentFactory.getInstance().createEditable(project, "", fileType);
+        DiffContentFactory diffContentFactory = DiffContentFactory.getInstance();
+        DocumentContent leftDocumentContent = diffContentFactory.createEditable(project, leftJsonStr, fileType);
+        DocumentContent rightDocumentContent = diffContentFactory.createEditable(project, "", fileType);
 
         SimpleDiffRequest simpleDiffRequest = new SimpleDiffRequest(
                 JsonAssistantBundle.messageOnSystem("dialog.json.text.diff.main.title"),

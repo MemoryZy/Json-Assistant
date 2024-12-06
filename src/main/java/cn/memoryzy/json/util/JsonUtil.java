@@ -154,6 +154,7 @@ public class JsonUtil {
 
             return new GsonBuilder()
                     .serializeSpecialFloatingPointValues()
+                    .serializeNulls()
                     .setPrettyPrinting()
                     .create()
                     .toJson(data);

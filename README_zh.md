@@ -17,7 +17,7 @@
 <br/>
 
 ## 功能 
-- 完全支持 [JSON5](https://json5.org/)
+- 完全支持 [JSON5][json5]
 - JSON 窗口（多选项卡）
   - 选项卡更名
   - 移动至主编辑器
@@ -43,10 +43,28 @@
 
 <br/>
 
-## 快速开始 🚀
-当处于或选中 JSON 数据时，可通过按下快捷键 `Alt+K` 或右键选择 `Json Assistant` 唤出操作菜单。
-
-更多操作请参阅 [插件文档][plugin:docs]。
+## 兼容
+ - Android Studio — Arctic Fox | 2020.3.1+
+ - AppCode — 2020.3+
+ - Aqua — 2024.1.1+
+ - CLion — 2020.3+
+ - Code With Me Guest — 1.0+
+ - DataGrip — 2020.3+
+ - DataSpell — 2021.3+
+ - GoLand — 2020.3+
+ - IntelliJ IDEA Community — 2020.3+
+ - IntelliJ IDEA Ultimate — 2020.3+
+ - JetBrains Client — 1.0+
+ - JetBrains Gateway — 2022.2+
+ - MPS — 2020.3+
+ - PhpStorm — 2020.3+
+ - PyCharm Community — 2020.3+
+ - PyCharm Professional — 2020.3+
+ - Rider — 2020.3+
+ - RubyMine — 2020.3+
+ - RustRover — 2024.1+
+ - WebStorm — 2020.3+
+ - Writerside — 2024.1+
 
 <br/>
 
@@ -57,11 +75,19 @@
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>Marketplace</kbd> > <kbd>搜索 "Json Assistant"</kbd> >
   <kbd>Install</kbd>
 
+
 - 手动安装:
 
-  下载 [最新版本][gh:release] 插件，并按照以下流程安装：
+  在 [JetBrains Marketplace][jb:plugin-link] 或 [GitHub Releases][gh:release] 下载与 IDE 版本兼容的插件包，并按照以下流程安装：
 
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd> > <kbd>选择插件包并进行安装（无需解压zip）</kbd> 
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd> > <kbd>选择插件包并进行安装（无需解压 zip）</kbd> 
+
+<br/>
+
+## 使用
+
+> 
+
 
 <br/>
 
@@ -80,3 +106,4 @@
 [jb:version]: https://plugins.jetbrains.com/plugin/24738-json-assistant/versions
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
 [plugin:docs]: https://json.memoryzy.cn/overview
+[json5]: https://json5.org/

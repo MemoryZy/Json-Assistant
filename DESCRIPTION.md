@@ -1,4 +1,4 @@
-**JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze! 🚀**
+**JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!**
 
 <br/>
 

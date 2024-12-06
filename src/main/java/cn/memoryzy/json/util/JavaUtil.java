@@ -86,7 +86,7 @@ public class JavaUtil {
                 if (Objects.equals(psiClass, fieldClz)) {
                     nestedJsonMap = null;
                 } else {
-                    nestedJsonMap = new HashMap<>();
+                    nestedJsonMap = new LinkedHashMap<>();
                     // 递归
                     recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, persistentState);
                 }
@@ -107,7 +107,7 @@ public class JavaUtil {
                 if (psiClz != null) {
                     PsiClassType classType = PsiTypesUtil.getClassType(psiClz);
                     if (JavaUtil.isApplicationClsType(classType)) {
-                        Map<String, Object> nestedJsonMap = new HashMap<>();
+                        Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
                         // 递归
                         recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, persistentState);
                         // 添加至list

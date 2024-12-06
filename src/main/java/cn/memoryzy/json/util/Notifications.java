@@ -40,23 +40,43 @@ import java.util.stream.Collectors;
  */
 public class Notifications {
 
-    private static final NotificationGroupManager NOTIFICATION_GROUP_MANAGER = NotificationGroupManager.getInstance();
+    /**
+     * 按需获取服务实例
+     *
+     * @return 通知组管理
+     */
+    private static NotificationGroupManager getNotificationGroupManager() {
+        return NotificationGroupManager.getInstance();
+    }
 
     /**
-     * 获取注册的通知组
+     * 普通气泡通知
      */
-    public static final NotificationGroup BALLOON_GROUP = NOTIFICATION_GROUP_MANAGER.getNotificationGroup("JsonAssistant Plugin");
+    public static NotificationGroup getBalloonNotificationGroup() {
+        return getNotificationGroupManager().getNotificationGroup("JsonAssistant Plugin");
+    }
 
-    public static final NotificationGroup BALLOON_LOG_GROUP = NOTIFICATION_GROUP_MANAGER.getNotificationGroup("JsonAssistant Plugin Log");
+    /**
+     * 普通气泡通知（记录性）
+     */
+    public static NotificationGroup getBalloonLogNotificationGroup() {
+        return getNotificationGroupManager().getNotificationGroup("JsonAssistant Plugin Log");
+    }
 
-    public static final NotificationGroup STICKY_LOG_GROUP = NOTIFICATION_GROUP_MANAGER.getNotificationGroup("JsonAssistant Plugin Sticky Log");
+    /**
+     * 粘性气泡通知（记录性）
+     */
+    public static NotificationGroup getStickyLogNotificationGroup() {
+        return getNotificationGroupManager().getNotificationGroup("JsonAssistant Plugin Sticky Log");
+    }
+
 
     /**
      * 展示通知（瞬态通知）
      */
     public static void showNotification(String content, NotificationType notificationType, Project project) {
         // 使用通知组创建通知
-        BALLOON_GROUP.createNotification(content, notificationType).notify(project);
+        getBalloonNotificationGroup().createNotification(content, notificationType).notify(project);
     }
 
     /**
@@ -64,7 +84,7 @@ public class Notifications {
      */
     public static void showNotification(String title, String content, NotificationType notificationType, Project project) {
         // 使用通知组创建通知
-        BALLOON_GROUP.createNotification(content, notificationType).setTitle(title).notify(project);
+        getBalloonNotificationGroup().createNotification(content, notificationType).setTitle(title).notify(project);
     }
 
     /**
@@ -72,7 +92,7 @@ public class Notifications {
      */
     public static void showLogNotification(String content, NotificationType notificationType, Project project) {
         // 使用通知组创建通知
-        BALLOON_LOG_GROUP.createNotification(content, notificationType).notify(project);
+        getBalloonLogNotificationGroup().createNotification(content, notificationType).notify(project);
     }
 
     /**
@@ -80,14 +100,14 @@ public class Notifications {
      */
     public static void showLogNotification(String title, String content, NotificationType notificationType, Project project) {
         // 使用通知组创建通知
-        BALLOON_LOG_GROUP.createNotification(content, notificationType).setTitle(title).notify(project);
+        getBalloonLogNotificationGroup().createNotification(content, notificationType).setTitle(title).notify(project);
     }
 
     /**
      * 展示不被折叠的通知
      */
     public static void showFullNotification(String title, String content, NotificationType notificationType, Project project) {
-        new FullContentNotification(BALLOON_LOG_GROUP.getDisplayId(), title, content, notificationType).notify(project);
+        new FullContentNotification(getBalloonLogNotificationGroup().getDisplayId(), title, content, notificationType).notify(project);
     }
 
     /**
@@ -95,7 +115,7 @@ public class Notifications {
      */
     public static void showFullStickyNotification(String title, String content, NotificationType notificationType,
                                                   Project project, List<? extends @NotNull AnAction> actions) {
-        FullContentNotification notification = new FullContentNotification(STICKY_LOG_GROUP.getDisplayId(), title, content, notificationType);
+        FullContentNotification notification = new FullContentNotification(getStickyLogNotificationGroup().getDisplayId(), title, content, notificationType);
         actions.forEach(notification::addAction);
         notification.notify(project);
     }
@@ -103,7 +123,7 @@ public class Notifications {
 
     @SuppressWarnings({"deprecation", "DuplicatedCode"})
     public static void showWelcomeNotification(Project project) {
-        Notification notification = Notifications.BALLOON_LOG_GROUP
+        Notification notification = Notifications.getBalloonLogNotificationGroup()
                 .createNotification(JsonAssistantBundle.messageOnSystem("notification.welcome.content",
                                 Urls.GITHUB_LINK,
                                 UrlType.SPONSOR.getId()
@@ -143,7 +163,7 @@ public class Notifications {
         String content = JsonAssistantBundle.messageOnSystem("notification.welcome.content", Urls.GITHUB_LINK, UrlType.SPONSOR.getId());
         content += "<br/>" + JsonAssistantBundle.messageOnSystem("notification.update.content", changeNotes);
 
-        Notification notification = Notifications.BALLOON_LOG_GROUP
+        Notification notification = Notifications.getBalloonLogNotificationGroup()
                 .createNotification(content, NotificationType.INFORMATION)
                 .setTitle(JsonAssistantBundle.messageOnSystem("notification.update.title", JsonAssistantPlugin.getVersion()))
                 .setImportant(true)

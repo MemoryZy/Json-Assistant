@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.text.MessageFormat;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -71,7 +71,7 @@ public class ErrorReporter extends ErrorReportSubmitter {
         String runtimeEnv = getRuntimeEnv();
         String stacktrace = StringUtil.first(event.getThrowableText(), stacktraceLen, true);
 
-        Map<String, String> parameters = new HashMap<>();
+        Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("labels", GITHUB_ISSUE_BUG_LABEL);
         parameters.put("template", PlatformUtil.isChineseLocale() ? GITHUB_ISSUE_BUG_CN_TEMPLATE : GITHUB_ISSUE_BUG_TEMPLATE);
         parameters.put("title", title);

@@ -1,6 +1,11 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+ - 优化 JavaBean 序列化为 JSON 的逻辑，确保生成的 JSON 对象中的属性顺序与属性的声明顺序一致。
+ - 解决 [#41](https://github.com/MemoryZy/Json-Assistant/issues/41) 问题。
+ - Optimize the JavaBean-to-JSON serialization process to preserve the order of properties according to their declaration sequence in the Java class.
+ - Solve problem [#41](https://github.com/MemoryZy/Json-Assistant/issues/41).
+
 
 ## [1.7.2] - 2024-11-30
 
