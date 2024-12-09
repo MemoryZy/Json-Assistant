@@ -82,7 +82,10 @@ public class JavaUtil {
 
                 if (Objects.nonNull(fieldClz)) {
                     if (fieldClz.isEnum()) {
-                       // 先获取常量值，没有的话，从枚举中取第一个的String类型
+                        // 先获取常量值，没有的话，从枚举中取第一个的String类型
+                        Object o = psiField.computeConstantValue();
+
+                        System.out.println();
 
                     } else {
                         // 嵌套Map（为了实现嵌套属性）
