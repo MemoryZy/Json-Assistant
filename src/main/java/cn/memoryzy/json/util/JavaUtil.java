@@ -77,22 +77,31 @@ public class JavaUtil {
 
             // 是否为引用类型
             if (JavaUtil.isApplicationClsType(psiType)) {
-                // 嵌套Map（为了实现嵌套属性）
-                Map<String, Object> nestedJsonMap;
-
                 // 获取类型对应的Class
                 PsiClass fieldClz = PsiTypesUtil.getPsiClass(psiType);
-                // 判断属性中是否存在本类类型的嵌套
-                if (Objects.equals(psiClass, fieldClz)) {
-                    nestedJsonMap = null;
+
+                if (Objects.nonNull(fieldClz)) {
+                    if (fieldClz.isEnum()) {
+                       // 先获取常量值，没有的话，从枚举中取第一个的String类型
+
+                    } else {
+                        // 嵌套Map（为了实现嵌套属性）
+                        Map<String, Object> nestedJsonMap;
+                        // 判断属性中是否存在本类类型的嵌套
+                        if (Objects.equals(psiClass, fieldClz)) {
+                            nestedJsonMap = null;
+                        } else {
+                            nestedJsonMap = new LinkedHashMap<>();
+                            // 递归
+                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, persistentState);
+                        }
+                        // 添加至主Map
+                        jsonMap.put(propertyName, nestedJsonMap);
+                    }
                 } else {
-                    nestedJsonMap = new LinkedHashMap<>();
-                    // 递归
-                    recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, persistentState);
+                    jsonMap.put(propertyName, null);
                 }
 
-                // 添加至主Map
-                jsonMap.put(propertyName, nestedJsonMap);
             } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType) {
                 String typeClassName;
                 String canonicalText = psiType.getCanonicalText();
@@ -122,7 +131,13 @@ public class JavaUtil {
                 jsonMap.put(propertyName, list);
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
+                // TODO 可能定义为常量了，尝试获取下
                 jsonMap.put(propertyName, getDefaultValue(psiField, psiType, persistentState));
+
+                Object o = psiField.computeConstantValue();
+
+                System.out.println();
+
             }
         }
     }
