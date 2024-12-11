@@ -19,6 +19,7 @@ public class Urls {
     public static final String GITHUB_ISSUE_LINK = "https://github.com/MemoryZy/Json-Assistant/issues/new";
     public static final String SUPPORT_LINK = "https://json.memoryzy.cn/support";
     public static final String SPONSOR_LINK = "https://json.memoryzy.cn/support#sponsor";
+    public static final String SPONSORED_LIST_LINK = "https://json.memoryzy.cn/support.html#sponsored-list";
     public static final String TREE_LINK = "https://json.memoryzy.cn/tree";
     public static final String JSON_TO_JAVA_BEAN_LINK = "https://json.memoryzy.cn/json-to-javabean";
     public static final String OVERVIEW = "https://json.memoryzy.cn/overview";

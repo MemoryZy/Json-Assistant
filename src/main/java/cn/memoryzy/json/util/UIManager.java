@@ -268,10 +268,14 @@ public class UIManager implements Disposable {
         return font;
     }
 
-    public static void setCommentLabel(JLabel label, JCheckBox checkBox, String commentText) {
+    public static void setCommentLabel(JLabel label, JComponent component, String commentText) {
+        label.setBorder(getCommentBorder(component));
+        setCommentLabel(label, commentText);
+    }
+
+    public static void setCommentLabel(JLabel label, String commentText) {
         label.setForeground(UIUtil.getContextHelpForeground());
         label.setFont(getCommentFont(label.getFont()));
-        label.setBorder(getCommentBorder(checkBox));
         setCommentText(label, commentText, true, 70);
     }
 
@@ -303,8 +307,8 @@ public class UIManager implements Disposable {
         }
     }
 
-    public static Border getCommentBorder(JCheckBox checkBox) {
-        Insets insets = ComponentPanelBuilder.computeCommentInsets(checkBox, true);
+    public static Border getCommentBorder(JComponent component) {
+        Insets insets = ComponentPanelBuilder.computeCommentInsets(component, true);
         insets.bottom -= 4;
         return new JBEmptyBorder(insets);
     }

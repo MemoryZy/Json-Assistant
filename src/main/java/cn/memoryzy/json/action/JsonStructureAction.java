@@ -25,6 +25,9 @@ public class JsonStructureAction extends DumbAwareAction {
         presentation.setText(JsonAssistantBundle.message("action.structure.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.description"));
         presentation.setIcon(JsonAssistantIcons.STRUCTURE);
+
+        // TODO 使用编程式设置 树结构，将其切换到工具窗口来展示，由用户在配置中选择哪种方式，临时侧边栏
+
     }
 
     @Override

@@ -1,18 +1,12 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ClassUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.ReflectUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * @author Memory
@@ -193,6 +187,17 @@ public class JsonAssistantUtil {
         }
 
         return result;
+    }
+
+    public static boolean hasStringType(Object... array) {
+        return ArrayUtil.isNotEmpty(array) && Arrays.stream(array).anyMatch(String.class::isInstance);
+    }
+
+    public static boolean allElementsAreNumeric(Object... array) {
+        return ArrayUtil.isNotEmpty(array) && Arrays.stream(array)
+                .allMatch(el -> el instanceof Byte || el instanceof Short || el instanceof Integer
+                        || el instanceof Long || el instanceof Float
+                        || el instanceof Double || el instanceof Character);
     }
 
 }

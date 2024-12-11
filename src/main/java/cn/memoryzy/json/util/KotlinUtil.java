@@ -78,7 +78,7 @@ public class KotlinUtil {
         }
 
         // kt 依赖于 Java，所以直接用 Java 工具即可
-        PsiField[] fields = JavaUtil.getAllFieldFilterStatic(psiClass);
+        PsiField[] fields = JavaUtil.getNonStaticFields(psiClass);
         return ArrayUtil.isNotEmpty(fields);
     }
 

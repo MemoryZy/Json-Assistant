@@ -49,7 +49,7 @@ public class JavaUtil {
     public static void recursionAddProperty(Project project, PsiClass psiClass, Map<String, Object> jsonMap,
                                             Map<String, List<String>> ignoreMap, AttributeSerializationState persistentState) {
         // 获取该类所有字段
-        PsiField[] allFields = JavaUtil.getAllFieldFilterStatic(psiClass);
+        PsiField[] allFields = JavaUtil.getNonStaticFields(psiClass);
         List<String> fieldNameList = new ArrayList<>();
         ignoreMap.put(psiClass.getQualifiedName(), fieldNameList);
 
@@ -83,9 +83,16 @@ public class JavaUtil {
                 if (Objects.nonNull(fieldClz)) {
                     if (fieldClz.isEnum()) {
                         // 先获取常量值，没有的话，从枚举中取第一个的String类型
-                        Object o = psiField.computeConstantValue();
+                        Object value = PsiUtil.computeConstantExpression(psiField);
+                        if (Objects.isNull(value)) {
+                            // 枚举常量在枚举类中表现为静态常量
+                            PsiField[] staticFields = getStaticFields(fieldClz);
+                            if (ArrayUtil.isNotEmpty(staticFields)) {
+                                value = staticFields[0].getName();
+                            }
+                        }
 
-                        System.out.println();
+                        jsonMap.put(propertyName, value);
 
                     } else {
                         // 嵌套Map（为了实现嵌套属性）
@@ -125,27 +132,22 @@ public class JavaUtil {
                         // 添加至list
                         list.add(nestedJsonMap);
                     } else {
-                        Object defaultValue = getDefaultValue(classType, persistentState.includeRandomValues);
-                        if (Objects.nonNull(defaultValue))
+                        Object defaultValue = getDefaultValue(psiField, classType, persistentState.includeRandomValues);
+                        if (Objects.nonNull(defaultValue)) {
                             list.add(defaultValue);
+                        }
                     }
                 }
 
                 jsonMap.put(propertyName, list);
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
-                // TODO 可能定义为常量了，尝试获取下
-                jsonMap.put(propertyName, getDefaultValue(psiField, psiType, persistentState));
-
-                Object o = psiField.computeConstantValue();
-
-                System.out.println();
-
+                jsonMap.put(propertyName, getDefaultValueWithAnnotation(psiField, psiType, persistentState));
             }
         }
     }
 
-    private static Object getDefaultValue(PsiField psiField, PsiType psiType, AttributeSerializationState persistentState) {
+    private static Object getDefaultValueWithAnnotation(PsiField psiField, PsiType psiType, AttributeSerializationState persistentState) {
         // 如果是加了时间序列化注解，但是类型不属于时间相关类型，那注解不生效
         boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;
         boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
@@ -201,7 +203,7 @@ public class JavaUtil {
             }
         }
 
-        return getDefaultValue(psiType, persistentState.includeRandomValues);
+        return getDefaultValue(psiField, psiType, persistentState.includeRandomValues);
     }
 
 
@@ -296,7 +298,13 @@ public class JavaUtil {
      * @param psiType 类型
      * @return 默认值
      */
-    public static Object getDefaultValue(PsiType psiType, boolean includeRandomValues) {
+    public static Object getDefaultValue(PsiField psiField, PsiType psiType, boolean includeRandomValues) {
+        // 检查是否存在常量定义
+        Object value = PsiUtil.computeConstantExpression(psiField);
+        if (Objects.nonNull(value)) {
+            return value;
+        }
+
         String canonicalText = psiType.getCanonicalText();
         // 8大包装类皆不许继承
         // 防止类型为继承的类，光靠类型名称判断不够严谨
@@ -514,7 +522,7 @@ public class JavaUtil {
         boolean enabled = false;
         PsiClass psiClass = getPsiClass(dataContext);
         if (Objects.nonNull(psiClass)) {
-            PsiField[] fields = getAllFieldFilterStatic(psiClass);
+            PsiField[] fields = getNonStaticFields(psiClass);
             enabled = ArrayUtil.isNotEmpty(fields);
         }
 
@@ -523,16 +531,29 @@ public class JavaUtil {
 
 
     /**
-     * 获取该类的所有字段
+     * 获取该类的所有字段（除去静态字段）
      *
      * @param psiClass class
      * @return 所有字段
      */
-    public static PsiField[] getAllFieldFilterStatic(PsiClass psiClass) {
+    public static PsiField[] getNonStaticFields(PsiClass psiClass) {
         return (Objects.isNull(psiClass))
                 ? new PsiField[0]
                 : Arrays.stream(psiClass.getAllFields()).filter(el -> !el.hasModifierProperty(PsiModifier.STATIC)).toArray(PsiField[]::new);
     }
+
+    /**
+     * 获取该类的所有静态字段
+     *
+     * @param psiClass class
+     * @return 所有静态字段
+     */
+    public static PsiField[] getStaticFields(PsiClass psiClass) {
+        return (Objects.isNull(psiClass))
+                ? new PsiField[0]
+                : Arrays.stream(psiClass.getAllFields()).filter(el -> el.hasModifierProperty(PsiModifier.STATIC)).toArray(PsiField[]::new);
+    }
+
 
     /**
      * 获取注解中的指定属性（去除"之后）

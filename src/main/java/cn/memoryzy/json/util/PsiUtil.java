@@ -1,6 +1,5 @@
 package cn.memoryzy.json.util;
 
-import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.ConstantExpressionEvaluator;
@@ -11,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * @author Memory
@@ -28,7 +28,7 @@ public class PsiUtil {
         return literalExpression.getValue();
     }
 
-    public static String computeExpression(DataContext dataContext) {
+    public static String computeStringExpression(DataContext dataContext) {
         // 不做方法返回值的处理
         PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
@@ -36,29 +36,21 @@ public class PsiUtil {
 
         String jsonStr = null;
         if (null != psiField) {
-            jsonStr = computeExpression(psiField);
+            String canonicalText = psiField.getType().getCanonicalText();
+            jsonStr = String.class.getName().equals(canonicalText) ? String.valueOf(computeConstantExpression(psiField)) : null;
         } else if (null != localVariable) {
-            jsonStr = computeExpression(localVariable);
+            String canonicalText = localVariable.getType().getCanonicalText();
+            jsonStr = String.class.getName().equals(canonicalText) ? String.valueOf(computeConstantExpression(localVariable)) : null;
         }
 
         return jsonStr;
     }
 
-    public static String computeExpression(PsiField psiField) {
-        String canonicalText = psiField.getType().getCanonicalText();
-        return String.class.getName().equals(canonicalText) ? computeConstantExpression(psiField) : null;
-    }
-
-    public static String computeExpression(PsiLocalVariable localVariable) {
-        String canonicalText = localVariable.getType().getCanonicalText();
-        return String.class.getName().equals(canonicalText) ? computeConstantExpression(localVariable) : null;
-    }
-
-    private static String computeConstantExpression(PsiField field) {
+    public static Object computeConstantExpression(PsiField field) {
         return computeInitializer(field.getInitializer());
     }
 
-    private static String computeConstantExpression(PsiLocalVariable localVariable) {
+    public static Object computeConstantExpression(PsiLocalVariable localVariable) {
         return computeInitializer(localVariable.getInitializer());
     }
 
@@ -69,10 +61,10 @@ public class PsiUtil {
      * @param initializer 初始化常量表达式
      * @return 结果
      */
-    private static String computeInitializer(PsiExpression initializer) {
+    public static Object computeInitializer(PsiExpression initializer) {
         if (initializer instanceof PsiLiteralExpression) {
             // 单独的 Java 字面表达式
-            return String.valueOf(computeLiteralExpression((PsiLiteralExpression) initializer));
+            return computeLiteralExpression((PsiLiteralExpression) initializer);
 
         } else if (initializer instanceof PsiBinaryExpression) {
             // Java二进制表达式（加、乘等）
@@ -97,8 +89,10 @@ public class PsiUtil {
      * @param binaryExpression 二进制表达式
      * @return 结果
      */
-    private static String computeBinaryExpression(PsiBinaryExpression binaryExpression) {
+    private static Object computeBinaryExpression(PsiBinaryExpression binaryExpression) {
+        // 左边指定的常量值
         PsiExpression lOperand = binaryExpression.getLOperand();
+        // 右边指定的常量值
         PsiExpression rOperand = binaryExpression.getROperand();
 
         // 在此不计算方法调用表达式，防止调用过深
@@ -108,7 +102,9 @@ public class PsiUtil {
 
         // 皆为字面表达式
         if ((lOperand instanceof PsiLiteralExpression) && (rOperand instanceof PsiLiteralExpression)) {
-            return String.valueOf(((PsiLiteralExpression) lOperand).getValue()) + ((PsiLiteralExpression) rOperand).getValue();
+            Object lValue = ((PsiLiteralExpression) lOperand).getValue();
+            Object rValue = ((PsiLiteralExpression) rOperand).getValue();
+            return combineValues(lValue, rValue);
         }
 
         // 若存在引用表达式
@@ -126,12 +122,15 @@ public class PsiUtil {
      * @param polyadicExpression 多元表达式
      * @return 结果
      */
-    private static String computePolyadicExpression(PsiPolyadicExpression polyadicExpression) {
+    private static Object computePolyadicExpression(PsiPolyadicExpression polyadicExpression) {
         PsiExpression[] expressions = polyadicExpression.getOperands();
+        Predicate<PsiExpression> predicate = el -> (el instanceof PsiLiteralExpression)
+                && Objects.nonNull(PsiUtil.computeLiteralExpression((PsiLiteralExpression) el));
+
         // 判断是否皆为 PsiLiteralExpression，且字面表达式的值皆不为 null，如果是，直接拼接
-        if (Arrays.stream(expressions).allMatch(el -> (el instanceof PsiLiteralExpression) && Objects.nonNull(PsiUtil.computeLiteralExpression((PsiLiteralExpression) el)))) {
+        if (Arrays.stream(expressions).allMatch(predicate)) {
             ConstantExpressionEvaluator constantExpressionEvaluator = LanguageConstantExpressionEvaluator.INSTANCE.forLanguage(polyadicExpression.getLanguage());
-            return (String) constantExpressionEvaluator.computeConstantExpression(polyadicExpression, true);
+            return constantExpressionEvaluator.computeConstantExpression(polyadicExpression, true);
         } else if (Arrays.stream(expressions).anyMatch(el -> el instanceof PsiMethodCallExpression)) {
             // 在此不计算方法调用表达式，防止调用过深
             return null;
@@ -146,7 +145,7 @@ public class PsiUtil {
      * @param referenceExpression 引用表达式
      * @return 值
      */
-    private static String computeReferenceExpression(PsiReferenceExpression referenceExpression) {
+    private static Object computeReferenceExpression(PsiReferenceExpression referenceExpression) {
         return computeMultiExpression(new PsiExpression[]{referenceExpression});
     }
 
@@ -156,10 +155,10 @@ public class PsiUtil {
      * @param expressions 表达式列表
      * @return 结果
      */
-    private static String computeMultiExpression(PsiExpression[] expressions) {
-        List<String> resultList = new ArrayList<>();
+    private static Object computeMultiExpression(PsiExpression[] expressions) {
+        List<Object> resultList = new ArrayList<>();
         computeMultiExpression(expressions, resultList);
-        return StrUtil.join("", resultList);
+        return combineValues(resultList.toArray());
     }
 
     /**
@@ -168,20 +167,52 @@ public class PsiUtil {
      * @param expressions 表达式列表
      * @param resultList  结果列表
      */
-    private static void computeMultiExpression(PsiExpression[] expressions, List<String> resultList) {
+    private static void computeMultiExpression(PsiExpression[] expressions, List<Object> resultList) {
         for (PsiExpression expression : expressions) {
             if (expression instanceof PsiLiteralExpression) {
-                resultList.add(String.valueOf(PsiUtil.computeLiteralExpression((PsiLiteralExpression) expression)));
+                resultList.add(PsiUtil.computeLiteralExpression((PsiLiteralExpression) expression));
 
             } else if (expression instanceof PsiReferenceExpression) {
                 PsiReferenceExpression referenceExpression = (PsiReferenceExpression) expression;
                 PsiElement resolve = referenceExpression.resolve();
-                if (resolve instanceof PsiField) {
+
+                if (resolve instanceof PsiEnumConstant) {
+                    // 枚举类
+                    resultList.add(((PsiEnumConstant) resolve).getName());
+                } else if (resolve instanceof PsiField) {
+                    // 字段
                     resultList.add(computeConstantExpression((PsiField) resolve));
                 } else if (resolve instanceof PsiLocalVariable) {
+                    // 方法变量
                     resultList.add(computeConstantExpression((PsiLocalVariable) resolve));
                 }
             }
         }
     }
+
+    public static Object combineValues(Object... values) {
+        // 只要一方为字符串类型，那么整体都将被转为字符串
+        if (JsonAssistantUtil.hasStringType(values)) {
+            // 字符串
+            return concatenateAsString(values);
+        } else if (JsonAssistantUtil.allElementsAreNumeric(values)) {
+            // 纯数值（包括字符）
+            return Arrays.stream(values)
+                    // 将每个数值对象转换为double
+                    .mapToDouble(el -> el instanceof Number ? ((Number) el).doubleValue() : ((Character) el))
+                    // 对所有数值求和
+                    .sum();
+        }
+
+        return null;
+    }
+
+    private static String concatenateAsString(Object... values) {
+        StringBuilder sb = new StringBuilder();
+        for (Object value : values) {
+            sb.append(value);
+        }
+        return sb.toString();
+    }
+
 }

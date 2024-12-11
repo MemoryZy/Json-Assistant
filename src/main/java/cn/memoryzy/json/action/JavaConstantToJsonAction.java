@@ -30,13 +30,13 @@ public class JavaConstantToJsonAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), PsiUtil.computeExpression(event.getDataContext()), FileTypeHolder.JSON5);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), PsiUtil.computeStringExpression(event.getDataContext()), FileTypeHolder.JSON5);
     }
 
     @Override
     @SuppressWarnings("DuplicatedCode")
     public void update(@NotNull AnActionEvent event) {
-        String json = PsiUtil.computeExpression(event.getDataContext());
+        String json = PsiUtil.computeStringExpression(event.getDataContext());
         event.getPresentation().setEnabledAndVisible(
                 getEventProject(event) != null
                         && StrUtil.isNotBlank(json)

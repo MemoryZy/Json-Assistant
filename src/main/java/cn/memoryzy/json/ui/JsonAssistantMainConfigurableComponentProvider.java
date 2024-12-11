@@ -3,11 +3,9 @@ package cn.memoryzy.json.ui;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.HistoryViewType;
+import cn.memoryzy.json.enums.TreeDisplayMode;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
-import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
-import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
-import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.ui.color.CircleIcon;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.util.UIManager;
@@ -68,6 +66,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel historyStyleTitle;
     private JBRadioButton historyTree;
     private JBRadioButton historyList;
+    private TitledSeparator generalLabel;
+    private JBLabel treeDisplayModeTitle;
+    private JBRadioButton popupMode;
+    private JBRadioButton sidebarMode;
+    private JBLabel treeDisplayModeDesc;
     // endregion
 
     // 区分亮暗，防止配置界面还存在时，主题被切换
@@ -81,22 +84,37 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private final JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
 
     public JPanel createRootPanel() {
-        applyAttributeSerializationChunk();
-        applyToolWindowBehaviorChunk();
-        applyToolWindowAppearanceChunk();
-        applyDonateLinkChunk();
-        applyHistoryChunk();
-
-        addSwitchListener();
-        setRenderer();
+        configureGeneralComponents();
+        configureAttributeSerializationComponents();
+        configureToolWindowBehaviorComponents();
+        configureToolWindowAppearanceComponents();
+        configureHistoryComponents();
+        configureDonateLinkComponents();
         // 初始化
         reset();
-
         return rootPanel;
     }
 
+    /**
+     * 常规
+     */
+    private void configureGeneralComponents() {
+        generalLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.general.text"));
+        treeDisplayModeTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
+        UIManager.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
-    private void applyAttributeSerializationChunk() {
+        popupMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.popup.mode.desc"));
+        sidebarMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.sidebar.mode.desc"));
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(popupMode);
+        group.add(sidebarMode);
+    }
+
+    /**
+     * 属性序列化
+     */
+    private void configureAttributeSerializationComponents() {
         attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
 
         includeRandomValuesCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
@@ -109,7 +127,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
         UIManager.setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
     }
 
-    private void applyToolWindowBehaviorChunk() {
+    /**
+     * 窗口行为
+     */
+    private void configureToolWindowBehaviorComponents() {
         windowBehaviorLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
 
         importHistoryCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.history.text"));
@@ -121,36 +142,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
         xmlFormatsCb.setText("Xml");
         yamlFormatsCb.setText("Yaml");
         tomlFormatsCb.setText("Toml");
-        urlParamFormatsCb.setText("URL Param");
+        urlParamFormatsCb.setText("Url Param");
 
         int left = UIUtil.getCheckBoxTextHorizontalOffset(recognizeOtherFormatsCb);
         formatCbPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
-    }
 
-    private void applyToolWindowAppearanceChunk() {
-        windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
-
-        backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
-        for (ColorScheme value : ColorScheme.values()) {
-            backgroundColorBox.addItem(value);
-        }
-
-        UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
-        displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
-        foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
-    }
-
-    private void applyHistoryChunk() {
-        historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
-        historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
-        historyTree.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.tree.text"));
-        historyList.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.list.text"));
-        ButtonGroup group = new ButtonGroup();
-        group.add(historyTree);
-        group.add(historyList);
-    }
-
-    private void addSwitchListener() {
         recognizeOtherFormatsCb.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 UIManager.controlEnableCheckBox(xmlFormatsCb, true);
@@ -164,6 +160,22 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
             }
         });
+    }
+
+    /**
+     * 窗口外观
+     */
+    private void configureToolWindowAppearanceComponents() {
+        windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
+
+        backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
+        for (ColorScheme value : ColorScheme.values()) {
+            backgroundColorBox.addItem(value);
+        }
+
+        UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
+        displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
+        foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
 
         // 当有焦点时，表示内部活动完毕，此时才允许用户选择颜色
         backgroundColorBox.addFocusListener(new FocusAdapter() {
@@ -200,21 +212,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 }
             }
         });
-    }
 
-    private void applyDonateLinkChunk() {
-        donateLink.setIcon(JsonAssistantIcons.DONATE);
-        donateLink.setText(JsonAssistantBundle.messageOnSystem("action.donate.welcome.text"));
-        donateLink.addActionListener(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new SupportDialog().show();
-            }
-        });
-    }
-
-
-    private void setRenderer() {
         backgroundColorBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -248,6 +246,33 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 }
 
                 return color;
+            }
+        });
+    }
+
+    /**
+     * 历史记录
+     */
+    private void configureHistoryComponents() {
+        historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
+        historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
+        historyTree.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.tree.text"));
+        historyList.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.list.text"));
+        ButtonGroup group = new ButtonGroup();
+        group.add(historyTree);
+        group.add(historyList);
+    }
+
+    /**
+     * 支持/捐赠
+     */
+    private void configureDonateLinkComponents() {
+        donateLink.setIcon(JsonAssistantIcons.DONATE);
+        donateLink.setText(JsonAssistantBundle.messageOnSystem("action.donate.welcome.text"));
+        donateLink.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SupportDialog().show();
             }
         });
     }
@@ -300,6 +325,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
         }
 
         UIManager.repaintComponent(backgroundColorBox);
+
+        // 常规
+        GeneralState generalState = persistentState.generalState;
+        if (generalState.treeDisplayMode == TreeDisplayMode.POPUP) {
+            popupMode.setSelected(true);
+        } else {
+            sidebarMode.setSelected(true);
+        }
     }
 
     private void resetBackgroundColorItem(EditorAppearanceState editorAppearanceState) {
@@ -341,6 +374,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
         HistoryState historyState = persistentState.historyState;
         HistoryViewType oldHistoryViewType = historyState.historyViewType;
 
+        // 常规
+        GeneralState generalState = persistentState.generalState;
+        TreeDisplayMode oldTreeDisplayMode = generalState.treeDisplayMode;
+
         // ----------------------------------------------------------------------
 
         // 属性序列化
@@ -364,6 +401,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
         // 历史记录
         HistoryViewType newHistoryViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
 
+        // 常规
+        TreeDisplayMode newTreeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.SIDEBAR;
+
         // 比较是否更改
         return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
                 || !Objects.equals(oldRecognitionFastJsonAnnotation, newRecognitionFastJsonAnnotation)
@@ -383,7 +423,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognizeYamlFormat, newRecognizeYamlFormat)
                 || !Objects.equals(oldRecognizeTomlFormat, newRecognizeTomlFormat)
                 || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
-                || !Objects.equals(oldHistoryViewType, newHistoryViewType);
+                || !Objects.equals(oldHistoryViewType, newHistoryViewType)
+                || !Objects.equals(oldTreeDisplayMode, newTreeDisplayMode)
+
+                ;
     }
 
     public void apply() {
@@ -423,6 +466,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 editorAppearanceState.customLightColor = selectedLightColor;
             }
         }
+
+        // 常规
+        GeneralState generalState = persistentState.generalState;
+        generalState.treeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.SIDEBAR;
     }
 
 }
