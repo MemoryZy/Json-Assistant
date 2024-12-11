@@ -69,8 +69,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private TitledSeparator generalLabel;
     private JBLabel treeDisplayModeTitle;
     private JBRadioButton popupMode;
-    private JBRadioButton sidebarMode;
+    private JBRadioButton oldSidebarMode;
     private JBLabel treeDisplayModeDesc;
+    private JBRadioButton newSidebarMode;
     // endregion
 
     // 区分亮暗，防止配置界面还存在时，主题被切换
@@ -104,11 +105,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
         UIManager.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
         popupMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.popup.mode.desc"));
-        sidebarMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.sidebar.mode.desc"));
+        oldSidebarMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.original.sidebar.mode.desc"));
 
         ButtonGroup group = new ButtonGroup();
         group.add(popupMode);
-        group.add(sidebarMode);
+        group.add(oldSidebarMode);
     }
 
     /**
@@ -331,7 +332,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         if (generalState.treeDisplayMode == TreeDisplayMode.POPUP) {
             popupMode.setSelected(true);
         } else {
-            sidebarMode.setSelected(true);
+            oldSidebarMode.setSelected(true);
         }
     }
 
@@ -402,7 +403,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         HistoryViewType newHistoryViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
 
         // 常规
-        TreeDisplayMode newTreeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.SIDEBAR;
+        TreeDisplayMode newTreeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.NEW_SIDEBAR;
 
         // 比较是否更改
         return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
@@ -469,7 +470,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 常规
         GeneralState generalState = persistentState.generalState;
-        generalState.treeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.SIDEBAR;
+        generalState.treeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.NEW_SIDEBAR;
     }
 
 }
