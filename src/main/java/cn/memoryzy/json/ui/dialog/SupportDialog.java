@@ -76,9 +76,6 @@ public class SupportDialog extends DialogWrapper {
         return rootPanel;
     }
 
-    // 感谢您的支持！<br/>通过微信或支付宝捐赠时，请在留言中提供名称（昵称）和网站链接。<br/>赞助者信息将被添加到赞助者列表中。<br/>如需进一步了解或有任何疑问，可通过邮箱联系。
-    // Thank you for your support! <br/>When donating via WeChat or Alipay, please include your name (nickname) and website link in the message. <br/>Sponsor information will be added to the sponsors list.<br/>For further information or any questions, please contact via email.
-
     private void initLinkListener() {
         donateNote.addActionListener(new AbstractAction() {
             @Override
@@ -89,7 +86,7 @@ public class SupportDialog extends DialogWrapper {
                 JBPopupFactory.getInstance()
                         .createHtmlTextBalloonBuilder(
                                 JsonAssistantBundle.messageOnSystem("dialog.support.donate.note",
-                                        Urls.SPONSORED_LIST_LINK, UrlType.MAIL.getId(), Urls.EMAIL_LINK),
+                                        Urls.DONORS_LIST_LINK, UrlType.MAIL.getId(), Urls.EMAIL_LINK),
                                 null,
                                 JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
                                 new HyperLinkListenerImpl())

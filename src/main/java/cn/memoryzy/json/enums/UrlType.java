@@ -22,9 +22,9 @@ public enum UrlType {
     SHARE(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#SHARE", Urls.MARKETPLACE_LINK),
 
     /**
-     * 赞助链接
+     * 捐赠链接
      */
-    SPONSOR(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#SPONSOR", Urls.SPONSOR_LINK),
+    DONATE(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#DONATE", Urls.DONATE_LINK),
 
     /**
      * 邮件链接

@@ -126,7 +126,7 @@ public class Notifications {
         Notification notification = Notifications.getBalloonLogNotificationGroup()
                 .createNotification(JsonAssistantBundle.messageOnSystem("notification.welcome.content",
                                 Urls.GITHUB_LINK,
-                                UrlType.SPONSOR.getId()
+                                UrlType.DONATE.getId()
                         ) + "<br/>",
                         NotificationType.INFORMATION)
                 .setTitle(JsonAssistantBundle.messageOnSystem("notification.welcome.title", JsonAssistantPlugin.getVersion()))
@@ -160,7 +160,7 @@ public class Notifications {
             changeNotes = PlatformUtil.isChineseLocale() ? pair.left : pair.right;
         }
 
-        String content = JsonAssistantBundle.messageOnSystem("notification.welcome.content", Urls.GITHUB_LINK, UrlType.SPONSOR.getId());
+        String content = JsonAssistantBundle.messageOnSystem("notification.welcome.content", Urls.GITHUB_LINK, UrlType.DONATE.getId());
         content += "<br/>" + JsonAssistantBundle.messageOnSystem("notification.update.content", changeNotes);
 
         Notification notification = Notifications.getBalloonLogNotificationGroup()
@@ -278,9 +278,9 @@ public class Notifications {
         protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
             String url = e.getDescription();
 
-            if (Objects.equals(UrlType.SPONSOR.getId(), url)) {
+            if (Objects.equals(UrlType.DONATE.getId(), url)) {
                 if (Urls.isReachable()) {
-                    BrowserUtil.browse(UrlType.SPONSOR.getUrl());
+                    BrowserUtil.browse(UrlType.DONATE.getUrl());
                 } else {
                     new SupportDialog().show();
                 }
