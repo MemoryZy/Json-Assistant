@@ -68,10 +68,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBRadioButton historyList;
     private TitledSeparator generalLabel;
     private JBLabel treeDisplayModeTitle;
-    private JBRadioButton popupMode;
-    private JBRadioButton oldSidebarMode;
     private JBLabel treeDisplayModeDesc;
-    private JBRadioButton newSidebarMode;
+    private ComboBox<TreeDisplayMode> treeDisplayModeBox;
     // endregion
 
     // 区分亮暗，防止配置界面还存在时，主题被切换
@@ -84,7 +82,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private boolean isLoading = false;
     private final JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
 
-    public JPanel createRootPanel() {
+    public JPanel createComponent() {
         configureGeneralComponents();
         configureAttributeSerializationComponents();
         configureToolWindowBehaviorComponents();
@@ -104,12 +102,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
         treeDisplayModeTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
         UIManager.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
-        popupMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.popup.mode.desc"));
-        oldSidebarMode.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.original.sidebar.mode.desc"));
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(popupMode);
-        group.add(oldSidebarMode);
+        for (TreeDisplayMode value : TreeDisplayMode.values()) {
+            treeDisplayModeBox.addItem(value);
+        }
     }
 
     /**
@@ -329,11 +324,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 常规
         GeneralState generalState = persistentState.generalState;
-        if (generalState.treeDisplayMode == TreeDisplayMode.POPUP) {
-            popupMode.setSelected(true);
-        } else {
-            oldSidebarMode.setSelected(true);
-        }
+        treeDisplayModeBox.setItem(generalState.treeDisplayMode);
     }
 
     private void resetBackgroundColorItem(EditorAppearanceState editorAppearanceState) {
@@ -403,7 +394,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         HistoryViewType newHistoryViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
 
         // 常规
-        TreeDisplayMode newTreeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.NEW_SIDEBAR;
+        TreeDisplayMode newTreeDisplayMode = treeDisplayModeBox.getItem();
 
         // 比较是否更改
         return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
@@ -470,7 +461,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 常规
         GeneralState generalState = persistentState.generalState;
-        generalState.treeDisplayMode = popupMode.isSelected() ? TreeDisplayMode.POPUP : TreeDisplayMode.NEW_SIDEBAR;
+        generalState.treeDisplayMode = treeDisplayModeBox.getItem();
     }
 
 }

@@ -15,12 +15,14 @@ public interface PluginConstant {
 
     String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
     String JSON_ASSISTANT_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonAssistant";
+    String AUXILIARY_TREE_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.AuxiliaryTree";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     String LOMBOK_LIB = "org.projectlombok:lombok";
     String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
 
     String JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME = "View";
+    String AUXILIARY_TREE_TOOL_WINDOW_DISPLAY_NAME = "Tab";
 
     String OUTLINE_PROPERTY = "JComponent.outline";
     String ERROR_VALUE = "error";

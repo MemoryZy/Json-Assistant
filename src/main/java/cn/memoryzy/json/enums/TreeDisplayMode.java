@@ -1,5 +1,7 @@
 package cn.memoryzy.json.enums;
 
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+
 /**
  * @author Memory
  * @since 2024/12/11
@@ -9,18 +11,27 @@ public enum TreeDisplayMode {
     /**
      * 弹出窗口
      */
-    POPUP,
+    POPUP("setting.component.tree.display.popup.mode.text"),
 
     /**
-     * 新的侧边栏窗口
+     * 原本的工具窗口窗口（Json Assistant）
      */
-    NEW_SIDEBAR,
+    ORIGINAL_TOOLWINDOW("setting.component.tree.display.original.toolwindow.mode.text"),
 
     /**
-     * 原本的侧边栏窗口（JSON编辑器）
+     * 辅助侧边栏窗口（动态注册的窗口）
      */
-    ORIGINAL_SIDEBAR
+    AUXILIARY_TOOLWINDOW("setting.component.tree.display.new.toolwindow.mode.text");
 
-    // TODO 可以改为 “新侧边栏”和“原侧边栏”，或 “辅助侧边栏”和“主侧边栏”
 
+    private final String key;
+
+    TreeDisplayMode(String key) {
+        this.key = key;
+    }
+
+    @Override
+    public String toString() {
+        return JsonAssistantBundle.messageOnSystem(key);
+    }
 }

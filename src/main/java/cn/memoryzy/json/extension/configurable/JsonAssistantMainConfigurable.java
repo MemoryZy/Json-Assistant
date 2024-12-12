@@ -24,7 +24,7 @@ public class JsonAssistantMainConfigurable implements Configurable {
     @Override
     public @Nullable JComponent createComponent() {
         if (componentProvider == null) componentProvider = new JsonAssistantMainConfigurableComponentProvider();
-        return componentProvider.createRootPanel();
+        return componentProvider.createComponent();
     }
 
     @Override

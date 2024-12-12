@@ -25,14 +25,14 @@ public class ExpandAllAction extends DumbAwareActionButton {
      */
     private final boolean includeRoot;
 
-    public ExpandAllAction(Tree tree, JRootPane rootPane, boolean includeRoot) {
+    public ExpandAllAction(Tree tree, JComponent component, boolean includeRoot) {
         super(JsonAssistantBundle.message("action.expand.all.text"),
                 JsonAssistantBundle.messageOnSystem("action.expand.all.description"),
                 JsonAssistantIcons.Structure.INTELLIJ_EXPAND_ALL);
         this.tree = tree;
         this.includeRoot = includeRoot;
 
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), rootPane);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), component);
     }
 
     @Override

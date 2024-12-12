@@ -21,7 +21,7 @@ import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
-import cn.memoryzy.json.ui.component.ToolWindowPanel;
+import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -80,11 +80,11 @@ public class JsonAssistantToolWindowComponentProvider {
         this.editorAppearanceState = persistentState.editorAppearanceState;
     }
 
-    public JComponent createRootPanel() {
+    public JComponent createComponent() {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
-        ToolWindowPanel rootPanel = new ToolWindowPanel(new BorderLayout(), this.editor);
+        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout(), this.editor);
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
         rootPanel.add(centerPanel, BorderLayout.CENTER);

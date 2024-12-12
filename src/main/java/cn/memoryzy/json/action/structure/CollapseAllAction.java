@@ -25,14 +25,14 @@ public class CollapseAllAction extends DumbAwareActionButton {
      */
     private final boolean includeRoot;
 
-    public CollapseAllAction(Tree tree, JRootPane rootPane, boolean includeRoot) {
+    public CollapseAllAction(Tree tree, JComponent component, boolean includeRoot) {
         super(JsonAssistantBundle.message("action.collapse.all.text"),
                 JsonAssistantBundle.messageOnSystem("action.collapse.all.description"),
                 JsonAssistantIcons.Structure.INTELLIJ_COLLAPSE_ALL);
 
         this.tree = tree;
         this.includeRoot = includeRoot;
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), rootPane);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), component);
     }
 
     @Override

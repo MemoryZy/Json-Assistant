@@ -114,7 +114,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
     private void showComponentPopup(Project project) {
         JsonPathComponentProvider provider = new JsonPathComponentProvider(project, editor);
-        JPanel rootPanel = provider.createRootPanel();
+        JPanel rootPanel = provider.createComponent();
         JComponent expressionComboBoxTextField = provider.getPathExpressionComboBoxTextField();
 
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();

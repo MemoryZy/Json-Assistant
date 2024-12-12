@@ -46,6 +46,7 @@
                 key="setting.display.name"/>
 
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
+        <projectService serviceImplementation="cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.JsonAssistantPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>

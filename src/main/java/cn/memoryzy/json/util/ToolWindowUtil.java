@@ -3,7 +3,7 @@ package cn.memoryzy.json.util;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
-import cn.memoryzy.json.ui.component.ToolWindowPanel;
+import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -102,10 +102,10 @@ public class ToolWindowUtil {
      * @param content 选项卡实例，从中获取面板实例
      * @return 组件面板
      */
-    public static ToolWindowPanel getPanelOnContent(Content content) {
+    public static JsonAssistantToolWindowPanel getPanelOnContent(Content content) {
         if (Objects.nonNull(content)) {
             SimpleToolWindowPanel windowPanel = (SimpleToolWindowPanel) content.getComponent();
-            return (ToolWindowPanel) windowPanel.getContent();
+            return (JsonAssistantToolWindowPanel) windowPanel.getContent();
         }
 
         return null;
@@ -118,7 +118,7 @@ public class ToolWindowUtil {
      * @return 编辑器
      */
     public static EditorEx getEditorOnContent(Content content) {
-        ToolWindowPanel showPanel = getPanelOnContent(content);
+        JsonAssistantToolWindowPanel showPanel = getPanelOnContent(content);
         if (Objects.nonNull(showPanel)) {
             return showPanel.getEditor();
         }
@@ -141,7 +141,7 @@ public class ToolWindowUtil {
         String displayName = PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
-        Content content = contentFactory.createContent(window.createRootPanel(), displayName, false);
+        Content content = contentFactory.createContent(window.createComponent(), displayName, false);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
         return content;

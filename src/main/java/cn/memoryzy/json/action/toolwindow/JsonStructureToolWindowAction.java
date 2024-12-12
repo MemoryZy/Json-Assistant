@@ -32,7 +32,7 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         String text = editor.getDocument().getText();
-        JsonStructureDialog.show(text, JsonUtil.canResolveToJson(text));
+        JsonStructureDialog.show(getEventProject(event), text, JsonUtil.canResolveToJson(text));
     }
 
     @Override
