@@ -74,6 +74,7 @@ public class JsonStructureDialog extends DialogWrapper {
         ApplicationManager.getApplication().invokeLater(super::show);
     }
 
+
     public static void show(Project project, String text, boolean isJson) {
         JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parse(text);
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
