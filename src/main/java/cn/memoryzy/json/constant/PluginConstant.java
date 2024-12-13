@@ -13,9 +13,25 @@ import java.util.*;
  */
 public interface PluginConstant {
 
-    String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
+    /**
+     * Json Assistant 工具窗口 ID
+     */
     String JSON_ASSISTANT_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonAssistant";
+
+    /**
+     * Json Structure 工具窗口 ID
+     */
     String AUXILIARY_TREE_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.AuxiliaryTree";
+
+    /**
+     * Json 编辑器卡片名称
+     */
+    String JSON_EDITOR_CARD_NAME = "editor";
+
+    /**
+     * Json 树卡片名称
+     */
+    String JSON_TREE_CARD_NAME = "tree";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     String LOMBOK_LIB = "org.projectlombok:lombok";

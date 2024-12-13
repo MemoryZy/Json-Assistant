@@ -1,7 +1,9 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
+import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -17,10 +19,12 @@ import org.jetbrains.annotations.NotNull;
 public class JsonStructureToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
+    private final SimpleToolWindowPanel simpleToolWindowPanel;
 
     public JsonStructureToolWindowAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
         this.editor = editor;
+        this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.structure.text"));
@@ -32,12 +36,13 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         String text = editor.getDocument().getText();
-        JsonStructureDialog.show(getEventProject(event), text, JsonUtil.canResolveToJson(text));
+        JsonStructureDialog.show(event.getDataContext(), text, JsonUtil.canResolveToJson(text), StructureActionSource.TOOLWINDOW_TOOLBAR);
     }
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor));
+        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
     }
 
 }

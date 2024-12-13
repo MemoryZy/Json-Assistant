@@ -10,12 +10,18 @@ import java.awt.*;
  * @since 2024/12/12
  */
 public class AuxiliaryTreeToolWindowPanel extends JPanel {
-    private final Tree tree;
-    private final JPanel treeComponent;
+    private Tree tree;
+    private JPanel treeComponent;
 
-    public AuxiliaryTreeToolWindowPanel(LayoutManager layout, Tree tree, JPanel treeComponent) {
+    public AuxiliaryTreeToolWindowPanel(LayoutManager layout) {
         super(layout);
+    }
+
+    public void setTree(Tree tree) {
         this.tree = tree;
+    }
+
+    public void setTreeComponent(JPanel treeComponent) {
         this.treeComponent = treeComponent;
     }
 

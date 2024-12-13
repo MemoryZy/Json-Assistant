@@ -34,8 +34,14 @@ public class JsonStructureComponentProvider {
     private Tree tree;
     private JPanel treeComponent;
 
-    public JsonStructureComponentProvider(JsonWrapper wrapper, JComponent treeComponent) {
-        init(wrapper, treeComponent);
+    /**
+     * 构造器
+     *
+     * @param wrapper   JSON 结构
+     * @param component 注册快捷键的组件
+     */
+    public JsonStructureComponentProvider(JsonWrapper wrapper, JComponent component) {
+        init(wrapper, component);
     }
 
     /**
@@ -46,7 +52,10 @@ public class JsonStructureComponentProvider {
      */
     private void init(JsonWrapper wrapper, JComponent component) {
         JsonTreeNode rootNode = new JsonTreeNode("root");
-        convertToTreeNode(wrapper, rootNode);
+        // 允许在后面再进行树的构建
+        if (wrapper != null) {
+            convertToTreeNode(wrapper, rootNode);
+        }
 
         // 构建树
         tree = new Tree(new DefaultTreeModel(rootNode));
@@ -65,6 +74,17 @@ public class JsonStructureComponentProvider {
 
         this.treeComponent = new JPanel(new BorderLayout());
         this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
+    }
+
+    public void rebuildTree(JsonWrapper wrapper) {
+        JsonTreeNode rootNode = new JsonTreeNode("root");
+        if (wrapper != null) {
+            convertToTreeNode(wrapper, rootNode);
+        }
+
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        model.setRoot(rootNode);
+        // UIManager.repaintComponent(tree);
     }
 
     private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {

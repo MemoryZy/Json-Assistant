@@ -9,6 +9,8 @@ import com.intellij.openapi.actionSystem.AnAction;
  */
 public interface ActionHolder {
 
+    String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
+
     String JSON_BEAUTIFY_ACTION_ID = "JsonAssistant.Action.JsonBeautifyAction";
     String JSON_MINIFY_ACTION_ID = "JsonAssistant.Action.JsonMinifyAction";
     String JSON_STRUCTURE_ACTION_ID = "JsonAssistant.Action.JsonStructureAction";

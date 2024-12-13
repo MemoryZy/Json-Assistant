@@ -5,6 +5,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.TextSourceType;
 import cn.memoryzy.json.model.EditorInitData;
@@ -21,6 +22,7 @@ import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
+import cn.memoryzy.json.ui.component.EditorTreeCardLayout;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
@@ -48,6 +50,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,6 +73,7 @@ public class JsonAssistantToolWindowComponentProvider {
     private final EditorAppearanceState editorAppearanceState;
     private EditorEx editor;
 
+
     public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initTab) {
         this.project = project;
         this.editorFileType = editorFileType;
@@ -84,12 +88,37 @@ public class JsonAssistantToolWindowComponentProvider {
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
-        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout(), this.editor);
-        JPanel centerPanel = new JPanel(new BorderLayout());
-        centerPanel.add(textEditor.getComponent(), BorderLayout.CENTER);
-        rootPanel.add(centerPanel, BorderLayout.CENTER);
+        // 卡片布局
+        EditorTreeCardLayout cardLayout = new EditorTreeCardLayout();
+        // 卡片面板
+        JPanel cardPanel = new JPanel(cardLayout);
 
         SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
+        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel);
+        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout());
+        rootPanel.setEditor(this.editor);
+        rootPanel.setTreeProvider(treeProvider);
+        rootPanel.setCardLayout(cardLayout);
+
+        // 在工具窗口中，可能字体需略微调大一点
+        Tree tree = treeProvider.getTree();
+        Font font = tree.getFont();
+        tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
+
+        // Json 编辑器
+        JComponent editorComponent = textEditor.getComponent();
+        // Json 树
+        JPanel treeComponent = treeProvider.getTreeComponent();
+
+        // 添加 Json 编辑器
+        cardPanel.add(editorComponent, PluginConstant.JSON_EDITOR_CARD_NAME);
+        // 添加 Json 树
+        cardPanel.add(treeComponent, PluginConstant.JSON_TREE_CARD_NAME);
+        // 默认显示编辑器
+        cardLayout.show(cardPanel, PluginConstant.JSON_EDITOR_CARD_NAME);
+
+        rootPanel.add(cardPanel, BorderLayout.CENTER);
+
         simpleToolWindowPanel.setContent(rootPanel);
         simpleToolWindowPanel.setToolbar(createToolbar(simpleToolWindowPanel));
         return simpleToolWindowPanel;
@@ -151,8 +180,8 @@ public class JsonAssistantToolWindowComponentProvider {
         actionGroup.add(new JsonStructureToolWindowAction(editor, simpleToolWindowPanel));
         actionGroup.add(new JsonPathAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new SaveToDiskAction(editor));
-        actionGroup.add(new ClearEditorAction(editor));
+        actionGroup.add(new SaveToDiskAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new ClearEditorAction(editor, simpleToolWindowPanel));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         return toolbar.getComponent();

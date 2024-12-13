@@ -16,20 +16,17 @@ import java.awt.*;
 public class AuxiliaryTreeToolWindowComponentProvider {
 
     private final JsonWrapper wrapper;
-    private final JComponent component;
 
     /**
      * 构造器
      *
      * @param wrapper   JSON对象
-     * @param component 用于注册操作快捷键的组件
      */
-    public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper, @NotNull JComponent component) {
+    public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper) {
         this.wrapper = wrapper;
-        this.component = component;
     }
 
-    public JComponent createComponent() {
+    public JComponent createComponent(@NotNull JComponent component) {
         // 创建树结构
         JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component);
         JPanel treeComponent = provider.getTreeComponent();
@@ -39,7 +36,9 @@ public class AuxiliaryTreeToolWindowComponentProvider {
         Font font = tree.getFont();
         tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
 
-        AuxiliaryTreeToolWindowPanel panel = new AuxiliaryTreeToolWindowPanel(new BorderLayout(), tree, treeComponent);
+        AuxiliaryTreeToolWindowPanel panel = new AuxiliaryTreeToolWindowPanel(new BorderLayout());
+        panel.setTree(tree);
+        panel.setTreeComponent(treeComponent);
         panel.add(treeComponent, BorderLayout.CENTER);
 
         SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);

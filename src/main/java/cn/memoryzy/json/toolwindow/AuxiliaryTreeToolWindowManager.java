@@ -39,9 +39,9 @@ public class AuxiliaryTreeToolWindowManager {
 
     public void convertAndShow(JsonWrapper jsonWrapper) {
         // 为其分配一个标签页，用于展示
-        AuxiliaryTreeToolWindowComponentProvider provider = new AuxiliaryTreeToolWindowComponentProvider(jsonWrapper, toolWindow.getComponent());
+        AuxiliaryTreeToolWindowComponentProvider provider = new AuxiliaryTreeToolWindowComponentProvider(jsonWrapper);
         // 创建标签页
-        createToolWindowContent(provider.createComponent());
+        createToolWindowContent(provider.createComponent(toolWindow.getComponent()));
         // 展示
         show();
     }

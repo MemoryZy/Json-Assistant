@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ActionHolder;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.application.ApplicationManager;
@@ -27,7 +27,7 @@ public class ShortcutAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        EditKeymapsDialog dialog = new EditKeymapsDialog(null, PluginConstant.MAIN_ACTION_ID);
+        EditKeymapsDialog dialog = new EditKeymapsDialog(null, ActionHolder.MAIN_ACTION_ID);
         ApplicationManager.getApplication().invokeLater(dialog::show);
     }
 

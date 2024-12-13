@@ -2,6 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
+import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -19,10 +20,12 @@ import org.jetbrains.annotations.NotNull;
 public class JsonBeautifyToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
+    private final SimpleToolWindowPanel simpleToolWindowPanel;
 
     public JsonBeautifyToolWindowAction(@NotNull EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
         super();
         this.editor = editor;
+        this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.beautify.text"));
@@ -41,7 +44,8 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor));
+        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
     }
 
 }
