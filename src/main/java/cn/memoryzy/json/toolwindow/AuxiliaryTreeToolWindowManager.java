@@ -65,7 +65,8 @@ public class AuxiliaryTreeToolWindowManager {
         String title = JsonAssistantBundle.message("toolwindow.auxiliary.tree.name");
         toolWindow.setTitle(title);
         toolWindow.setStripeTitle(title);
-        toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE);
+        toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
+
         return toolWindow;
     }
 

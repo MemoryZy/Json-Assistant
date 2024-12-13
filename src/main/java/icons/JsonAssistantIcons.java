@@ -60,6 +60,7 @@ public class JsonAssistantIcons {
     public static class ToolWindow {
 
         public static final Icon LOGO = load("/icons/toolwindow/logo.svg");
+        public static final Icon STRUCTURE_LOGO = load("/icons/toolwindow/structure_logo.svg");
         public static final Icon DELETE = load("/icons/toolwindow/delete.svg");
         public static final Icon HISTORY = load("/icons/toolwindow/history.svg");
         public static final Icon MINIFY = load("/icons/toolwindow/minify.svg");

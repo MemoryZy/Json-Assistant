@@ -16,6 +16,7 @@
       },
       "toolwindow": {
         "logo.svg": "icons/toolwindow/logo.svg",
+        "structure_logo.svg": "icons/toolwindow/structure_logo.svg",
         "minify.svg": "icons/toolwindow/minify.svg",
         "save.svg": "icons/toolwindow/save.svg",
         "search.svg": "icons/toolwindow/search.svg",
