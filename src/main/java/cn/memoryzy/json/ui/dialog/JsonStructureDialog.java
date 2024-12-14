@@ -113,11 +113,10 @@ public class JsonStructureDialog extends DialogWrapper {
 
         // 如果是 Toolbar Action 或 ToolWindow 的编辑器内打开的，那么就获取当前选中的标签页
         Content content = ToolWindowUtil.getSelectedContent(toolWindow);
-        JsonAssistantToolWindowPanel panelOnContent = null;
+        JsonAssistantToolWindowPanel panelOnContent = ToolWindowUtil.getPanelOnContent(content);
 
         if (StructureActionSource.OUTSIDE.equals(source)) {
             // 如果是其他地方的，那么判断当前标签页是否存在文本，存在则用此标签页，不存在则新开标签页
-            panelOnContent = ToolWindowUtil.getPanelOnContent(content);
             Boolean hasText = Optional.ofNullable(panelOnContent)
                     .map(JsonAssistantToolWindowPanel::getEditor)
                     .map(EditorEx::getDocument)

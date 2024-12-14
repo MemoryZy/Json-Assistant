@@ -64,7 +64,7 @@ public class AuxiliaryTreeToolWindowManager {
                     ToolWindowAnchor.RIGHT,
                     () -> {},
                     true,
-                    true);
+                    false);
         }
 
         String title = JsonAssistantBundle.message("toolwindow.auxiliary.tree.name");

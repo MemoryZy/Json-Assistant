@@ -4,6 +4,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.component.AuxiliaryTreeToolWindowPanel;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -35,6 +36,8 @@ public class AuxiliaryTreeToolWindowComponentProvider {
         // 在工具窗口中，可能字体需略微调大一点
         Font font = tree.getFont();
         tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
+
+        treeComponent.setBorder(JBUI.Borders.empty());
 
         AuxiliaryTreeToolWindowPanel panel = new AuxiliaryTreeToolWindowPanel(new BorderLayout());
         panel.setTree(tree);

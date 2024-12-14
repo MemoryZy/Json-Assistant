@@ -394,7 +394,7 @@ public class UIManager implements Disposable {
      * @return 字体
      */
     public static Font getCommentFont(Font font) {
-        return new FontUIResource(font.deriveFont((float) (font.getSize() - 0.5)));
+        return new FontUIResource(font.deriveFont((float) (font.getSize() - 0.7)));
     }
 
 

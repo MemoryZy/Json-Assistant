@@ -33,7 +33,7 @@
         <toolWindow id="JsonAssistant.ToolWindow.JsonAssistant"
                     factoryClass="cn.memoryzy.json.toolwindow.JsonAssistantToolWindowFactory"
                     anchor="right"
-                    secondary="false"
+                    secondary="true"
                     canCloseContents="true"
                     doNotActivateOnStart="true"/>
 
