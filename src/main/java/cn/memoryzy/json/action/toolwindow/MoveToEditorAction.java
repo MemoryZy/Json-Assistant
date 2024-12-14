@@ -12,7 +12,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
@@ -27,9 +27,9 @@ import java.util.Optional;
  * @since 2024/8/21
  */
 public class MoveToEditorAction extends DumbAwareAction {
-    private final ToolWindowEx toolWindow;
+    private final ToolWindow toolWindow;
 
-    public MoveToEditorAction(ToolWindowEx toolWindow) {
+    public MoveToEditorAction(ToolWindow toolWindow) {
         super();
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);

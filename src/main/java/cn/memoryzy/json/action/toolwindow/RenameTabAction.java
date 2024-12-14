@@ -109,17 +109,18 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
 
     @Override
     public void update(@NotNull AnActionEvent event) {
+        boolean enabled = false;
         Project project = event.getProject();
-        ToolWindow toolWindow = event.getDataContext().getData(PlatformDataKeys.TOOL_WINDOW);
-        if (toolWindow == null) {
-            event.getPresentation().setEnabledAndVisible(false);
-            return;
+        ToolWindow toolWindow = event.getData(PlatformDataKeys.TOOL_WINDOW);
+        if (toolWindow != null) {
+            String id = toolWindow.getId();
+            Content content = ToolWindowUtil.getContextContent(event.getDataContext());
+            enabled = project != null
+                    && (Objects.equals(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, id) || Objects.equals(PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID, id))
+                    && content != null;
         }
 
-        Content content = ToolWindowUtil.getContextContent(event.getDataContext());
-        event.getPresentation().setEnabledAndVisible(project != null
-                && Objects.equals(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, toolWindow.getId())
-                && content != null);
+        event.getPresentation().setEnabledAndVisible(enabled);
     }
 
 

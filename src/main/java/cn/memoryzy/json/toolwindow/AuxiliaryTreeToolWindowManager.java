@@ -1,14 +1,19 @@
 package cn.memoryzy.json.toolwindow;
 
+import cn.memoryzy.json.action.notification.DonateAction;
+import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
+import cn.memoryzy.json.action.toolwindow.RenameTabAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.AuxiliaryTreeToolWindowComponentProvider;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
@@ -67,8 +72,28 @@ public class AuxiliaryTreeToolWindowManager {
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
 
+        registerAction(toolWindow);
+
         return toolWindow;
     }
+
+    private void registerAction(ToolWindow toolWindow) {
+        // 右键弹出菜单
+        SimpleActionGroup group = new SimpleActionGroup();
+        group.add(Separator.create());
+        group.add(new RenameTabAction());
+
+        // TODO 需要研究一下用什么 vf 文件才能展示视图
+
+        // group.add(new MoveToEditorAction(toolWindow));
+        group.add(new FloatingWindowAction(toolWindow));
+        // group.add(new EditInNewWindowAction(toolWindow));
+        group.add(Separator.create());
+        group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
+        group.add(Separator.create());
+        toolWindow.setAdditionalGearActions(group);
+    }
+
 
     private void createToolWindowContent(JComponent component) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();

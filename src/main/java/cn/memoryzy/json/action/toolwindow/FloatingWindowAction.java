@@ -6,17 +6,17 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowType;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
 public class FloatingWindowAction extends ToggleAction implements DumbAware {
 
-    private final ToolWindowEx toolWindow;
+    private final ToolWindow toolWindow;
 
-    public FloatingWindowAction(ToolWindowEx toolWindow) {
+    public FloatingWindowAction(ToolWindow toolWindow) {
         super();
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
