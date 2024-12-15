@@ -92,7 +92,6 @@ public class JsonStructureComponentProvider {
 
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         model.setRoot(rootNode);
-        // UIManager.repaintComponent(tree);
     }
 
     private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {
