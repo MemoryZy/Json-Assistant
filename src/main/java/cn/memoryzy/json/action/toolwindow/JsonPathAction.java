@@ -129,7 +129,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .setShowShadow(true)
                 .setShowBorder(true)
                 .setModalContext(false)
-                .setLocateWithinScreenBounds(true)
+                .setLocateWithinScreenBounds(false)
                 .setFocusable(true)
                 .setRequestFocus(true)
                 .setModalContext(false)
@@ -137,6 +137,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .setCancelOnOtherWindowOpen(false)
                 .setCancelKeyEnabled(true)
                 .setMovable(true)
+                .setResizable(true)
                 .createPopup();
 
         // Enter
