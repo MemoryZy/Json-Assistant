@@ -94,7 +94,7 @@ public class JsonAssistantToolWindowComponentProvider {
         JPanel cardPanel = new JPanel(cardLayout);
 
         SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
-        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel);
+        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, false);
         JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout());
         rootPanel.setEditor(this.editor);
         rootPanel.setTreeProvider(treeProvider);
@@ -109,10 +109,6 @@ public class JsonAssistantToolWindowComponentProvider {
         Tree tree = treeProvider.getTree();
         Font font = tree.getFont();
         tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
-
-        // 去除边框
-        treeComponent.setBorder(JBUI.Borders.empty());
-
 
         // 添加 Json 编辑器
         cardPanel.add(editorComponent, PluginConstant.JSON_EDITOR_CARD_NAME);

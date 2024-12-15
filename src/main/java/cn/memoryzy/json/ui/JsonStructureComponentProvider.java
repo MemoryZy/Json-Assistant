@@ -16,6 +16,7 @@ import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.ui.*;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,20 +38,22 @@ public class JsonStructureComponentProvider {
     /**
      * 构造器
      *
-     * @param wrapper   JSON 结构
-     * @param component 注册快捷键的组件
+     * @param wrapper    JSON 结构
+     * @param component  注册快捷键的组件
+     * @param needBorder 是否需要边框
      */
-    public JsonStructureComponentProvider(JsonWrapper wrapper, JComponent component) {
-        init(wrapper, component);
+    public JsonStructureComponentProvider(JsonWrapper wrapper, JComponent component, boolean needBorder) {
+        init(wrapper, component, needBorder);
     }
 
     /**
      * 初始化组件
      *
-     * @param wrapper   JSON 结构
-     * @param component 注册快捷键的组件
+     * @param wrapper    JSON 结构
+     * @param component  注册快捷键的组件
+     * @param needBorder 是否需要边框
      */
-    private void init(JsonWrapper wrapper, JComponent component) {
+    private void init(JsonWrapper wrapper, JComponent component, boolean needBorder) {
         JsonTreeNode rootNode = new JsonTreeNode("root");
         // 允许在后面再进行树的构建
         if (wrapper != null) {
@@ -71,6 +74,11 @@ public class JsonStructureComponentProvider {
         ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree)
                 .addExtraAction(new ExpandAllAction(tree, component, true))
                 .addExtraAction(new CollapseAllAction(tree, component, true));
+
+        if (!needBorder) {
+            // 去除边框
+            decorator.setPanelBorder(JBUI.Borders.empty()).setScrollPaneBorder(JBUI.Borders.empty());
+        }
 
         this.treeComponent = new JPanel(new BorderLayout());
         this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
