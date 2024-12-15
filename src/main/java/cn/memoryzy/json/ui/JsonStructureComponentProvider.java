@@ -77,7 +77,7 @@ public class JsonStructureComponentProvider {
 
         if (!needBorder) {
             // 去除边框
-            decorator.setPanelBorder(JBUI.Borders.empty()).setScrollPaneBorder(JBUI.Borders.empty());
+            decorator.setPanelBorder(JBUI.Borders.empty(0, 1)).setScrollPaneBorder(JBUI.Borders.empty(0, 1));
         }
 
         this.treeComponent = new JPanel(new BorderLayout());
