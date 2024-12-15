@@ -4,20 +4,24 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.diff.DiffContentFactory;
-import com.intellij.diff.DiffDialogHints;
-import com.intellij.diff.DiffManager;
 import com.intellij.diff.contents.DocumentContent;
+import com.intellij.diff.editor.DiffVirtualFile;
+import com.intellij.diff.editor.SimpleDiffVirtualFile;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -53,6 +57,8 @@ public class JsonTextDiffAction extends DumbAwareAction {
                 JsonAssistantBundle.messageOnSystem("dialog.json.text.diff.left.title"),
                 JsonAssistantBundle.messageOnSystem("dialog.json.text.diff.right.title"));
 
-        DiffManager.getInstance().showDiff(project, simpleDiffRequest, DiffDialogHints.NON_MODAL);
+        DiffVirtualFile file = new SimpleDiffVirtualFile(simpleDiffRequest);
+        FileEditorManager manager = FileEditorManager.getInstance(Objects.requireNonNull(project));
+        JsonAssistantUtil.invokeMethod(manager, "openFileInNewWindow", file);
     }
 }
