@@ -27,6 +27,7 @@ public class JsonFileEditorProvider implements FileEditorProvider, DumbAware {
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
+        // TODO 查看 StructureViewBuilder 类
         return PlatformUtil.isJsonFileType(file.getFileType()) && StrUtil.isNotBlank(getContent(file));
     }
 
@@ -37,7 +38,7 @@ public class JsonFileEditorProvider implements FileEditorProvider, DumbAware {
 
     @Override
     public @NotNull @NonNls String getEditorTypeId() {
-        return JsonAssistantPlugin.PLUGIN_ID_NAME + "FileEditor";
+        return JsonAssistantPlugin.PLUGIN_ID_NAME + ".FileEditor";
     }
 
     @Override

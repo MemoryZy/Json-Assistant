@@ -27,7 +27,6 @@ public class CloseTreeCardViewAction extends DumbAwareAction implements UpdateIn
         super();
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
-        // 根据当前的展示，选择对应的名称、描述
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.toggle.editor.card.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.toggle.editor.card.description"));
