@@ -110,6 +110,8 @@ public class JsonAssistantToolWindowComponentProvider {
         Font font = tree.getFont();
         tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
 
+        // TODO 可以加个卡片，处理 JSONPath 相关的页面
+
         // 添加 Json 编辑器
         cardPanel.add(editorComponent, PluginConstant.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树

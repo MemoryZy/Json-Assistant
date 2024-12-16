@@ -32,6 +32,11 @@ public enum UrlType {
     MAIL(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#MAIL", "mailto:" + Urls.EMAIL_LINK),
 
     /**
+     * 关于 JSON 窗口相关介绍的页面
+     */
+    VIEW(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#VIEW", Urls.VIEW),
+
+    /**
      * 关于 JSON 树相关介绍的页面
      */
     SITE_TREE(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#SITE_TREE", Urls.TREE_LINK),

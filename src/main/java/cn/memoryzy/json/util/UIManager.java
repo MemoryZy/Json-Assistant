@@ -4,6 +4,7 @@ import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
+import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
@@ -18,6 +19,7 @@ import com.intellij.openapi.ui.panel.ComponentPanelBuilder;
 import com.intellij.openapi.util.text.HtmlBuilder;
 import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.ColorUtil;
 import com.intellij.ui.DocumentAdapter;
@@ -341,6 +343,11 @@ public class UIManager implements Disposable {
     public static Component getFocusComponent() {
         Component component = IdeFocusManager.getGlobalInstance().getFocusOwner();
         return Objects.nonNull(component) ? component : null;
+    }
+
+    public static @Nullable JComponent getWindowComponent(Project project) {
+        IdeFrame window = (IdeFrame) NotificationsManagerImpl.findWindowForBalloon(project);
+        return window != null ? window.getComponent() : null;
     }
 
     // public static @Nullable Component getFocusedComponent() {

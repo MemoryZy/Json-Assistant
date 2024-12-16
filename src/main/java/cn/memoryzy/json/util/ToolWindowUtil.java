@@ -12,6 +12,7 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.openapi.wm.impl.content.BaseLabel;
@@ -182,6 +183,27 @@ public class ToolWindowUtil {
         }
 
         return null;
+    }
+
+
+    /**
+     * 将窗口移至右上角位置
+     *
+     * @param toolWindow 窗口
+     */
+    public static void moveWindowToRightTop(ToolWindow toolWindow) {
+        toolWindow.setAnchor(ToolWindowAnchor.RIGHT, null);
+        toolWindow.setSplitMode(false, null);
+    }
+
+    /**
+     * 将窗口移至右下角位置
+     *
+     * @param toolWindow 窗口
+     */
+    public static void moveWindowToRightBottom(ToolWindow toolWindow) {
+        toolWindow.setAnchor(ToolWindowAnchor.RIGHT, null);
+        toolWindow.setSplitMode(true, null);
     }
 
 }

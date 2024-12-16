@@ -52,6 +52,8 @@
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
 
+        <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonFileEditorProvider"/>
+
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
 

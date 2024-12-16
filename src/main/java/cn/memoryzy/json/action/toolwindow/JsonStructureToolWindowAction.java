@@ -1,10 +1,10 @@
 package cn.memoryzy.json.action.toolwindow;
 
+import cn.memoryzy.json.action.JsonStructureAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -36,7 +36,7 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         String text = editor.getDocument().getText();
-        JsonStructureDialog.show(event.getDataContext(), text, JsonUtil.canResolveToJson(text), StructureActionSource.TOOLWINDOW_TOOLBAR);
+        JsonStructureAction.show(event.getDataContext(), text, JsonUtil.canResolveToJson(text), StructureActionSource.TOOLWINDOW_TOOLBAR);
     }
 
     @Override

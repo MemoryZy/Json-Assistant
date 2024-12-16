@@ -32,7 +32,9 @@ public class ExpandAllAction extends DumbAwareActionButton {
         this.tree = tree;
         this.includeRoot = includeRoot;
 
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), component);
+        if (component != null) {
+            registerCustomShortcutSet(CustomShortcutSet.fromString("alt DOWN"), component);
+        }
     }
 
     @Override

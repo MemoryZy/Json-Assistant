@@ -85,7 +85,7 @@ public class JsonPathComponentProvider {
 
         JPanel rootPanel = new JPanel(new BorderLayout());
         rootPanel.add(splitter, BorderLayout.CENTER);
-        rootPanel.setPreferredSize(new Dimension(260, 280));
+        rootPanel.setPreferredSize(new Dimension(310, 280));
         rootPanel.setBorder(JBUI.Borders.empty(3));
         return rootPanel;
     }

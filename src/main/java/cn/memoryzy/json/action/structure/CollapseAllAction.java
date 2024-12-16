@@ -32,7 +32,10 @@ public class CollapseAllAction extends DumbAwareActionButton {
 
         this.tree = tree;
         this.includeRoot = includeRoot;
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), component);
+
+        if (component != null) {
+            registerCustomShortcutSet(CustomShortcutSet.fromString("alt UP"), component);
+        }
     }
 
     @Override

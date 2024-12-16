@@ -7,6 +7,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.AuxiliaryTreeToolWindowComponentProvider;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
@@ -64,7 +65,7 @@ public class AuxiliaryTreeToolWindowManager {
                     ToolWindowAnchor.RIGHT,
                     () -> {},
                     true,
-                    false);
+                    true);
         }
 
         String title = JsonAssistantBundle.message("toolwindow.auxiliary.tree.name");
@@ -73,7 +74,6 @@ public class AuxiliaryTreeToolWindowManager {
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
 
         registerAction(toolWindow);
-
         return toolWindow;
     }
 
@@ -82,12 +82,7 @@ public class AuxiliaryTreeToolWindowManager {
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
         group.add(new RenameTabAction());
-
-        // TODO 需要研究一下用什么 vf 文件才能展示视图
-
-        // group.add(new MoveToEditorAction(toolWindow));
         group.add(new FloatingWindowAction(toolWindow));
-        // group.add(new EditInNewWindowAction(toolWindow));
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         group.add(Separator.create());
@@ -122,6 +117,9 @@ public class AuxiliaryTreeToolWindowManager {
             toolWindow.setAvailable(true);
         }
 
+        // 将 Json 编辑器窗口移至右上角
+        ToolWindowUtil.moveWindowToRightTop(ToolWindowUtil.getJsonAssistantToolWindow(project));
+
         // 辅助窗口只允许打开一个，会自动隐藏其他的窗口
         toolWindow.show();
     }
@@ -147,6 +145,8 @@ public class AuxiliaryTreeToolWindowManager {
             int contentCount = contentManager.getContentCount();
             if (contentCount == 0) {
                 toolWindow.setAvailable(false);
+                // 当辅助窗口被关闭时，再将Json 编辑器窗口移回右下角
+                ToolWindowUtil.moveWindowToRightBottom(ToolWindowUtil.getJsonAssistantToolWindow(project));
             }
         }
     }

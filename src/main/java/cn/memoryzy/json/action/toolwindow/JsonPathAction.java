@@ -105,6 +105,13 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         showComponentPopup(project);
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabled(
+                GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
+    }
+
     private String getShortcut() {
         Shortcut[] shortcuts = getShortcutSet().getShortcuts();
         if (shortcuts.length == 0) {
@@ -112,6 +119,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         }
         return KeymapUtil.getShortcutsText(shortcuts);
     }
+
 
     private void showComponentPopup(Project project) {
         JsonPathComponentProvider provider = new JsonPathComponentProvider(project, editor);
@@ -128,8 +136,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("tooltip.json.path.cancel"), AllIcons.General.HideToolWindow))
                 .setShowShadow(true)
                 .setShowBorder(true)
-                .setModalContext(false)
-                .setLocateWithinScreenBounds(false)
+                .setLocateWithinScreenBounds(true)
                 .setFocusable(true)
                 .setRequestFocus(true)
                 .setModalContext(false)
@@ -138,6 +145,9 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
                 .setCancelKeyEnabled(true)
                 .setMovable(true)
                 .setResizable(true)
+                .setLocateByContent(true)
+                .setAdText("你好", SwingConstants.LEFT)
+                .setNormalWindowLevel(true)
                 .createPopup();
 
         // Enter
@@ -163,7 +173,7 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
         JComponent toolbar = simpleToolWindowPanel.getToolbar();
         Component[] components = Objects.requireNonNull(toolbar).getComponents();
         Component firstAction = components[0];
-        return new RelativePoint(toolbar, new Point((simpleToolWindowPanel.getWidth() / 2 - 35), firstAction.getY()));
+        return new RelativePoint(toolbar, new Point((simpleToolWindowPanel.getWidth() / 2 - 90), firstAction.getY()));
     }
 
     private void showGuidePopup(JBPopup popup, JComponent component) {
@@ -186,12 +196,6 @@ public class JsonPathAction extends DumbAwareAction implements CustomComponentAc
 
             propertiesComponent.setValue(JSON_PATH_GUIDE_KEY, true);
         }
-    }
-
-    @Override
-    public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
     }
 
 }

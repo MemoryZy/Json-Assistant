@@ -6,6 +6,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
@@ -37,6 +38,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         toolWindow.setTitle(title);
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.LOGO);
+        toolWindow.setHelpId(UrlType.VIEW.getId());
     }
 
     @Override

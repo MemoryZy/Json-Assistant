@@ -23,6 +23,7 @@ public class Urls {
     public static final String TREE_LINK = "https://json.memoryzy.cn/tree";
     public static final String JSON_TO_JAVA_BEAN_LINK = "https://json.memoryzy.cn/json-to-javabean";
     public static final String OVERVIEW = "https://json.memoryzy.cn/overview";
+    public static final String VIEW = "https://json.memoryzy.cn/view";
     public static final String MARKETPLACE_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant";
     public static final String MARKETPLACE_REVIEWS_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews";
     public static final String EMAIL_LINK = "memoryzk@outlook.com";

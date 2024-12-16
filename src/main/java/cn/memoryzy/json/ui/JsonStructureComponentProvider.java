@@ -19,6 +19,7 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -42,7 +43,7 @@ public class JsonStructureComponentProvider {
      * @param component  注册快捷键的组件
      * @param needBorder 是否需要边框
      */
-    public JsonStructureComponentProvider(JsonWrapper wrapper, JComponent component, boolean needBorder) {
+    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, boolean needBorder) {
         init(wrapper, component, needBorder);
     }
 
@@ -53,7 +54,7 @@ public class JsonStructureComponentProvider {
      * @param component  注册快捷键的组件
      * @param needBorder 是否需要边框
      */
-    private void init(JsonWrapper wrapper, JComponent component, boolean needBorder) {
+    private void init(JsonWrapper wrapper, @Nullable JComponent component, boolean needBorder) {
         JsonTreeNode rootNode = new JsonTreeNode("root");
         // 允许在后面再进行树的构建
         if (wrapper != null) {
