@@ -6,10 +6,10 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.FileTypes;
-import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
-import cn.memoryzy.json.ui.component.editor.JsonPathExtendableComboBoxEditor;
-import cn.memoryzy.json.ui.component.editor.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
+import cn.memoryzy.json.ui.editor.JsonPathExtendableComboBoxEditor;
+import cn.memoryzy.json.ui.editor.JsonPathFileTypeComboBoxEditor;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -82,6 +82,7 @@ public class JsonPathComponentProvider {
         Splitter splitter = new Splitter(true, 0.1f);
         splitter.setFirstComponent(firstPanel);
         splitter.setSecondComponent(secondPanel);
+        splitter.setResizeEnabled(false);
 
         JPanel rootPanel = new JPanel(new BorderLayout());
         rootPanel.add(splitter, BorderLayout.CENTER);

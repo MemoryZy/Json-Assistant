@@ -1,9 +1,11 @@
 package cn.memoryzy.json.extension.editor;
 
 import cn.memoryzy.json.ui.JsonEditorComponentProvider;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -25,7 +27,7 @@ public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
 
     public JsonFileEditor(Project project, VirtualFile file) {
         this.file = file;
-        this.provider = new JsonEditorComponentProvider(project);
+        this.provider = new JsonEditorComponentProvider(project, PlatformUtil.getFileContent(file));
     }
 
     @Override
@@ -46,6 +48,11 @@ public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
     @Override
     public void setState(@NotNull FileEditorState state) {
 
+    }
+
+    @Override
+    public @NotNull FileEditorState getState(@NotNull FileEditorStateLevel level) {
+        return FileEditor.super.getState(level);
     }
 
     @Override
@@ -71,6 +78,13 @@ public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
     @Override
     public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
 
+    }
+
+    @Override
+    public void selectNotify() {
+        // 确保应用程序中的文件状态与物理文件系统的状态同步
+        file.refresh(true, true, null);
+        provider.selectNotify(PlatformUtil.getFileContent(file));
     }
 
     @Override

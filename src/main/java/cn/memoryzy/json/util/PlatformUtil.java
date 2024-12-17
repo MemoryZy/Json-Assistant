@@ -1,5 +1,6 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
@@ -44,6 +45,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -333,6 +335,17 @@ public class PlatformUtil {
 
         ConversionContextImpl conversionContext = new ConversionContextImpl(projectBasePath);
         return conversionContext.getProjectRootManagerSettings();
+    }
+
+    public static String getFileContent(VirtualFile file) {
+        String content = null;
+        try {
+            content = StrUtil.str(file.contentsToByteArray(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            LOG.error("Failed to get text", e);
+        }
+
+        return content;
     }
 
 }

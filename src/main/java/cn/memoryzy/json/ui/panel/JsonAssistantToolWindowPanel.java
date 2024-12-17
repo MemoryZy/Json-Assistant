@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.component;
+package cn.memoryzy.json.ui.panel;
 
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;

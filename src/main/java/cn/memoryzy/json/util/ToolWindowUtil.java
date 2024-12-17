@@ -3,7 +3,7 @@ package cn.memoryzy.json.util;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
-import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -143,6 +143,7 @@ public class ToolWindowUtil {
 
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
         Content content = contentFactory.createContent(window.createComponent(), displayName, false);
+        content.setDisposer(window);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
         return content;

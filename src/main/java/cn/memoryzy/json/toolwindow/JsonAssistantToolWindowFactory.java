@@ -76,6 +76,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
 
         Content content = contentFactory.createContent(window.createComponent(), PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, false);
         content.setCloseable(false);
+        content.setDisposer(window);
         contentManager.addContent(content, 0);
 
         // 验证地址可达性

@@ -11,8 +11,8 @@ import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.ui.component.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
@@ -97,6 +97,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JBSplitter splitter = new JBSplitter(true, 0.06f);
         splitter.setFirstComponent(firstPanel);
         splitter.setSecondComponent(jsonTextField);
+        splitter.setResizeEnabled(false);
 
         JPanel rootPanel = new JPanel(new BorderLayout());
         rootPanel.add(splitter, BorderLayout.CENTER);

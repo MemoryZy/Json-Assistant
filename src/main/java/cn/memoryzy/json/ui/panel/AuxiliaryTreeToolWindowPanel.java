@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.component;
+package cn.memoryzy.json.ui.panel;
 
 import com.intellij.ui.treeStructure.Tree;
 

@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.component;
+package cn.memoryzy.json.ui.panel;
 
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.ui.JBCardLayout;

@@ -22,10 +22,11 @@ import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
-import cn.memoryzy.json.ui.component.EditorTreeCardLayout;
-import cn.memoryzy.json.ui.component.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.EditorTreeCardLayout;
+import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -34,6 +35,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
@@ -62,7 +64,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonAssistantToolWindowComponentProvider {
+public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
 
     private final Project project;
@@ -85,6 +87,9 @@ public class JsonAssistantToolWindowComponentProvider {
     }
 
     public JComponent createComponent() {
+        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
+
+        // 创建编辑器
         TextEditor textEditor = createEditorComponent();
         this.editor = (EditorEx) textEditor.getEditor();
 
@@ -93,12 +98,8 @@ public class JsonAssistantToolWindowComponentProvider {
         // 卡片面板
         JPanel cardPanel = new JPanel(cardLayout);
 
-        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
         JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, false);
-        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout());
-        rootPanel.setEditor(this.editor);
-        rootPanel.setTreeProvider(treeProvider);
-        rootPanel.setCardLayout(cardLayout);
+        JsonAssistantToolWindowPanel rootPanel = createToolWindowPanel(treeProvider, cardLayout);
 
         // Json 编辑器
         JComponent editorComponent = textEditor.getComponent();
@@ -106,9 +107,7 @@ public class JsonAssistantToolWindowComponentProvider {
         JPanel treeComponent = treeProvider.getTreeComponent();
 
         // 在工具窗口中，可能字体需略微调大一点
-        Tree tree = treeProvider.getTree();
-        Font font = tree.getFont();
-        tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
+        resizeTreeFont(treeProvider);
 
         // TODO 可以加个卡片，处理 JSONPath 相关的页面
 
@@ -118,12 +117,26 @@ public class JsonAssistantToolWindowComponentProvider {
         cardPanel.add(treeComponent, PluginConstant.JSON_TREE_CARD_NAME);
         // 默认显示编辑器
         cardLayout.show(cardPanel, PluginConstant.JSON_EDITOR_CARD_NAME);
-
+        // 添加到面板
         rootPanel.add(cardPanel, BorderLayout.CENTER);
 
         simpleToolWindowPanel.setContent(rootPanel);
         simpleToolWindowPanel.setToolbar(createToolbar(simpleToolWindowPanel));
         return simpleToolWindowPanel;
+    }
+
+    private void resizeTreeFont(JsonStructureComponentProvider treeProvider) {
+        Tree tree = treeProvider.getTree();
+        Font font = tree.getFont();
+        tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
+    }
+
+    private JsonAssistantToolWindowPanel createToolWindowPanel(JsonStructureComponentProvider treeProvider, EditorTreeCardLayout cardLayout) {
+        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout());
+        rootPanel.setEditor(this.editor);
+        rootPanel.setTreeProvider(treeProvider);
+        rootPanel.setCardLayout(cardLayout);
+        return rootPanel;
     }
 
     private TextEditor createEditorComponent() {
@@ -134,6 +147,8 @@ public class JsonAssistantToolWindowComponentProvider {
 
         TextEditor textEditor = UIManager.createDefaultTextEditor(project, editorFileType, jsonString);
         EditorEx editor = (EditorEx) textEditor.getEditor();
+
+        // TODO 可以自己创建适合的编辑器 TextEditorImpl 类
 
         EditorSettings settings = editor.getSettings();
         // 行号显示
@@ -301,6 +316,11 @@ public class JsonAssistantToolWindowComponentProvider {
                 historyList.add(project, jsonWrapper);
             }
         });
+    }
+
+    @Override
+    public void dispose() {
+        EditorFactory.getInstance().releaseEditor(editor);
     }
 
     public static void toggleLineNumbers(EditorEx editor, boolean display) {

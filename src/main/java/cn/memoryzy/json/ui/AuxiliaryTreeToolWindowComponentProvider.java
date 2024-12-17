@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.component.AuxiliaryTreeToolWindowPanel;
+import cn.memoryzy.json.ui.panel.AuxiliaryTreeToolWindowPanel;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;

@@ -6,7 +6,7 @@ import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.ListRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;

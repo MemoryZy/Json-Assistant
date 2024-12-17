@@ -4,7 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
-import cn.memoryzy.json.ui.component.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;

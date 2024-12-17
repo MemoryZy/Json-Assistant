@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.component.node;
+package cn.memoryzy.json.ui.node;
 
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.model.HistoryEntry;
