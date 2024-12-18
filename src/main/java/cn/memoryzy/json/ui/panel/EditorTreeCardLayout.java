@@ -33,11 +33,8 @@ public class EditorTreeCardLayout extends JBCardLayout {
     /**
      * 切换卡片展示
      */
-    public void toggleCard() {
-        String name = PluginConstant.JSON_EDITOR_CARD_NAME.equals(currentCardName)
-                ? PluginConstant.JSON_TREE_CARD_NAME : PluginConstant.JSON_EDITOR_CARD_NAME;
-
-        show(name);
+    public void toggleCard(String cardName) {
+        show(cardName);
     }
 
     public boolean isEditorCardDisplayed() {
@@ -47,5 +44,10 @@ public class EditorTreeCardLayout extends JBCardLayout {
     public boolean isTreeCardDisplayed() {
         return PluginConstant.JSON_TREE_CARD_NAME.equals(currentCardName);
     }
+
+    public boolean isPathCardDisplayed() {
+        return PluginConstant.JSONPATH_CARD_NAME.equals(currentCardName);
+    }
+
 
 }

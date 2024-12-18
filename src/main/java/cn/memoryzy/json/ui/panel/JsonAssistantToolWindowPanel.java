@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui.panel;
 
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -8,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -27,10 +29,9 @@ public class JsonAssistantToolWindowPanel extends JPanel {
     /**
      * 切换卡片
      */
-    public void switchToCard(JsonWrapper wrapper, boolean switchToEditor) {
-        cardLayout.toggleCard();
-        // 如果是切换回编辑器，则不需要生成树节点
-        if (!switchToEditor) {
+    public void switchToCard(JsonWrapper wrapper, String cardName) {
+        cardLayout.toggleCard(cardName);
+        if (Objects.equals(PluginConstant.JSON_TREE_CARD_NAME, cardName)) {
             // 重新生成根节点
             treeProvider.rebuildTree(wrapper);
         }

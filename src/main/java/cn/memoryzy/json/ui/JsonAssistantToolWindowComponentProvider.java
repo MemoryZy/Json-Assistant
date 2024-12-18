@@ -99,12 +99,15 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         JPanel cardPanel = new JPanel(cardLayout);
 
         JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, false);
+        JsonQueryComponentProvider2 pathProvider = new JsonQueryComponentProvider2(project);
         JsonAssistantToolWindowPanel rootPanel = createToolWindowPanel(treeProvider, cardLayout);
 
         // Json 编辑器
         JComponent editorComponent = textEditor.getComponent();
         // Json 树
         JPanel treeComponent = treeProvider.getTreeComponent();
+        // JsonPath 界面
+        JComponent pathComponent = pathProvider.createComponent();
 
         // 在工具窗口中，可能字体需略微调大一点
         resizeTreeFont(treeProvider);
@@ -115,6 +118,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         cardPanel.add(editorComponent, PluginConstant.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树
         cardPanel.add(treeComponent, PluginConstant.JSON_TREE_CARD_NAME);
+        // 添加 JsonPath 界面
+        cardPanel.add(pathComponent, PluginConstant.JSONPATH_CARD_NAME);
         // 默认显示编辑器
         cardLayout.show(cardPanel, PluginConstant.JSON_EDITOR_CARD_NAME);
         // 添加到面板
@@ -195,7 +200,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         actionGroup.add(new JsonMinifyToolWindowAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
         actionGroup.add(new JsonStructureToolWindowAction(editor, simpleToolWindowPanel));
-        actionGroup.add(new JsonPathAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new JsonQueryAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
         actionGroup.add(new SaveToDiskAction(editor, simpleToolWindowPanel));
         actionGroup.add(new ClearEditorAction(editor, simpleToolWindowPanel));

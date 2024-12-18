@@ -106,7 +106,7 @@ public class JsonStructureAction extends DumbAwareAction {
         }
 
         // 获取标签页的面板，切换卡片
-        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, false));
+        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, PluginConstant.JSON_TREE_CARD_NAME));
 
         // 打开窗口
         toolWindow.show();

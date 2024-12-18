@@ -33,6 +33,11 @@ public interface PluginConstant {
      */
     String JSON_TREE_CARD_NAME = "tree";
 
+    /**
+     * JSONPath 卡片名
+     */
+    String JSONPATH_CARD_NAME = "jsonpath";
+
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     String LOMBOK_LIB = "org.projectlombok:lombok";
     String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";

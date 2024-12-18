@@ -54,7 +54,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
         // 标题行，在此增加一个切换卡片展示的Action
         List<AnAction> titleActions = List.of(
-                new CloseTreeCardViewAction(toolWindowEx),
+                new BackToEditorViewAction(toolWindowEx),
                 Separator.create(),
                 new JsonHistoryAction(toolWindowEx),
                 new OpenSettingsAction(toolWindowEx));

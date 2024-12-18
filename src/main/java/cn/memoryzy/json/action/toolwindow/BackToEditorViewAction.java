@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.panel.EditorTreeCardLayout;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -19,11 +19,11 @@ import java.util.Optional;
  * @author Memory
  * @since 2024/12/13
  */
-public class CloseTreeCardViewAction extends DumbAwareAction implements UpdateInBackground {
+public class BackToEditorViewAction extends DumbAwareAction implements UpdateInBackground {
 
     private final ToolWindowEx toolWindow;
 
-    public CloseTreeCardViewAction(ToolWindowEx toolWindow) {
+    public BackToEditorViewAction(ToolWindowEx toolWindow) {
         super();
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
@@ -36,7 +36,8 @@ public class CloseTreeCardViewAction extends DumbAwareAction implements UpdateIn
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
-        Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent)).ifPresent(panel -> panel.switchToCard(null, true));
+        Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent))
+                .ifPresent(panel -> panel.switchToCard(null, PluginConstant.JSON_EDITOR_CARD_NAME));
     }
 
     @Override
@@ -45,7 +46,7 @@ public class CloseTreeCardViewAction extends DumbAwareAction implements UpdateIn
         Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
         Boolean treeCardDisplayed = Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent))
                 .map(JsonAssistantToolWindowPanel::getCardLayout)
-                .map(EditorTreeCardLayout::isTreeCardDisplayed)
+                .map(el -> el.isTreeCardDisplayed() || el.isPathCardDisplayed())
                 .orElse(false);
 
         e.getPresentation().setEnabledAndVisible(treeCardDisplayed);
