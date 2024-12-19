@@ -211,6 +211,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         actionGroup.add(new ClearEditorAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
         actionGroup.add(new ToggleUseSoftWrapsAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new ScrollToTheEndAction(editor, simpleToolWindowPanel));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         return toolbar.getComponent();

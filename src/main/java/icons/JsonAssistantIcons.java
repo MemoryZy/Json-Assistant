@@ -74,6 +74,7 @@ public class JsonAssistantIcons {
         public static final Icon MAGIC = load("/icons/toolwindow/magic.svg");
         public static final Icon EYE_OFF = load("/icons/toolwindow/eye_off.svg");
         public static final Icon SOFT_WRAP = load("/icons/toolwindow/softWrap.svg");
+        public static final Icon SCROLL_DOWN = load("/icons/toolwindow/scrollDown.svg");
     }
 
     public static Icon load(String iconPath) {
