@@ -107,7 +107,8 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
         // showComponentPopup(project);
 
         Optional.ofNullable(simpleToolWindowPanel.getContent())
-                .ifPresent(el -> ((JsonAssistantToolWindowPanel) el).switchToCard(null, PluginConstant.JSONPATH_CARD_NAME));
+                .ifPresent(el -> ((JsonAssistantToolWindowPanel) el)
+                        .switchToCard(null, PluginConstant.JSON_QUERY_CARD_NAME));
     }
 
     @Override

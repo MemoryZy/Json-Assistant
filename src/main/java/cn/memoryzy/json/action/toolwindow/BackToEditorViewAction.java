@@ -2,6 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -28,7 +29,7 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.toggle.editor.card.text"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.close.tree.card.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.toggle.editor.card.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.EYE_OFF);
     }
@@ -44,11 +45,23 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
     public void update(@NotNull AnActionEvent e) {
         // 只有当前处于树视图才能切换
         Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
-        Boolean treeCardDisplayed = Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent))
+        CombineCardLayout cardLayout = Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent))
                 .map(JsonAssistantToolWindowPanel::getCardLayout)
-                .map(el -> el.isTreeCardDisplayed() || el.isPathCardDisplayed())
-                .orElse(false);
+                .orElse(null);
 
-        e.getPresentation().setEnabledAndVisible(treeCardDisplayed);
+        boolean enabled = false;
+        Presentation presentation = e.getPresentation();
+        if (cardLayout != null) {
+            boolean treeCardDisplayed = cardLayout.isTreeCardDisplayed();
+            boolean queryCardDisplayed = cardLayout.isQueryCardDisplayed();
+
+            if (treeCardDisplayed || queryCardDisplayed) {
+                enabled = true;
+                String text = treeCardDisplayed ? JsonAssistantBundle.messageOnSystem("action.close.tree.card.text") : JsonAssistantBundle.messageOnSystem("action.close.query.card.text");
+                presentation.setText(text);
+            }
+        }
+
+        presentation.setEnabledAndVisible(enabled);
     }
 }

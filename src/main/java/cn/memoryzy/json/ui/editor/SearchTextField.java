@@ -19,7 +19,10 @@ public class SearchTextField extends com.intellij.ui.SearchTextField {
         addKeyboardListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                action.run();
+                // 检查是否按下了Enter键
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    action.run();
+                }
             }
         });
     }

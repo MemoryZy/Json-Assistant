@@ -8,6 +8,8 @@ import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.ListRightClickPopupMenuMouseAdapter;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
+import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
@@ -40,6 +42,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.MouseEvent;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -174,7 +177,16 @@ public class JsonHistoryListChooser extends DialogWrapper {
         ListModel<HistoryEntry> listModel = showList.getModel();
         if (listModel.getSize() > 0) {
             showList.setSelectedIndex(0);
-            enabledOkAction();
+            // 只有处于编辑器页面，才能开启ok按钮
+            Content content = ToolWindowUtil.getSelectedContent(toolWindow);
+            Boolean editorCardDisplayed = Optional.ofNullable(ToolWindowUtil.getPanelOnContent(content))
+                    .map(JsonAssistantToolWindowPanel::getCardLayout)
+                    .map(CombineCardLayout::isEditorCardDisplayed)
+                    .orElse(false);
+
+            if (editorCardDisplayed) {
+                enabledOkAction();
+            }
         }
     }
 

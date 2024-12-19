@@ -21,6 +21,8 @@ import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.EditorKind;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
@@ -35,6 +37,8 @@ import com.intellij.project.ProjectKt;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
 import com.intellij.util.ui.UIUtil;
@@ -346,6 +350,18 @@ public class PlatformUtil {
         }
 
         return content;
+    }
+
+
+    public static Editor createEditor(Project project, String fileName, FileType fileType, boolean isViewer, EditorKind kind, String text) {
+        VirtualFile sourceVirtualFile = new LightVirtualFile(fileName, fileType, text);
+        PsiFile sourceFile = PsiManager.getInstance(project).findFile(sourceVirtualFile);
+
+        assert sourceFile != null;
+        Document document = PsiDocumentManager.getInstance(project).getDocument(sourceFile);
+
+        assert document != null;
+        return EditorFactory.getInstance().createEditor(document, project, sourceVirtualFile, isViewer, kind);
     }
 
 }

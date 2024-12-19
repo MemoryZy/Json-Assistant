@@ -9,12 +9,12 @@ import java.awt.*;
  * @author Memory
  * @since 2024/12/13
  */
-public class EditorTreeCardLayout extends JBCardLayout {
+public class CombineCardLayout extends JBCardLayout {
 
     private Container parent;
     private String currentCardName;
 
-    public EditorTreeCardLayout() {
+    public CombineCardLayout() {
         super();
     }
 
@@ -45,8 +45,8 @@ public class EditorTreeCardLayout extends JBCardLayout {
         return PluginConstant.JSON_TREE_CARD_NAME.equals(currentCardName);
     }
 
-    public boolean isPathCardDisplayed() {
-        return PluginConstant.JSONPATH_CARD_NAME.equals(currentCardName);
+    public boolean isQueryCardDisplayed() {
+        return PluginConstant.JSON_QUERY_CARD_NAME.equals(currentCardName);
     }
 
 

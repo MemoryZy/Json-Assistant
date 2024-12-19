@@ -30,7 +30,7 @@ public class JsonPathEvaluator {
         }
 
         if (StrUtil.isBlank(jsonDoc)) {
-            return new IncorrectDocument(JsonAssistantBundle.messageOnSystem("jsonpath.evaluate.doc.blank"));
+            return new IncorrectDocument(JsonAssistantBundle.messageOnSystem("json.query.evaluate.doc.blank"));
         }
 
         Configuration configuration = new Configuration.ConfigurationBuilder()

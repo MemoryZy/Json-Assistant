@@ -8,11 +8,13 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
+import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
@@ -78,6 +80,11 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         content.setCloseable(false);
         content.setDisposer(window);
         contentManager.addContent(content, 0);
+
+        // 检查位置
+        if (ToolWindowAnchor.RIGHT.equals(toolWindow.getAnchor()) && !toolWindow.isSplitMode()) {
+            ToolWindowUtil.moveWindowToRightBottom(toolWindow);
+        }
 
         // 验证地址可达性
         Urls.verifyReachable();

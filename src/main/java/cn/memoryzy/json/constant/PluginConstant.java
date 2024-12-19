@@ -34,9 +34,9 @@ public interface PluginConstant {
     String JSON_TREE_CARD_NAME = "tree";
 
     /**
-     * JSONPath 卡片名
+     * JSONQuery 卡片名
      */
-    String JSONPATH_CARD_NAME = "jsonpath";
+    String JSON_QUERY_CARD_NAME = "json_query";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
     String LOMBOK_LIB = "org.projectlombok:lombok";

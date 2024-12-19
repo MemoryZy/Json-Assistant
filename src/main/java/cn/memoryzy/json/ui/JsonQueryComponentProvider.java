@@ -3,7 +3,11 @@ package cn.memoryzy.json.ui;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.enums.JsonQuerySchema;
 import cn.memoryzy.json.ui.editor.SearchTextField;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.WriteAction;
@@ -12,11 +16,9 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
@@ -34,11 +36,15 @@ import java.awt.*;
  * @author Memory
  * @since 2024/12/17
  */
-public class JsonQueryComponentProvider2 implements Disposable {
+public class JsonQueryComponentProvider implements Disposable {
 
     public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
+    public static final String JMES_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JmesPathHistory";
+    public static final String SPLITTER_PROPORTION_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SplitterProportionKey";
 
     private final Project project;
+    private final JBLabel searchLabel;
+    private final ComboBox<JsonQuerySchema> searchChooser;
     private final SearchTextField searchTextField;
     private final JBPanelWithEmptyText resultWrapper;
     private final JBLabel resultLabel;
@@ -48,18 +54,20 @@ public class JsonQueryComponentProvider2 implements Disposable {
     private final JBLabel docLabel;
     private final Editor docEditor;
 
-    public JsonQueryComponentProvider2(Project project) {
+    public JsonQueryComponentProvider(Project project) {
         this.project = project;
+        this.searchLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.search"));
+        this.searchChooser = new ComboBox<>();
         this.searchTextField = new SearchTextField(JSON_PATH_HISTORY_KEY, 10, this::evaluate);
 
         this.resultWrapper = new JBPanelWithEmptyText(new BorderLayout());
-        this.resultLabel = new JBLabel(JsonAssistantBundle.message("jsonpath.evaluate.result"));
+        this.resultLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.result"));
         this.resultEditor = createJsonEditor("result.json5", true, EditorKind.PREVIEW);
 
         this.errorOutputArea = new JBTextArea();
         this.errorOutputContainer = new JBScrollPane(errorOutputArea);
 
-        this.docLabel = new JBLabel(JsonAssistantBundle.message("jsonpath.evaluate.doc"));
+        this.docLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.doc"));
         this.docEditor = createJsonEditor("doc.json5", false, EditorKind.MAIN_EDITOR);
     }
 
@@ -72,14 +80,26 @@ public class JsonQueryComponentProvider2 implements Disposable {
 
 
     private JComponent createFirstComponent() {
-        return searchTextField;
+        for (JsonQuerySchema value : JsonQuerySchema.values()) {
+            searchChooser.addItem(value);
+        }
+
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panel.add(searchLabel);
+        panel.add(searchChooser);
+
+        return new BorderLayoutPanel()
+                .addToTop(panel)
+                .addToCenter(searchTextField);
     }
 
     private JComponent createSecondComponent() {
         // 一个Json原文编辑器（默认颜色），一个计算结果编辑器（跟随主界面）
         JBSplitter splitter = new JBSplitter(true, 0.5f);
+        // 保存拆分比例
+        splitter.setSplitterProportionKey(SPLITTER_PROPORTION_KEY);
 
-        resultWrapper.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("jsonpath.evaluate.no.result"));
+        resultWrapper.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("json.query.evaluate.no.result"));
         resultLabel.setBorder(JBUI.Borders.empty(3, 6));
         resultEditor.setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0));
 
@@ -89,18 +109,22 @@ public class JsonQueryComponentProvider2 implements Disposable {
         errorOutputArea.setBorder(JBUI.Borders.empty(10));
         errorOutputContainer.setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0));
 
-        BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel()
-                .addToTop(docLabel)
-                .addToCenter(docEditor.getComponent());
+        docLabel.setBorder(JBUI.Borders.empty(3, 6));
+        docEditor.setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0));
 
         splitter.setFirstComponent(resultWrapper);
-        splitter.setSecondComponent(borderLayoutPanel);
+        splitter.setSecondComponent(new BorderLayoutPanel().addToTop(docLabel).addToCenter(docEditor.getComponent()));
 
         return splitter;
     }
 
 
     private void evaluate() {
+
+        // setError("xxx");
+
+        setResult("aaaaa");
+
         // JsonPathEvaluator.evaluate();
 
         // if (result instanceof IncorrectExpression) {
@@ -158,35 +182,26 @@ public class JsonQueryComponentProvider2 implements Disposable {
 
 
     private Editor createJsonEditor(String fileName, Boolean isViewer, EditorKind kind) {
-        // require strict JSON with quotes
-        VirtualFile sourceVirtualFile = new LightVirtualFile(fileName, FileTypeHolder.JSON5, "");
-        PsiFile sourceFile = PsiManager.getInstance(project).findFile(sourceVirtualFile);
-
-        assert sourceFile != null;
-        Document document = PsiDocumentManager.getInstance(project).getDocument(sourceFile);
-
-        assert document != null;
-        Editor editor = EditorFactory.getInstance().createEditor(document, project, sourceVirtualFile, isViewer, kind);
-
+        Editor editor = PlatformUtil.createEditor(project, fileName, FileTypeHolder.JSON5, isViewer, kind, "");
         editor.getSettings().setLineNumbersShown(false);
         return editor;
     }
 
 
-    public static void main(String[] args) {
-        // JBSplitter splitter = new JBSplitter(true, 0.5f);
-        // splitter.setFirstComponent(borderLayoutPanel);
-        // splitter.setSecondComponent(showTextField);
-        //
-        // // 保存分割比例
-        // splitter.setSplitterProportionKey(showTextField);
-
-
-    }
-
-
     @Override
     public void dispose() {
-        EditorFactory.getInstance().releaseEditor(resultEditor);
+        EditorFactory factory = EditorFactory.getInstance();
+        factory.releaseEditor(resultEditor);
+        factory.releaseEditor(docEditor);
     }
+
+
+    public void setDocumentText(String text) {
+        WriteAction.run(() -> {
+            if (JsonUtil.isJson(text) || Json5Util.isJson5(text)) {
+                docEditor.getDocument().setText(text);
+            }
+        });
+    }
+
 }
