@@ -24,6 +24,11 @@ public interface PluginConstant {
     String AUXILIARY_TREE_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.AuxiliaryTree";
 
     /**
+     * 选择的软换行状态 Key
+     */
+    String SOFT_WRAPS_SELECT_STATE = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SOFT_WRAPS_SELECT_STATE";
+
+    /**
      * Json 编辑器卡片名称
      */
     String JSON_EDITOR_CARD_NAME = "editor";

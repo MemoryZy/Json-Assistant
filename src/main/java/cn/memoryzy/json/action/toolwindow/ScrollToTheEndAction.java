@@ -1,6 +1,9 @@
 package cn.memoryzy.json.action.toolwindow;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.ScrollToTheEndToolbarAction;
@@ -27,6 +30,12 @@ public class ScrollToTheEndAction extends ScrollToTheEndToolbarAction {
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SCROLL_DOWN);
     }
 
-
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(
+                getEventProject(e) != null
+                        && StrUtil.isNotBlank(editor.getDocument().getText())
+                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
+    }
 
 }

@@ -156,6 +156,7 @@ public class JsonUtil {
                     .serializeSpecialFloatingPointValues()
                     .serializeNulls()
                     .setPrettyPrinting()
+                    .disableHtmlEscaping()
                     .create()
                     .toJson(data);
         } catch (Exception e) {

@@ -26,6 +26,7 @@ import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -35,6 +36,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.actions.AbstractToggleUseSoftWrapsAction;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentEvent;
@@ -196,6 +198,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         JComponent component = editor.getComponent();
         component.setFont(UIManager.consolasFont(15));
         component.setBorder(JBUI.Borders.customLine(editor.getBackgroundColor(), 0, 4, 0, 0));
+
+        // 切换软换行状态
+        PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
+        String value = propertiesComponent.getValue(PluginConstant.SOFT_WRAPS_SELECT_STATE);
+        if (null != value) {
+            AbstractToggleUseSoftWrapsAction.toggleSoftWraps(editor, null, Boolean.parseBoolean(value));
+        }
     }
 
 
@@ -207,11 +216,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         actionGroup.add(new JsonStructureToolWindowAction(editor, simpleToolWindowPanel));
         actionGroup.add(new JsonQueryAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new SaveToDiskAction(editor, simpleToolWindowPanel));
-        actionGroup.add(new ClearEditorAction(editor, simpleToolWindowPanel));
-        actionGroup.add(Separator.create());
         actionGroup.add(new ToggleUseSoftWrapsAction(editor, simpleToolWindowPanel));
         actionGroup.add(new ScrollToTheEndAction(editor, simpleToolWindowPanel));
+        actionGroup.add(Separator.create());
+        actionGroup.add(new SaveToDiskAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new ClearEditorAction(editor, simpleToolWindowPanel));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         return toolbar.getComponent();

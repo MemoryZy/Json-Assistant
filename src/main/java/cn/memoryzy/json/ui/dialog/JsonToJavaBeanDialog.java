@@ -33,11 +33,14 @@ import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.TitledSeparator;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.IncorrectOperationException;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.SwingHelper;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -84,6 +87,23 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
+        // TODO 添加注解、功能选项
+        TitledSeparator titledSeparator = new TitledSeparator("可选参数");
+        JBCheckBox fastJsonCb = new JBCheckBox("FastJson 注解");
+        JBCheckBox jacksonCb = new JBCheckBox("Jackson 注解");
+        JBCheckBox toCamelCb = new JBCheckBox("下划线转驼峰");
+
+        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 13,5));
+        checkBoxPanel.add(fastJsonCb);
+        checkBoxPanel.add(jacksonCb);
+        checkBoxPanel.add(toCamelCb);
+
+        BorderLayoutPanel centerPanel = new BorderLayoutPanel().addToTop(titledSeparator).addToCenter(checkBoxPanel);
+        centerPanel.setBorder(JBUI.Borders.empty(10, 4, 10, 0));
+
+        BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(centerPanel);
+
+
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
@@ -95,7 +115,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
 
         JBSplitter splitter = new JBSplitter(true, 0.06f);
-        splitter.setFirstComponent(firstPanel);
+        splitter.setFirstComponent(borderLayoutPanel);
         splitter.setSecondComponent(jsonTextField);
         splitter.setResizeEnabled(false);
 

@@ -22,7 +22,9 @@
         "search.svg": "icons/toolwindow/search.svg",
         "structure.svg": "icons/toolwindow/structure.svg",
         "delete.svg": "icons/toolwindow/delete.svg",
-        "magic.svg": "icons/toolwindow/magic.svg"
+        "magic.svg": "icons/toolwindow/magic.svg",
+        "scrollDown.svg": "icons/toolwindow/scrollDown.svg",
+        "softWrap.svg": "icons/toolwindow/softWrap.svg"
       }
     }
   }
