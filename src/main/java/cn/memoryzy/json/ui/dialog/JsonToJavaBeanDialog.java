@@ -87,19 +87,23 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
+        // TODO 修改为设置按钮，点击后弹出ListPopup
+        // ActionButton actionButton = new ActionButton();
+
+
         // TODO 添加注解、功能选项
         TitledSeparator titledSeparator = new TitledSeparator("可选参数");
         JBCheckBox fastJsonCb = new JBCheckBox("FastJson 注解");
         JBCheckBox jacksonCb = new JBCheckBox("Jackson 注解");
         JBCheckBox toCamelCb = new JBCheckBox("下划线转驼峰");
 
-        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 13,5));
+        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 18,5));
         checkBoxPanel.add(fastJsonCb);
         checkBoxPanel.add(jacksonCb);
         checkBoxPanel.add(toCamelCb);
 
         BorderLayoutPanel centerPanel = new BorderLayoutPanel().addToTop(titledSeparator).addToCenter(checkBoxPanel);
-        centerPanel.setBorder(JBUI.Borders.empty(10, 4, 10, 0));
+        centerPanel.setBorder(JBUI.Borders.empty(10, 4, 7, 0));
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(centerPanel);
 
