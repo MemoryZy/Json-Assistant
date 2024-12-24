@@ -100,6 +100,11 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
         }
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabledAndVisible(persistenceState.historyState.switchHistory);
+    }
+
     private String getShortcut() {
         Shortcut[] shortcuts = getShortcutSet().getShortcuts();
         if (shortcuts.length == 0) {
@@ -115,77 +120,80 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
      * @param project 项目
      */
     public static void compatibilityHistory(Project project) {
-        // 历史记录检测
-        ApplicationManager.getApplication().invokeLater(() -> {
-            ComponentManagerSettings projectDataManagerSettings = PlatformUtil.getProjectDataManagerSettings(project);
-            // 项目数据（.idea/misc.xml）
-            Path path = projectDataManagerSettings.getPath();
-            // 根节点
-            Element rootElement = projectDataManagerSettings.getRootElement();
+        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+        if (persistentState.historyState.switchHistory) {
+            // 历史记录检测
+            ApplicationManager.getApplication().invokeLater(() -> {
+                ComponentManagerSettings projectDataManagerSettings = PlatformUtil.getProjectDataManagerSettings(project);
+                // 项目数据（.idea/misc.xml）
+                Path path = projectDataManagerSettings.getPath();
+                // 根节点
+                Element rootElement = projectDataManagerSettings.getRootElement();
 
-            // 获取之前版本历史记录的 State Key
-            Element historyElement = projectDataManagerSettings.getComponentElement("JsonAssistantJsonHistory");
-            // 获取属性值
-            String oriHistory = (historyElement == null) ? null : historyElement.getAttributeValue("historyList");
+                // 获取之前版本历史记录的 State Key
+                Element historyElement = projectDataManagerSettings.getComponentElement("JsonAssistantJsonHistory");
+                // 获取属性值
+                String oriHistory = (historyElement == null) ? null : historyElement.getAttributeValue("historyList");
 
-            // 没有数据的话，退出
-            if (StrUtil.isBlank(oriHistory) && !JsonUtil.isJsonArray(oriHistory)) {
-                return;
-            }
-
-            ArrayWrapper array = JsonUtil.parseArray(oriHistory);
-            if (array.isEmpty()) {
-                return;
-            }
-
-            // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
-            List<JsonWrapper> oldHistory = new ArrayList<>();
-            HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).getHistory();
-            for (Object data : array) {
-                JsonWrapper wrapper = null;
-                String dataStr = (String) data;
-                if (JsonUtil.isJson(dataStr)) {
-                    if (JsonUtil.isJsonObject(dataStr)) {
-                        wrapper = JsonUtil.parseObject(dataStr);
-                    } else {
-                        wrapper = JsonUtil.parseArray(dataStr);
-                    }
-                } else if (Json5Util.isJson5(dataStr)) {
-                    if (Json5Util.isJson5Object(dataStr)) {
-                        wrapper = Json5Util.parseObject(dataStr);
-                    } else {
-                        wrapper = Json5Util.parseArray(dataStr);
-                    }
+                // 没有数据的话，退出
+                if (StrUtil.isBlank(oriHistory) && !JsonUtil.isJsonArray(oriHistory)) {
+                    return;
                 }
 
-                // 此Json是否存在
-                if (Objects.isNull(wrapper) || newHistory.exists(wrapper)) {
-                    continue;
+                ArrayWrapper array = JsonUtil.parseArray(oriHistory);
+                if (array.isEmpty()) {
+                    return;
                 }
 
-                oldHistory.add(wrapper);
-            }
+                // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
+                List<JsonWrapper> oldHistory = new ArrayList<>();
+                HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).getHistory();
+                for (Object data : array) {
+                    JsonWrapper wrapper = null;
+                    String dataStr = (String) data;
+                    if (JsonUtil.isJson(dataStr)) {
+                        if (JsonUtil.isJsonObject(dataStr)) {
+                            wrapper = JsonUtil.parseObject(dataStr);
+                        } else {
+                            wrapper = JsonUtil.parseArray(dataStr);
+                        }
+                    } else if (Json5Util.isJson5(dataStr)) {
+                        if (Json5Util.isJson5Object(dataStr)) {
+                            wrapper = Json5Util.parseObject(dataStr);
+                        } else {
+                            wrapper = Json5Util.parseArray(dataStr);
+                        }
+                    }
 
-            // 都存在于现在的历史记录的话，就结束
-            if (oldHistory.isEmpty()) {
-                return;
-            }
+                    // 此Json是否存在
+                    if (Objects.isNull(wrapper) || newHistory.exists(wrapper)) {
+                        continue;
+                    }
 
-            NotificationAction importAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
-                    () -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
+                    oldHistory.add(wrapper);
+                }
 
-            NotificationAction ignoreAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
-                    () -> ignoreRecords(path, rootElement, historyElement));
+                // 都存在于现在的历史记录的话，就结束
+                if (oldHistory.isEmpty()) {
+                    return;
+                }
 
-            ArrayList<NotificationAction> notificationActions = Lists.newArrayList(importAction, ignoreAction);
+                NotificationAction importAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
+                        () -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
 
-            Notifications.showFullStickyNotification(
-                    "Json Assistant",
-                    JsonAssistantBundle.messageOnSystem("notification.recover.content", oldHistory.size()),
-                    NotificationType.INFORMATION,
-                    project,
-                    notificationActions);
-        });
+                NotificationAction ignoreAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
+                        () -> ignoreRecords(path, rootElement, historyElement));
+
+                ArrayList<NotificationAction> notificationActions = Lists.newArrayList(importAction, ignoreAction);
+
+                Notifications.showFullStickyNotification(
+                        "Json Assistant",
+                        JsonAssistantBundle.messageOnSystem("notification.recover.content", oldHistory.size()),
+                        NotificationType.INFORMATION,
+                        project,
+                        notificationActions);
+            });
+        }
     }
 
     private static void importRecords(Project project, List<JsonWrapper> oldHistory, HistoryLimitedList newHistory,

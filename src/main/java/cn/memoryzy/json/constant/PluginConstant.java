@@ -44,7 +44,7 @@ public interface PluginConstant {
     String JSON_QUERY_CARD_NAME = "json_query";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
-    String LOMBOK_LIB = "org.projectlombok:lombok";
+
     String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
 
     String JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME = "View";

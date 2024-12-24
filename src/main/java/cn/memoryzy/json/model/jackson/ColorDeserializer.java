@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.deserializer;
+package cn.memoryzy.json.model.jackson;
 
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonParser;

@@ -317,15 +317,23 @@ public class UIManager implements Disposable {
 
 
     public static void controlEnableCheckBox(JCheckBox checkBox, boolean enable) {
+        controlEnableToggleButton(checkBox, enable);
+    }
+
+    public static void controlEnableRadioButton(JRadioButton radioButton, boolean enable) {
+        controlEnableToggleButton(radioButton, enable);
+    }
+
+    public static void controlEnableToggleButton(JToggleButton toggleButton, boolean enable) {
         // 开
         if (enable) {
-            if (!checkBox.isEnabled()) {
-                checkBox.setEnabled(true);
+            if (!toggleButton.isEnabled()) {
+                toggleButton.setEnabled(true);
             }
         } else {
             // 关
-            if (checkBox.isEnabled()) {
-                checkBox.setEnabled(false);
+            if (toggleButton.isEnabled()) {
+                toggleButton.setEnabled(false);
             }
         }
     }

@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model.serializer;
+package cn.memoryzy.json.model.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

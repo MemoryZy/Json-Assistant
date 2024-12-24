@@ -1,8 +1,8 @@
 package cn.memoryzy.json.service.persistent.state;
 
 import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.model.deserializer.ColorDeserializer;
-import cn.memoryzy.json.model.serializer.ColorSerializer;
+import cn.memoryzy.json.model.jackson.ColorDeserializer;
+import cn.memoryzy.json.model.jackson.ColorSerializer;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

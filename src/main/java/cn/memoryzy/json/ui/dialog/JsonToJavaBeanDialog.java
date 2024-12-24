@@ -4,19 +4,26 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.action.deserializer.OptionsGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -34,7 +41,6 @@ import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.TitledSeparator;
-import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.IncorrectOperationException;
@@ -67,11 +73,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     private final PsiDirectory directory;
     private final Module module;
 
+    private final DeserializerState deserializerState;
+
     public JsonToJavaBeanDialog(@Nullable Project project, PsiDirectory directory, Module module) {
         super(project, true);
         this.project = project;
         this.directory = directory;
         this.module = module;
+        this.deserializerState = JsonAssistantPersistentState.getInstance().deserializerState;
 
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.deserialize.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.deserialize.ok"));
@@ -87,26 +96,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
-        // TODO 修改为设置按钮，点击后弹出ListPopup
-        // ActionButton actionButton = new ActionButton();
+        JPanel optionPanel = new JPanel();
+        optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.X_AXIS)); // 水平排列
+        optionPanel.setBorder(JBUI.Borders.empty(5, 0, 0, 4));
+        optionPanel.add(new TitledSeparator());
+        optionPanel.add(Box.createRigidArea(new Dimension(3, 0)));
+        optionPanel.add(createOptionsButton());
 
-
-        // TODO 添加注解、功能选项
-        TitledSeparator titledSeparator = new TitledSeparator("可选参数");
-        JBCheckBox fastJsonCb = new JBCheckBox("FastJson 注解");
-        JBCheckBox jacksonCb = new JBCheckBox("Jackson 注解");
-        JBCheckBox toCamelCb = new JBCheckBox("下划线转驼峰");
-
-        JPanel checkBoxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 18,5));
-        checkBoxPanel.add(fastJsonCb);
-        checkBoxPanel.add(jacksonCb);
-        checkBoxPanel.add(toCamelCb);
-
-        BorderLayoutPanel centerPanel = new BorderLayoutPanel().addToTop(titledSeparator).addToCenter(checkBoxPanel);
-        centerPanel.setBorder(JBUI.Borders.empty(10, 4, 7, 0));
-
-        BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(centerPanel);
-
+        BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(optionPanel);
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
@@ -127,6 +124,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         rootPanel.add(splitter, BorderLayout.CENTER);
         rootPanel.setPreferredSize(new Dimension(480, 450));
         return rootPanel;
+    }
+
+    private ActionButton createOptionsButton() {
+        OptionsGroup group = new OptionsGroup(deserializerState, module);
+        return new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
     }
 
     @Override
@@ -203,12 +205,8 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 PsiElementFactory factory = JavaPsiFacade.getInstance(project).getElementFactory();
                 // 递归添加Json字段
                 recursionAddProperty(jsonObject, newClass, factory, needImportList);
-                // 判断是否存在lombok依赖
-                if (JavaUtil.hasLibrary(module, PluginConstant.LOMBOK_LIB)) {
-                    // 添加lombok注解，递归给内部类也加上
-                    importClass(project, newClass, factory);
-                }
-
+                // 添加注解
+                addAnnotation(newClass, factory);
                 // 导入
                 JavaUtil.importClassesInClass(project, newClass, needImportList.toArray(new String[0]));
 
@@ -273,6 +271,17 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         }
 
         return null;
+    }
+
+    private void addAnnotation(PsiClass newClass, PsiElementFactory factory) {
+        // 判断是否存在lombok依赖
+        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
+            // 添加lombok注解，递归给内部类也加上
+            addLombokAnnotation(project, newClass, factory);
+        }
+
+        // 是否
+
     }
 
     private void recursionAddProperty(ObjectWrapper jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
@@ -374,7 +383,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
      * @param newClass 待导入的类
      * @param factory  用于创建新的psi元素的工厂
      */
-    private void importClass(Project project, PsiClass newClass, PsiElementFactory factory) {
+    private void addLombokAnnotation(Project project, PsiClass newClass, PsiElementFactory factory) {
         // 增加注解
         PsiAnnotation dataAnnotation = factory.createAnnotationFromText(
                 "@" + StringUtil.getShortName(LombokAnnotations.DATA.getValue()), null);

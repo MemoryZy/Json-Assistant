@@ -9,6 +9,11 @@ import cn.memoryzy.json.enums.HistoryViewType;
 public class HistoryState {
 
     /**
+     * 历史记录开关
+     */
+    public boolean switchHistory = true;
+
+    /**
      * 历史记录显示类型
      */
     public HistoryViewType historyViewType = HistoryViewType.TREE;

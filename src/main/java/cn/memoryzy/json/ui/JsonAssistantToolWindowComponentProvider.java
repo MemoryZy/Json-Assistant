@@ -21,6 +21,7 @@ import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
@@ -71,6 +72,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private final JsonHistoryPersistentState historyState;
     private final EditorBehaviorState editorBehaviorState;
     private final EditorAppearanceState editorAppearanceState;
+    private final HistoryState historyOptionState;
     private EditorEx editor;
 
 
@@ -82,6 +84,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
         this.editorBehaviorState = persistentState.editorBehaviorState;
         this.editorAppearanceState = persistentState.editorAppearanceState;
+        this.historyOptionState = persistentState.historyState;
     }
 
     public JComponent createComponent() {
@@ -254,7 +257,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                 }
             }
 
-            if (editorBehaviorState.importHistory && StrUtil.isBlank(jsonString)) {
+            if (historyOptionState.switchHistory && editorBehaviorState.importHistory && StrUtil.isBlank(jsonString)) {
                 HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(project).getHistory();
                 if (CollUtil.isNotEmpty(historyList)) {
                     sourceType = TextSourceType.FROM_HISTORY;
@@ -305,39 +308,43 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     }
 
     private void addJsonToHistory() {
-        HistoryLimitedList historyList = historyState.getHistory();
-        String text = StrUtil.trim(editor.getDocument().getText());
+        if (historyOptionState.switchHistory) {
+            HistoryLimitedList historyList = historyState.getHistory();
+            String text = StrUtil.trim(editor.getDocument().getText());
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            JsonWrapper jsonWrapper = null;
-            if (JsonUtil.isJson(text)) {
-                // 无元素，不添加
-                if (JsonUtil.isJsonArray(text)) {
-                    ArrayWrapper jsonArray = JsonUtil.parseArray(text);
-                    jsonWrapper = jsonArray;
-                    if (jsonArray.isEmpty()) return;
-                } else if (JsonUtil.isJsonObject(text)) {
-                    ObjectWrapper jsonObject = JsonUtil.parseObject(text);
-                    jsonWrapper = jsonObject;
-                    if (jsonObject.isEmpty()) return;
+            // TODO 防止 IDE 持久化时，XML 解析非法字符，在此加上非法字符过滤。反序列化时再转回来
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                JsonWrapper jsonWrapper = null;
+                if (JsonUtil.isJson(text)) {
+                    // 无元素，不添加
+                    if (JsonUtil.isJsonArray(text)) {
+                        ArrayWrapper jsonArray = JsonUtil.parseArray(text);
+                        jsonWrapper = jsonArray;
+                        if (jsonArray.isEmpty()) return;
+                    } else if (JsonUtil.isJsonObject(text)) {
+                        ObjectWrapper jsonObject = JsonUtil.parseObject(text);
+                        jsonWrapper = jsonObject;
+                        if (jsonObject.isEmpty()) return;
+                    }
+
+                } else if (Json5Util.isJson5(text)) {
+                    if (Json5Util.isJson5Array(text)) {
+                        ArrayWrapper jsonArray = Json5Util.parseArray(text);
+                        jsonWrapper = jsonArray;
+                        if (CollUtil.isEmpty(jsonArray)) return;
+                    } else if (Json5Util.isJson5Object(text)) {
+                        ObjectWrapper jsonObject = Json5Util.parseObject(text);
+                        jsonWrapper = jsonObject;
+                        if (MapUtil.isEmpty(jsonObject)) return;
+                    }
                 }
 
-            } else if (Json5Util.isJson5(text)) {
-                if (Json5Util.isJson5Array(text)) {
-                    ArrayWrapper jsonArray = Json5Util.parseArray(text);
-                    jsonWrapper = jsonArray;
-                    if (CollUtil.isEmpty(jsonArray)) return;
-                } else if (Json5Util.isJson5Object(text)) {
-                    ObjectWrapper jsonObject = Json5Util.parseObject(text);
-                    jsonWrapper = jsonObject;
-                    if (MapUtil.isEmpty(jsonObject)) return;
+                if (Objects.nonNull(jsonWrapper)) {
+                    historyList.add(project, jsonWrapper);
                 }
-            }
-
-            if (Objects.nonNull(jsonWrapper)) {
-                historyList.add(project, jsonWrapper);
-            }
-        });
+            });
+        }
     }
 
     @Override

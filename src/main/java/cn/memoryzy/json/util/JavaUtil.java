@@ -703,4 +703,20 @@ public class JavaUtil {
         return psiFacade.findClass(qualifiedName, GlobalSearchScope.allScope(project));
     }
 
+    /**
+     * 查找指定模块中的类。
+     *
+     * @param module        模块对象
+     * @param qualifiedName 类的全限定名
+     * @return 匹配的PsiClass对象，如果没有找到则返回null
+     */
+    public static PsiClass findClass(Module module, String qualifiedName) {
+        if (StrUtil.isBlank(qualifiedName)) {
+            return null;
+        }
+
+        JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(module.getProject());
+        return psiFacade.findClass(qualifiedName, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false));
+    }
+
 }

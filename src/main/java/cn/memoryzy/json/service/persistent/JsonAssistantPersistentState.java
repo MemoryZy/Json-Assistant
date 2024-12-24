@@ -51,6 +51,12 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
     @Attribute(converter = GeneralStateConverter.class)
     public GeneralState generalState = new GeneralState();
 
+    /**
+     * 持久化设置项
+     */
+    @Attribute(converter = DeserializerStateConverter.class)
+    public DeserializerState deserializerState = new DeserializerState();
+
 
     @Override
     public @Nullable JsonAssistantPersistentState getState() {
@@ -64,5 +70,6 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
         this.editorBehaviorState = state.editorBehaviorState;
         this.historyState = state.historyState;
         this.generalState = state.generalState;
+        this.deserializerState = state.deserializerState;
     }
 }

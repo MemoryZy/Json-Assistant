@@ -64,6 +64,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel backgroundColorDesc;
     private TitledSeparator historyLabel;
     private JBLabel historyStyleTitle;
+    private JBCheckBox recordHistory;
     private JBRadioButton historyTree;
     private JBRadioButton historyList;
     private TitledSeparator generalLabel;
@@ -251,12 +252,23 @@ public class JsonAssistantMainConfigurableComponentProvider {
      */
     private void configureHistoryComponents() {
         historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
+        recordHistory.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
         historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
         historyTree.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.tree.text"));
         historyList.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.list.text"));
         ButtonGroup group = new ButtonGroup();
         group.add(historyTree);
         group.add(historyList);
+
+        recordHistory.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                UIManager.controlEnableRadioButton(historyTree, true);
+                UIManager.controlEnableRadioButton(historyList, true);
+            } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+                UIManager.controlEnableRadioButton(historyTree, false);
+                UIManager.controlEnableRadioButton(historyList, false);
+            }
+        });
     }
 
     /**
@@ -302,10 +314,20 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 历史记录
         HistoryState historyState = persistentState.historyState;
+        boolean switchHistory = historyState.switchHistory;
+        recordHistory.setSelected(switchHistory);
         if (historyState.historyViewType == HistoryViewType.TREE) {
             historyTree.setSelected(true);
         } else {
             historyList.setSelected(true);
+        }
+
+        if (switchHistory) {
+            UIManager.controlEnableRadioButton(historyTree, true);
+            UIManager.controlEnableRadioButton(historyList, true);
+        } else {
+            UIManager.controlEnableRadioButton(historyTree, false);
+            UIManager.controlEnableRadioButton(historyList, false);
         }
 
         if (recognizeOtherFormats) {
@@ -364,6 +386,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 历史记录
         HistoryState historyState = persistentState.historyState;
+        boolean oldSwitchHistory = historyState.switchHistory;
         HistoryViewType oldHistoryViewType = historyState.historyViewType;
 
         // 常规
@@ -391,6 +414,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newRecognizeUrlParamFormat = urlParamFormatsCb.isSelected();
 
         // 历史记录
+        boolean newSwitchHistory = recordHistory.isSelected();
         HistoryViewType newHistoryViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
 
         // 常规
@@ -415,6 +439,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognizeYamlFormat, newRecognizeYamlFormat)
                 || !Objects.equals(oldRecognizeTomlFormat, newRecognizeTomlFormat)
                 || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
+                || !Objects.equals(oldSwitchHistory, newSwitchHistory)
                 || !Objects.equals(oldHistoryViewType, newHistoryViewType)
                 || !Objects.equals(oldTreeDisplayMode, newTreeDisplayMode)
 
@@ -439,6 +464,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 历史记录
         HistoryState historyState = persistentState.historyState;
+        historyState.switchHistory = recordHistory.isSelected();
         historyState.historyViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
 
         // 外观

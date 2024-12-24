@@ -57,7 +57,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
         showTextField.setFont(UIManager.consolasFont(14));
 
-        showList = new JBList<>(fillHistoryListModel());
+        showList = new JBList<>(fillListModel());
         showList.setFont(UIManager.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
@@ -148,7 +148,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         }.installOn(showList);
     }
 
-    private DefaultListModel<YamlDocEntry> fillHistoryListModel() {
+    private DefaultListModel<YamlDocEntry> fillListModel() {
         List<YamlDocEntry> models = YamlDocEntry.of(values);
         return JBList.createDefaultListModel(models);
     }
