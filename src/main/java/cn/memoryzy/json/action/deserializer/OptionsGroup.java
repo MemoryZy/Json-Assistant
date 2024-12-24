@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.util.JavaUtil;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -19,6 +20,7 @@ import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.Objects;
 
 
 /**
@@ -49,12 +51,13 @@ public class OptionsGroup extends DefaultActionGroup {
         JBCheckBox jacksonCheckBox = new JBCheckBox(JsonAssistantBundle.messageOnSystem("action.deserializer.jackson.text"), deserializerState.jacksonAnnotation);
         JBCheckBox keepCamelCheckBox = new JBCheckBox(JsonAssistantBundle.messageOnSystem("action.deserializer.keepCamel.text"), deserializerState.keepCamelCase);
 
-        // TODO 当系统不存在 FastJson、Jackson 的依赖，那就置灰
+        // TODO 当系统不存在 FastJson、Jackson 的依赖，那就置灰，并在adtext中给出提示
         PsiClass jfAnnotation = JavaUtil.findClass(module, JsonAnnotations.FAST_JSON_JSON_FIELD.getValue());
         PsiClass jf2Annotation = JavaUtil.findClass(module, JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue());
         PsiClass jpAnnotation = JavaUtil.findClass(module, JsonAnnotations.JACKSON_JSON_PROPERTY.getValue());
 
-
+        UIManager.controlEnableCheckBox(fastJsonCheckBox, Objects.nonNull(jfAnnotation) || Objects.nonNull(jf2Annotation));
+        UIManager.controlEnableCheckBox(jacksonCheckBox, Objects.nonNull(jpAnnotation));
 
         listModel.addElement(fastJsonCheckBox);
         listModel.addElement(jacksonCheckBox);
