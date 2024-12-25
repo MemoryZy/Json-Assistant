@@ -14,6 +14,11 @@ public class DeserializerState {
     public boolean fastJsonAnnotation = false;
 
     /**
+     * 添加 FastJson2 注解
+     */
+    public boolean fastJson2Annotation = false;
+
+    /**
      * 添加 Jackson 注解
      */
     public boolean jacksonAnnotation = false;
@@ -22,5 +27,10 @@ public class DeserializerState {
      * 类属性保持驼峰命名
      */
     public boolean keepCamelCase = true;
+
+    /**
+     * 保持小写名称，即如果是纯大写，将转为纯小写
+     */
+    public boolean keepLowercase = true;
 
 }

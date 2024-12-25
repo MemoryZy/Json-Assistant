@@ -436,6 +436,14 @@ public class JavaUtil {
         return psiClass;
     }
 
+    public static void addKeywordsToClass(PsiElementFactory factory, String keywordString, PsiClass psiClass) {
+        PsiKeyword keyword = factory.createKeyword(keywordString);
+        PsiModifierList modifierList = psiClass.getModifierList();
+        if (Objects.nonNull(modifierList)) {
+            modifierList.add(keyword);
+        }
+    }
+
 
     /**
      * 根据Java文件获取当前Class文件及所有内部类
@@ -717,6 +725,30 @@ public class JavaUtil {
 
         JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(module.getProject());
         return psiFacade.findClass(qualifiedName, GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(module, false));
+    }
+
+    public static boolean hasFastJsonLib(Module module) {
+        return Objects.nonNull(JavaUtil.findClass(module, JsonAnnotations.FAST_JSON_JSON_FIELD.getValue()));
+    }
+
+    public static boolean hasFastJson2Lib(Module module) {
+        return Objects.nonNull(JavaUtil.findClass(module, JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue()));
+    }
+
+    public static boolean hasJacksonLib(Module module) {
+        return Objects.nonNull(JavaUtil.findClass(module, JsonAnnotations.JACKSON_JSON_PROPERTY.getValue()));
+    }
+
+    public static boolean isMissingFastJsonLib(Module module) {
+        return !hasFastJsonLib(module);
+    }
+
+    public static boolean isMissingFastJson2Lib(Module module) {
+        return !hasFastJson2Lib(module);
+    }
+
+    public static boolean isMissingJacksonLib(Module module) {
+        return !hasJacksonLib(module);
     }
 
 }

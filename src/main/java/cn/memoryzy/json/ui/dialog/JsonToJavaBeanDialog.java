@@ -3,12 +3,14 @@ package cn.memoryzy.json.ui.dialog;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.deserializer.OptionsGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
@@ -206,12 +208,16 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 // 递归添加Json字段
                 recursionAddProperty(jsonObject, newClass, factory, needImportList);
                 // 添加注解
-                addAnnotation(newClass, factory);
+                addClassLevelAnnotation(newClass, factory);
                 // 导入
                 JavaUtil.importClassesInClass(project, newClass, needImportList.toArray(new String[0]));
 
                 // 刷新文件系统
                 PlatformUtil.refreshFileSystem();
+
+                // 格式化
+                // CodeStyleManager.getInstance(project).reformat(newClass);
+
                 // 编辑器定位到新建类
                 newClass.navigate(true);
             } catch (Exception e) {
@@ -273,46 +279,36 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return null;
     }
 
-    private void addAnnotation(PsiClass newClass, PsiElementFactory factory) {
-        // 判断是否存在lombok依赖
-        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
-            // 添加lombok注解，递归给内部类也加上
-            addLombokAnnotation(project, newClass, factory);
-        }
-
-        // 是否
-
-    }
-
     private void recursionAddProperty(ObjectWrapper jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
         // 循环所有Json字段
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
+            // 处理后的key
+            String processedKey = getFieldName(key);
 
             // ------------- 如果value是ObjectWrapper，表示是对象
             if (value instanceof ObjectWrapper) {
                 ObjectWrapper childJsonObject = (ObjectWrapper) value;
                 // 如果是对象，则还需要创建内部类
-                PsiClass innerClass = factory.createClass(StrUtil.upperFirst(key));
-
+                PsiClass innerClass = factory.createClass(StrUtil.upperFirst(processedKey));
                 // 添加 static 关键字
-                PsiKeyword keyword = factory.createKeyword(PsiModifier.STATIC);
-                PsiModifierList modifierList = innerClass.getModifierList();
-                if (Objects.nonNull(modifierList)) {
-                    modifierList.add(keyword);
-                }
-
+                JavaUtil.addKeywordsToClass(factory, PsiModifier.STATIC, innerClass);
                 // 则递归添加
                 recursionAddProperty(childJsonObject, innerClass, factory, needImportList);
                 // 添加内部类至主类
                 psiClass.add(innerClass);
                 // 添加当前内部类类型的字段
-                String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, innerClass.getName(), StrUtil.lowerFirst(key));
+                String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, innerClass.getName(), processedKey);
                 // 构建字段对象
                 PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
+                // 添加注解
+                addFieldLevelAnnotation(key, psiClass, psiField, factory);
                 // 添加到Class
                 psiClass.add(psiField);
+                // 添加换行
+                addWhiteSpaceToField(psiField, factory);
+
             } else if (value instanceof ArrayWrapper) {
                 ArrayWrapper jsonArray = (ArrayWrapper) value;
                 if (CollUtil.isNotEmpty(jsonArray)) {
@@ -321,15 +317,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                     if (element instanceof ObjectWrapper) {
                         ObjectWrapper jsonObj = (ObjectWrapper) element;
                         // 对象值
-                        innerClassName = StrUtil.upperFirst(key + "Bean");
+                        innerClassName = StrUtil.upperFirst(processedKey + "Bean");
                         // 如果是对象，则还需要创建内部类
                         PsiClass innerClass = factory.createClass(innerClassName);
                         // 添加 static 关键字
-                        PsiKeyword keyword = factory.createKeyword(PsiModifier.STATIC);
-                        PsiModifierList modifierList = innerClass.getModifierList();
-                        if (Objects.nonNull(modifierList)) {
-                            modifierList.add(keyword);
-                        }
+                        JavaUtil.addKeywordsToClass(factory, PsiModifier.STATIC, innerClass);
                         // 则递归添加
                         recursionAddProperty(jsonObj, innerClass, factory, needImportList);
                         // 添加内部类至主类
@@ -341,9 +333,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
                     needImportList.add(List.class.getName());
                     // 添加当前内部类类型的字段
-                    String fieldText = StrUtil.format("{} List<{}> {};", PsiModifier.PRIVATE, innerClassName, StrUtil.lowerFirst(key));
+                    String fieldText = StrUtil.format("{} List<{}> {};", PsiModifier.PRIVATE, innerClassName, processedKey);
                     // 构建字段对象
                     PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
+                    // 添加注解
+                    addFieldLevelAnnotation(key, psiClass, psiField, factory);
                     // 添加到Class
                     psiClass.add(psiField);
                 }
@@ -352,7 +346,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 // 获取字段类型
                 String propertyType = JavaUtil.getStrType(value);
                 // 定义字段文本
-                String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, propertyType, StrUtil.lowerFirst(key));
+                String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, propertyType, processedKey);
 
                 if (Objects.equals(propertyType, Date.class.getSimpleName())) {
                     needImportList.add(Date.class.getName());
@@ -369,12 +363,67 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                     throw e;
                 }
 
+                // 添加注解
+                addFieldLevelAnnotation(key, psiClass, psiField, factory);
+
                 // 添加到Class
                 psiClass.add(psiField);
             }
         }
     }
 
+    private void addFieldLevelAnnotation(String originalKey, PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
+        // 是否存在FastJson依赖
+        boolean hasFastJsonLib = JavaUtil.hasFastJsonLib(module);
+        boolean hasFastJson2Lib = JavaUtil.hasFastJson2Lib(module);
+        // 当选择了添加 fastJson/fastJson2 注解，且存在 fastJson/fastJson2 注解
+        if ((deserializerState.fastJsonAnnotation || deserializerState.fastJson2Annotation) && (hasFastJsonLib || hasFastJson2Lib)) {
+            addFieldLevelFastJsonAnnotation(originalKey, newClass, psiField, factory, hasFastJsonLib, hasFastJson2Lib);
+        }
+
+        // 是否存在Jackson依赖
+        if (deserializerState.jacksonAnnotation && JavaUtil.hasJacksonLib(module)) {
+            addFieldLevelJacksonAnnotation(originalKey, psiField, factory);
+        }
+    }
+
+    private void addFieldLevelJacksonAnnotation(String originalKey, PsiField psiField, PsiElementFactory factory) {
+
+    }
+
+    private void addFieldLevelFastJsonAnnotation(String originalKey, PsiClass newClass, PsiField psiField,
+                                                 PsiElementFactory factory, boolean hasFastJsonLib, boolean hasFastJson2Lib) {
+        String annotationName = null;
+        if (deserializerState.fastJsonAnnotation && hasFastJsonLib) {
+            // 如果选择添加 fastJson 注解，且存在 fastJson 库
+            annotationName = JsonAnnotations.FAST_JSON_JSON_FIELD.getValue();
+        } else if (deserializerState.fastJson2Annotation && hasFastJson2Lib) {
+            // 如果选择添加 fastJson2 注解，且存在 fastJson2 库
+            annotationName = JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue();
+        }
+
+        if (annotationName == null) {
+            return;
+        }
+
+        // 增加注解
+        String formatted = StrUtil.format("@{}(name = \"{}\")", StringUtil.getShortName(annotationName), originalKey);
+        // 导入类
+        JavaUtil.importClassesInClass(project, newClass, annotationName);
+
+        PsiElement firstChild = psiField.getFirstChild();
+        PsiAnnotation jsonFieldAnnotation = factory.createAnnotationFromText(formatted, psiField);
+        psiField.addBefore(jsonFieldAnnotation, firstChild);
+    }
+
+
+    private void addClassLevelAnnotation(PsiClass newClass, PsiElementFactory factory) {
+        // 判断是否存在lombok依赖
+        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
+            // 在类上添加lombok注解，递归给内部类也加上
+            addClassLevelLombokAnnotation(project, newClass, factory);
+        }
+    }
 
     /**
      * 导入类并添加注解
@@ -383,7 +432,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
      * @param newClass 待导入的类
      * @param factory  用于创建新的psi元素的工厂
      */
-    private void addLombokAnnotation(Project project, PsiClass newClass, PsiElementFactory factory) {
+    private void addClassLevelLombokAnnotation(Project project, PsiClass newClass, PsiElementFactory factory) {
         // 增加注解
         PsiAnnotation dataAnnotation = factory.createAnnotationFromText(
                 "@" + StringUtil.getShortName(LombokAnnotations.DATA.getValue()), null);
@@ -417,6 +466,27 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 addImportAnnotationOnInnerClass(innerClass, dataAnnotation, accessorsAnnotation);
             }
         }
+    }
+
+    private String getFieldName(String originalKey) {
+        String fieldName;
+        // 包含下划线或空格，那就转为驼峰格式
+        if (deserializerState.keepCamelCase && (originalKey.contains("_") || originalKey.contains(" "))) {
+            return JsonAssistantUtil.toCamel(originalKey);
+        }
+
+        if (ReUtil.isMatch("^[A-Z]+$", originalKey)) {
+            // 若为纯大写，则转为纯小写
+            return originalKey.toLowerCase();
+        }
+
+        return StrUtil.lowerFirst(originalKey);
+    }
+
+    private void addWhiteSpaceToField(PsiField psiField, PsiElementFactory factory) {
+        PsiElement lastChild = psiField.getLastChild();
+
+
     }
 
 

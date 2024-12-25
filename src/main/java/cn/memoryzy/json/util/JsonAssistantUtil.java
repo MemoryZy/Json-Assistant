@@ -1,7 +1,9 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -198,6 +200,41 @@ public class JsonAssistantUtil {
                 .allMatch(el -> el instanceof Byte || el instanceof Short || el instanceof Integer
                         || el instanceof Long || el instanceof Float
                         || el instanceof Double || el instanceof Character);
+    }
+
+    /**
+     * 下划线、空格转驼峰
+     *
+     * @param text 文本
+     * @return 转换后的文本
+     */
+    public static String toCamel(String text) {
+        if (StringUtils.isBlank(text)) {
+            return text;
+        }
+
+        String[] split = text.split(" ");
+        if (split.length > 1) {
+            text = blankToSnakeCase(text);
+        }
+
+        return NamingCase.toCamelCase(text);
+    }
+
+    /**
+     * 空白分隔转下划线
+     *
+     * @param text 文本
+     * @return 转换后的文本
+     */
+    public static String blankToSnakeCase(String text) {
+        // 替换开头的空格
+        text = text.replaceAll("^\\s+", "_");
+        // 替换结尾的空格
+        text = text.replaceAll("\\s+$", "_");
+        // 替换所有空格
+        text = text.replaceAll("\\s+", "_");
+        return text;
     }
 
 }
