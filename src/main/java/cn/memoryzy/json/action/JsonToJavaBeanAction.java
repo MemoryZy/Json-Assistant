@@ -8,7 +8,6 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
@@ -22,7 +21,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/07/07
  */
-public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBackground {
+public class JsonToJavaBeanAction extends AnAction implements UpdateInBackground {
 
     private static Class<?> clz;
     private static Method updateMethod;
@@ -44,6 +43,7 @@ public class JsonToJavaBeanAction extends DumbAwareAction implements UpdateInBac
         presentation.setText(JsonAssistantBundle.message("action.deserialize.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.deserialize.description"));
         presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
+        // 注：由DumbAwareAction切换为AnAction，防止出现IndexNotReadyException异常
     }
 
     @Override

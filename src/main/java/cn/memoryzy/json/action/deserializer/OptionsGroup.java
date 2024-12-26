@@ -1,8 +1,6 @@
 package cn.memoryzy.json.action.deserializer;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.ui.component.*;
 import cn.memoryzy.json.util.JavaUtil;
@@ -11,8 +9,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.DumbAware;
-import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
@@ -21,15 +17,15 @@ import com.intellij.ui.components.JBCheckBox;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 
 /**
  * @author Memory
  * @since 2024/12/23
  */
-public class OptionsGroup extends DefaultActionGroup implements DumbAware {
+public class OptionsGroup extends DefaultActionGroup {
 
     private final Module module;
     private final DeserializerState deserializerState;
@@ -51,91 +47,81 @@ public class OptionsGroup extends DefaultActionGroup implements DumbAware {
         boolean hasFastJson2Lib = JavaUtil.hasFastJson2Lib(module);
         boolean hasJacksonLib = JavaUtil.hasJacksonLib(module);
 
-        DefaultListModel<JCheckBox> listModel = createListModel(hasFastJsonLib, hasFastJson2Lib);
-        CheckBoxList<JBCheckBox> checkBoxList = new CheckBoxList<>(listModel) {
-            @Override
-            protected boolean isEnabled(int index) {
-                return ((OptionsCheckBox) getModel().getElementAt(index)).isFeatureEnabled();
-            }
-        };
+        DefaultListModel<JCheckBox> listModel = createListModel(hasFastJsonLib, hasFastJson2Lib, hasJacksonLib);
+        CheckBoxList<JBCheckBox> checkBoxList = new CheckBoxList<>(listModel);
 
-        ComponentPopupBuilder popupBuilder = JBPopupFactory.getInstance()
+        JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(checkBoxList, null)
                 .setFocusable(true)
                 .setShowShadow(true)
                 .setShowBorder(true)
                 .setLocateByContent(true)
                 .setNormalWindowLevel(true)
-                .addListener(new SaveOptionsListener(listModel));
-
-        String adText = getAdText(hasFastJsonLib, hasFastJson2Lib, hasJacksonLib);
-        if (StrUtil.isNotBlank(adText)) {
-            popupBuilder.setAdText(HtmlConstant.wrapHtml(adText));
-        }
-
-        popupBuilder.createPopup().showInBestPositionFor(e.getDataContext());
+                .addListener(new SaveOptionsListener(listModel))
+                .createPopup()
+                .showInBestPositionFor(e.getDataContext());
     }
 
-    private String getAdText(boolean hasFastJsonLib, boolean hasFastJson2Lib, boolean hasJacksonLib) {
-        // 取反，方便处理逻辑
-        boolean missingFastJsonLib = !hasFastJsonLib;
-        boolean missingFastJson2Lib = !hasFastJson2Lib;
-        boolean missingJacksonLib = !hasJacksonLib;
 
-        // 若缺少 FastJson/FastJson2 或 Jackson 依赖其中一个，就给出提示
-        if ((missingFastJsonLib && missingFastJson2Lib) || missingJacksonLib) {
-            StringBuilder builder = new StringBuilder(JsonAssistantBundle.messageOnSystem("popup.deserialize.options.missingDependencies.text"));
-            List<String> missingLibraries = new ArrayList<>();
-
-            // 如果 FastJson/FastJson2依赖都没有，那就提示FastJson
-            if (missingFastJsonLib && missingFastJson2Lib) {
-                missingLibraries.add("<u><b>FastJson</b></u>");
-            }
-
-            if (missingJacksonLib) {
-                missingLibraries.add("<u><b>Jackson</b></u>");
-            }
-
-            builder.append(StrUtil.join("、", missingLibraries));
-            return builder.toString();
-        }
-
-        return null;
-    }
-
-    private DefaultListModel<JCheckBox> createListModel(boolean hasFastJsonLib, boolean hasFastJson2Lib) {
+    private DefaultListModel<JCheckBox> createListModel(boolean hasFastJsonLib, boolean hasFastJson2Lib, boolean hasJacksonLib) {
         JBCheckBox fastJsonCheckBox = new FastJsonOptionsCheckBox(module, deserializerState);
         JBCheckBox fastJson2CheckBox = new FastJson2OptionsCheckBox(module, deserializerState);
         JBCheckBox jacksonCheckBox = new JacksonOptionsCheckBox(module, deserializerState);
         JBCheckBox keepCamelCheckBox = new KeepCamelOptionsCheckBox(deserializerState);
         DefaultListModel<JCheckBox> listModel = new DefaultListModel<>();
 
-        // -- 如果同时存在 fastJson、fastJson2 依赖，那么同时展示选择
-        // -- 如果只存在 fastJson 依赖，不存在 fastJson2 依赖，那么只展示 fastJson 选项，反之亦然
+        // 存在某种依赖，就添加某个选项
         if (hasFastJsonLib && hasFastJson2Lib) {
             listModel.addElement(fastJsonCheckBox);
             listModel.addElement(fastJson2CheckBox);
 
             // 限制单选
-            ButtonGroup group = new ButtonGroup();
-            group.add(fastJsonCheckBox);
-            group.add(fastJson2CheckBox);
-
-        } else if (!hasFastJsonLib && !hasFastJson2Lib) {
-            // 如果两种都不存在，那就添加一个默认的
-            listModel.addElement(fastJsonCheckBox);
+            fastJsonCheckBox.addItemListener(new RestrictedRadioItemListener(fastJsonCheckBox, fastJson2CheckBox));
+            fastJson2CheckBox.addItemListener(new RestrictedRadioItemListener(fastJsonCheckBox, fastJson2CheckBox));
 
         } else if (hasFastJsonLib) {
             listModel.addElement(fastJsonCheckBox);
 
-        } else {
+        } else if (hasFastJson2Lib) {
             listModel.addElement(fastJson2CheckBox);
         }
 
-        listModel.addElement(jacksonCheckBox);
-        listModel.addElement(keepCamelCheckBox);
+        if (hasJacksonLib) {
+            listModel.addElement(jacksonCheckBox);
+        }
 
+        listModel.addElement(keepCamelCheckBox);
         return listModel;
+    }
+
+    public static class RestrictedRadioItemListener implements ItemListener {
+        private final JBCheckBox fastJsonCheckBox;
+        private final JBCheckBox fastJson2CheckBox;
+
+        public RestrictedRadioItemListener(JBCheckBox fastJsonCheckBox, JBCheckBox fastJson2CheckBox) {
+            this.fastJsonCheckBox = fastJsonCheckBox;
+            this.fastJson2CheckBox = fastJson2CheckBox;
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            Object item = e.getItem();
+            int stateChange = e.getStateChange();
+            if (item instanceof FastJsonOptionsCheckBox) {
+                // fastjson
+                if (stateChange == ItemEvent.SELECTED) {
+                    // 当fastjson点击选中后，去除fastjson2的选中
+                    fastJson2CheckBox.setSelected(false);
+                }
+
+            } else {
+                // fastjson2
+                if (stateChange == ItemEvent.SELECTED) {
+                    // 当fastjson点击选中后，去除fastjson2的选中
+                    fastJsonCheckBox.setSelected(false);
+                }
+            }
+        }
     }
 
 

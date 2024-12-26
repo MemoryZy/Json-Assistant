@@ -5,7 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.deserializer.OptionsGroup;
+import cn.memoryzy.json.action.deserializer.OptionsGroup2;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
@@ -27,8 +27,10 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.module.Module;
@@ -38,6 +40,7 @@ import com.intellij.openapi.ui.InputValidatorEx;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.EditorTextField;
@@ -128,9 +131,24 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return rootPanel;
     }
 
-    private ActionButton createOptionsButton() {
-        OptionsGroup group = new OptionsGroup(deserializerState, module);
-        return new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
+    private JComponent createOptionsButton() {
+        OptionsGroup2 group = new OptionsGroup2(deserializerState, module);
+
+        ActionButton button = new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
+
+        return button;
+
+        // OptionsGroup2 group = new OptionsGroup2(deserializerState, module);
+        //
+        // DefaultActionGroup defaultActionGroup = new DefaultActionGroup();
+        // defaultActionGroup.add(group);
+        //
+        // ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, defaultActionGroup, true);
+        //
+        //
+        // // return new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
+        //
+        // return toolbar.getComponent();
     }
 
     @Override
@@ -216,7 +234,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 PlatformUtil.refreshFileSystem();
 
                 // 格式化
-                // CodeStyleManager.getInstance(project).reformat(newClass);
+                CodeStyleManager.getInstance(project).reformat(newClass);
+
+                // 为每个字段添加换行
+                addWhiteSpaceToField(newClass);
 
                 // 编辑器定位到新建类
                 newClass.navigate(true);
@@ -228,56 +249,9 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return true;
     }
 
-    private ObjectWrapper resolveJson(String jsonText) {
-        // 解析Json及Json5
-        if (!JsonUtil.isJson(jsonText) && !Json5Util.isJson5(jsonText)) {
-            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
-            return null;
-        }
 
-        // ----------------- 普通Json解析
-        if (JsonUtil.isJsonArray(jsonText)) {
-            ArrayWrapper jsonArray = JsonUtil.parseArray(jsonText);
-            // 数组为空
-            if (jsonArray.isEmpty()) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
-                return null;
-            }
+    // -------------------------------------- Psi 操作 -------------------------------------- //
 
-            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
-            if (jsonArray.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
-                return null;
-            }
-
-            return (ObjectWrapper) jsonArray.get(0);
-        } else if (JsonUtil.isJsonObject(jsonText)) {
-            return JsonUtil.parseObject(jsonText);
-        }
-
-
-        // ----------------- Json5解析
-        if (Json5Util.isJson5Array(jsonText)) {
-            ArrayWrapper arrayWrapper = Json5Util.parseArray(jsonText);
-            if (CollUtil.isEmpty(arrayWrapper)) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
-                return null;
-            }
-
-            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
-            if (arrayWrapper.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
-                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
-                return null;
-            }
-
-            // 转为JsonObject
-            return (ObjectWrapper) arrayWrapper.get(0);
-        } else if (Json5Util.isJson5Object(jsonText)) {
-            return Json5Util.parseObject(jsonText);
-        }
-
-        return null;
-    }
 
     private void recursionAddProperty(ObjectWrapper jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
         // 循环所有Json字段
@@ -306,8 +280,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 addFieldLevelAnnotation(key, psiClass, psiField, factory);
                 // 添加到Class
                 psiClass.add(psiField);
-                // 添加换行
-                addWhiteSpaceToField(psiField, factory);
 
             } else if (value instanceof ArrayWrapper) {
                 ArrayWrapper jsonArray = (ArrayWrapper) value;
@@ -340,6 +312,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                     addFieldLevelAnnotation(key, psiClass, psiField, factory);
                     // 添加到Class
                     psiClass.add(psiField);
+
                 }
             } else {
                 // ------------- 非对象，则直接添加字段
@@ -383,12 +356,12 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         // 是否存在Jackson依赖
         if (deserializerState.jacksonAnnotation && JavaUtil.hasJacksonLib(module)) {
-            addFieldLevelJacksonAnnotation(originalKey, psiField, factory);
+            addFieldLevelJacksonAnnotation(originalKey, newClass, psiField, factory);
         }
     }
 
-    private void addFieldLevelJacksonAnnotation(String originalKey, PsiField psiField, PsiElementFactory factory) {
-
+    private void addFieldLevelJacksonAnnotation(String originalKey, PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
+        addFieldLevelJsonAnnotation(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue(), "value", originalKey, newClass, psiField, factory);
     }
 
     private void addFieldLevelFastJsonAnnotation(String originalKey, PsiClass newClass, PsiField psiField,
@@ -406,8 +379,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return;
         }
 
+        addFieldLevelJsonAnnotation(annotationName, "name", originalKey, newClass, psiField, factory);
+    }
+
+
+    private void addFieldLevelJsonAnnotation(String annotationName, String attributeName, String originalKey,
+                                             PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
         // 增加注解
-        String formatted = StrUtil.format("@{}(name = \"{}\")", StringUtil.getShortName(annotationName), originalKey);
+        String formatted = StrUtil.format("@{}({} = \"{}\")", StringUtil.getShortName(annotationName), attributeName, originalKey);
         // 导入类
         JavaUtil.importClassesInClass(project, newClass, annotationName);
 
@@ -468,6 +447,91 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         }
     }
 
+
+    // ----------------------------------------------------------------------------------- //
+
+    private void addWhiteSpaceToField(PsiClass newClass) {
+        PsiFile psiFile = newClass.getContainingFile();
+        PsiDocumentManager documentManager = PsiDocumentManager.getInstance(project);
+        Document document = documentManager.getDocument(psiFile);
+        if (document == null) {
+            return;
+        }
+
+        String text = document.getText();
+        String[] textArray = text.split("\n");
+        List<String> resultList = new ArrayList<>();
+        for (String textStr : textArray) {
+            // 不包含 package 及 import，且以;结尾，表示字段行
+            if ((textStr.endsWith(";") && !textStr.contains("package ") && !textStr.contains("import "))
+                    // 如果是class声明行，也加个换行
+                    || (textStr.contains("public class ") || textStr.contains("public static class "))) {
+                textStr += "\n";
+            }
+
+            resultList.add(textStr);
+        }
+
+        WriteAction.run(() -> {
+            String result = StrUtil.join("\n", resultList);
+            // 解锁 Document，防止 Psi 锁住无法修改
+            documentManager.doPostponedOperationsAndUnblockDocument(document);
+            document.setText(result);
+        });
+    }
+
+    private ObjectWrapper resolveJson(String jsonText) {
+        // 解析Json及Json5
+        if (!JsonUtil.isJson(jsonText) && !Json5Util.isJson5(jsonText)) {
+            jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
+            return null;
+        }
+
+        // ----------------- 普通Json解析
+        if (JsonUtil.isJsonArray(jsonText)) {
+            ArrayWrapper jsonArray = JsonUtil.parseArray(jsonText);
+            // 数组为空
+            if (jsonArray.isEmpty()) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
+                return null;
+            }
+
+            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
+            if (jsonArray.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
+                return null;
+            }
+
+            return (ObjectWrapper) jsonArray.get(0);
+        } else if (JsonUtil.isJsonObject(jsonText)) {
+            return JsonUtil.parseObject(jsonText);
+        }
+
+
+        // ----------------- Json5解析
+        if (Json5Util.isJson5Array(jsonText)) {
+            ArrayWrapper arrayWrapper = Json5Util.parseArray(jsonText);
+            if (CollUtil.isEmpty(arrayWrapper)) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
+                return null;
+            }
+
+            // 判断：如果Array中除了对象类型还有其他的，那么提示错误
+            if (arrayWrapper.stream().anyMatch(el -> !(el instanceof ObjectWrapper))) {
+                jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
+                return null;
+            }
+
+            // 转为JsonObject
+            return (ObjectWrapper) arrayWrapper.get(0);
+        } else if (Json5Util.isJson5Object(jsonText)) {
+            return Json5Util.parseObject(jsonText);
+        }
+
+        return null;
+    }
+
+
     private String getFieldName(String originalKey) {
         String fieldName;
         // 包含下划线或空格，那就转为驼峰格式
@@ -481,12 +545,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         }
 
         return StrUtil.lowerFirst(originalKey);
-    }
-
-    private void addWhiteSpaceToField(PsiField psiField, PsiElementFactory factory) {
-        PsiElement lastChild = psiField.getLastChild();
-
-
     }
 
 
