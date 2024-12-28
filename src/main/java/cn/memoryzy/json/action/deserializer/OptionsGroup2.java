@@ -4,16 +4,27 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.ui.component.FastJson2OptionsCheckBox;
+import cn.memoryzy.json.ui.component.FastJsonOptionsCheckBox;
+import cn.memoryzy.json.ui.component.JacksonOptionsCheckBox;
+import cn.memoryzy.json.ui.component.KeepCamelOptionsCheckBox;
+import cn.memoryzy.json.util.JavaUtil;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
+import com.intellij.ui.CheckBoxList;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.popup.KeepingPopupOpenAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +59,28 @@ public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpe
         DataContext dataContext = e.getDataContext();
 
         // IdeEventQueue.invokeLater(() -> {
+
+        // JBPopupFactory.getInstance().createComponentPopupBuilder()
+        boolean hasFastJsonLib = JavaUtil.hasFastJsonLib(module);
+        boolean hasFastJson2Lib = JavaUtil.hasFastJson2Lib(module);
+        boolean hasJacksonLib = JavaUtil.hasJacksonLib(module);
+
+        DefaultListModel<JCheckBox> listModel = createListModel(hasFastJsonLib, hasFastJson2Lib, hasJacksonLib);
+        CheckBoxList<JBCheckBox> checkBoxList = new CheckBoxList<>(listModel);
+
+        JBPopup popup1 = JBPopupFactory.getInstance()
+                .createComponentPopupBuilder(checkBoxList, null)
+                .setFocusable(true)
+                .setShowShadow(true)
+                .setShowBorder(true)
+                .setLocateByContent(true)
+                .setNormalWindowLevel(true)
+                // .addListener(new SaveOptionsListener(listModel))
+                .createPopup();
+
+        popup1.showInBestPositionFor(e.getDataContext());
+
+
         ListPopup popup = JBPopupFactory.getInstance()
                 .createActionGroupPopup(null,
                         this, dataContext, JBPopupFactory.ActionSelectionAid.MNEMONICS, true);
@@ -60,6 +93,7 @@ public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpe
         //         popup.setRequestFocus(true);
         //     }
         // });
+
 
         Runnable disposeCallback = () -> {
             System.out.println("callback...");
@@ -74,14 +108,57 @@ public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpe
 
         JBList myList = (JBList) ReflectUtil.getFieldValue(popup, "myList");
 
+        // myList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+
         ListSelectionListener[] listSelectionListeners = myList.getListSelectionListeners();
 
+        popup.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                Object source = e.getSource();
+                UIManager.repaintComponent((JComponent) source);
+
+                System.out.println("sync list " + source);
+            }
+        });
 
         popup.showInBestPositionFor(dataContext);
         // });
 
 
     }
+
+    private DefaultListModel<JCheckBox> createListModel(boolean hasFastJsonLib, boolean hasFastJson2Lib, boolean hasJacksonLib) {
+        JBCheckBox fastJsonCheckBox = new FastJsonOptionsCheckBox(module, deserializerState);
+        JBCheckBox fastJson2CheckBox = new FastJson2OptionsCheckBox(module, deserializerState);
+        JBCheckBox jacksonCheckBox = new JacksonOptionsCheckBox(module, deserializerState);
+        JBCheckBox keepCamelCheckBox = new KeepCamelOptionsCheckBox(deserializerState);
+        DefaultListModel<JCheckBox> listModel = new DefaultListModel<>();
+
+        // 存在某种依赖，就添加某个选项
+        if (hasFastJsonLib && hasFastJson2Lib) {
+            listModel.addElement(fastJsonCheckBox);
+            listModel.addElement(fastJson2CheckBox);
+
+            // 限制单选
+            fastJsonCheckBox.addItemListener(new OptionsGroup.RestrictedRadioItemListener(fastJsonCheckBox, fastJson2CheckBox));
+            fastJson2CheckBox.addItemListener(new OptionsGroup.RestrictedRadioItemListener(fastJsonCheckBox, fastJson2CheckBox));
+
+        } else if (hasFastJsonLib) {
+            listModel.addElement(fastJsonCheckBox);
+
+        } else if (hasFastJson2Lib) {
+            listModel.addElement(fastJson2CheckBox);
+        }
+
+        if (hasJacksonLib) {
+            listModel.addElement(jacksonCheckBox);
+        }
+
+        listModel.addElement(keepCamelCheckBox);
+        return listModel;
+    }
+
 
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
@@ -94,7 +171,7 @@ public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpe
     }
 
 
-    public class FastJsonToggleAction extends ToggleAction {
+    public class FastJsonToggleAction extends ToggleAction implements KeepingPopupOpenAction{
 
         private final DeserializerState deserializerState;
 
@@ -114,7 +191,7 @@ public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpe
         }
     }
 
-    public class JacksonToggleAction extends ToggleAction  {
+    public class JacksonToggleAction extends ToggleAction implements KeepingPopupOpenAction {
 
         private final DeserializerState deserializerState;
 
@@ -134,7 +211,7 @@ public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpe
         }
     }
 
-    public class KeepCamelToggleAction extends ToggleAction  {
+    public class KeepCamelToggleAction extends ToggleAction implements KeepingPopupOpenAction {
 
         private final DeserializerState deserializerState;
 

@@ -12,6 +12,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.GeneralState;
 import cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager;
+import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.Json5Util;
@@ -19,6 +20,7 @@ import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -50,6 +52,10 @@ public class JsonStructureAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
+        Editor editor = PlatformUtil.getEditor(dataContext);
+
+        // 如果是标记的编辑器，那么就用弹窗
+        boolean editorFlag = Boolean.TRUE.equals(editor.getUserData(JsonQueryComponentProvider.EDITOR_FLAG));
         ToolWindow toolWindow = PlatformDataKeys.TOOL_WINDOW.getData(dataContext);
         StructureActionSource source =
                 Objects.nonNull(toolWindow) && PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID.equals(toolWindow.getId())
@@ -58,21 +64,28 @@ public class JsonStructureAction extends DumbAwareAction {
 
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
-        show(event.getDataContext(), json, GlobalJsonConverter.isValidJson(context.getProcessor()), source);
+        show(event.getDataContext(), json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, editorFlag);
     }
 
 
-    public static void show(DataContext dataContext, String text, boolean isJson, StructureActionSource source) {
+    public static void show(DataContext dataContext, String text, boolean isJson, StructureActionSource source, boolean editorFlag) {
         Project project = dataContext.getData(CommonDataKeys.PROJECT);
         JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parse(text);
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-        GeneralState generalState = persistentState.generalState;
 
-        if (generalState.treeDisplayMode == TreeDisplayMode.POPUP) {
+        TreeDisplayMode treeDisplayMode;
+        if (editorFlag) {
+            treeDisplayMode = TreeDisplayMode.POPUP;
+        } else {
+            JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+            GeneralState generalState = persistentState.generalState;
+            treeDisplayMode = generalState.treeDisplayMode;
+        }
+
+        if (treeDisplayMode == TreeDisplayMode.POPUP) {
             // 弹窗展示
             new JsonStructureDialog(jsonWrapper).show();
 
-        } else if (generalState.treeDisplayMode == TreeDisplayMode.ORIGINAL_TOOLWINDOW) {
+        } else if (treeDisplayMode == TreeDisplayMode.ORIGINAL_TOOLWINDOW) {
             // 在旧窗口展示
             showInOriginalToolWindow(project, jsonWrapper, source);
 

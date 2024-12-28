@@ -49,6 +49,7 @@ import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.treeStructure.Tree;
@@ -100,6 +101,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, false);
         JsonQueryComponentProvider queryProvider = new JsonQueryComponentProvider(project);
+        Disposer.register(this, queryProvider);
+
         JsonAssistantToolWindowPanel rootPanel = createToolWindowPanel(treeProvider, queryProvider, cardLayout);
 
         // Json 编辑器
@@ -125,6 +128,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         simpleToolWindowPanel.setContent(rootPanel);
         simpleToolWindowPanel.setToolbar(createToolbar(simpleToolWindowPanel));
+        // simpleToolWindowPanel.setProvideQuickActions(true);
         return simpleToolWindowPanel;
     }
 
