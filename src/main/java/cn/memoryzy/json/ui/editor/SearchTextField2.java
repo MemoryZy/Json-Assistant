@@ -4,6 +4,8 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -37,9 +39,11 @@ public class SearchTextField2 extends EditorTextField {
     @Override
     protected @NotNull EditorEx createEditor() {
         EditorEx editor = super.createEditor();
-
-
-
-        return super.createEditor();
+        editor.setBorder(JBUI.Borders.empty());
+        JComponent component = editor.getComponent();
+        component.setBorder(JBUI.Borders.empty(4, 0, 3, 6));
+        component.setOpaque(false);
+        editor.setBackgroundColor(UIUtil.getTextFieldBackground());
+        return editor;
     }
 }
