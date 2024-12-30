@@ -432,4 +432,12 @@ public class UIManager implements Disposable {
         component.repaint();
     }
 
+    public static void setText(JComponent textField, String text) {
+        if (textField instanceof JTextField) {
+            ((JTextField) textField).setText(text);
+        } else if (textField instanceof EditorTextField) {
+            ((EditorTextField) textField).setText(text);
+        }
+    }
+
 }
