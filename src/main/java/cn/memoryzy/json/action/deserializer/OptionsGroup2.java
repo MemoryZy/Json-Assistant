@@ -35,6 +35,8 @@ import java.util.List;
  */
 public class OptionsGroup2 extends DefaultActionGroup implements KeepingPopupOpenAction{
 
+    // TODO 查看 com.intellij.vcs.log.ui.filter.StructureFilterPopupComponent.SelectVisibleRootAction 类的实现，模仿其实现方式，弹出窗口不消失
+
     private final Module module;
     private final DeserializerState deserializerState;
 
