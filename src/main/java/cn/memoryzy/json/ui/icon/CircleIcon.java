@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.color;
+package cn.memoryzy.json.ui.icon;
 
 import javax.swing.*;
 import java.awt.*;

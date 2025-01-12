@@ -46,7 +46,7 @@ public class ShowHistoryAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        List<String> history = getHistory(e.getProject());
+        List<String> history = getHistory(queryState, e.getProject());
         showCompletionPopup(history);
     }
 
@@ -64,37 +64,38 @@ public class ShowHistoryAction extends DumbAwareAction {
                 .showUnderneathOf(searchWrapper);
     }
 
-    public List<String> getHistory(Project project) {
+    public static List<String> getHistory(QueryState queryState, Project project) {
         String historyPropertyName = queryState.querySchema == JsonQuerySchema.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
         String history = PropertiesComponent.getInstance(project).getValue(historyPropertyName);
         return StrUtil.isNotBlank(history) ? StrUtil.split(history, '\n') : List.of();
     }
 
-    private void setHistory(Collection<String> history) {
+    public static void setHistory(QueryState queryState, Collection<String> history) {
         String historyPropertyName = queryState.querySchema == JsonQuerySchema.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
         PropertiesComponent.getInstance().setValue(historyPropertyName, StrUtil.join("\n", history));
     }
 
 
-    public void addHistory(Project project, String text) {
+    public static void addHistory(Project project, String text) {
         if (StrUtil.isBlank(text)) {
             return;
         }
 
-        ArrayDeque<String> history = new ArrayDeque<>(getHistory(project));
+        QueryState queryState = JsonAssistantPersistentState.getInstance().queryState;
+        ArrayDeque<String> history = new ArrayDeque<>(getHistory(queryState, project));
         if (!history.contains(text)) {
             history.addFirst(text);
             if (history.size() > 10) {
                 history.removeLast();
             }
-            setHistory(history);
+            setHistory(queryState, history);
         } else {
             if (history.getFirst().equals(text)) {
                 return;
             }
             history.remove(text);
             history.addFirst(text);
-            setHistory(history);
+            setHistory(queryState, history);
         }
     }
 }

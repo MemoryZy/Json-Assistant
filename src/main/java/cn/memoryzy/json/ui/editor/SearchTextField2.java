@@ -1,5 +1,7 @@
 package cn.memoryzy.json.ui.editor;
 
+import cn.memoryzy.json.action.query.ShowHistoryAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
+import java.util.function.Predicate;
 
 /**
  * 不包含按钮的纯输入框
@@ -19,9 +22,11 @@ import java.awt.event.KeyEvent;
  */
 public class SearchTextField2 extends EditorTextField {
 
-    private final Runnable action;
+    private static final Logger LOG = Logger.getInstance(SearchTextField2.class);
 
-    public SearchTextField2(Project project, FileType fileType, Runnable action) {
+    private final Predicate<String> action;
+
+    public SearchTextField2(Project project, FileType fileType, Predicate<String> action) {
         super(project, fileType);
         this.action = action;
     }
@@ -29,7 +34,12 @@ public class SearchTextField2 extends EditorTextField {
     @Override
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER && pressed) {
-            action.run();
+            boolean result = action.test(getText());
+            if (result) {
+                // 添加历史记录
+                ShowHistoryAction.addHistory(getProject(), getText());
+            }
+
             return true;
         }
 

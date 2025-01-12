@@ -5,7 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.deserializer.OptionsGroup;
+import cn.memoryzy.json.action.deserializer.OptionsGroup2;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
@@ -132,7 +132,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     }
 
     private JComponent createOptionsButton() {
-        OptionsGroup group = new OptionsGroup(deserializerState, module);
+        OptionsGroup2 group = new OptionsGroup2(deserializerState, module);
 
         ActionButton button = new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
 

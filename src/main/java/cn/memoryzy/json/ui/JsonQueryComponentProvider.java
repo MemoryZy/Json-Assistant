@@ -7,7 +7,7 @@ import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.QueryState;
-import cn.memoryzy.json.ui.editor.SearchTextField;
+import cn.memoryzy.json.ui.panel.SearchWrapper;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -21,6 +21,7 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Key;
@@ -46,13 +47,11 @@ import java.awt.*;
  */
 public class JsonQueryComponentProvider implements Disposable {
 
-    public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
-    public static final String JMES_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JmesPathHistory";
     public static final String SPLITTER_PROPORTION_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SplitterProportionKey";
     public static final Key<Boolean> EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EditorFlag");
 
     private final Project project;
-    private final SearchTextField searchTextField;
+    private final SearchWrapper searchWrapper;
     private final JBPanelWithEmptyText resultWrapper;
     private final JBLabel resultLabel;
     private final Editor resultEditor;
@@ -67,7 +66,7 @@ public class JsonQueryComponentProvider implements Disposable {
 
     public JsonQueryComponentProvider(Project project) {
         this.project = project;
-        this.searchTextField = new SearchTextField(JSON_PATH_HISTORY_KEY, 10, this::evaluate);
+        this.searchWrapper = new SearchWrapper(project, PlainTextFileType.INSTANCE, this::evaluate);
 
         this.resultWrapper = new JBPanelWithEmptyText(new BorderLayout());
         this.resultLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.result"));
@@ -107,7 +106,7 @@ public class JsonQueryComponentProvider implements Disposable {
     }
 
     private JComponent createFirstComponent() {
-        return searchTextField;
+        return searchWrapper;
     }
 
     private JComponent createSecondComponent() {
@@ -136,7 +135,7 @@ public class JsonQueryComponentProvider implements Disposable {
     }
 
 
-    private void evaluate() {
+    private boolean evaluate(String path) {
 
 
         // setError("xxx");
@@ -158,6 +157,8 @@ public class JsonQueryComponentProvider implements Disposable {
         // if (result != null && !(result instanceof IncorrectExpression)) {
         //     addJSONPathToHistory(searchTextField.getText().trim());
         // }
+
+        return false;
     }
 
     private void setResult(String result) {
