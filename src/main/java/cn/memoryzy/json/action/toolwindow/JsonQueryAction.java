@@ -1,6 +1,5 @@
 package cn.memoryzy.json.action.toolwindow;
 
-import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
@@ -8,9 +7,7 @@ import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.ui.JsonPathComponentProvider;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
@@ -35,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,8 +52,8 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
         this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.jsonpath.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.jsonpath.description"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.query.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.query.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt P"), simpleToolWindowPanel);
     }
@@ -72,28 +68,9 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
                 HelpTooltip helpTooltip = new HelpTooltip()
                         .setTitle(getTemplatePresentation().getText())
                         .setShortcut(getShortcut())
-                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.json.path.description"));
+                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.json.query.description", Urls.JSONPATH_EXPRESS_DESCRIPTION, Urls.JMESPATH_EXPRESS_DESCRIPTION));
 
-                setExternalLink(helpTooltip);
                 helpTooltip.installOn(this);
-            }
-
-            private void setExternalLink(HelpTooltip helpTooltip) {
-                String name = JsonAssistantBundle.messageOnSystem("tooltip.json.path.link");
-                Runnable action = () -> BrowserUtil.browse(Urls.JSONPATH_EXPRESS_DESCRIPTION);
-                boolean external = true;
-
-                // 带有 boolean external 的方法
-                Object[] hasExternalLinkMethodParams = {name, action, external};
-                Method method = JsonAssistantUtil.getMethod(helpTooltip, "setLink", hasExternalLinkMethodParams);
-
-                if (Objects.nonNull(method)) {
-                    ReflectUtil.invoke(helpTooltip, method, hasExternalLinkMethodParams);
-                } else {
-                    Object[] noExternalLinkMethodParams = {name, action};
-                    method = JsonAssistantUtil.getMethod(helpTooltip, "setLink", noExternalLinkMethodParams);
-                    if (Objects.nonNull(method)) ReflectUtil.invoke(helpTooltip, method, noExternalLinkMethodParams);
-                }
             }
         };
 
@@ -139,7 +116,7 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
                 .createComponentPopupBuilder(rootPanel, hasShown ? expressionComboBoxTextField : null)
                 .setFocusable(true)
                 .setTitle(JsonAssistantBundle.messageOnSystem("popup.jsonpath.title"))
-                .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("tooltip.json.path.cancel"), AllIcons.General.HideToolWindow))
+                .setCancelButton(new IconButton(JsonAssistantBundle.messageOnSystem("tooltip.json.query.cancel"), AllIcons.General.HideToolWindow))
                 .setShowShadow(true)
                 .setShowBorder(true)
                 .setLocateWithinScreenBounds(true)

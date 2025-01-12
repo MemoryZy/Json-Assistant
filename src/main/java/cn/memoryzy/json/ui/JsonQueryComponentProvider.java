@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.query.ShowOriginalTextAction;
 import cn.memoryzy.json.action.query.SwitchAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
@@ -40,6 +41,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -136,9 +138,13 @@ public class JsonQueryComponentProvider implements Disposable {
 
 
     private boolean evaluate(String path) {
+        String doc = docEditor.getDocument().getText();
+        if (Objects.isNull(path) || StrUtil.isBlank(doc)) {
+            setError("xxx");
+            return false;
+        }
 
 
-        // setError("xxx");
 
         setResult("aaaaa");
 
