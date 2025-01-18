@@ -1,8 +1,18 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+ - 支持 JMESPath 查询语言。
+ - 支持 JSON 树视图多展示形式切换。
+ - 反序列化支持 Jackson、FastJSON、Lombok 相关注解（可选）。
+ - 增加 JSON 历史记录的开关功能。
+ - 解决 格式化后的JSON无法保留原始的数字表现 （[#47](https://github.com/MemoryZy/Json-Assistant/issues/47)） 问题。
  - 优化 JavaBean 序列化为 JSON 的逻辑，确保生成的 JSON 对象中的属性顺序与属性的声明顺序一致。
  - 解决 [#41](https://github.com/MemoryZy/Json-Assistant/issues/41) 问题。
+ - Support for JMESPath query language.
+ - Support JSON tree view multi-display mode switch.
+ - Deserialization supports Jackson, FastJSON, Lombok annotations (optional).
+ - Added the ability to switch JSON history.
+ - Resolved that formatted JSON does not retain its original numeric representation ([#47](https://github.com/MemoryZy/Json-Assistant/issues/47)).
  - Optimize the JavaBean-to-JSON serialization process to preserve the order of properties according to their declaration sequence in the Java class.
  - Solve problem [#41](https://github.com/MemoryZy/Json-Assistant/issues/41).
 
