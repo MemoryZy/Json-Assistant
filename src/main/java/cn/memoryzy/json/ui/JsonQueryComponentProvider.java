@@ -143,7 +143,7 @@ public class JsonQueryComponentProvider implements Disposable {
 
     private boolean evaluate(String path) {
         String docText = docEditor.getDocument().getText();
-        if (Objects.isNull(path) || StrUtil.isBlank(docText)) {
+        if (StrUtil.isBlank(path) || StrUtil.isBlank(docText)) {
             return false;
         }
 
