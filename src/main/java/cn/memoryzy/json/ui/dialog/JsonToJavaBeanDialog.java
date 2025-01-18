@@ -56,6 +56,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -68,6 +69,7 @@ import java.util.*;
  */
 public class JsonToJavaBeanDialog extends DialogWrapper {
     private static final Logger LOG = Logger.getInstance(JsonToJavaBeanDialog.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(JsonToJavaBeanDialog.class);
 
     private JBTextField classNameTextField;
     private EditorTextField jsonTextField;
@@ -409,37 +411,58 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
      * @param factory  用于创建新的psi元素的工厂
      */
     private void addClassLevelLombokAnnotation(Project project, PsiClass newClass, PsiElementFactory factory) {
+        List<PsiAnnotation> annotations = new ArrayList<>();
+        List<String> importQualifiedNames = new ArrayList<>();
+
         // 增加注解
-        PsiAnnotation dataAnnotation = factory.createAnnotationFromText(
-                "@" + StringUtil.getShortName(LombokAnnotations.DATA.getValue()), null);
-        PsiAnnotation accessorsAnnotation = factory.createAnnotationFromText(
-                "@" + StringUtil.getShortName(LombokAnnotations.ACCESSORS.getValue()) + "(chain = true)", null);
+        if (deserializerState.dataLombokAnnotation) {
+            annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.DATA.getValue()), null));
+            importQualifiedNames.add(LombokAnnotations.DATA.getValue());
+        }
+
+        if (deserializerState.accessorsChainLombokAnnotation) {
+            annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.ACCESSORS.getValue()) + "(chain = true)", null));
+            importQualifiedNames.add(LombokAnnotations.ACCESSORS.getValue());
+        }
+
+        if (deserializerState.setterLombokAnnotation) {
+            annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.SETTER.getValue()), null));
+            importQualifiedNames.add(LombokAnnotations.SETTER.getValue());
+        }
+
+        if (deserializerState.getterLombokAnnotation) {
+            annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.GETTER.getValue()), null));
+            importQualifiedNames.add(LombokAnnotations.GETTER.getValue());
+        }
 
         // 导入类
-        JavaUtil.importClassesInClass(project, newClass, LombokAnnotations.DATA.getValue(), LombokAnnotations.ACCESSORS.getValue());
+        JavaUtil.importClassesInClass(project, newClass, importQualifiedNames.toArray(new String[0]));
 
         PsiElement firstChild = newClass.getFirstChild();
         if (firstChild instanceof PsiDocComment) {
-            newClass.addAfter(accessorsAnnotation, firstChild);
-            newClass.addAfter(dataAnnotation, firstChild);
+            for (PsiAnnotation annotation : annotations) {
+                newClass.addAfter(annotation, firstChild);
+            }
         } else {
-            newClass.addBefore(dataAnnotation, firstChild);
-            newClass.addBefore(accessorsAnnotation, firstChild);
+            for (PsiAnnotation annotation : annotations) {
+                newClass.addBefore(annotation, firstChild);
+            }
         }
 
         // 内部类也加上（要递归）
-        this.addImportAnnotationOnInnerClass(newClass, dataAnnotation, accessorsAnnotation);
+        this.addImportAnnotationOnInnerClass(newClass, annotations.toArray(new PsiAnnotation[0]));
     }
 
-    private void addImportAnnotationOnInnerClass(PsiClass newClass, PsiAnnotation dataAnnotation, PsiAnnotation accessorsAnnotation) {
+    private void addImportAnnotationOnInnerClass(PsiClass newClass, PsiAnnotation... classAnnotations) {
         PsiClass[] innerClasses = newClass.getInnerClasses();
         if (ArrayUtil.isNotEmpty(innerClasses)) {
             for (PsiClass innerClass : innerClasses) {
                 PsiElement innerFirstChild = innerClass.getFirstChild();
-                innerClass.addBefore(dataAnnotation, innerFirstChild);
-                innerClass.addBefore(accessorsAnnotation, innerFirstChild);
+                for (PsiAnnotation classAnnotation : classAnnotations) {
+                    innerClass.addBefore(classAnnotation, innerFirstChild);
+                }
                 // 找内部类中是否还有内部类，并添加上注解
-                addImportAnnotationOnInnerClass(innerClass, dataAnnotation, accessorsAnnotation);
+                addImportAnnotationOnInnerClass(innerClass, classAnnotations);
             }
         }
     }

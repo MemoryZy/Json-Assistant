@@ -15,6 +15,7 @@
    - Move Tab to Editor
    - Move Tab to New Window
    - JSONPath Evaluator
+   - JMESPath Evaluator
    - JSON History Log
    - Export JSON
  - JSON Beautifier

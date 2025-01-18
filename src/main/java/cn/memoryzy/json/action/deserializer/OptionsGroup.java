@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.deserializer;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.ui.component.*;
 import cn.memoryzy.json.util.JavaUtil;
@@ -64,11 +65,23 @@ public class OptionsGroup extends DefaultActionGroup {
 
 
     private DefaultListModel<JCheckBox> createListModel(boolean hasFastJsonLib, boolean hasFastJson2Lib, boolean hasJacksonLib) {
+        JBCheckBox dataCheckBox = new DataLombokOptionsCheckBox(module, deserializerState);
+        JBCheckBox accessorsChainCheckBox = new AccessorsChainLombokOptionsCheckBox(module, deserializerState);
+        JBCheckBox getterCheckBox = new GetterLombokOptionsCheckBox(module, deserializerState);
+        JBCheckBox setterCheckBox = new SetterLombokOptionsCheckBox(module, deserializerState);
+
         JBCheckBox fastJsonCheckBox = new FastJsonOptionsCheckBox(module, deserializerState);
         JBCheckBox fastJson2CheckBox = new FastJson2OptionsCheckBox(module, deserializerState);
         JBCheckBox jacksonCheckBox = new JacksonOptionsCheckBox(module, deserializerState);
         JBCheckBox keepCamelCheckBox = new KeepCamelOptionsCheckBox(deserializerState);
         DefaultListModel<JCheckBox> listModel = new DefaultListModel<>();
+
+        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
+            listModel.addElement(dataCheckBox);
+            listModel.addElement(accessorsChainCheckBox);
+            listModel.addElement(getterCheckBox);
+            listModel.addElement(setterCheckBox);
+        }
 
         // 存在某种依赖，就添加某个选项
         if (hasFastJsonLib && hasFastJson2Lib) {

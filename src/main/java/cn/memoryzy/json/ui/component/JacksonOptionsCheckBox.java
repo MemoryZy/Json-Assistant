@@ -1,6 +1,5 @@
 package cn.memoryzy.json.ui.component;
 
-import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.util.JavaUtil;
 import com.intellij.openapi.module.Module;
@@ -16,7 +15,7 @@ public class JacksonOptionsCheckBox extends JBCheckBox implements OptionsCheckBo
     private final DeserializerState deserializerState;
 
     public JacksonOptionsCheckBox(Module module, DeserializerState deserializerState) {
-        super(JsonAssistantBundle.messageOnSystem("popup.deserializer.jackson.text"), deserializerState.jacksonAnnotation);
+        super("@JsonProperty (Jackson)", deserializerState.jacksonAnnotation);
         this.module = module;
         this.deserializerState = deserializerState;
     }

@@ -29,8 +29,23 @@ public class DeserializerState {
     public boolean keepCamelCase = true;
 
     /**
-     * 保持小写名称，即如果是纯大写，将转为纯小写
+     * 添加 Lombok @Data 注解
      */
-    public boolean keepLowercase = true;
+    public boolean dataLombokAnnotation = true;
+
+    /**
+     * 添加 Lombok @Accessors(chain = true) 注解
+     */
+    public boolean accessorsChainLombokAnnotation = true;
+
+    /**
+     * 添加 Lombok @Getter 注解
+     */
+    public boolean getterLombokAnnotation = false;
+
+    /**
+     * 添加 Lombok @Setter 注解
+     */
+    public boolean setterLombokAnnotation = false;
 
 }
