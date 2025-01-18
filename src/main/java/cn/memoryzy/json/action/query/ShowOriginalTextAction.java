@@ -6,7 +6,6 @@ import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareToggleAction;
-import com.intellij.util.ui.components.BorderLayoutPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,18 +38,6 @@ public class ShowOriginalTextAction extends DumbAwareToggleAction {
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
         queryState.showOriginalText = state;
-        BorderLayoutPanel docPanel = queryComponentProvider.getDocPanel();
-        if (state) {
-            // 展示
-            if (!docPanel.isVisible()) {
-                docPanel.setVisible(true);
-            }
-
-        } else {
-            // 关闭
-            if (docPanel.isVisible()) {
-                docPanel.setVisible(false);
-            }
-        }
+        queryComponentProvider.toggleJsonDocumentVisibility(state);
     }
 }

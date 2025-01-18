@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -36,8 +37,9 @@ public class JsonUtil {
     /**
      * 构建 JsonMapper（支持解析 '非数字NaN' 标识）
      */
-    private static final JsonMapper MAPPER = JsonMapper.builder()
+    public static final JsonMapper MAPPER = JsonMapper.builder()
             .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS)
+            .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
             .disable(JsonWriteFeature.WRITE_NAN_AS_STRINGS)
             .build();
 

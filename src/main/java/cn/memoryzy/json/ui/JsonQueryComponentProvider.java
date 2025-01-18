@@ -6,12 +6,16 @@ import cn.memoryzy.json.action.query.SwitchAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.enums.JsonQuerySchema;
+import cn.memoryzy.json.model.jsonpath.EvaluateResult;
+import cn.memoryzy.json.model.jsonpath.IncorrectDocument;
+import cn.memoryzy.json.model.jsonpath.IncorrectExpression;
+import cn.memoryzy.json.model.jsonpath.ResultNotFound;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.QueryState;
 import cn.memoryzy.json.ui.panel.SearchWrapper;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -100,7 +104,7 @@ public class JsonQueryComponentProvider implements Disposable {
 
     public JComponent createToolbar() {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new SwitchAction(queryState));
+        actionGroup.add(new SwitchAction(queryState, this));
         actionGroup.add(new ShowOriginalTextAction(queryState, this));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
@@ -138,33 +142,31 @@ public class JsonQueryComponentProvider implements Disposable {
 
 
     private boolean evaluate(String path) {
-        String doc = docEditor.getDocument().getText();
-        if (Objects.isNull(path) || StrUtil.isBlank(doc)) {
-            setError("xxx");
+        String docText = docEditor.getDocument().getText();
+        if (Objects.isNull(path) || StrUtil.isBlank(docText)) {
             return false;
         }
 
+        if (!JsonUtil.isJson(docText) && !Json5Util.isJson5(docText)) {
+            setError(JsonAssistantBundle.messageOnSystem("json.query.invalid.document"));
+            return false;
+        }
 
+        if (Json5Util.isJson5(docText)) {
+            docText = Json5Util.convertJson5ToJson(docText);
+        }
 
-        setResult("aaaaa");
+        EvaluateResult result = JsonQuerySchema.JSONPath == queryState.querySchema
+                ? JsonPathEvaluator.evaluate(path, docText)
+                : JmesPathEvaluator.evaluate(path, docText);
 
-        // JsonPathEvaluator.evaluate();
-
-        // if (result instanceof IncorrectExpression) {
-        //     setError(((IncorrectExpression) result).getMessage());
-        // } else if (result instanceof IncorrectDocument) {
-        //     setError(((IncorrectDocument) result).getMessage());
-        // } else if (result instanceof ResultNotFound) {
-        //     setError(((ResultNotFound) result).getMessage());
-        // } else if (result instanceof ResultString) {
-        //     setResult(((ResultString) result).getValue());
-        // }
-        //
-        // if (result != null && !(result instanceof IncorrectExpression)) {
-        //     addJSONPathToHistory(searchTextField.getText().trim());
-        // }
-
-        return false;
+        if (result instanceof IncorrectExpression || result instanceof IncorrectDocument || result instanceof ResultNotFound) {
+            setError(result.getMessage());
+            return false;
+        } else {
+            setResult(result.getMessage());
+            return true;
+        }
     }
 
     private void setResult(String result) {
@@ -225,13 +227,62 @@ public class JsonQueryComponentProvider implements Disposable {
 
     public void setDocumentText(String text) {
         WriteAction.run(() -> {
-            if (JsonUtil.isJson(text) || Json5Util.isJson5(text)) {
-                docEditor.getDocument().setText(text);
+            String oriText = docEditor.getDocument().getText();
+            boolean isJsonNew = JsonUtil.isJson(text);
+
+            // 如果查询页面中的JSON文档非法，则直接清除
+            boolean isJson = JsonUtil.isJson(oriText);
+            boolean isJson5 = Json5Util.isJson5(oriText);
+            if (!isJson && !isJson5) {
+                clearSearchAndResultText();
+            } else {
+                JsonWrapper jsonWrapper;
+                JsonWrapper jsonWrapperNew;
+                if (isJsonNew) {
+                    jsonWrapperNew = JsonUtil.parse(text);
+                } else {
+                    jsonWrapperNew = Json5Util.parse(text);
+                }
+
+                if (isJson) {
+                    jsonWrapper = JsonUtil.parse(oriText);
+                } else {
+                    jsonWrapper = Json5Util.parse(oriText);
+                }
+
+                if (!Objects.equals(jsonWrapper, jsonWrapperNew)) {
+                    clearSearchAndResultText();
+                }
             }
+
+            docEditor.getDocument().setText(text);
         });
     }
 
-    public BorderLayoutPanel getDocPanel() {
-        return docPanel;
+    public void toggleJsonDocumentVisibility(boolean visible) {
+        if (visible) {
+            // 展示
+            if (!docPanel.isVisible()) {
+                docPanel.setVisible(true);
+            }
+
+        } else {
+            // 关闭
+            if (docPanel.isVisible()) {
+                docPanel.setVisible(false);
+            }
+        }
     }
+
+    public void clearSearchAndResultText() {
+        WriteAction.run(() -> {
+            searchWrapper.clearSearchText();
+            resultEditor.getDocument().setText("");
+
+            resultWrapper.removeAll();
+            resultWrapper.revalidate();
+            resultWrapper.repaint();
+        });
+    }
+
 }

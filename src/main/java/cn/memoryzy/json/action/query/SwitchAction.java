@@ -2,6 +2,7 @@ package cn.memoryzy.json.action.query;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.service.persistent.state.QueryState;
+import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -19,10 +20,12 @@ import java.awt.*;
 public class SwitchAction extends DumbAwareAction {
 
     private final QueryState queryState;
+    private final JsonQueryComponentProvider queryComponentProvider;
 
-    public SwitchAction(QueryState queryState) {
+    public SwitchAction(QueryState queryState, JsonQueryComponentProvider queryComponentProvider) {
         super();
         this.queryState = queryState;
+        this.queryComponentProvider = queryComponentProvider;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.switch.ql.text"));
@@ -33,8 +36,8 @@ public class SwitchAction extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonPathToggleAction(queryState));
-        actionGroup.add(new JmesPathToggleAction(queryState));
+        actionGroup.add(new JsonPathToggleAction(queryState, queryComponentProvider));
+        actionGroup.add(new JmesPathToggleAction(queryState, queryComponentProvider));
 
         JBPopupFactory.getInstance()
                 .createActionGroupPopup(null, actionGroup, e.getDataContext(), JBPopupFactory.ActionSelectionAid.MNEMONICS, true)

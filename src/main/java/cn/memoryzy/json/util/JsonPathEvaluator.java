@@ -8,6 +8,8 @@ import com.intellij.serialization.ClassUtil;
 import com.jayway.jsonpath.*;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,6 +18,36 @@ import java.util.stream.Collectors;
  * @since 2024/12/18
  */
 public class JsonPathEvaluator {
+
+    public static EvaluateResult evaluate(String expression, String jsonDoc) {
+        Object readResult;
+        try {
+            readResult = JsonPath.read(jsonDoc, expression);
+        } catch (PathNotFoundException e) {
+            return new IncorrectExpression(e.getMessage());
+        } catch (Exception e) {
+            return new IncorrectDocument(e.getMessage());
+        }
+
+        if (readResult == null) {
+            return new ResultString("null");
+        }
+
+        String jsonResult;
+        if (readResult instanceof Map || readResult instanceof Iterable) {
+            jsonResult = JsonUtil.formatJson(readResult);
+        } else if (readResult instanceof String) {
+            jsonResult = "\"" + readResult + "\"";
+        } else {
+            jsonResult = Objects.toString(readResult);
+        }
+
+        // 去除\r
+        jsonResult = JsonAssistantUtil.normalizeLineEndings(jsonResult);
+
+        return new ResultString(jsonResult);
+    }
+
 
     public static EvaluateResult evaluate(String expression, String jsonDoc, Set<Option> evalOptions) {
         JsonPath jsonPath;

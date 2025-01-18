@@ -20,13 +20,15 @@ import java.util.function.Predicate;
  */
 public class SearchWrapper extends NonOpaquePanel {
 
+    private SearchTextField2 searchTextField2;
+
     public SearchWrapper(Project project, FileType fileType, Predicate<String> action) {
         super(new BorderLayout());
         initComponents(project, fileType, action);
     }
 
     private void initComponents(Project project, FileType fileType, Predicate<String> action) {
-        SearchTextField2 searchTextField2 = new SearchTextField2(project, fileType, action);
+        searchTextField2 = new SearchTextField2(project, fileType, action);
         ShowHistoryAction showHistoryAction = new ShowHistoryAction(this, searchTextField2);
         SearchHistoryButton searchHistoryButton = new SearchHistoryButton(showHistoryAction, false);
 
@@ -44,5 +46,9 @@ public class SearchWrapper extends NonOpaquePanel {
     public void updateUI() {
         super.updateUI();
         this.setBackground(UIUtil.getTextFieldBackground());
+    }
+
+    public void clearSearchText() {
+        searchTextField2.setText("");
     }
 }

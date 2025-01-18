@@ -70,9 +70,9 @@ public class ShowHistoryAction extends DumbAwareAction {
         return StrUtil.isNotBlank(history) ? StrUtil.split(history, '\n') : List.of();
     }
 
-    public static void setHistory(QueryState queryState, Collection<String> history) {
+    public static void setHistory(QueryState queryState, Project project, Collection<String> history) {
         String historyPropertyName = queryState.querySchema == JsonQuerySchema.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
-        PropertiesComponent.getInstance().setValue(historyPropertyName, StrUtil.join("\n", history));
+        PropertiesComponent.getInstance(project).setValue(historyPropertyName, StrUtil.join("\n", history));
     }
 
 
@@ -88,14 +88,14 @@ public class ShowHistoryAction extends DumbAwareAction {
             if (history.size() > 10) {
                 history.removeLast();
             }
-            setHistory(queryState, history);
+            setHistory(queryState, project, history);
         } else {
             if (history.getFirst().equals(text)) {
                 return;
             }
             history.remove(text);
             history.addFirst(text);
-            setHistory(queryState, history);
+            setHistory(queryState, project, history);
         }
     }
 }
