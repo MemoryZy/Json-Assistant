@@ -237,4 +237,27 @@ public class JsonAssistantUtil {
         return text;
     }
 
+
+    /**
+     * 判断对象是否继承自某个类
+     *
+     * @param obj                对象
+     * @param fullyQualifiedName 类的完全限定名
+     * @return 是否继承自指定类
+     */
+    public static boolean isInheritedFrom(Object obj, String fullyQualifiedName) {
+        if (obj == null || StrUtil.isBlank(fullyQualifiedName)) {
+            return false;
+        }
+
+        Class<?> currentClass = obj.getClass();
+        while (currentClass != null) {
+            if (fullyQualifiedName.equals(currentClass.getName())) {
+                return true;
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+        return false;
+    }
+
 }

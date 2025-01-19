@@ -4,8 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.diagnostic.AbstractMessage;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.IdeBundle;
 import com.intellij.openapi.application.ApplicationNamesInfo;
@@ -38,6 +38,8 @@ public class ErrorReporter extends ErrorReportSubmitter {
     private static final String GITHUB_ISSUE_BUG_TEMPLATE = "bug_report.yml";
     private static final String GITHUB_ISSUE_BUG_CN_TEMPLATE = "bug_report_zh.yml";
     private static final int stacktraceLen = 6500;
+
+    private static final String MESSAGE_QUALIFIED_NAME = "com.intellij.diagnostic.AbstractMessage";
 
     @Override
     public @NlsActions.ActionText @NotNull String getReportActionText() {
@@ -88,10 +90,11 @@ public class ErrorReporter extends ErrorReportSubmitter {
 
     private static String getTitle(@Nullable Object messageData) {
         String errorMessage = null;
-        if (messageData instanceof AbstractMessage) {
-            AbstractMessage abstractMessage = (AbstractMessage) messageData;
-            Throwable throwable = abstractMessage.getThrowable();
-            errorMessage = throwable.toString();
+        if (JsonAssistantUtil.isInheritedFrom(messageData, MESSAGE_QUALIFIED_NAME)) {
+            Object throwable = JsonAssistantUtil.invokeMethod(messageData, "getThrowable");
+            if (throwable != null) {
+                errorMessage = throwable.toString();
+            }
         }
 
         return StrUtil.isBlank(errorMessage) ? "" : "Exception: " + errorMessage;
