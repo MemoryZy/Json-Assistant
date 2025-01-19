@@ -7,6 +7,7 @@ import cn.memoryzy.json.ui.component.*;
 import cn.memoryzy.json.util.JavaUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.module.Module;
@@ -38,8 +39,8 @@ public class OptionsGroup extends DefaultActionGroup {
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.General.Settings);
-        // 使用本身的 actionPerformed 执行
-        presentation.setPerformGroup(true);
+
+        // com.intellij.openapi.actionSystem.impl.ActionButton.paintDownArrow 渲染图标下标记，表示菜单的意思
     }
 
     @Override
@@ -63,6 +64,11 @@ public class OptionsGroup extends DefaultActionGroup {
                 .showInBestPositionFor(e.getDataContext());
     }
 
+    @Override
+    public boolean canBePerformed(@NotNull DataContext context) {
+        // 使用本身的 actionPerformed 执行
+        return true;
+    }
 
     private DefaultListModel<JCheckBox> createListModel(boolean hasFastJsonLib, boolean hasFastJson2Lib, boolean hasJacksonLib) {
         JBCheckBox dataCheckBox = new DataLombokOptionsCheckBox(module, deserializerState);

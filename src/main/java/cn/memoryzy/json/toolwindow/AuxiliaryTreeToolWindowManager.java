@@ -14,6 +14,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
@@ -73,11 +74,11 @@ public class AuxiliaryTreeToolWindowManager {
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
 
-        registerAction(toolWindow);
+        registerAction((ToolWindowEx )toolWindow);
         return toolWindow;
     }
 
-    private void registerAction(ToolWindow toolWindow) {
+    private void registerAction(ToolWindowEx toolWindow) {
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
