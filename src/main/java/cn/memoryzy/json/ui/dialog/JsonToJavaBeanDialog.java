@@ -25,6 +25,7 @@ import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
@@ -135,7 +136,9 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private JComponent createOptionsButton() {
         OptionsGroup group = new OptionsGroup(deserializerState, module);
-        return new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
+        Presentation presentation = new Presentation();
+        presentation.copyFrom(group.getTemplatePresentation());
+        return new ActionButton(group, presentation, ActionPlaces.UNKNOWN, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
 
         // OptionsGroup2 group = new OptionsGroup2(deserializerState, module);
         //

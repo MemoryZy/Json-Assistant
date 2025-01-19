@@ -1,10 +1,11 @@
 package cn.memoryzy.json.ui.editor;
 
 import cn.memoryzy.json.action.query.ShowHistoryAction;
-import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.ui.EditorTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -21,8 +22,6 @@ import java.util.function.Predicate;
  * @since 2024/12/27
  */
 public class SearchTextField2 extends EditorTextField {
-
-    private static final Logger LOG = Logger.getInstance(SearchTextField2.class);
 
     private final Predicate<String> action;
 
@@ -48,12 +47,14 @@ public class SearchTextField2 extends EditorTextField {
 
     @Override
     protected @NotNull EditorEx createEditor() {
-        EditorEx editor = super.createEditor();
-        editor.setBorder(JBUI.Borders.empty());
-        JComponent component = editor.getComponent();
-        component.setBorder(JBUI.Borders.empty(4, 0, 3, 6));
-        component.setOpaque(false);
-        editor.setBackgroundColor(UIUtil.getTextFieldBackground());
-        return editor;
+        return ApplicationManager.getApplication().runWriteAction((Computable<EditorEx>) () -> {
+            EditorEx editor = super.createEditor();
+            editor.setBorder(JBUI.Borders.empty());
+            JComponent component = editor.getComponent();
+            component.setBorder(JBUI.Borders.empty(4, 0, 3, 6));
+            component.setOpaque(false);
+            editor.setBackgroundColor(UIUtil.getTextFieldBackground());
+            return editor;
+        });
     }
 }
