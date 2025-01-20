@@ -41,6 +41,7 @@ public class JsonUtil {
             .enable(JsonReadFeature.ALLOW_NON_NUMERIC_NUMBERS)
             .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
             .disable(JsonWriteFeature.WRITE_NAN_AS_STRINGS)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
 
     /**

@@ -57,7 +57,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +69,6 @@ import java.util.*;
  */
 public class JsonToJavaBeanDialog extends DialogWrapper {
     private static final Logger LOG = Logger.getInstance(JsonToJavaBeanDialog.class);
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(JsonToJavaBeanDialog.class);
 
     private JBTextField classNameTextField;
     private EditorTextField jsonTextField;
@@ -88,7 +86,8 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.project = project;
         this.directory = directory;
         this.module = module;
-        this.deserializerState = JsonAssistantPersistentState.getInstance().deserializerState;
+        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+        this.deserializerState = persistentState.deserializerState;
 
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.deserialize.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.deserialize.ok"));
@@ -556,7 +555,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
 
     private String getFieldName(String originalKey) {
-        String fieldName;
         // 包含下划线或空格，那就转为驼峰格式
         if (deserializerState.keepCamelCase && (originalKey.contains("_") || originalKey.contains(" "))) {
             return JsonAssistantUtil.toCamel(originalKey);

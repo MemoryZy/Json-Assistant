@@ -24,21 +24,14 @@ public class OptionsGroup2 extends DefaultActionGroup {
     private final DeserializerState deserializerState;
 
     public OptionsGroup2(DeserializerState deserializerState, Module module) {
-        super(JsonAssistantBundle.messageOnSystem("dialog.deserialize.options.text"), true);
+        super(JsonAssistantBundle.messageOnSystem("dialog.deserialize.options.text"), false);
         this.module = module;
         this.deserializerState = deserializerState;
         // setEnabledInModalContext(false);
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.General.Settings);
-        // presentation.setMultipleChoice(true);
-        // presentation.setPopupGroup(true);
-
-        // 使用本身的 actionPerformed 执行
-        // presentation.setPerformGroup(true);
-
-
+        presentation.setMultipleChoice(true);
     }
-
 
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
