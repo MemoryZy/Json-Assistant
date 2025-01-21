@@ -7,25 +7,25 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
- * @since 2024/12/26
+ * @since 2025/1/21
  */
-public class JacksonToggleAction extends ToggleAction {
+public class FastJson2ToggleAction extends ToggleAction {
 
     private final DeserializerState deserializerState;
 
-    public JacksonToggleAction(DeserializerState deserializerState) {
-        super("@JsonProperty (Jackson)", null, null);
+    public FastJson2ToggleAction(DeserializerState deserializerState) {
+        super("@JSONField (FastJSON2)", null, null);
         this.deserializerState = deserializerState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializerState.jacksonAnnotation;
+        return deserializerState.fastJson2Annotation;
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializerState.jacksonAnnotation = state;
+        deserializerState.fastJson2Annotation = state;
     }
 
 }

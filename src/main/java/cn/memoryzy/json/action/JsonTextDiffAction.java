@@ -3,6 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -18,6 +19,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,6 +30,8 @@ import java.util.Objects;
  * @since 2024/8/14
  */
 public class JsonTextDiffAction extends DumbAwareAction {
+
+    public static final Key<SimpleDiffRequest> DIFF_REQUEST_KEY = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".DiffRequest");
 
     public JsonTextDiffAction() {
         super();
@@ -58,6 +62,7 @@ public class JsonTextDiffAction extends DumbAwareAction {
                 JsonAssistantBundle.messageOnSystem("dialog.json.text.diff.right.title"));
 
         DiffVirtualFile file = new SimpleDiffVirtualFile(simpleDiffRequest);
+        file.putUserData(DIFF_REQUEST_KEY, simpleDiffRequest);
         FileEditorManager manager = FileEditorManager.getInstance(Objects.requireNonNull(project));
         JsonAssistantUtil.invokeMethod(manager, "openFileInNewWindow", file);
     }

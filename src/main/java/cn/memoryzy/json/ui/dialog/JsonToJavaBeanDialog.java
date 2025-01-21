@@ -5,7 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.deserializer.OptionsGroup;
+import cn.memoryzy.json.action.deserializer.OptionsGroup2;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
@@ -134,22 +134,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     }
 
     private JComponent createOptionsButton() {
-        OptionsGroup group = new OptionsGroup(deserializerState, module);
+        OptionsGroup2 group = new OptionsGroup2(module, deserializerState);
         Presentation presentation = new Presentation();
         presentation.copyFrom(group.getTemplatePresentation());
         return new ActionButton(group, presentation, ActionPlaces.UNKNOWN, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
-
-        // OptionsGroup2 group = new OptionsGroup2(deserializerState, module);
-        //
-        // DefaultActionGroup defaultActionGroup = new DefaultActionGroup();
-        // defaultActionGroup.add(group);
-        //
-        // ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, defaultActionGroup, true);
-        //
-        //
-        // // return new ActionButton(group, group.getTemplatePresentation(), ActionPlaces.POPUP, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
-        //
-        // return toolbar.getComponent();
     }
 
     @Override

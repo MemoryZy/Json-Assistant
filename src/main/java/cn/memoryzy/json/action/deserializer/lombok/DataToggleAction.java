@@ -1,4 +1,4 @@
-package cn.memoryzy.json.action.deserializer;
+package cn.memoryzy.json.action.deserializer.lombok;
 
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -7,25 +7,24 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
- * @since 2024/12/26
+ * @since 2025/1/21
  */
-public class JacksonToggleAction extends ToggleAction {
+public class DataToggleAction extends ToggleAction {
 
     private final DeserializerState deserializerState;
 
-    public JacksonToggleAction(DeserializerState deserializerState) {
-        super("@JsonProperty (Jackson)", null, null);
+    public DataToggleAction(DeserializerState deserializerState) {
+        super("@Data", null, null);
         this.deserializerState = deserializerState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializerState.jacksonAnnotation;
+        return deserializerState.dataLombokAnnotation;
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializerState.jacksonAnnotation = state;
+        deserializerState.dataLombokAnnotation = state;
     }
-
 }

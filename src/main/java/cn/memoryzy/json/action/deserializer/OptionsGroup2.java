@@ -1,12 +1,12 @@
 package cn.memoryzy.json.action.deserializer;
 
+import cn.memoryzy.json.action.deserializer.lombok.LombokGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.util.JavaUtil;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.module.Module;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,8 +23,8 @@ public class OptionsGroup2 extends DefaultActionGroup {
     private final Module module;
     private final DeserializerState deserializerState;
 
-    public OptionsGroup2(DeserializerState deserializerState, Module module) {
-        super(JsonAssistantBundle.messageOnSystem("dialog.deserialize.options.text"), false);
+    public OptionsGroup2(Module module, DeserializerState deserializerState) {
+        super(JsonAssistantBundle.messageOnSystem("dialog.deserialize.options.text"), true);
         this.module = module;
         this.deserializerState = deserializerState;
         // setEnabledInModalContext(false);
@@ -36,10 +36,36 @@ public class OptionsGroup2 extends DefaultActionGroup {
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         List<AnAction> actions = new ArrayList<>();
-        actions.add(new FastJsonToggleAction());
-        actions.add(new JacksonToggleAction());
-        actions.add(new KeepCamelToggleAction());
+        Separator attributeSeparator = Separator.create(JsonAssistantBundle.messageOnSystem("separator.attribute"));
 
+        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)){
+            actions.add(new LombokGroup(deserializerState));
+        }
+
+        actions.add(Separator.create());
+        if (JavaUtil.hasFastJsonLib(module)) {
+            if (!actions.contains(attributeSeparator)) {
+                actions.add(attributeSeparator);
+            }
+            actions.add(new FastJsonToggleAction(deserializerState));
+        }
+
+        if (JavaUtil.hasFastJson2Lib(module)) {
+            if (!actions.contains(attributeSeparator)) {
+                actions.add(attributeSeparator);
+            }
+            actions.add(new FastJson2ToggleAction(deserializerState));
+        }
+
+        if (JavaUtil.hasJacksonLib(module)) {
+            if (!actions.contains(attributeSeparator)) {
+                actions.add(attributeSeparator);
+            }
+            actions.add(new JacksonToggleAction(deserializerState));
+        }
+
+        actions.add(Separator.create());
+        actions.add(new KeepCamelToggleAction(deserializerState));
         return actions.toArray(new AnAction[0]);
     }
 

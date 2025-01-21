@@ -77,6 +77,12 @@
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
 
+        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.StructureComparisonAction">
+            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt 0"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift 0"/>
+        </action>
+
         <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.action.OtherFormatsToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
