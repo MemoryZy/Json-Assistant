@@ -54,6 +54,13 @@
 
         <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonFileEditorProvider"/>
 
+        <localInspection language="JSON"
+                         displayName="Expand Nested JSON"
+                         groupName="JSON and JSON5"
+                         enabledByDefault="true"
+                         level="INFO"
+                         implementationClass="cn.memoryzy.json.inspection.ExpandJsonInspection"/>
+
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
 

@@ -327,6 +327,28 @@ public class PlatformUtil {
     }
 
     /**
+     * 判断是否是JSON语言
+     *
+     * @param language 语言
+     * @return 是JSON语言返回true，否则返回false
+     */
+    public static boolean isJsonLanguage(Language language) {
+        return isAssignLanguage(language, FileTypes.JSON.getLanguageQualifiedName())
+                || isAssignLanguage(language, FileTypes.JSON5.getLanguageQualifiedName());
+    }
+
+    /**
+     * 判断是否是某种语言
+     *
+     * @param language          语言
+     * @param languageClassName 语言类名
+     * @return 是指定文件类型返回true，否则返回false
+     */
+    public static boolean isAssignLanguage(Language language, String languageClassName) {
+        return language != null && Objects.equals(languageClassName, language.getClass().getName());
+    }
+
+    /**
      * 获取项目数据管理（misc.xml）
      *
      * @param project 项目

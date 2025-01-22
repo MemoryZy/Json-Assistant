@@ -1,0 +1,113 @@
+package cn.memoryzy.json.inspection;
+
+import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
+import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo;
+import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement;
+import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.json.psi.*;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.PsiFile;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+
+/**
+ * @author Memory
+ * @since 2025/1/22
+ */
+public class ExpandJsonInspection extends LocalInspectionTool {
+
+    private static final Logger LOG = Logger.getInstance(ExpandJsonInspection.class);
+
+    @Override
+    public @NotNull PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
+        return new JsonElementVisitor() {
+            @Override
+            public void visitObject(@NotNull JsonObject o) {
+                List<JsonProperty> propertyList = o.getPropertyList();
+                for (JsonProperty property : propertyList) {
+                    JsonValue jsonValue = property.getValue();
+                    registerProblem(jsonValue, holder);
+                }
+            }
+
+            @Override
+            public void visitArray(@NotNull JsonArray o) {
+                List<JsonValue> valueList = o.getValueList();
+                for (JsonValue jsonValue : valueList) {
+                    registerProblem(jsonValue, holder);
+                }
+            }
+        };
+    }
+
+    private void registerProblem(JsonValue jsonValue, ProblemsHolder holder) {
+        // 判断是否为 String 类型
+        if (jsonValue instanceof JsonStringLiteral) {
+            String value = ((JsonStringLiteral) jsonValue).getValue();
+            // 若为 JSON 格式
+            if (JsonUtil.isJson(value) || Json5Util.isJson5(value)) {
+                holder.registerProblem(jsonValue, JsonAssistantBundle.message("inspection.expand.json.description"), new ExpandJsonFix(jsonValue));
+            }
+        }
+    }
+
+    public static class ExpandJsonFix extends LocalQuickFixAndIntentionActionOnPsiElement {
+
+        // TODO 通过此链接查看意图预览
+        //  https://plugins.jetbrains.com/docs/intellij/code-intentions-preview.html#preparation-for-the-default-diff-preview
+
+        private ExpandJsonFix(@Nullable PsiElement element) {
+            super(element);
+        }
+
+        @Override
+        public void invoke(@NotNull Project project,
+                           @NotNull PsiFile file,
+                           @Nullable Editor editor,
+                           @NotNull PsiElement startElement,
+                           @NotNull PsiElement endElement) {
+            if (editor == null) return;
+
+            try {
+                String value = ((JsonStringLiteral) startElement).getValue();
+                String formatted = JsonUtil.isJson(value) ? JsonUtil.formatJson(value) : Json5Util.formatJson5(value);
+                if (StrUtil.isBlank(formatted)) {
+                    ExpandJsonInspection.LOG.error("Formatting failure, original: " + value);
+                    return;
+                }
+
+                startElement.replace(new JsonElementGenerator(project).createValue(formatted));
+            } catch (Exception e) {
+                ExpandJsonInspection.LOG.error(e);
+            }
+        }
+
+        @Override
+        public @NotNull IntentionPreviewInfo generatePreview(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
+            // TODO 意图预览
+            return IntentionPreviewInfo.DIFF;
+        }
+
+        @Override
+        public @NotNull String getText() {
+            return JsonAssistantBundle.message("inspection.expand.json.text");
+        }
+
+        @Override
+        public @NotNull String getFamilyName() {
+            return getText();
+        }
+    }
+
+
+}
