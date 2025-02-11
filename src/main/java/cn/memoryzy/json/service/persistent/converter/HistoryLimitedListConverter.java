@@ -1,5 +1,7 @@
 package cn.memoryzy.json.service.persistent.converter;
 
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
@@ -10,6 +12,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.util.xmlb.Converter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author Memory
@@ -23,6 +27,11 @@ public class HistoryLimitedListConverter extends Converter<HistoryLimitedList> {
         HistoryLimitedList historyList = new HistoryLimitedList(JsonHistoryPersistentState.LIMIT);
 
         try {
+            // 兼容旧数据，只有一次
+            if (Base64.isBase64(value)) {
+                value = StrUtil.str(Base64.decode(value), StandardCharsets.UTF_8);
+            }
+
             ArrayWrapper jsonArray = Json5Util.parseArray(value);
             // 应该反着来添加，因 List 以 新-旧 向后排，所以应该保持这个顺序
             // 这里后添加的元素会顶着前面的元素往后，所以先反转 List
@@ -41,7 +50,7 @@ public class HistoryLimitedListConverter extends Converter<HistoryLimitedList> {
 
     @Override
     public @Nullable String toString(@NotNull HistoryLimitedList value) {
-        return Json5Util.compressJson5(value);
+        return Base64.encode(Json5Util.compressJson5(value));
     }
 
 }

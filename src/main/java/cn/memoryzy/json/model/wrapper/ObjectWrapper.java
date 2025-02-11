@@ -20,7 +20,7 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
     public ObjectWrapper(Object source) {
         super();
         if (!(source instanceof Map)) {
-            throw new IllegalArgumentException("source is not a Map");
+            throw new IllegalArgumentException("source is not a Map: " + source);
         }
 
         initMap((Map<String, Object>) source);

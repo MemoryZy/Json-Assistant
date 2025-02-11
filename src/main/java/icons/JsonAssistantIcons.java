@@ -51,6 +51,7 @@ public class JsonAssistantIcons {
         public static final Icon JSON_OBJECT_ITEM = load("/icons/structure/json_object_item.svg");
         public static final Icon INTELLIJ_COLLAPSE_ALL = load("/icons/structure/intellij_collapseAll.svg");
         public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/structure/intellij_expandAll.svg");
+        public static final Icon COMPARE_STRUCTURE = load("/icons/structure/compare_structure.svg");
 
     }
 

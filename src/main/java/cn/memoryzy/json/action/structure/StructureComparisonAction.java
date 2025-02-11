@@ -1,4 +1,4 @@
-package cn.memoryzy.json;
+package cn.memoryzy.json.action.structure;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,13 +10,13 @@ import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.editor.SimpleDiffVirtualFile;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.VirtualFile;
+import icons.JsonAssistantIcons;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,7 +36,7 @@ public class StructureComparisonAction extends DumbAwareAction {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.show.structure.comparison.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.show.structure.comparison.description"));
-        presentation.setIcon(AllIcons.Actions.Compile);
+        presentation.setIcon(JsonAssistantIcons.Structure.COMPARE_STRUCTURE);
     }
 
     @Override

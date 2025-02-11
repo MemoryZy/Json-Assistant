@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
-import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.LocalQuickFixAndIntentionActionOnPsiElement;
 import com.intellij.codeInspection.ProblemsHolder;
@@ -90,12 +89,6 @@ public class ExpandJsonInspection extends LocalInspectionTool {
             } catch (Exception e) {
                 ExpandJsonInspection.LOG.error(e);
             }
-        }
-
-        @Override
-        public @NotNull IntentionPreviewInfo generatePreview(@NotNull Project project, @NotNull Editor editor, @NotNull PsiFile file) {
-            // TODO 意图预览
-            return IntentionPreviewInfo.DIFF;
         }
 
         @Override

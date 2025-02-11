@@ -316,8 +316,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             HistoryLimitedList historyList = historyState.getHistory();
             String text = StrUtil.trim(editor.getDocument().getText());
 
-            // TODO 防止 IDE 持久化时，XML 解析非法字符，在此加上非法字符过滤。反序列化时再转回来
-
             ApplicationManager.getApplication().invokeLater(() -> {
                 JsonWrapper jsonWrapper = null;
                 if (JsonUtil.isJson(text)) {
