@@ -47,7 +47,7 @@ public class CopyNodePathAction extends DumbAwareAction {
                         int index = parent.getIndex(node);
                         pathString.append("[").append(index).append("]");
                     } else {
-                        pathString.append(pathString.length() > 0 ? " -> " : "").append(node.getUserObject());
+                        pathString.append(pathString.length() > 0 ? " > " : "").append(node.getUserObject());
                     }
                 }
 

@@ -34,8 +34,8 @@ public class StructureComparisonAction extends DumbAwareAction {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.messageOnSystem("action.show.structure.comparison.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.show.structure.comparison.description"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.structure.comparison.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.comparison.description"));
         presentation.setIcon(JsonAssistantIcons.Structure.COMPARE_STRUCTURE);
     }
 
@@ -52,7 +52,7 @@ public class StructureComparisonAction extends DumbAwareAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(isValid(e.getDataContext()));
+        e.getPresentation().setEnabledAndVisible(isValid(e.getDataContext()));
     }
 
     private boolean isValid(DataContext dataContext) {
@@ -103,7 +103,7 @@ public class StructureComparisonAction extends DumbAwareAction {
         return contentList;
     }
 
-    private ImmutablePair<String, String> getTwoContent(List<DocumentContent> contentList){
+    private ImmutablePair<String, String> getTwoContent(List<DocumentContent> contentList) {
         DocumentContent diffContentLeft = contentList.get(0);
         DocumentContent diffContentRight = contentList.get(1);
 

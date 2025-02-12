@@ -23,7 +23,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,6 +39,7 @@ public class JsonStructureComponentProvider {
 
     private Tree tree;
     private JPanel treeComponent;
+    private Object hoverNode;
 
     /**
      * 构造器
@@ -68,6 +73,14 @@ public class JsonStructureComponentProvider {
         tree.setFont(UIManager.jetBrainsMonoFont(12));
         tree.setCellRenderer(new StyleTreeCellRenderer());
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
+        tree.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                TreePath path = tree.getPathForLocation(e.getX(), e.getY());
+                hoverNode = (path != null) ? path.getLastPathComponent() : null;
+                tree.repaint();
+            }
+        });
 
         // 触发快速检索
         new TreeSpeedSearch(tree);
@@ -202,7 +215,7 @@ public class JsonStructureComponentProvider {
         return treeComponent;
     }
 
-    private static class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
+    private class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
         @Override
         public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JsonTreeNode jsonTreeNode = (JsonTreeNode) value;
@@ -366,6 +379,34 @@ public class JsonStructureComponentProvider {
                 }
 
                 append(jsonValue, attributes, Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType));
+            }
+
+            if (jsonTreeNode.equals(hoverNode)) {
+                TreeNode[] path = jsonTreeNode.getPath();
+                // 不显示根节点与第二层的节点路径
+                if (path.length > 2) {
+                    // 悬停时显示完整路径
+                    StringBuilder pathString = new StringBuilder();
+                    for (Object element : path) {
+                        JsonTreeNode parentNode = (JsonTreeNode) element;
+                        JsonTreeNodeType parentNodeType = parentNode.getNodeType();
+                        if (JsonTreeNodeType.JSONArrayElement == parentNodeType) {
+                            // 获取父节点，并得知当前节点在父节点的索引位置
+                            TreeNode parent = parentNode.getParent();
+                            int index = parent.getIndex(parentNode);
+                            pathString.append("[").append(index).append("]");
+                        } else {
+                            pathString.append(pathString.length() > 0 ? " > " : "").append(parentNode.getUserObject());
+                        }
+                    }
+
+                    String pathResult = pathString.toString();
+                    // 同时显示工具提示
+                    setToolTipText(pathResult);
+                    append(" " + pathResult, lightAttributes, false);
+                }
+            } else {
+                setToolTipText(null);
             }
 
             setIcon(icon);

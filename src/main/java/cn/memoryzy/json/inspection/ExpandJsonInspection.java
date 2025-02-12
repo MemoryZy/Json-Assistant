@@ -55,7 +55,7 @@ public class ExpandJsonInspection extends LocalInspectionTool {
             String value = ((JsonStringLiteral) jsonValue).getValue();
             // 若为 JSON 格式
             if (JsonUtil.isJson(value) || Json5Util.isJson5(value)) {
-                holder.registerProblem(jsonValue, JsonAssistantBundle.message("inspection.expand.json.description"), new ExpandJsonFix(jsonValue));
+                holder.registerProblem(jsonValue, JsonAssistantBundle.messageOnSystem("inspection.expand.json.description"), new ExpandJsonFix(jsonValue));
             }
         }
     }
@@ -77,18 +77,14 @@ public class ExpandJsonInspection extends LocalInspectionTool {
                            @NotNull PsiElement endElement) {
             if (editor == null) return;
 
-            try {
-                String value = ((JsonStringLiteral) startElement).getValue();
-                String formatted = JsonUtil.isJson(value) ? JsonUtil.formatJson(value) : Json5Util.formatJson5(value);
-                if (StrUtil.isBlank(formatted)) {
-                    ExpandJsonInspection.LOG.error("Formatting failure, original: " + value);
-                    return;
-                }
-
-                startElement.replace(new JsonElementGenerator(project).createValue(formatted));
-            } catch (Exception e) {
-                ExpandJsonInspection.LOG.error(e);
+            String value = ((JsonStringLiteral) startElement).getValue();
+            String formatted = JsonUtil.isJson(value) ? JsonUtil.formatJson(value) : Json5Util.formatJson5(value);
+            if (StrUtil.isBlank(formatted)) {
+                ExpandJsonInspection.LOG.error("Formatting failure, original: " + value);
+                return;
             }
+
+            startElement.replace(new JsonElementGenerator(project).createValue(formatted));
         }
 
         @Override
