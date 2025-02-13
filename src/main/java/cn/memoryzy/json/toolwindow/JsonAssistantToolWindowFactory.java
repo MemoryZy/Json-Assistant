@@ -59,7 +59,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
                 new BackToEditorViewAction(toolWindowEx),
                 Separator.create(),
                 new JsonHistoryAction(toolWindowEx),
-                new OpenSettingsAction(toolWindowEx));
+                new OpenSettingsAction());
 
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();

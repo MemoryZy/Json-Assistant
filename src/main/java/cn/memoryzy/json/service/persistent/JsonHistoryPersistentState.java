@@ -16,7 +16,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/11/25
  */
-@State(name = "JsonAssistantHistoryState", storages = {@Storage(value = "JsonAssistantHistoryState.xml")})
+@State(name = "Json Assistant History", storages = {@Storage(value = "JsonAssistantHistoryState.xml")})
 public class JsonHistoryPersistentState implements PersistentStateComponent<JsonHistoryPersistentState> {
     public static final int LIMIT = 25;
 

@@ -9,7 +9,6 @@ import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ import javax.swing.*;
  */
 public class OpenSettingsAction extends DumbAwareAction implements CustomComponentAction {
 
-    public OpenSettingsAction(ToolWindowEx toolWindow) {
+    public OpenSettingsAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();

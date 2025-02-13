@@ -12,6 +12,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -35,6 +36,9 @@ public class GlobalJsonConverter {
     public static void parseAndProcessJson(DataContext dataContext, Editor editor, boolean needBeautify, String selectionMessage, String globalMessage) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        if (Objects.isNull(editorData)) {
+            return;
+        }
 
         JsonConversionProcessor[] processors = needBeautify
                 ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData)
