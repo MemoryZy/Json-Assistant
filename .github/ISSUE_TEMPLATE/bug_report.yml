@@ -22,7 +22,7 @@ body:
     id: version
     attributes:
       label: 🏷 Plugin Version
-      description: What version of translation plugin are you running?
+      description: Which version of the plugin are you running?
       placeholder: e.g. 1.6.0
     validations:
       required: true

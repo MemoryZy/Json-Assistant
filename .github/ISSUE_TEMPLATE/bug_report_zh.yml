@@ -22,7 +22,7 @@ body:
     id: version
     attributes:
       label: 🏷 插件版本
-      description: 您正在运行的插件是哪个版本？
+      description: 您正在运行的是哪个版本的插件？
       placeholder: 例如：1.6.0
     validations:
       required: true
