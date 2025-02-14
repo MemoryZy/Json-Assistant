@@ -21,6 +21,7 @@
     <depends optional="true" config-file="optional/plugin-toml.xml">org.toml.lang</depends>
     <depends optional="true" config-file="optional/plugin-yaml.xml">org.jetbrains.plugins.yaml</depends>
     <depends optional="true" config-file="optional/plugin-properties.xml">com.intellij.properties</depends>
+    <depends optional="true" config-file="optional/plugin-xdebugger.xml">com.intellij.modules.xdebugger</depends>
 
     <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
 

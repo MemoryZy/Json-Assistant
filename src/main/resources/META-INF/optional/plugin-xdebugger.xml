@@ -1,0 +1,13 @@
+<idea-plugin>
+    <actions>
+        <action id="JsonAssistant.Action.RuntimeObjectToJsonAction" class="cn.memoryzy.json.action.debug.RuntimeObjectToJsonAction"/>
+
+        <group id="JsonAssistant.Group.XDebuggerGroup">
+            <separator/>
+            <reference ref="JsonAssistant.Action.RuntimeObjectToJsonAction"/>
+            <separator/>
+
+            <add-to-group group-id="XDebugger.Actions" relative-to-action="XDebugger.CopyValue" anchor="before"/>
+        </group>
+    </actions>
+</idea-plugin>
