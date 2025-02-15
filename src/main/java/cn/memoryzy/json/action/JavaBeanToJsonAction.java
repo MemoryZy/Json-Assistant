@@ -13,11 +13,9 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiJavaCodeReferenceElement;
-import com.intellij.psi.PsiLocalVariable;
+import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.intellij.psi.util.PsiTypesUtil;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -47,8 +45,8 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
         DataContext dataContext = event.getDataContext();
-        // 在此判断当前光标是在某个对象 或 对象实例上，那就将该对象 或 对象实例解析为JSON
-        PsiClass psiClass = getCurrentCursorPositionClass(dataContext);
+        // 在此判断当前光标是在某个对象 或 对象实例 及 List、数组上，那就将该对象 或 对象实例解析为JSON
+        PsiClass psiClass = getCurrentCursorPositionClass(project, dataContext);
         // 执行操作
         convertAttributesToJsonAndNotify(project, psiClass, JsonUtil::formatJson, LOG);
     }
@@ -106,7 +104,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         }
     }
 
-    private static PsiClass getCurrentCursorPositionClass(DataContext dataContext) {
+    private static PsiClass getCurrentCursorPositionClass(Project project, DataContext dataContext) {
         PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
         // 本地变量
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
@@ -115,15 +113,24 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
 
         PsiClass psiClass = null;
         if (localVariable != null) {
-            psiClass = JavaUtil.getPsiClass(localVariable.getType());
+            psiClass = resolveLocalVariable(project, localVariable);
+
         } else if (referenceElement != null) {
             psiClass = JavaUtil.getPsiClass(referenceElement);
         }
 
         // 获取当前类
-        return psiClass != null ? psiClass : JavaUtil.getPsiClass(dataContext);
+        return (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) ? psiClass : JavaUtil.getPsiClass(dataContext);
     }
 
+    public static PsiClass resolveLocalVariable(Project project, PsiLocalVariable localVariable) {
+        PsiType psiType = localVariable.getType();
+        if (JavaUtil.isCollectionOrArray(psiType)) {
+            return JavaUtil.getGenericTypeOfCollection(project, psiType);
+        } else {
+            return JavaUtil.getPsiClass(localVariable.getType());
+        }
+    }
 
     public static boolean isEnable(Project project, DataContext dataContext) {
         if (Objects.isNull(project)) {
@@ -134,7 +141,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
             return false;
         }
 
-        PsiClass psiClass = getCurrentCursorPositionClass(dataContext);
+        PsiClass psiClass = getCurrentCursorPositionClass(project, dataContext);
         if (psiClass == null) {
             return false;
         }

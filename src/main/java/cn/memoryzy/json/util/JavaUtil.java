@@ -112,16 +112,8 @@ public class JavaUtil {
                     jsonMap.put(propertyName, null);
                 }
 
-            } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType) {
-                String typeClassName;
-                String canonicalText = psiType.getCanonicalText();
-                if (psiType instanceof PsiArrayType) {
-                    typeClassName = canonicalText.replace("[]", "");
-                } else {
-                    typeClassName = ReUtil.get("<(.*?)>", canonicalText, 1);
-                }
-
-                PsiClass psiClz = findClass(project, typeClassName);
+            } else if (isCollectionOrArray(psiType)) {
+                PsiClass psiClz = getGenericTypeOfCollection(project, psiType);
                 ArrayList<Object> list = new ArrayList<>();
                 if (psiClz != null) {
                     PsiClassType classType = PsiTypesUtil.getClassType(psiClz);
@@ -233,6 +225,21 @@ public class JavaUtil {
         return null;
     }
 
+    public static boolean isCollectionOrArray(PsiType psiType) {
+        return isAssignType(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType;
+    }
+
+    public static PsiClass getGenericTypeOfCollection(Project project, PsiType psiType) {
+        String typeClassName;
+        String canonicalText = psiType.getCanonicalText();
+        if (psiType instanceof PsiArrayType) {
+            typeClassName = canonicalText.replace("[]", "");
+        } else {
+            typeClassName = ReUtil.get("<(.*?)>", canonicalText, 1);
+        }
+
+        return findClass(project, typeClassName);
+    }
 
     /**
      * 获取Json注解中的键名称
@@ -441,17 +448,22 @@ public class JavaUtil {
     }
 
     public static PsiClass getPsiClass(PsiJavaCodeReferenceElement referenceElement) {
+        PsiClass psiClass = null;
         PsiElement resolve = referenceElement.resolve();
         if (resolve instanceof PsiClass) {
-            return (PsiClass) resolve;
+            psiClass = (PsiClass) resolve;
         } else if (resolve instanceof PsiLocalVariable) {
-            return getPsiClass(((PsiLocalVariable) resolve).getType());
+            psiClass = getPsiClass(((PsiLocalVariable) resolve).getType());
         } else if (resolve instanceof PsiField) {
             PsiType psiType = ((PsiField) resolve).getType();
-            return isApplicationClsType(psiType) ? PsiTypesUtil.getPsiClass(psiType) : null;
-        } else {
-            return null;
+            if (isApplicationClsType(psiType)) {
+                psiClass = PsiTypesUtil.getPsiClass(psiType);
+            } else if (isCollectionOrArray(psiType)) {
+                psiClass = getGenericTypeOfCollection(referenceElement.getProject(), psiType);
+            }
         }
+
+        return psiClass;
     }
 
     public static void addKeywordsToClass(PsiElementFactory factory, String keywordString, PsiClass psiClass) {

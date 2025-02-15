@@ -4,12 +4,14 @@
 - 新增了从 JSON 树结构中提取节点路径的功能。
 - 优化了反序列化配置选项。
 - 实现了对嵌套 JSON 结构的智能感知能力。
+- 当选定目标为对象实例或对象、数组、集合时，类序列化将以此对象实例或对象、数组、集合代表的对象为准 [#52](https://github.com/MemoryZy/Json-Assistant/issues/52)。
 - 修复了配置持久化过程中因非法字符导致的错误。
 - 用户体验优化与改进。
 - BUG修复。
 - Added the capability to extract node paths from JSON tree structures.
 - Optimized deserialization configuration options.
 - Implemented intelligent detection capabilities for nested JSON structures.
+- When an object instance or object, array, or collection is selected as the target, the class serialization takes the object represented by this object instance or object, array, or collection as the standard [#52](https://github.com/MemoryZy/Json-Assistant/issues/52).
 - Fixed the error caused by invalid characters during configuration persistence.
 - User experience optimization and improvement.
 - BUG fixes.
