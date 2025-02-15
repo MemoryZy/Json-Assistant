@@ -436,6 +436,24 @@ public class JavaUtil {
         return psiClass;
     }
 
+    public static PsiClass getPsiClass(PsiType psiType) {
+        return psiType instanceof PsiClassReferenceType ? ((PsiClassReferenceType) psiType).resolve() : null;
+    }
+
+    public static PsiClass getPsiClass(PsiJavaCodeReferenceElement referenceElement) {
+        PsiElement resolve = referenceElement.resolve();
+        if (resolve instanceof PsiClass) {
+            return (PsiClass) resolve;
+        } else if (resolve instanceof PsiLocalVariable) {
+            return getPsiClass(((PsiLocalVariable) resolve).getType());
+        } else if (resolve instanceof PsiField) {
+            PsiType psiType = ((PsiField) resolve).getType();
+            return isApplicationClsType(psiType) ? PsiTypesUtil.getPsiClass(psiType) : null;
+        } else {
+            return null;
+        }
+    }
+
     public static void addKeywordsToClass(PsiElementFactory factory, String keywordString, PsiClass psiClass) {
         PsiKeyword keyword = factory.createKeyword(keywordString);
         PsiModifierList modifierList = psiClass.getModifierList();
@@ -527,8 +545,18 @@ public class JavaUtil {
      * @return true -> 存在；false -> 不存在
      */
     public static boolean hasJavaProperty(DataContext dataContext) {
-        boolean enabled = false;
         PsiClass psiClass = getPsiClass(dataContext);
+        return hasJavaProperty(psiClass);
+    }
+
+    /**
+     * 当前 Java 类中是否存在属性
+     *
+     * @param psiClass 类
+     * @return true -> 存在；false -> 不存在
+     */
+    public static boolean hasJavaProperty(PsiClass psiClass) {
+        boolean enabled = false;
         if (Objects.nonNull(psiClass)) {
             PsiField[] fields = getNonStaticFields(psiClass);
             enabled = ArrayUtil.isNotEmpty(fields);

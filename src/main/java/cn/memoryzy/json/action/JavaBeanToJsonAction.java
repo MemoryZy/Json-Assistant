@@ -14,6 +14,10 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiJavaCodeReferenceElement;
+import com.intellij.psi.PsiLocalVariable;
+import com.intellij.psi.util.PsiTreeUtil;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,8 +46,9 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        // 获取当前类
-        PsiClass psiClass = JavaUtil.getPsiClass(event.getDataContext());
+        DataContext dataContext = event.getDataContext();
+        // 在此判断当前光标是在某个对象 或 对象实例上，那就将该对象 或 对象实例解析为JSON
+        PsiClass psiClass = getCurrentCursorPositionClass(dataContext);
         // 执行操作
         convertAttributesToJsonAndNotify(project, psiClass, JsonUtil::formatJson, LOG);
     }
@@ -101,9 +106,40 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         }
     }
 
+    private static PsiClass getCurrentCursorPositionClass(DataContext dataContext) {
+        PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
+        // 本地变量
+        PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
+        // 引用
+        PsiJavaCodeReferenceElement referenceElement = PsiTreeUtil.getParentOfType(element, PsiJavaCodeReferenceElement.class);
+
+        PsiClass psiClass = null;
+        if (localVariable != null) {
+            psiClass = JavaUtil.getPsiClass(localVariable.getType());
+        } else if (referenceElement != null) {
+            psiClass = JavaUtil.getPsiClass(referenceElement);
+        }
+
+        // 获取当前类
+        return psiClass != null ? psiClass : JavaUtil.getPsiClass(dataContext);
+    }
+
 
     public static boolean isEnable(Project project, DataContext dataContext) {
-        return Objects.nonNull(project) && JavaUtil.isJavaFile(dataContext) && JavaUtil.hasJavaProperty(dataContext);
+        if (Objects.isNull(project)) {
+            return false;
+        }
+
+        if (!JavaUtil.isJavaFile(dataContext)) {
+            return false;
+        }
+
+        PsiClass psiClass = getCurrentCursorPositionClass(dataContext);
+        if (psiClass == null) {
+            return false;
+        }
+
+        return JavaUtil.hasJavaProperty(psiClass);
     }
 
 
