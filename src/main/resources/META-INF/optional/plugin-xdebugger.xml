@@ -7,7 +7,7 @@
             <reference ref="JsonAssistant.Action.RuntimeObjectToJsonAction"/>
             <separator/>
 
-            <add-to-group group-id="XDebugger.Actions" relative-to-action="XDebugger.CopyValue" anchor="before"/>
+            <add-to-group group-id="XDebugger.ValueGroup" relative-to-action="XDebugger.CopyName" anchor="after"/>
         </group>
     </actions>
 </idea-plugin>
