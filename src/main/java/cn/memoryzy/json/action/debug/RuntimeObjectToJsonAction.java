@@ -28,10 +28,12 @@ public class RuntimeObjectToJsonAction extends AnAction {
         Project project = e.getProject();
         DataContext dataContext = e.getDataContext();
 
+        // boolean complexNodeWithChildren = JavaDebugUtil.isComplexNodeWithChildren(project, dataContext);
+
+        JavaDebugUtil.resolveComplexNode(dataContext);
 
 
-
-
+        //
         // DebugProcessEvents debugProcessEvents = new DebugProcessEvents(project);
         // debugProcessEvents.getManagerThread().invoke(new DebuggerCommandImpl() {
         //     @Override
@@ -92,6 +94,6 @@ public class RuntimeObjectToJsonAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(JavaDebugUtil.isObjectNodeWithChildren(e.getProject(), e.getDataContext()));
+        // e.getPresentation().setEnabledAndVisible(JavaDebugUtil.isComplexNodeWithChildren(e.getProject(), e.getDataContext()));
     }
 }
