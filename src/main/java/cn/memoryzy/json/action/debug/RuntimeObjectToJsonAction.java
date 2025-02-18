@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
  * @since 2025/2/14
  */
 public class RuntimeObjectToJsonAction extends AnAction {
+
+    private static final Logger LOG = Logger.getInstance(RuntimeObjectToJsonAction.class);
 
     public RuntimeObjectToJsonAction() {
         super();
@@ -28,7 +31,14 @@ public class RuntimeObjectToJsonAction extends AnAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         DataContext dataContext = e.getDataContext();
-        Object result = JavaDebugUtil.resolveObjectReference(dataContext);
+        Object result;
+        try {
+            result = JavaDebugUtil.resolveObjectReference(dataContext);
+        } catch (StackOverflowError ex) {
+            LOG.error("The current object is too deep to convert!");
+            return;
+        }
+
         if (result != null) {
             ToolWindowUtil.addNewContentWithEditorContentIfNeeded(e.getProject(), JsonUtil.toJsonStr(result), FileTypeHolder.JSON5);
         }
