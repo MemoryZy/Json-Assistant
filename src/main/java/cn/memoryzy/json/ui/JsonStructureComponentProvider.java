@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
+import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
@@ -44,22 +45,22 @@ public class JsonStructureComponentProvider {
     /**
      * 构造器
      *
-     * @param wrapper    JSON 结构
-     * @param component  注册快捷键的组件
-     * @param needBorder 是否需要边框
+     * @param wrapper   JSON 结构
+     * @param component 注册快捷键的组件
+     * @param config    配置
      */
-    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, boolean needBorder) {
-        init(wrapper, component, needBorder);
+    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
+        init(wrapper, component, config);
     }
 
     /**
      * 初始化组件
      *
-     * @param wrapper    JSON 结构
-     * @param component  注册快捷键的组件
-     * @param needBorder 是否需要边框
+     * @param wrapper   JSON 结构
+     * @param component 注册快捷键的组件
+     * @param config    配置
      */
-    private void init(JsonWrapper wrapper, @Nullable JComponent component, boolean needBorder) {
+    private void init(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
         JsonTreeNode rootNode = new JsonTreeNode("root");
         // 允许在后面再进行树的构建
         if (wrapper != null) {
@@ -85,13 +86,18 @@ public class JsonStructureComponentProvider {
         // 触发快速检索
         new TreeSpeedSearch(tree);
 
-        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree)
-                .addExtraAction(new ExpandAllAction(tree, component, true))
-                .addExtraAction(new CollapseAllAction(tree, component, true));
+        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree);
+        if (config.isNeedToolbar()) {
+            decorator.addExtraAction(new ExpandAllAction(tree, component, true))
+                    .addExtraAction(new CollapseAllAction(tree, component, true));
+        } else {
+            decorator.setPanelBorder(JBUI.Borders.empty());
+        }
 
-        if (!needBorder) {
+        if (!config.isNeedBorder()) {
             // 去除边框
-            decorator.setPanelBorder(JBUI.Borders.empty(0, 1)).setScrollPaneBorder(JBUI.Borders.empty(0, 1));
+            decorator.setPanelBorder(JBUI.Borders.empty(0, 1))
+                    .setScrollPaneBorder(JBUI.Borders.empty(0, 1));
         }
 
         this.treeComponent = new JPanel(new BorderLayout());
@@ -221,7 +227,7 @@ public class JsonStructureComponentProvider {
             JsonTreeNode jsonTreeNode = (JsonTreeNode) value;
             JsonTreeNodeType nodeType = jsonTreeNode.getNodeType();
 
-            String text = jsonTreeNode.getUserObject().toString();
+            String text = String.valueOf(jsonTreeNode.getUserObject());
             SimpleTextAttributes simpleTextAttributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
 
             SimpleTextAttributes lightAttributes = SimpleTextAttributes.merge(simpleTextAttributes, SimpleTextAttributes.GRAYED_ATTRIBUTES);
@@ -382,21 +388,20 @@ public class JsonStructureComponentProvider {
             }
 
             if (jsonTreeNode.equals(hoverNode)) {
-                TreeNode[] path = jsonTreeNode.getPath();
+                TreeNode[] pathElements = jsonTreeNode.getPath();
                 // 不显示根节点与第二层的节点路径
-                if (path.length > 2) {
+                if (pathElements.length > 2) {
                     // 悬停时显示完整路径
                     StringBuilder pathString = new StringBuilder();
-                    for (Object element : path) {
-                        JsonTreeNode parentNode = (JsonTreeNode) element;
-                        JsonTreeNodeType parentNodeType = parentNode.getNodeType();
+
+                    for (int i = 0; i < pathElements.length; i++) {
+                        JsonTreeNode node = (JsonTreeNode) pathElements[i];
+                        JsonTreeNodeType parentNodeType = node.getNodeType();
+
                         if (JsonTreeNodeType.JSONArrayElement == parentNodeType) {
-                            // 获取父节点，并得知当前节点在父节点的索引位置
-                            TreeNode parent = parentNode.getParent();
-                            int index = parent.getIndex(parentNode);
-                            pathString.append("[").append(index).append("]");
+                            appendArrayElementPath(node, pathString);
                         } else {
-                            pathString.append(pathString.length() > 0 ? " > " : "").append(parentNode.getUserObject());
+                            appendObjectElementPath(node, pathString, i, pathElements.length);
                         }
                     }
 
@@ -411,6 +416,20 @@ public class JsonStructureComponentProvider {
 
             setIcon(icon);
         }
+    }
+
+    public static void appendArrayElementPath(JsonTreeNode node, StringBuilder pathString) {
+        TreeNode parent = node.getParent();
+        int index = parent.getIndex(node);
+        pathString.append("[").append(index).append("]");
+    }
+
+    private static void appendObjectElementPath(JsonTreeNode node, StringBuilder pathString, int currentIndex, int totalLength) {
+        boolean isLastElement = currentIndex == totalLength - 1;
+        String separator = (pathString.length() > 0 && !isLastElement) ? " > " : "";
+        String elementValue = isLastElement ? "" : String.valueOf(node.getUserObject());
+
+        pathString.append(separator).append(elementValue);
     }
 
 }

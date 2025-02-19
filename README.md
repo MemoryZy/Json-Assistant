@@ -22,29 +22,28 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 ## Key Features
 - Support [JSON5](https://json5.org/)
-- JSON Window (Multi-Tab)
-  - Rename Tab
-  - Move Tab to Editor
-  - Move Tab to New Window
-  - JSONPath Evaluator
-  - JMESPath Evaluator
-  - JSON History Log
-  - Export JSON
-- JSON Beautifier
-- JSON Minifier
-- JSON Tree View
-- JavaBean to JSON
-- JSON to JavaBean
-- Kotlin Properties to JSON
-- JSON Diff
-- JSON Escape
-- Extracting Java constants to JSON
-- Format Converters
-  - JSON <-> XML
-  - JSON <-> YAML
-  - JSON <-> Toml
-  - JSON <-> Properties
-  - JSON <-> URL Param
+- JSON Window
+  - History
+  - JSONPath/JMESPath Evaluator
+- JSON Processing
+  - Beautify
+  - Minify
+  - Tree View
+  - Compare
+  - Escape
+  - Expand Nested JSON
+- Serialization
+  - JavaBean to JSON
+  - Runtime Objects to JSON
+  - JSON to JavaBean
+  - Kotlin Properties to JSON
+  - Extract Java Constants to JSON
+- Format Conversion
+  - XML
+  - YAML
+  - Toml
+  - Properties
+  - URL Params
 
 <br/>
 

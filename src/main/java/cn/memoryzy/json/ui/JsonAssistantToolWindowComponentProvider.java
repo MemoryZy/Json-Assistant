@@ -10,6 +10,7 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.TextSourceType;
 import cn.memoryzy.json.model.EditorInitData;
 import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
@@ -99,7 +100,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         // 卡片面板
         JPanel cardPanel = new JPanel(cardLayout);
 
-        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, false);
+        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, StructureConfig.of(false));
         JsonQueryComponentProvider queryProvider = new JsonQueryComponentProvider(project);
         Disposer.register(this, queryProvider);
 

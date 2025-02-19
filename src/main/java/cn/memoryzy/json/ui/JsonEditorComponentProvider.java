@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
@@ -18,7 +19,7 @@ public class JsonEditorComponentProvider {
     private final JsonStructureComponentProvider componentProvider;
 
     public JsonEditorComponentProvider(Project project, String content) {
-        this.componentProvider = new JsonStructureComponentProvider(getJsonWrapper(content), UIManager.getWindowComponent(project), false);
+        this.componentProvider = new JsonStructureComponentProvider(getJsonWrapper(content), UIManager.getWindowComponent(project), StructureConfig.of(false));
     }
 
     public JComponent getComponent() {

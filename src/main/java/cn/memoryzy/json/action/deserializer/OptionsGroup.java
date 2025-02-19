@@ -29,7 +29,6 @@ public class OptionsGroup extends DefaultActionGroup {
         this.deserializerState = deserializerState;
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.General.Settings);
-        presentation.setMultipleChoice(true);
 
         // com.intellij.openapi.actionSystem.impl.ActionButton.paintDownArrow 渲染图标下标记，表示菜单的意思
     }

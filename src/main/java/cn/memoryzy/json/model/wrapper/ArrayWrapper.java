@@ -50,4 +50,8 @@ public class ArrayWrapper extends ArrayList<Object> implements JsonWrapper {
         return toJsonString();
     }
 
+    public static boolean isWrapper(Object object) {
+        return object instanceof ArrayWrapper;
+    }
+
 }

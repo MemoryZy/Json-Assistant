@@ -31,6 +31,11 @@ public class HistoryEntry {
     private Integer id;
 
     /**
+     * 记录名称
+     */
+    private String name;
+
+    /**
      * 历史记录短文本（展示）
      */
     private String shortText;
@@ -71,6 +76,10 @@ public class HistoryEntry {
         this.id = id;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setShortText(String shortText) {
         this.shortText = shortText;
     }
@@ -89,6 +98,10 @@ public class HistoryEntry {
 
     public Integer getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getShortText() {

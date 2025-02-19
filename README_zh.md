@@ -18,29 +18,28 @@
 
 ## 功能 
 - 完全支持 [JSON5][json5]
-- JSON 窗口（多选项卡）
-  - 选项卡更名
-  - 移动至主编辑器
-  - 用新窗口打开选项卡
-  - JSONPath 查询
-  - JMESPath 查询
-  - JSON 历史记录
-  - JSON 导出
-- JSON 美化
-- JSON 压缩
-- JSON 结构化（树视图）
-- JavaBean 转换为 JSON
-- JSON 转换为 JavaBean
-- Kotlin 属性转为 JSON
-- JSON 比对
-- JSON 转义
-- Java 常量提取为 JSON
+- JSON 窗口
+  - 历史记录
+  - JSONPath/JMESPath 查询
+- JSON 处理
+  - 美化
+  - 压缩
+  - 树视图
+  - 比较
+  - 转义
+  - 展开嵌套 JSON
+- 序列化
+  - JavaBean 转换为 JSON
+  - 运行时对象转换为 JSON
+  - JSON 转换为 JavaBean
+  - Kotlin 属性转为 JSON
+  - 提取 Java 常量为 JSON
 - 格式转换
-  - JSON <-> XML
-  - JSON <-> YAML
-  - JSON <-> Toml
-  - JSON <-> Properties
-  - JSON <-> URL Param
+  - XML
+  - YAML
+  - Toml
+  - Properties
+  - URL Params
 
 <br/>
 

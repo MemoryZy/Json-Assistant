@@ -59,4 +59,8 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
         return toJsonString();
     }
 
+    public static boolean isWrapper(Object object) {
+        return object instanceof ObjectWrapper;
+    }
+
 }

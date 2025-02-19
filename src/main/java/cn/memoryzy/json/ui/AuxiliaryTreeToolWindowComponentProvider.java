@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui;
 
+import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.panel.AuxiliaryTreeToolWindowPanel;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -28,7 +29,7 @@ public class AuxiliaryTreeToolWindowComponentProvider {
 
     public JComponent createComponent(@NotNull JComponent component) {
         // 创建树结构
-        JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component, false);
+        JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component, StructureConfig.of(false));
         JPanel treeComponent = provider.getTreeComponent();
         Tree tree = provider.getTree();
 

@@ -2,6 +2,7 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 import com.intellij.openapi.application.ApplicationManager;
@@ -38,7 +39,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        JsonStructureComponentProvider componentProvider = new JsonStructureComponentProvider(wrapper, getRootPane(), true);
+        JsonStructureComponentProvider componentProvider = new JsonStructureComponentProvider(wrapper, getRootPane(), StructureConfig.of(true));
         tree = componentProvider.getTree();
         JPanel rootPanel = componentProvider.getTreeComponent();
         rootPanel.setPreferredSize(new Dimension(400, 470));

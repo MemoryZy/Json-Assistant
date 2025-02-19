@@ -4,25 +4,19 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.JsonTextDiffAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
-import com.intellij.diff.contents.DiffContent;
 import com.intellij.diff.contents.DocumentContent;
-import com.intellij.diff.editor.SimpleDiffVirtualFile;
-import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.vfs.VirtualFile;
 import icons.JsonAssistantIcons;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -41,10 +35,21 @@ public class StructureComparisonAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        DataContext dataContext = event.getDataContext();
-        ImmutablePair<String, String> immutablePair = getTwoContent(getDiffContent(dataContext));
-        String leftText = immutablePair.getLeft();
-        String rightText = immutablePair.getRight();
+
+
+        // DataContext dataContext = event.getDataContext();
+        // ImmutablePair<String, String> pair = getTwoContent(getDiffContent(dataContext));
+
+        // JsonWrapper leftObj = parseJson(pair.getLeft());
+        // JsonWrapper rightObj = parseJson(pair.getRight());
+
+        // DualTreeComponentProvider provider = new DualTreeComponentProvider(leftObj, rightObj);
+
+        // JsonStructureComponentProvider leftProvider = new JsonStructureComponentProvider(leftObj, null, false, false);
+
+        // DialogBuilder dialogBuilder = new DialogBuilder();
+        // dialogBuilder.centerPanel(provider.createComponent());
+        // dialogBuilder.show();
 
         // TODO do somethings......
 
@@ -55,13 +60,25 @@ public class StructureComparisonAction extends DumbAwareAction {
         e.getPresentation().setEnabledAndVisible(isValid(e.getDataContext()));
     }
 
+    public static JsonWrapper parseJson(String json) {
+        if (StrUtil.isNotBlank(json)) {
+            if (JsonUtil.isJson(json)) {
+                return JsonUtil.parse(json);
+            } else {
+                return Json5Util.parse(json);
+            }
+        }
+
+        return null;
+    }
+
     private boolean isValid(DataContext dataContext) {
-        List<DocumentContent> contentList = getDiffContent(dataContext);
+        List<DocumentContent> contentList = JsonTextDiffAction.getDiffContent(dataContext);
         if (CollUtil.isEmpty(contentList)) {
             return false;
         }
 
-        ImmutablePair<String, String> immutablePair = getTwoContent(contentList);
+        ImmutablePair<String, String> immutablePair = JsonTextDiffAction.getContent(contentList);
         String leftText = immutablePair.getLeft();
         String rightText = immutablePair.getRight();
 
@@ -81,36 +98,6 @@ public class StructureComparisonAction extends DumbAwareAction {
         return blankRightText || JsonUtil.isJson(rightText) || Json5Util.isJson5(rightText);
     }
 
-    private List<DocumentContent> getDiffContent(DataContext dataContext) {
-        List<DocumentContent> contentList = new ArrayList<>();
-        VirtualFile virtualFile = CommonDataKeys.VIRTUAL_FILE.getData(dataContext);
-        if (virtualFile instanceof SimpleDiffVirtualFile) {
-            SimpleDiffRequest diffRequest = virtualFile.getUserData(JsonTextDiffAction.DIFF_REQUEST_KEY);
-            if (Objects.isNull(diffRequest)) {
-                return contentList;
-            }
 
-            List<DiffContent> contents = diffRequest.getContents();
-            if (contents.size() != 2) {
-                return contentList;
-            }
-
-            for (DiffContent content : contents) {
-                contentList.add((DocumentContent) content);
-            }
-        }
-
-        return contentList;
-    }
-
-    private ImmutablePair<String, String> getTwoContent(List<DocumentContent> contentList) {
-        DocumentContent diffContentLeft = contentList.get(0);
-        DocumentContent diffContentRight = contentList.get(1);
-
-        String leftText = diffContentLeft.getDocument().getText();
-        String rightText = diffContentRight.getDocument().getText();
-
-        return ImmutablePair.of(leftText, rightText);
-    }
 
 }

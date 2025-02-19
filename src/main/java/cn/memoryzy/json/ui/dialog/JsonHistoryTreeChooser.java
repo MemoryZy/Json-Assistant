@@ -233,6 +233,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
 
     private JPopupMenu buildRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
+        group.add(new SetNameAction());
         group.add(new RemoveNodeAction());
 
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
@@ -245,6 +246,43 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
 
     public void enabledOkAction() {
         getOKAction().setEnabled(true);
+    }
+
+
+    class SetNameAction extends DumbAwareAction {
+
+        public SetNameAction() {
+            super(JsonAssistantBundle.message("action.structure.setName.text"), JsonAssistantBundle.messageOnSystem("action.structure.setName.description"), null);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            boolean enabled = false;
+            TreePath selectionPath = tree.getSelectionPath();
+            if (selectionPath != null) {
+                HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
+                if (HistoryTreeNodeType.NODE == node.getNodeType()) {
+
+
+
+                }
+
+
+                HistoryEntry value = node.getValue();
+
+                value.getName();
+
+
+            }
+
+            e.getPresentation().setEnabledAndVisible(enabled);
+        }
+
     }
 
 

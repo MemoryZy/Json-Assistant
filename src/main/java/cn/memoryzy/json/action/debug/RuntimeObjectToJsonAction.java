@@ -4,7 +4,9 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.JavaDebugUtil;
 import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.ToolWindowUtil;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -35,7 +37,8 @@ public class RuntimeObjectToJsonAction extends AnAction {
         try {
             result = JavaDebugUtil.resolveObjectReference(dataContext);
         } catch (StackOverflowError ex) {
-            LOG.error("The current object is too deep to convert!");
+            LOG.error(ex);
+            Notifications.showNotification(JsonAssistantBundle.messageOnSystem("error.runtime.serialize.recursion"), NotificationType.ERROR, e.getProject());
             return;
         }
 
