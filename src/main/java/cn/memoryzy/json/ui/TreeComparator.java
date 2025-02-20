@@ -8,6 +8,7 @@ public class TreeComparator {
 
     /**
      * 递归比较两棵树，返回一个包含差异信息的列表。
+     *
      * @param tree1 第一个树的根节点
      * @param tree2 第二个树的根节点
      * @return 包含差异信息的列表
@@ -20,10 +21,11 @@ public class TreeComparator {
 
     /**
      * 递归比较两个节点及其子节点。
-     * @param node1 第一个节点
-     * @param node2 第二个节点
+     *
+     * @param node1       第一个节点
+     * @param node2       第二个节点
      * @param differences 差异信息列表
-     * @param path 节点的路径，用于标识节点位置
+     * @param path        节点的路径，用于标识节点位置
      */
     private static void compareNodes(DefaultMutableTreeNode node1, DefaultMutableTreeNode node2, List<Difference> differences, String path) {
         if (node1 == null && node2 == null) return; // 两个节点都为空，没有差异
@@ -51,10 +53,10 @@ public class TreeComparator {
 
         // 处理额外的子节点（一个节点比另一个节点多子节点的情况）
         for (int i = minChildCount; i < childCount1; i++) {
-            differences.add(new Difference(path + "/" + i, ((DefaultMutableTreeNode)node1.getChildAt(i)).getUserObject(), null));
+            differences.add(new Difference(path + "/" + i, ((DefaultMutableTreeNode) node1.getChildAt(i)).getUserObject(), null));
         }
         for (int i = minChildCount; i < childCount2; i++) {
-            differences.add(new Difference(path + "/" + i, null, ((DefaultMutableTreeNode)node2.getChildAt(i)).getUserObject()));
+            differences.add(new Difference(path + "/" + i, null, ((DefaultMutableTreeNode) node2.getChildAt(i)).getUserObject()));
         }
     }
 

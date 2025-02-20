@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui.dialog;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
@@ -24,6 +25,7 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
@@ -192,6 +194,8 @@ public class JsonHistoryListChooser extends DialogWrapper {
 
     private JPopupMenu buildRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
+        group.add(new SetNameAction());
+        group.add(Separator.create());
         group.add(new RemoveElementAction());
 
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
@@ -206,6 +210,43 @@ public class JsonHistoryListChooser extends DialogWrapper {
         getOKAction().setEnabled(true);
     }
 
+
+    class SetNameAction extends DumbAwareAction {
+
+        public SetNameAction() {
+            super(JsonAssistantBundle.message("action.structure.setName.text"), JsonAssistantBundle.messageOnSystem("action.structure.setName.description"), null);
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            HistoryEntry selectedValue = showList.getSelectedValue();
+            if (selectedValue != null) {
+                String name = selectedValue.getName();
+                String newName = Messages.showInputDialog(project, null, "指定记录名称", null, name, new JsonHistoryTreeChooser.NameValidator());
+                if (StrUtil.isNotBlank(newName)) {
+                    selectedValue.setName(newName);
+                    UIManager.repaintComponent(showList);
+                }
+            }
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            boolean enabled = false;
+            Presentation presentation = e.getPresentation();
+            HistoryEntry selectedValue = showList.getSelectedValue();
+            if (selectedValue != null) {
+                enabled = true;
+                String name = selectedValue.getName();
+                if (StrUtil.isNotBlank(name)) {
+                    presentation.setText(JsonAssistantBundle.message("action.structure.rename.text"));
+                    presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.rename.description"));
+                }
+            }
+
+            presentation.setEnabledAndVisible(enabled);
+        }
+    }
 
     class RemoveElementAction extends DumbAwareAction {
 
@@ -255,8 +296,9 @@ public class JsonHistoryListChooser extends DialogWrapper {
     static class StyleListCellRenderer extends ColoredListCellRenderer<HistoryEntry> {
         @Override
         protected void customizeCellRenderer(@NotNull JList<? extends HistoryEntry> list, HistoryEntry value, int index, boolean selected, boolean hasFocus) {
+            String name = value.getName();
             append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
-            append(" " + value.getShortText(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+            append(" " + (StrUtil.isNotBlank(name) ? name : value.getShortText()), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
             setIcon(AllIcons.FileTypes.Json);
             SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
         }

@@ -114,7 +114,7 @@ public class GlobalJsonConverter {
     /**
      * 从编辑器解析 JSON 文本（默认不关注格式化或压缩）
      *
-     * @param editor      编辑器
+     * @param editor 编辑器
      * @return JSON 文本
      */
     public static String parseJson(Editor editor) {
@@ -142,8 +142,8 @@ public class GlobalJsonConverter {
     /**
      * 解析文本并验证是否为 JSON/JSON5（从选中文本或全局文本中选取）
      *
-     * @param project     项目
-     * @param editor      编辑器
+     * @param project 项目
+     * @param editor  编辑器
      * @return 若为 JSON 则为true；反之为 false
      */
     public static boolean validateEditorAllJson(Project project, Editor editor) {
@@ -175,8 +175,8 @@ public class GlobalJsonConverter {
     /**
      * 解析文本并验证是否为 JSON（从选中文本或全局文本中选取）
      *
-     * @param project     项目
-     * @param editor      编辑器
+     * @param project 项目
+     * @param editor  编辑器
      * @return 若为 JSON 则为true；反之为 false
      */
     public static boolean validateEditorJson(Project project, Editor editor) {

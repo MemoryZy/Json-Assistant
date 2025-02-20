@@ -98,6 +98,4 @@ public class StructureComparisonAction extends DumbAwareAction {
         return blankRightText || JsonUtil.isJson(rightText) || Json5Util.isJson5(rightText);
     }
 
-
-
 }

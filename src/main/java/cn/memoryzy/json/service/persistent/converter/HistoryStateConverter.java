@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/11/29
  */
-public class HistoryStateConverter extends Converter<HistoryState>  {
+public class HistoryStateConverter extends Converter<HistoryState> {
 
     @Override
     public @Nullable HistoryState fromString(@NotNull String value) {

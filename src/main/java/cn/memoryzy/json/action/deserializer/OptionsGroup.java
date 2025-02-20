@@ -38,7 +38,7 @@ public class OptionsGroup extends DefaultActionGroup {
         List<AnAction> actions = new ArrayList<>();
         Separator attributeSeparator = Separator.create(JsonAssistantBundle.messageOnSystem("separator.attribute"));
 
-        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)){
+        if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
             actions.add(new LombokGroup(deserializerState));
         }
 

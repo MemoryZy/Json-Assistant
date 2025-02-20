@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui.node;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.model.HistoryEntry;
 
@@ -63,8 +64,14 @@ public class HistoryTreeNode extends DefaultMutableTreeNode {
     @Override
     public String toString() {
         if (Objects.nonNull(nodeType)) {
-            return HistoryTreeNodeType.GROUP.equals(nodeType) ? groupTime : value.getShortText();
+            if (HistoryTreeNodeType.GROUP == nodeType) {
+                return groupTime;
+            } else {
+                String name = value.getName();
+                return StrUtil.isNotBlank(name) ? name : value.getShortText();
+            }
         }
+
         return null;
     }
 }

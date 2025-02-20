@@ -21,7 +21,7 @@ public class AuxiliaryTreeToolWindowComponentProvider {
     /**
      * 构造器
      *
-     * @param wrapper   JSON对象
+     * @param wrapper JSON对象
      */
     public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper) {
         this.wrapper = wrapper;

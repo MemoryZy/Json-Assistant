@@ -74,7 +74,7 @@ public class AuxiliaryTreeToolWindowManager {
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
 
-        registerAction((ToolWindowEx )toolWindow);
+        registerAction((ToolWindowEx) toolWindow);
         return toolWindow;
     }
 

@@ -461,6 +461,8 @@ public class JavaUtil {
             } else if (isCollectionOrArray(psiType)) {
                 psiClass = getGenericTypeOfCollection(referenceElement.getProject(), psiType);
             }
+        } else if (resolve instanceof PsiParameter) {
+            psiClass = getPsiClass(((PsiParameter) resolve).getType());
         }
 
         return psiClass;

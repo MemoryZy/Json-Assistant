@@ -2,6 +2,7 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.structure.CollapseAllAction;
 import cn.memoryzy.json.action.structure.ExpandAllAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
@@ -31,6 +32,8 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.InputValidator;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.*;
 import com.intellij.ui.content.Content;
@@ -234,6 +237,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     private JPopupMenu buildRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
         group.add(new SetNameAction());
+        group.add(Separator.create());
         group.add(new RemoveNodeAction());
 
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
@@ -257,32 +261,41 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-
+            TreePath selectionPath = tree.getSelectionPath();
+            if (selectionPath != null) {
+                HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
+                if (HistoryTreeNodeType.NODE == node.getNodeType()) {
+                    HistoryEntry entry = node.getValue();
+                    String name = entry.getName();
+                    String newName = Messages.showInputDialog(project, null, "指定记录名称", null, name, new NameValidator());
+                    if (StrUtil.isNotBlank(newName)) {
+                        entry.setName(newName);
+                        UIManager.repaintComponent(tree);
+                    }
+                }
+            }
         }
 
         @Override
         public void update(@NotNull AnActionEvent e) {
             boolean enabled = false;
+            Presentation presentation = e.getPresentation();
             TreePath selectionPath = tree.getSelectionPath();
             if (selectionPath != null) {
                 HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
                 if (HistoryTreeNodeType.NODE == node.getNodeType()) {
-
-
-
+                    enabled = true;
+                    HistoryEntry value = node.getValue();
+                    String name = value.getName();
+                    if (StrUtil.isNotBlank(name)) {
+                        presentation.setText(JsonAssistantBundle.message("action.structure.rename.text"));
+                        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.rename.description"));
+                    }
                 }
-
-
-                HistoryEntry value = node.getValue();
-
-                value.getName();
-
-
             }
 
-            e.getPresentation().setEnabledAndVisible(enabled);
+            presentation.setEnabledAndVisible(enabled);
         }
-
     }
 
 
@@ -511,6 +524,18 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                     UIManager.repaintEditor(Objects.requireNonNull(editor));
                 }
             }
+        }
+    }
+
+    public static class NameValidator implements InputValidator {
+        @Override
+        public boolean checkInput(String inputString) {
+            return StrUtil.isNotBlank(inputString) && inputString.length() <= 50;
+        }
+
+        @Override
+        public boolean canClose(String inputString) {
+            return true;
         }
     }
 
