@@ -1,10 +1,14 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.7.7-beta] - 2025-02-22
+
 - 解决在 GoLand、PyCharm 平台上的兼容问题。
 - Resolve compatibility issues on GoLand and PyCharm platforms.
 
 ## [1.7.6] - 2025-02-22
+
 - 新增了从 JSON 树结构中提取节点路径的功能。
 - 新增了从运行环境中提取对象为 JSON 的功能。
 - 新增了 JSON 对比的优化排序功能。
@@ -252,7 +256,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.5...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7-beta...HEAD
+[1.7.7-beta]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.6...v1.7.7-beta
 [1.7.6]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.5...v1.7.6
 [1.7.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.2...v1.7.5
 [1.7.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.6.7...v1.7.2
