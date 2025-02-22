@@ -2,10 +2,8 @@ package cn.memoryzy.json.action.debug;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.util.JavaDebugUtil;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.Notifications;
-import cn.memoryzy.json.util.ToolWindowUtil;
+import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -49,6 +47,13 @@ public class RuntimeObjectToJsonAction extends AnAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(JavaDebugUtil.isObjectOrListWithChildren(e.getDataContext()));
+        boolean enable = false;
+        Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
+        Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
+        if (languageClz != null && classClz != null) {
+            enable = true;
+        }
+
+        e.getPresentation().setEnabledAndVisible(enable && JavaDebugUtil.isObjectOrListWithChildren(e.getDataContext()));
     }
 }

@@ -6,6 +6,8 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.enums.FileTypes;
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.JavaStackFrame;
 import com.intellij.debugger.engine.JavaValue;
@@ -14,7 +16,6 @@ import com.intellij.debugger.engine.events.DebuggerContextCommandImpl;
 import com.intellij.debugger.impl.DebuggerContextImpl;
 import com.intellij.debugger.jdi.ThreadReferenceProxyImpl;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
-import com.intellij.lang.java.JavaLanguage;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
@@ -726,6 +727,11 @@ public class JavaDebugUtil {
      */
     public static List<Value> evaluate(Project project, String expressionText) {
         List<Value> values = new ArrayList<>();
+        Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
+        if (languageClz == null) {
+            return values;
+        }
+
         XDebuggerManager debuggerManager = XDebuggerManager.getInstance(project);
         XDebugSession currentSession = debuggerManager.getCurrentSession();
         if (currentSession == null) {
@@ -739,7 +745,7 @@ public class JavaDebugUtil {
         }
 
         // 看 com/intellij/xdebugger/impl/evaluate/XDebuggerEvaluationDialog.java:344
-        XExpression expression = XDebuggerUtil.getInstance().createExpression(expressionText, JavaLanguage.INSTANCE, null, EvaluationMode.EXPRESSION);
+        XExpression expression = XDebuggerUtil.getInstance().createExpression(expressionText, LanguageHolder.JAVA, null, EvaluationMode.EXPRESSION);
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
         XDebuggerEvaluator.XEvaluationCallback callback = new XEvaluationCallbackBase() {

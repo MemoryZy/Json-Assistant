@@ -22,4 +22,6 @@ public interface LanguageHolder {
 
     Language PROPERTIES = PlatformUtil.getLanguage(FileTypes.PROPERTIES);
 
+    Language JAVA = PlatformUtil.getLanguage(FileTypes.JAVA);
+
 }
