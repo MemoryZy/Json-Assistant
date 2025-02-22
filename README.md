@@ -76,7 +76,7 @@ If you find any problem during use, you can submit [Issue][gh:issue] and [PR][gh
 
 ## Donors List
 
-Heartfelt thanks to every donor who supports us! Your generosity helps us improve and enhance the project. Thank you for your support!
+Heartfelt thanks to every donor who supports us! Your generosity helps us improve and enhance the project. Thank you for your support!❤️
 
 | Name       | Website Link | Accompanying Message | Total Donation |
 |------------|--------------|----------------------|----------------|
