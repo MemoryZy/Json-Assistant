@@ -70,6 +70,8 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
         actions.add(ActionHolder.CONVERT_OTHER_FORMATS_GROUP);
         actions.add(Separator.create());
+        actions.add(ActionHolder.EXTEND_ACTION);
+        actions.add(Separator.create());
         actions.add(ActionHolder.SHORTCUT_ACTION);
         actions.add(Separator.create());
         actions.add(new OnlineDocAction(true));

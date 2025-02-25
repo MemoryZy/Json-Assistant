@@ -1,6 +1,20 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 检测 JSON 中是否存在时间戳，并提供了时间戳转为时间格式的快速修复功能。
+- 新增两项扩展功能
+  - 将 JSON 内所有时间戳转为时间格式。
+  - 将 JSON 内所有嵌套 JSON 字符串转为 JSON 对象。
+- 解决插件兼容问题。
+- 用户体验优化与改进。
+- BUG修复。
+- Detects whether timestamp exists in JSON, and provides a quick repair function to convert timestamp into time format.
+- Two new extensions
+  - Converts all timestamps in JSON to time format.
+  - Converts all nested JSON strings in JSON to JSON objects.
+- Solve plugin compatibility issues.
+- User experience optimization and improvement.
+- BUG fixes.
 
 ## [1.7.7-beta] - 2025-02-22
 

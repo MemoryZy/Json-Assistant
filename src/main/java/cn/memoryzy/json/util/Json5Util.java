@@ -70,6 +70,16 @@ public class Json5Util {
     /**
      * 格式化Json5文本
      *
+     * @param data 对象
+     * @return 格式化后的Json5文本
+     */
+    public static String formatJson5(Object data) {
+        return toJson5Str(data, FORMAT_JSON5);
+    }
+
+    /**
+     * 格式化Json5文本
+     *
      * @param json json字符串
      * @return 格式化后的Json5文本
      */

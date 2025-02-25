@@ -84,6 +84,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | *瑞         | N/A          | N/A                  | 5.00 CNY       |
 | JiaoJunWei | N/A          | N/A                  | 5.00 CNY       |
 | 广柔散人       | N/A          | good                 | 6.66 CNY       |
+| One        | N/A          | N/A                  | 6.66 CNY       |
 
 
 

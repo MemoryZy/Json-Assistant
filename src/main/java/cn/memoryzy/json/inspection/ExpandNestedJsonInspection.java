@@ -23,10 +23,11 @@ import java.util.List;
  * @author Memory
  * @since 2025/1/22
  */
-public class ExpandJsonInspection extends LocalInspectionTool {
+public class ExpandNestedJsonInspection extends LocalInspectionTool {
 
-    private static final Logger LOG = Logger.getInstance(ExpandJsonInspection.class);
+    private static final Logger LOG = Logger.getInstance(ExpandNestedJsonInspection.class);
 
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public @NotNull PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
         return new JsonElementVisitor() {
@@ -55,17 +56,14 @@ public class ExpandJsonInspection extends LocalInspectionTool {
             String value = ((JsonStringLiteral) jsonValue).getValue();
             // 若为 JSON 格式
             if (JsonUtil.isJson(value) || Json5Util.isJson5(value)) {
-                holder.registerProblem(jsonValue, JsonAssistantBundle.messageOnSystem("inspection.expand.json.description"), new ExpandJsonFix(jsonValue));
+                holder.registerProblem(jsonValue, JsonAssistantBundle.messageOnSystem("inspection.expand.json.description"), new ExpandNestedJsonFix(jsonValue));
             }
         }
     }
 
-    public static class ExpandJsonFix extends LocalQuickFixAndIntentionActionOnPsiElement {
+    public static class ExpandNestedJsonFix extends LocalQuickFixAndIntentionActionOnPsiElement {
 
-        // TODO 通过此链接查看意图预览
-        //  https://plugins.jetbrains.com/docs/intellij/code-intentions-preview.html#preparation-for-the-default-diff-preview
-
-        private ExpandJsonFix(@Nullable PsiElement element) {
+        private ExpandNestedJsonFix(@Nullable PsiElement element) {
             super(element);
         }
 
@@ -80,7 +78,7 @@ public class ExpandJsonInspection extends LocalInspectionTool {
             String value = ((JsonStringLiteral) startElement).getValue();
             String formatted = JsonUtil.isJson(value) ? JsonUtil.formatJson(value) : Json5Util.formatJson5(value);
             if (StrUtil.isBlank(formatted)) {
-                ExpandJsonInspection.LOG.error("Formatting failure, original: " + value);
+                ExpandNestedJsonInspection.LOG.error("Formatting failure, original: " + value);
                 return;
             }
 

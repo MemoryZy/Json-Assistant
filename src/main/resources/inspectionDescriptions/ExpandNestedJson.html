@@ -1,0 +1,27 @@
+<html>
+<body>
+This operation detects cases where the string values themselves are valid JSON and expands those string values into JSON objects.<br/><br/>此操作会检测到字符串值本身是有效 JSON 的情况，并将这些字符串值展开为 JSON 对象。
+
+<p><b>Example:</b></p>
+<pre><code>
+<span style="color: #3f920a">{</span>
+  <span style="color: #871094">"content"</span>: <span style="color: #067D17">"{\"hobbies\":[\"reading\"]}"</span>
+<span style="color: #3f920a">}</span></code></pre>
+
+<p>After the quick-fix is applied:</p>
+
+<pre><code>
+<span style="color: #3f920a">{</span>
+  <span style="color: #871094">"content"</span>: <span style="color: #3f920a">{</span>
+    <span style="color: #871094">"hobbies"</span>: <span style="color: #ba9e2f">[</span>
+      <span style="color: #067D17">"reading"</span>
+    <span style="color: #ba9e2f">]</span>
+  <span style="color: #3f920a">}</span>
+<span style="color: #3f920a">}</span></code></pre>
+
+<br/>
+
+Powered by: <a href="https://plugins.jetbrains.com/plugin/24738-json-assistant">Json Assistant</a> plugin
+
+</body>
+</html>

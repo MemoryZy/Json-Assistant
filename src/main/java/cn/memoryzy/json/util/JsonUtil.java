@@ -370,6 +370,30 @@ public class JsonUtil {
 
 
     /**
+     * 判断JSON文本是否是格式化的。
+     *
+     * @param json JSON文本
+     * @return true表示格式化后的JSON，false表示压缩成一行的JSON
+     */
+    public static boolean isFormattedJson(String json) {
+        // 检查是否有换行符
+        if (!json.contains("\n")) {
+            return false;
+        }
+
+        // 检查是否有缩进（通常为2个或4个空格）
+        Pattern indentPattern = Pattern.compile("^[ \\t]{2,}", Pattern.MULTILINE);
+        if (indentPattern.matcher(json).find()) {
+            return true;
+        }
+
+        // 检查是否有对象或数组内部的换行符
+        Pattern objectArrayPattern = Pattern.compile("[\\{\\[]\\s*\\n", Pattern.MULTILINE);
+        return objectArrayPattern.matcher(json).find();
+    }
+
+
+    /**
      * 使用默认的PrettyPrinter时，Key的后面总是会带一个空格，然后才是冒号，通过继承这个类做处理
      * <p>并且在Jackson生成的Json中换行符为系统默认的 \r\n 换行符，利用此类将其固定为 \n  <br/>
      * （{@link com.intellij.openapi.editor.Document} 类不允许编辑器内出现\r）</p>

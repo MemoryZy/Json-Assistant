@@ -372,7 +372,7 @@ public class JavaDebugUtil {
         Object fastTime = getFieldValue(project, objectReference, "fastTime");
         if (fastTime instanceof Long) {
             long timestamp = (Long) fastTime;
-            return formatDateBasedOnTimestampDetails(timestamp);
+            return JsonAssistantUtil.formatDateBasedOnTimestampDetails(timestamp);
         }
 
         return null;
@@ -467,42 +467,6 @@ public class JavaDebugUtil {
         return null;
     }
 
-
-    /**
-     * 根据时间戳的详细信息（时、分、秒、毫秒）选择合适的日期时间格式并返回格式化后的字符串。
-     *
-     * @param timestamp 时间戳（单位：毫秒）
-     * @return 格式化后的日期时间字符串
-     */
-    public static String formatDateBasedOnTimestampDetails(long timestamp) {
-        LocalDateTime localDateTime = LocalDateTimeUtil.of(timestamp);
-
-        int hour = localDateTime.getHour();
-        int minute = localDateTime.getMinute();
-        int second = localDateTime.getSecond();
-        // 获取毫秒部分
-        int millis = (int) ((timestamp % 1000));
-
-        String format;
-        if (hour == 0 && minute == 0 && second == 0 && millis == 0) {
-            // 如果时、分、秒和毫秒都为0，则只显示日期
-            format = DatePattern.NORM_DATE_PATTERN;
-        } else if (millis > 0) {
-            // 如果毫秒部分存在值，则包含毫秒的格式化表达式
-            format = DatePattern.NORM_DATETIME_MS_PATTERN;
-        } else if (second > 0) {
-            // 如果秒部分存在值，则包含秒的格式化表达式
-            format = DatePattern.NORM_DATETIME_PATTERN;
-        } else if (minute > 0 || hour > 0) {
-            // 如果分钟或小时部分存在值，则包含时和分的格式化表达式
-            format = DatePattern.NORM_DATETIME_MINUTE_PATTERN;
-        } else {
-            // 默认情况下仅显示日期
-            format = DatePattern.NORM_DATE_PATTERN;
-        }
-
-        return LocalDateTimeUtil.format(localDateTime, format);
-    }
 
     /**
      * 获取字段值

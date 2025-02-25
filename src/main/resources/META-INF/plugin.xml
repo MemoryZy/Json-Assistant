@@ -60,7 +60,14 @@
                          groupName="JSON and JSON5"
                          enabledByDefault="true"
                          level="INFO"
-                         implementationClass="cn.memoryzy.json.inspection.ExpandJsonInspection"/>
+                         implementationClass="cn.memoryzy.json.inspection.ExpandNestedJsonInspection"/>
+
+        <localInspection language="JSON"
+                         displayName="Convert to time format"
+                         groupName="JSON and JSON5"
+                         enabledByDefault="true"
+                         level="INFO"
+                         implementationClass="cn.memoryzy.json.inspection.ConvertTimestampInspection"/>
 
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
@@ -76,6 +83,7 @@
         <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.action.JsonTextDiffAction"/>
         <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
         <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
+        <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.ConvertAllTimestampAction"/>
 
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
@@ -113,6 +121,7 @@
 
         <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
         <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
+        <group id="JsonAssistant.Group.ExtendGroup" class="cn.memoryzy.json.action.group.ExtendGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>

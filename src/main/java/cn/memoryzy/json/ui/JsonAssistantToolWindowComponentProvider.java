@@ -2,6 +2,7 @@ package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
@@ -60,6 +61,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Memory
@@ -67,6 +70,7 @@ import java.util.Objects;
  */
 public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
+    private static final ScheduledThreadPoolExecutor EXECUTOR = ThreadUtil.createScheduledExecutor(2);
 
     private final Project project;
     private final FileType editorFileType;
@@ -315,9 +319,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private void addJsonToHistory() {
         if (historyOptionState.switchHistory) {
             HistoryLimitedList historyList = historyState.getHistory();
-            String text = StrUtil.trim(editor.getDocument().getText());
 
-            ApplicationManager.getApplication().invokeLater(() -> {
+            EXECUTOR.schedule(() -> {
+                String text = StrUtil.trim(editor.getDocument().getText());
                 JsonWrapper jsonWrapper = null;
                 if (JsonUtil.isJson(text)) {
                     // 无元素，不添加
@@ -346,7 +350,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                 if (Objects.nonNull(jsonWrapper)) {
                     historyList.add(project, jsonWrapper);
                 }
-            });
+            }, 3, TimeUnit.SECONDS);
         }
     }
 

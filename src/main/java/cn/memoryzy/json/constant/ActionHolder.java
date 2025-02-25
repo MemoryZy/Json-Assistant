@@ -18,6 +18,8 @@ public interface ActionHolder {
     String CONVERT_OTHER_FORMATS_GROUP_ID = "JsonAssistant.Group.ConvertOtherFormatsGroup";
     String SHORTCUT_ACTION_ID = "JsonAssistant.Action.ShortcutAction";
     String JSON_ESCAPE_ACTION_ID = "JsonAssistant.Action.JsonEscapeAction";
+    String CONVERT_ALL_TIMESTAMP_ACTION_ID = "JsonAssistant.Action.ConvertAllTimestampAction";
+    String EXTEND_ACTION_ID = "JsonAssistant.Group.ExtendGroup";
     String TO_XML_ACTION_ID = "JsonAssistant.Action.ToXmlAction";
     String TO_YAML_ACTION_ID = "JsonAssistant.Action.ToYamlAction";
     String TO_TOML_ACTION_ID = "JsonAssistant.Action.ToTomlAction";
@@ -33,6 +35,8 @@ public interface ActionHolder {
     AnAction CONVERT_OTHER_FORMATS_GROUP = ActionManager.getInstance().getAction(CONVERT_OTHER_FORMATS_GROUP_ID);
     AnAction SHORTCUT_ACTION = ActionManager.getInstance().getAction(SHORTCUT_ACTION_ID);
     AnAction JSON_ESCAPE_ACTION = ActionManager.getInstance().getAction(JSON_ESCAPE_ACTION_ID);
+    AnAction CONVERT_ALL_TIMESTAMP_ACTION = ActionManager.getInstance().getAction(CONVERT_ALL_TIMESTAMP_ACTION_ID);
+    AnAction EXTEND_ACTION = ActionManager.getInstance().getAction(EXTEND_ACTION_ID);
     AnAction TO_XML_ACTION = ActionManager.getInstance().getAction(TO_XML_ACTION_ID);
     AnAction TO_YAML_ACTION = ActionManager.getInstance().getAction(TO_YAML_ACTION_ID);
     AnAction TO_TOML_ACTION = ActionManager.getInstance().getAction(TO_TOML_ACTION_ID);
