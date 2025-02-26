@@ -127,4 +127,17 @@ public class GlobalTextConversionProcessorContext {
         };
     }
 
+    /**
+     * 获取 JSON 处理器列表（转换出的结果不变化）
+     *
+     * @param editorData 编辑器信息
+     * @return 压缩 JSON 处理器列表
+     */
+    public static JsonConversionProcessor[] getOriginalAllJsonProcessors(EditorData editorData) {
+        return new JsonConversionProcessor[]{
+                new JsonConversionProcessor(editorData, null),
+                new Json5ConversionProcessor(editorData, null)
+        };
+    }
+
 }

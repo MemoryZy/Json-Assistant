@@ -27,7 +27,6 @@
   - 树视图
   - 比较
   - 转义
-  - 展开嵌套 JSON
 - 序列化
   - JavaBean 转换为 JSON
   - 运行时对象转换为 JSON
@@ -40,6 +39,9 @@
   - Toml
   - Properties
   - URL Params
+- 扩展
+  - 将 JSON 中的时间戳类型转换为时间格式
+  - 将嵌套的 JSON 文本扩展为 JSON 对象/数组
 
 <br/>
 
@@ -80,14 +82,7 @@
 
   在 [JetBrains Marketplace][jb:plugin-link] 或 [GitHub Releases][gh:release] 下载与 IDE 版本兼容的插件包，并按照以下流程安装：
 
-  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd> > <kbd>选择插件包并进行安装（无需解压 zip）</kbd> 
-
-<br/>
-
-## 使用
-
-> 
-
+  <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd> > <kbd>选择插件包并进行安装（无需解压 zip）</kbd>
 
 <br/>
 
@@ -101,11 +96,13 @@
 
 | 名称         | 网站链接 | 留言           | 捐赠总额     |
 |------------|------|--------------|----------|
-| ت          | 无    | Json插件很好用，加油 | 6.66 CNY |
-| *瑞         | 无    | 无            | 5.00 CNY |
-| JiaoJunWei | 无    | 无            | 5.00 CNY |
-| 广柔散人       | 无    | good         | 6.66 CNY |
-| One        | 无    | 无            | 6.66 CNY |
+| ت          |      | Json插件很好用，加油 | 6.66 CNY |
+| *瑞         |      |              | 5.00 CNY |
+| JiaoJunWei |      |              | 5.00 CNY |
+| 广柔散人       |      | good         | 6.66 CNY |
+| One        |      |              | 6.66 CNY |
+| Vinay      |      |              | 6.66 CNY |
+| **权        |      |              | 1.00 CNY |
 
 [shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTEwIDE5di01aDR2NWMwIC41NS40NSAxIDEgMWgzYy41NSAwIDEtLjQ1IDEtMXYtN2gxLjdjLjQ2IDAgLjY4LS41Ny4zMy0uODdMMTIuNjcgMy42Yy0uMzgtLjM0LS45Ni0uMzQtMS4zNCAwbC04LjM2IDcuNTNjLS4zNC4zLS4xMy44Ny4zMy44N0g1djdjMCAuNTUuNDUgMSAxIDFoM2MuNTUgMCAxLS40NSAxLTEiLz48L3N2Zz4=
 [shields:build]: https://github.com/MemoryZy/Json-Assistant/workflows/Build/badge.svg

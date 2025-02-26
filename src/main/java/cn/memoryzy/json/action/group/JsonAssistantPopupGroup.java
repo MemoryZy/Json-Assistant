@@ -69,8 +69,13 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         }
 
         actions.add(ActionHolder.CONVERT_OTHER_FORMATS_GROUP);
+        // ------- 分隔符
         actions.add(Separator.create());
-        actions.add(ActionHolder.EXTEND_ACTION);
+        if (actionEventPopup || PlatformUtil.isNewUi()) {
+            actions.add(Separator.create(JsonAssistantBundle.message("separator.extend")));
+        }
+
+        actions.add(ActionHolder.EXTEND_GROUP);
         actions.add(Separator.create());
         actions.add(ActionHolder.SHORTCUT_ACTION);
         actions.add(Separator.create());

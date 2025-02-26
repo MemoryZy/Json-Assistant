@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.formats.context;
 
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.TextResolveStatus;
@@ -8,6 +9,8 @@ import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.FileTypeData;
 import cn.memoryzy.json.model.strategy.formats.data.MessageData;
 import cn.memoryzy.json.util.JsonUtil;
+
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -28,7 +31,7 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
     /**
      * 转换完成的 JSON 文本是否需要格式化
      */
-    private final boolean needBeautify;
+    private final Boolean needBeautify;
 
     /**
      * 处理器所代表的数据类型
@@ -51,7 +54,7 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
     protected final MessageData messageData;
 
 
-    protected AbstractGlobalTextConversionProcessor(EditorData editorData, boolean needBeautify) {
+    protected AbstractGlobalTextConversionProcessor(EditorData editorData, Boolean needBeautify) {
         this.editorData = editorData;
         this.needBeautify = needBeautify;
         this.actionData = createActionData();
@@ -106,7 +109,11 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
 
     @Override
     public String postprocessing(String text) {
-        return needBeautify ? JsonUtil.formatJson(text) : JsonUtil.compressJson(text);
+        if (Objects.nonNull(needBeautify)) {
+            return needBeautify ? JsonUtil.formatJson(text) : JsonUtil.compressJson(text);
+        }
+
+        return text;
     }
 
     // ----------------------- GETTER/SETTER -----------------------
@@ -128,8 +135,8 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
         this.textResolveStatus = textResolveStatus;
     }
 
-    public boolean isNeedBeautify() {
-        return needBeautify;
+    public Boolean isNeedBeautify() {
+        return BooleanUtil.isTrue(needBeautify);
     }
 
     public FileTypeData getFileTypeData() {

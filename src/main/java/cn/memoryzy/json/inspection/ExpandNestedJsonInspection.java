@@ -55,7 +55,7 @@ public class ExpandNestedJsonInspection extends LocalInspectionTool {
         if (jsonValue instanceof JsonStringLiteral) {
             String value = ((JsonStringLiteral) jsonValue).getValue();
             // 若为 JSON 格式
-            if (JsonUtil.isJson(value) || Json5Util.isJson5(value)) {
+            if (StrUtil.isNotBlank(value) && (JsonUtil.isJson(value) || Json5Util.isJson5(value))) {
                 holder.registerProblem(jsonValue, JsonAssistantBundle.messageOnSystem("inspection.expand.json.description"), new ExpandNestedJsonFix(jsonValue));
             }
         }

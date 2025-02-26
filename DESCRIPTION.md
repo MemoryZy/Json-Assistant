@@ -19,7 +19,6 @@
   - Tree View
   - Compare
   - Escape
-  - Expand Nested JSON
 - Serialization
   - JavaBean to JSON
   - Runtime Objects to JSON
@@ -32,6 +31,9 @@
   - Toml
   - Properties
   - URL Params
+- Extend
+  - Convert timestamp types in JSON to time formats
+  - Expands the nested JSON text into a JSON object/array
 
 <br/>
 

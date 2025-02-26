@@ -21,7 +21,7 @@ import java.util.Objects;
  */
 public class JsonConversionProcessor extends AbstractGlobalTextConversionProcessor {
 
-    public JsonConversionProcessor(EditorData editorData, boolean needBeautify) {
+    public JsonConversionProcessor(EditorData editorData, Boolean needBeautify) {
         super(editorData, needBeautify);
         setAllowedFileTypeQualifiedNames();
     }

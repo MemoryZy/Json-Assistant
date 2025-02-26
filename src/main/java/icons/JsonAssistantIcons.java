@@ -32,6 +32,7 @@ public class JsonAssistantIcons {
     public static final Icon BOOK_READER = load("/icons/book_reader.svg");
     public static final Icon GROUP = load("/icons/group.svg");
     public static final Icon CHECKMARK = load("/icons/checkmark.svg");
+    public static final Icon OPEN = load("/icons/open.svg");
 
     public static class FileTypes {
         public static final Icon TOML = load("/icons/fileTypes/toml-file.svg");
