@@ -94,15 +94,16 @@
 ## 捐赠列表
 衷心感谢每一位支持我们的捐赠者！您的慷慨帮助我们改进和完善项目。感谢您的支持！❤️
 
-| 名称         | 网站链接 | 留言           | 捐赠总额     |
-|------------|------|--------------|----------|
-| ت          |      | Json插件很好用，加油 | 6.66 CNY |
-| *瑞         |      |              | 5.00 CNY |
-| JiaoJunWei |      |              | 5.00 CNY |
-| 广柔散人       |      | good         | 6.66 CNY |
-| One        |      |              | 6.66 CNY |
-| Vinay      |      |              | 6.66 CNY |
-| **权        |      |              | 1.00 CNY |
+| 名称         | 网站链接 | 留言           | 捐赠总额      |
+|------------|------|--------------|-----------|
+| ت          |      | Json插件很好用，加油 | 6.66 CNY  |
+| *瑞         |      |              | 5.00 CNY  |
+| JiaoJunWei |      |              | 5.00 CNY  |
+| 广柔散人       |      | good         | 6.66 CNY  |
+| One        |      |              | 6.66 CNY  |
+| Vinay      |      |              | 6.66 CNY  |
+| **权        |      |              | 1.00 CNY  |
+| **程        |      |              | 10.00 CNY |
 
 [shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTEwIDE5di01aDR2NWMwIC41NS40NSAxIDEgMWgzYy41NSAwIDEtLjQ1IDEtMXYtN2gxLjdjLjQ2IDAgLjY4LS41Ny4zMy0uODdMMTIuNjcgMy42Yy0uMzgtLjM0LS45Ni0uMzQtMS4zNCAwbC04LjM2IDcuNTNjLS4zNC4zLS4xMy44Ny4zMy44N0g1djdjMCAuNTUuNDUgMSAxIDFoM2MuNTUgMCAxLS40NSAxLTEiLz48L3N2Zz4=
 [shields:build]: https://github.com/MemoryZy/Json-Assistant/workflows/Build/badge.svg

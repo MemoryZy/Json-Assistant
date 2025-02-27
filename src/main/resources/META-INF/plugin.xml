@@ -94,11 +94,8 @@
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
 
-        <action id="JsonAssistant.Action.OptimizeCompareAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction">
-            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt o"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift o"/>
-        </action>
+        <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
+        <action id="JsonAssistant.Action.OptimizeCompareAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
 
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
@@ -146,6 +143,15 @@
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
+
+        <!-- Diff组 -->
+        <group id="JsonAssistant.Group.DiffGroup">
+            <reference ref="JsonAssistant.Action.RenameDiffTitleAction"/>
+            <reference ref="JsonAssistant.Action.OptimizeCompareAction"/>
+
+            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
+        </group>
+
 
     </actions>
 
