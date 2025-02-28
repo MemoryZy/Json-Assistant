@@ -8,6 +8,8 @@ package cn.memoryzy.json.model.strategy.clipboard.context;
  */
 public interface ClipboardTextConversionStrategy {
 
+    String type();
+
     boolean canConvert(String text) throws Exception;
 
     String convertToJson(String text) throws Exception;

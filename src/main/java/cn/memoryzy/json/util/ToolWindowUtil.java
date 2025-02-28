@@ -146,6 +146,7 @@ public class ToolWindowUtil {
         content.setDisposer(window);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
+        window.setContent(content);
         return content;
     }
 

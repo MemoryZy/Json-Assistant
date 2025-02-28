@@ -30,6 +30,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
         <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="JsonAssistant Plugin Sticky" isLogByDefault="false"/>
         <notificationGroup displayType="STICKY_BALLOON" id="JsonAssistant Plugin Sticky Log" isLogByDefault="true"/>
         <toolWindow id="JsonAssistant.ToolWindow.JsonAssistant"
                     factoryClass="cn.memoryzy.json.toolwindow.JsonAssistantToolWindowFactory"

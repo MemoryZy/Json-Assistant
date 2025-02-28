@@ -12,6 +12,8 @@ public interface JsonWrapper {
 
     boolean isArray();
 
+    boolean noItems();
+
     default String toJsonString() {
         return JsonUtil.formatJson(this);
     }

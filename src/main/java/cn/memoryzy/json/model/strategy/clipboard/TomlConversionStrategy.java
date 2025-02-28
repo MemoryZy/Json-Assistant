@@ -10,6 +10,11 @@ import cn.memoryzy.json.util.TomlUtil;
 public class TomlConversionStrategy implements ClipboardTextConversionStrategy {
 
     @Override
+    public String type() {
+        return "Toml";
+    }
+
+    @Override
     public boolean canConvert(String text) {
         return TomlUtil.isToml(text);
     }

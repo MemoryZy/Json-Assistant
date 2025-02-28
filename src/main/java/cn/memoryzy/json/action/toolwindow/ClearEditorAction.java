@@ -43,6 +43,7 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
         event.getPresentation().setEnabled(
                 getEventProject(event) != null
                         && StrUtil.isNotBlank(editor.getDocument().getText())
-                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
+                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
+                        && !editor.isViewer());
     }
 }

@@ -25,12 +25,18 @@ public class EditorInitData {
      */
     private final TextSourceType sourceType;
 
+    /**
+     * 解析类型
+     */
+    private final String parseType;
+
 
     // region 构造器与Getter
-    public EditorInitData(boolean hasText, String jsonString, TextSourceType sourceType) {
+    public EditorInitData(boolean hasText, String jsonString, TextSourceType sourceType, String parseType) {
         this.hasText = hasText;
         this.jsonString = jsonString;
         this.sourceType = sourceType;
+        this.parseType = parseType;
     }
 
     public boolean isHasText() {
@@ -44,5 +50,10 @@ public class EditorInitData {
     public TextSourceType getSourceType() {
         return sourceType;
     }
+
+    public String getParseType() {
+        return parseType;
+    }
+
     // endregion
 }

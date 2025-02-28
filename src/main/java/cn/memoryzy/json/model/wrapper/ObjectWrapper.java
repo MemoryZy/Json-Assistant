@@ -55,6 +55,11 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
     }
 
     @Override
+    public boolean noItems() {
+        return isEmpty();
+    }
+
+    @Override
     public String toString() {
         return toJsonString();
     }

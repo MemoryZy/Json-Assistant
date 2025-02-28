@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.YamlUtil;
 
@@ -9,6 +10,10 @@ import cn.memoryzy.json.util.YamlUtil;
  */
 public class YamlConversionStrategy implements ClipboardTextConversionStrategy {
 
+    @Override
+    public String type() {
+        return DataTypeConstant.YAML;
+    }
     @Override
     public boolean canConvert(String text) {
         // 不处理多文档

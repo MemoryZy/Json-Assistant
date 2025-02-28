@@ -41,4 +41,9 @@ public class EditorBehaviorState {
      */
     public boolean recognizeUrlParamFormat = true;
 
+    /**
+     * 自动导入剪贴板数据前提示
+     */
+    public boolean promptBeforeImport = true;
+
 }

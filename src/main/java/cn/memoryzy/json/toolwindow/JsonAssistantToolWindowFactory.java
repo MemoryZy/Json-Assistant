@@ -76,10 +76,14 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         toolWindowEx.setTitleActions(titleActions);
         toolWindowEx.setAdditionalGearActions(group);
 
-        Content content = contentFactory.createContent(window.createComponent(), PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, false);
+        Content content = contentFactory.createContent(null, PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, false);
+        window.setContent(content);
+        content.setComponent(window.createComponent());
+
         content.setCloseable(false);
         content.setDisposer(window);
         contentManager.addContent(content, 0);
+
 
         // 检查位置
         if (ToolWindowAnchor.RIGHT.equals(toolWindow.getAnchor()) && !toolWindow.isSplitMode()) {

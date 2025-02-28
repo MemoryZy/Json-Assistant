@@ -74,7 +74,8 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
                 GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
+                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
+                        && !editor.isViewer());
     }
 
     private String getShortcut() {

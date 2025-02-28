@@ -71,6 +71,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel treeDisplayModeTitle;
     private JBLabel treeDisplayModeDesc;
     private ComboBox<TreeDisplayMode> treeDisplayModeBox;
+    private JBCheckBox promptBeforeImportCb;
+    private JBLabel promptBeforeImportDesc;
     // endregion
 
     // 区分亮暗，防止配置界面还存在时，主题被切换
@@ -157,6 +159,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
             }
         });
+
+        // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
+        promptBeforeImportCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
+        UIManager.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
     }
 
     /**
@@ -305,6 +311,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
         yamlFormatsCb.setSelected(editorBehaviorState.recognizeYamlFormat);
         tomlFormatsCb.setSelected(editorBehaviorState.recognizeTomlFormat);
         urlParamFormatsCb.setSelected(editorBehaviorState.recognizeUrlParamFormat);
+        promptBeforeImportCb.setSelected(editorBehaviorState.promptBeforeImport);
+
 
         // 外观
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
@@ -374,6 +382,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean oldRecognizeYamlFormat = editorBehaviorState.recognizeYamlFormat;
         boolean oldRecognizeTomlFormat = editorBehaviorState.recognizeTomlFormat;
         boolean oldRecognizeUrlParamFormat = editorBehaviorState.recognizeUrlParamFormat;
+        boolean oldPromptBeforeImport = editorBehaviorState.promptBeforeImport;
 
         // 外观
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
@@ -412,6 +421,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newRecognizeYamlFormat = yamlFormatsCb.isSelected();
         boolean newRecognizeTomlFormat = tomlFormatsCb.isSelected();
         boolean newRecognizeUrlParamFormat = urlParamFormatsCb.isSelected();
+        boolean newPromptBeforeImport = promptBeforeImportCb.isSelected();
 
         // 历史记录
         boolean newSwitchHistory = recordHistory.isSelected();
@@ -439,6 +449,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognizeYamlFormat, newRecognizeYamlFormat)
                 || !Objects.equals(oldRecognizeTomlFormat, newRecognizeTomlFormat)
                 || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
+                || !Objects.equals(oldPromptBeforeImport, newPromptBeforeImport)
                 || !Objects.equals(oldSwitchHistory, newSwitchHistory)
                 || !Objects.equals(oldHistoryViewType, newHistoryViewType)
                 || !Objects.equals(oldTreeDisplayMode, newTreeDisplayMode)
@@ -461,6 +472,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         editorBehaviorState.recognizeYamlFormat = yamlFormatsCb.isSelected();
         editorBehaviorState.recognizeTomlFormat = tomlFormatsCb.isSelected();
         editorBehaviorState.recognizeUrlParamFormat = urlParamFormatsCb.isSelected();
+        editorBehaviorState.promptBeforeImport = promptBeforeImportCb.isSelected();
 
         // 历史记录
         HistoryState historyState = persistentState.historyState;

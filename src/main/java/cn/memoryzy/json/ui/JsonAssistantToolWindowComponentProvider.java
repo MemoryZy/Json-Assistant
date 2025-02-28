@@ -1,11 +1,11 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.TextSourceType;
@@ -16,9 +16,7 @@ import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
-import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
@@ -30,6 +28,8 @@ import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationAction;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -51,9 +51,13 @@ import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
+import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -61,8 +65,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
@@ -81,6 +87,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private final HistoryState historyOptionState;
     private EditorEx editor;
 
+    private Content content;
+
+    private final CopyOnWriteArraySet<JsonWrapper> rejectImportSet = new CopyOnWriteArraySet<>();
 
     public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initTab) {
         this.project = project;
@@ -158,25 +167,108 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         boolean hasText = initData.isHasText();
         String jsonString = initData.getJsonString();
         TextSourceType sourceType = initData.getSourceType();
+        String parseType = initData.getParseType();
+        boolean isClipboard = TextSourceType.FROM_CLIPBOARD.equals(sourceType);
+        // 是否需要提示询问
+        boolean needPrompt = hasText && isClipboard && editorBehaviorState.promptBeforeImport;
 
         EditorEx editor = (EditorEx) PlatformUtil.createEditor(
                 project,
                 "View." + editorFileType.getDefaultExtension(),
                 editorFileType,
-                false,
+                needPrompt,
                 EditorKind.MAIN_EDITOR,
                 jsonString);
 
         // 补充编辑器的外观
         changeEditorAppearance(editor, hasText);
 
-        if (hasText) {
-            hintEditor(500, TextSourceType.FROM_CLIPBOARD.equals(sourceType)
+        if (needPrompt) {
+            askImportClipboard(editor, false, parseType, jsonString);
+        }
+
+        if (hasText && !needPrompt) {
+            hintEditor(500, isClipboard
                     ? JsonAssistantBundle.messageOnSystem("hint.paste.json")
                     : JsonAssistantBundle.messageOnSystem("hint.import.json"));
         }
 
         return editor;
+    }
+
+    private void askImportClipboard(EditorEx editorEx, boolean needInitViewer, String parseType, String jsonString) {
+        if (needInitViewer) {
+            editorEx.setViewer(true);
+            UIManager.repaintEditor(editorEx);
+        }
+
+        // 更改标签页名
+        content.setDisplayName(JsonAssistantBundle.messageOnSystem("content.preview.name"));
+        AtomicReference<Boolean> select = new AtomicReference<>(null);
+        // 弹出通知气泡
+        NotificationAction confirm = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.confirm.text"), () -> confirmAction(select, jsonString));
+        NotificationAction cancel = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.cancel.text"), () -> cancelAction(select, parseType, jsonString));
+
+        String displayId = Notifications.getStickyNotificationGroup().getDisplayId();
+        Notifications.FullContentNotification notification = new Notifications.FullContentNotification(
+                displayId,
+                "Json Assistant",
+                StrUtil.format("检测到剪贴板中存在可导入的 {} 数据，是否确定将其导入编辑器？", parseType),
+                NotificationType.INFORMATION);
+
+        notification.addAction(confirm).addAction(cancel).notify(project);
+
+        Balloon balloon = notification.getBalloon();
+        if (null != balloon) {
+            balloon.addListener(new JBPopupListener() {
+                @Override
+                public void onClosed(@NotNull LightweightWindowEvent event) {
+                    Boolean selectResult = select.get();
+                    if (Objects.isNull(selectResult)) {
+                        recoverAndEmpty(parseType, jsonString);
+                    }
+                }
+            });
+        } else {
+            // 定时器监测
+
+        }
+    }
+
+    private void confirmAction(AtomicReference<Boolean> select, String jsonString) {
+        select.set(true);
+        recover();
+        WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), jsonString));
+    }
+
+    private void cancelAction(AtomicReference<Boolean> select, String parseType, String jsonString) {
+        select.set(false);
+        recoverAndEmpty(parseType, jsonString);
+    }
+
+    private void recoverAndEmpty(String parseType, String jsonString) {
+        recover();
+        JsonWrapper wrapper;
+        if (DataTypeConstant.JSON5.equals(parseType)) {
+            wrapper = Json5Util.parse(jsonString);
+        } else {
+            wrapper = JsonUtil.parse(jsonString);
+        }
+
+        rejectImportSet.add(wrapper);
+        // 清空编辑器
+        WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(""));
+    }
+
+    private void recover() {
+        // 恢复编辑器模式
+        if (editor.isViewer()) {
+            editor.setViewer(false);
+            UIManager.repaintEditor(editor);
+        }
+
+        // 恢复标签页名
+        content.setDisplayName(PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME);
     }
 
     private void changeEditorAppearance(EditorEx editor, boolean hasText) {
@@ -247,6 +339,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private EditorInitData getInitData() {
         String jsonString = "";
         TextSourceType sourceType = null;
+        String parseType = null;
 
         if (initTab) {
             if (editorBehaviorState.recognizeOtherFormats) {
@@ -259,9 +352,20 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                     if (StrUtil.isNotBlank(processedText)) {
                         sourceType = TextSourceType.FROM_CLIPBOARD;
                         ClipboardTextConversionStrategy strategy = context.getStrategy();
-                        jsonString = (strategy instanceof Json5ConversionStrategy)
-                                ? Json5Util.formatJson5(processedText)
-                                : JsonUtil.formatJson(processedText);
+                        parseType = strategy.type();
+
+                        JsonWrapper wrapper;
+                        if (strategy instanceof Json5ConversionStrategy) {
+                            wrapper = Json5Util.parse(processedText);
+                            jsonString = Json5Util.formatJson5(processedText);
+                        } else {
+                            wrapper = JsonUtil.parse(processedText);
+                            jsonString = JsonUtil.formatJson(processedText);
+                        }
+
+                        if ((wrapper != null && wrapper.noItems()) || rejectImportSet.contains(wrapper)) {
+                            jsonString = "";
+                        }
                     }
                 }
             }
@@ -275,7 +379,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             }
         }
 
-        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, sourceType);
+        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, sourceType, parseType);
     }
 
 
@@ -291,14 +395,32 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
                     if (StrUtil.isNotBlank(jsonStr)) {
                         ClipboardTextConversionStrategy strategy = context.getStrategy();
-                        String formattedStr = (strategy instanceof Json5ConversionStrategy)
-                                ? Json5Util.formatJson5(jsonStr)
-                                : JsonUtil.formatJson(jsonStr);
+                        JsonWrapper wrapper;
+                        String formattedStr;
+                        if (strategy instanceof Json5ConversionStrategy) {
+                            wrapper = Json5Util.parse(jsonStr);
+                            formattedStr = Json5Util.formatJson5(jsonStr);
+                        } else {
+                            wrapper = JsonUtil.parse(jsonStr);
+                            formattedStr = JsonUtil.formatJson(jsonStr);
+                        }
+
+                        // 过滤
+                        if ((wrapper != null && wrapper.noItems()) || rejectImportSet.contains(wrapper)) {
+                            return;
+                        }
 
                         WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
 
-                        // 提示粘贴成功的消息
-                        hintEditor(400, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
+                        boolean needPrompt = editorBehaviorState.promptBeforeImport;
+                        if (needPrompt) {
+                            askImportClipboard(editor, true, strategy.type(), formattedStr);
+                        }
+
+                        if (!needPrompt) {
+                            // 提示粘贴成功的消息
+                            hintEditor(400, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
+                        }
                     }
                 }
             }
@@ -317,37 +439,20 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     }
 
     private void addJsonToHistory() {
-        if (historyOptionState.switchHistory) {
+        if (historyOptionState.switchHistory && !editor.isViewer()) {
             HistoryLimitedList historyList = historyState.getHistory();
 
             EXECUTOR.schedule(() -> {
                 String text = StrUtil.trim(editor.getDocument().getText());
                 JsonWrapper jsonWrapper = null;
                 if (JsonUtil.isJson(text)) {
-                    // 无元素，不添加
-                    if (JsonUtil.isJsonArray(text)) {
-                        ArrayWrapper jsonArray = JsonUtil.parseArray(text);
-                        jsonWrapper = jsonArray;
-                        if (jsonArray.isEmpty()) return;
-                    } else if (JsonUtil.isJsonObject(text)) {
-                        ObjectWrapper jsonObject = JsonUtil.parseObject(text);
-                        jsonWrapper = jsonObject;
-                        if (jsonObject.isEmpty()) return;
-                    }
+                    jsonWrapper = JsonUtil.parse(text);
 
                 } else if (Json5Util.isJson5(text)) {
-                    if (Json5Util.isJson5Array(text)) {
-                        ArrayWrapper jsonArray = Json5Util.parseArray(text);
-                        jsonWrapper = jsonArray;
-                        if (CollUtil.isEmpty(jsonArray)) return;
-                    } else if (Json5Util.isJson5Object(text)) {
-                        ObjectWrapper jsonObject = Json5Util.parseObject(text);
-                        jsonWrapper = jsonObject;
-                        if (MapUtil.isEmpty(jsonObject)) return;
-                    }
+                    jsonWrapper = Json5Util.parse(text);
                 }
 
-                if (Objects.nonNull(jsonWrapper)) {
+                if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
                     historyList.add(project, jsonWrapper);
                 }
             }, 3, TimeUnit.SECONDS);
@@ -419,6 +524,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             editor.reinitSettings();
             UIManager.repaintEditor(editor);
         });
+    }
+
+    public Content getContent() {
+        return content;
+    }
+
+    public void setContent(Content content) {
+        this.content = content;
     }
 
     private class FocusListenerImpl implements FocusChangeListener {

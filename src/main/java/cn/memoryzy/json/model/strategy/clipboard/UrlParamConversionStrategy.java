@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.DataConverter;
 
@@ -9,6 +10,10 @@ import cn.memoryzy.json.util.DataConverter;
  */
 public class UrlParamConversionStrategy implements ClipboardTextConversionStrategy {
 
+    @Override
+    public String type() {
+        return DataTypeConstant.URL_PARAM;
+    }
     @Override
     public boolean canConvert(String text) {
         return null != DataConverter.urlParamsToJson(text);

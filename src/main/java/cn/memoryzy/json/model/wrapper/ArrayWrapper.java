@@ -46,6 +46,11 @@ public class ArrayWrapper extends ArrayList<Object> implements JsonWrapper {
     }
 
     @Override
+    public boolean noItems() {
+        return isEmpty();
+    }
+
+    @Override
     public String toString() {
         return toJsonString();
     }

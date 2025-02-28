@@ -64,6 +64,13 @@ public class Notifications {
     }
 
     /**
+     * 粘性气泡通知
+     */
+    public static NotificationGroup getStickyNotificationGroup() {
+        return getNotificationGroupManager().getNotificationGroup("JsonAssistant Plugin Sticky");
+    }
+
+    /**
      * 粘性气泡通知（记录性）
      */
     public static NotificationGroup getStickyLogNotificationGroup() {
@@ -267,7 +274,7 @@ public class Notifications {
         return list;
     }
 
-    private static class FullContentNotification extends Notification implements NotificationFullContent {
+    public static class FullContentNotification extends Notification implements NotificationFullContent {
         public FullContentNotification(@NotNull @NonNls String groupId, @NotNull String title, @NotNull String content, @NotNull NotificationType type) {
             super(groupId, title, content, type);
         }

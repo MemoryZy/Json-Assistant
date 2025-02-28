@@ -43,6 +43,7 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
+                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
+                && !editor.isViewer());
     }
 }

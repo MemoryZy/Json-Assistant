@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.Json5Util;
 
@@ -8,6 +9,11 @@ import cn.memoryzy.json.util.Json5Util;
  * @since 2024/11/12
  */
 public class Json5ConversionStrategy implements ClipboardTextConversionStrategy {
+
+    @Override
+    public String type() {
+        return DataTypeConstant.JSON5;
+    }
 
     @Override
     public boolean canConvert(String text) {
