@@ -10,6 +10,12 @@ public interface HtmlConstant {
 
     static String wrapHtml(String text) {
         return HtmlChunk.raw(text)
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    static String wrapBody(String text) {
+        return HtmlChunk.raw(text)
                 .wrapWith(HtmlChunk.body())
                 .wrapWith(HtmlChunk.html())
                 .toString();

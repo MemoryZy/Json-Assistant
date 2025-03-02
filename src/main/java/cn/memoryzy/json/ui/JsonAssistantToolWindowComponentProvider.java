@@ -23,6 +23,7 @@ import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
+import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
@@ -184,7 +185,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         changeEditorAppearance(editor, hasText);
 
         if (needPrompt) {
-            askImportClipboard(editor, false, parseType, jsonString);
+            PreviewClipboardDataDialog previewClipboardDataDialog = new PreviewClipboardDataDialog(project, parseType);
+            previewClipboardDataDialog.show();
+
+            // askImportClipboard(editor, false, parseType, jsonString);
         }
 
         if (hasText && !needPrompt) {

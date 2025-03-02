@@ -55,14 +55,14 @@ public class SupportDialog extends DialogWrapper {
 
         supportHeader.setIcon(JsonAssistantIcons.DONATE);
         supportHeader.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.support.header")));
-        supportContent.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
+        supportContent.setText(HtmlConstant.wrapBody(JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
                 Urls.GITHUB_LINK,
                 Urls.MARKETPLACE_REVIEWS_LINK,
                 UrlType.SHARE.getId())));
 
         donateHeader.setIcon(JsonAssistantIcons.HEART);
         donateHeader.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.donate.header")));
-        donateContent.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
+        donateContent.setText(HtmlConstant.wrapBody(JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
 
         wechatLabel.setIcon(JsonAssistantIcons.WECHAT_PAY);
         wechatLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.wechat")));
