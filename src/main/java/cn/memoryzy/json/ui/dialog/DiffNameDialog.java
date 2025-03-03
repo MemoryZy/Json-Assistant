@@ -2,12 +2,14 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -60,6 +62,12 @@ public class DiffNameDialog extends DialogWrapper {
     public void show() {
         ApplicationManager.getApplication().invokeLater(super::show);
     }
+
+    @Override
+    protected @NonNls @Nullable String getHelpId() {
+        return UrlType.DEFAULT.getId();
+    }
+
 
     @Override
     protected void doOKAction() {

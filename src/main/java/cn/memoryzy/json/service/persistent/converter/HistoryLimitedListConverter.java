@@ -2,8 +2,8 @@ package cn.memoryzy.json.service.persistent.converter;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
@@ -38,7 +38,7 @@ public class HistoryLimitedListConverter extends Converter<HistoryLimitedList> {
             // Collections.reverse(jsonArray);
             for (Object data : jsonArray) {
                 ObjectWrapper element = (ObjectWrapper) data;
-                HistoryEntry entry = HistoryEntry.fromMap(element);
+                JsonEntry entry = JsonEntry.fromMap(element);
                 historyList.add(entry);
             }
         } catch (Exception ex) {

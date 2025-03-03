@@ -4,8 +4,8 @@ import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.util.Json5Util;
@@ -164,7 +164,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
             }
 
             HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).getHistory();
-            for (HistoryEntry entry : history) {
+            for (JsonEntry entry : history) {
                 if (Objects.equals(jsonWrapper, entry.getJsonWrapper())) {
                     entry.setName(name);
                 }

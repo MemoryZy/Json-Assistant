@@ -5,7 +5,6 @@ import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.TextSourceType;
@@ -29,8 +28,6 @@ import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.notification.NotificationAction;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -52,9 +49,6 @@ import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupListener;
-import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
@@ -66,10 +60,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
@@ -90,7 +82,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
     private Content content;
 
-    private final CopyOnWriteArraySet<JsonWrapper> rejectImportSet = new CopyOnWriteArraySet<>();
 
     public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initTab) {
         this.project = project;
@@ -170,25 +161,22 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         TextSourceType sourceType = initData.getSourceType();
         String parseType = initData.getParseType();
         boolean isClipboard = TextSourceType.FROM_CLIPBOARD.equals(sourceType);
-        // 是否需要提示询问
         boolean needPrompt = hasText && isClipboard && editorBehaviorState.promptBeforeImport;
 
         EditorEx editor = (EditorEx) PlatformUtil.createEditor(
                 project,
                 "View." + editorFileType.getDefaultExtension(),
                 editorFileType,
-                needPrompt,
+                false,
                 EditorKind.MAIN_EDITOR,
-                jsonString);
+                needPrompt ? "" : jsonString);
 
         // 补充编辑器的外观
         changeEditorAppearance(editor, hasText);
 
+        // 是否需要提示询问
         if (needPrompt) {
-            PreviewClipboardDataDialog previewClipboardDataDialog = new PreviewClipboardDataDialog(project, parseType);
-            previewClipboardDataDialog.show();
-
-            // askImportClipboard(editor, false, parseType, jsonString);
+            new PreviewClipboardDataDialog(project, editor, parseType, jsonString).show();
         }
 
         if (hasText && !needPrompt) {
@@ -198,81 +186,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         }
 
         return editor;
-    }
-
-    private void askImportClipboard(EditorEx editorEx, boolean needInitViewer, String parseType, String jsonString) {
-        if (needInitViewer) {
-            editorEx.setViewer(true);
-            UIManager.repaintEditor(editorEx);
-        }
-
-        // 更改标签页名
-        content.setDisplayName(JsonAssistantBundle.messageOnSystem("content.preview.name"));
-        AtomicReference<Boolean> select = new AtomicReference<>(null);
-        // 弹出通知气泡
-        NotificationAction confirm = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.confirm.text"), () -> confirmAction(select, jsonString));
-        NotificationAction cancel = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.cancel.text"), () -> cancelAction(select, parseType, jsonString));
-
-        String displayId = Notifications.getStickyNotificationGroup().getDisplayId();
-        Notifications.FullContentNotification notification = new Notifications.FullContentNotification(
-                displayId,
-                "Json Assistant",
-                StrUtil.format("检测到剪贴板中存在可导入的 {} 数据，是否确定将其导入编辑器？", parseType),
-                NotificationType.INFORMATION);
-
-        notification.addAction(confirm).addAction(cancel).notify(project);
-
-        Balloon balloon = notification.getBalloon();
-        if (null != balloon) {
-            balloon.addListener(new JBPopupListener() {
-                @Override
-                public void onClosed(@NotNull LightweightWindowEvent event) {
-                    Boolean selectResult = select.get();
-                    if (Objects.isNull(selectResult)) {
-                        recoverAndEmpty(parseType, jsonString);
-                    }
-                }
-            });
-        } else {
-            // 定时器监测
-
-        }
-    }
-
-    private void confirmAction(AtomicReference<Boolean> select, String jsonString) {
-        select.set(true);
-        recover();
-        WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), jsonString));
-    }
-
-    private void cancelAction(AtomicReference<Boolean> select, String parseType, String jsonString) {
-        select.set(false);
-        recoverAndEmpty(parseType, jsonString);
-    }
-
-    private void recoverAndEmpty(String parseType, String jsonString) {
-        recover();
-        JsonWrapper wrapper;
-        if (DataTypeConstant.JSON5.equals(parseType)) {
-            wrapper = Json5Util.parse(jsonString);
-        } else {
-            wrapper = JsonUtil.parse(jsonString);
-        }
-
-        rejectImportSet.add(wrapper);
-        // 清空编辑器
-        WriteCommandAction.runWriteCommandAction(project, () -> editor.getDocument().setText(""));
-    }
-
-    private void recover() {
-        // 恢复编辑器模式
-        if (editor.isViewer()) {
-            editor.setViewer(false);
-            UIManager.repaintEditor(editor);
-        }
-
-        // 恢复标签页名
-        content.setDisplayName(PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME);
     }
 
     private void changeEditorAppearance(EditorEx editor, boolean hasText) {
@@ -367,7 +280,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                             jsonString = JsonUtil.formatJson(processedText);
                         }
 
-                        if ((wrapper != null && wrapper.noItems()) || rejectImportSet.contains(wrapper)) {
+                        // 无属性或在拒绝黑名单里
+                        if ((wrapper != null && wrapper.noItems()) || PreviewClipboardDataDialog.existsInBlacklist(wrapper)) {
                             jsonString = "";
                         }
                     }
@@ -410,18 +324,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                         }
 
                         // 过滤
-                        if ((wrapper != null && wrapper.noItems()) || rejectImportSet.contains(wrapper)) {
+                        if ((wrapper != null && wrapper.noItems()) || PreviewClipboardDataDialog.existsInBlacklist(wrapper)) {
                             return;
                         }
 
-                        WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
-
-                        boolean needPrompt = editorBehaviorState.promptBeforeImport;
-                        if (needPrompt) {
-                            askImportClipboard(editor, true, strategy.type(), formattedStr);
-                        }
-
-                        if (!needPrompt) {
+                        if (editorBehaviorState.promptBeforeImport) {
+                            new PreviewClipboardDataDialog(project, editor, strategy.type(), formattedStr).show();
+                        } else {
+                            WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
                             // 提示粘贴成功的消息
                             hintEditor(400, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
                         }

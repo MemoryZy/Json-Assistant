@@ -4,8 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.ListRightClickPopupMenuMouseAdapter;
@@ -53,7 +53,7 @@ import java.util.Optional;
 @SuppressWarnings("DuplicatedCode")
 public class JsonHistoryListChooser extends DialogWrapper {
 
-    private JBList<HistoryEntry> showList;
+    private JBList<JsonEntry> showList;
     private EditorTextField showTextField;
     private final Project project;
     private final ToolWindowEx toolWindow;
@@ -80,7 +80,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
         showList = new JBList<>(fillHistoryListModel());
         showList.setFont(UIManager.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        showList.addListSelectionListener(new UpdateEditorListSelectionListener());
+        showList.addListSelectionListener(new UpdateEditorListSelectionListener(showList, showTextField));
         showList.setCellRenderer(new StyleListCellRenderer());
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
         showList.addMouseListener(new ListRightClickPopupMenuMouseAdapter(showList, buildRightMousePopupMenu()));
@@ -105,7 +105,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
         UIManager.updateComponentColorsScheme(showTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
-        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, HistoryEntry::getShortText, true));
+        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, JsonEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
         rebuildListWithFilter();
 
@@ -146,7 +146,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
     }
 
     private void executeOkAction() {
-        HistoryEntry selectedValue = showList.getSelectedValue();
+        JsonEntry selectedValue = showList.getSelectedValue();
         if (selectedValue != null) {
             Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
             if (Objects.nonNull(selectedContent)) {
@@ -169,14 +169,14 @@ public class JsonHistoryListChooser extends DialogWrapper {
         }
     }
 
-    private DefaultListModel<HistoryEntry> fillHistoryListModel() {
+    private DefaultListModel<JsonEntry> fillHistoryListModel() {
         HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).getHistory();
         return JBList.createDefaultListModel(history);
     }
 
     private void selectFirstItemInList() {
         // 选中第一条
-        ListModel<HistoryEntry> listModel = showList.getModel();
+        ListModel<JsonEntry> listModel = showList.getModel();
         if (listModel.getSize() > 0) {
             showList.setSelectedIndex(0);
             // 只有处于编辑器页面，才能开启ok按钮
@@ -219,7 +219,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            HistoryEntry selectedValue = showList.getSelectedValue();
+            JsonEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 String name = selectedValue.getName();
                 String newName = Messages.showInputDialog(project, null, "指定记录名称", null, name, new JsonHistoryTreeChooser.NameValidator());
@@ -234,7 +234,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
         public void update(@NotNull AnActionEvent e) {
             boolean enabled = false;
             Presentation presentation = e.getPresentation();
-            HistoryEntry selectedValue = showList.getSelectedValue();
+            JsonEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 enabled = true;
                 String name = selectedValue.getName();
@@ -259,14 +259,14 @@ public class JsonHistoryListChooser extends DialogWrapper {
         public void actionPerformed(@NotNull AnActionEvent event) {
             Project project = event.getProject();
             int selectedIndex = showList.getSelectedIndex();
-            HistoryEntry selectedValue = showList.getSelectedValue();
+            JsonEntry selectedValue = showList.getSelectedValue();
 
             // 删除真实数据
             HistoryLimitedList history = JsonHistoryPersistentState.getInstance(Objects.requireNonNull(project)).getHistory();
             history.removeById(selectedValue.getId());
 
             // 替换List数据为最新的
-            NameFilteringListModel<HistoryEntry> listModel = (NameFilteringListModel<HistoryEntry>) showList.getModel();
+            NameFilteringListModel<JsonEntry> listModel = (NameFilteringListModel<JsonEntry>) showList.getModel();
             listModel.replaceAll(history);
 
             // 若没有数据，则置空
@@ -293,9 +293,9 @@ public class JsonHistoryListChooser extends DialogWrapper {
         }
     }
 
-    static class StyleListCellRenderer extends ColoredListCellRenderer<HistoryEntry> {
+    static class StyleListCellRenderer extends ColoredListCellRenderer<JsonEntry> {
         @Override
-        protected void customizeCellRenderer(@NotNull JList<? extends HistoryEntry> list, HistoryEntry value, int index, boolean selected, boolean hasFocus) {
+        protected void customizeCellRenderer(@NotNull JList<? extends JsonEntry> list, JsonEntry value, int index, boolean selected, boolean hasFocus) {
             String name = value.getName();
             append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
             append(" " + (StrUtil.isNotBlank(name) ? name : value.getShortText()), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
@@ -304,12 +304,19 @@ public class JsonHistoryListChooser extends DialogWrapper {
         }
     }
 
-    class UpdateEditorListSelectionListener implements ListSelectionListener {
+    public static class UpdateEditorListSelectionListener implements ListSelectionListener {
         private int lastLineCount = 0;
+        private final JBList<JsonEntry> showList;
+        private final EditorTextField showTextField;
+
+        public UpdateEditorListSelectionListener(JBList<JsonEntry> showList, EditorTextField showTextField) {
+            this.showList = showList;
+            this.showTextField = showTextField;
+        }
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            HistoryEntry selectedValue = showList.getSelectedValue();
+            JsonEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 showTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getJsonString()));
 

@@ -10,8 +10,8 @@ import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.HistoryEntry;
 import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
@@ -160,7 +160,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
         if (selectionPath != null) {
             HistoryTreeNode treeNode = (HistoryTreeNode) selectionPath.getLastPathComponent();
             if (HistoryTreeNodeType.NODE.equals(treeNode.getNodeType())) {
-                HistoryEntry entry = treeNode.getValue();
+                JsonEntry entry = treeNode.getValue();
                 Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
                 if (Objects.nonNull(selectedContent)) {
                     EditorEx editor = ToolWindowUtil.getEditorOnContent(selectedContent);
@@ -179,12 +179,12 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
 
     private TreeNode buildRootNode(HistoryLimitedList historyList) {
         HistoryTreeNode rootNode = new HistoryTreeNode();
-        Map<String, List<HistoryEntry>> historyGroup = historyList.stream().collect(Collectors.groupingBy(el -> {
+        Map<String, List<JsonEntry>> historyGroup = historyList.stream().collect(Collectors.groupingBy(el -> {
             String formatted = LocalDateTimeUtil.format(el.getInsertTime(), DatePattern.NORM_DATE_FORMATTER);
             return formatted != null ? formatted : PluginConstant.UNKNOWN;
         }));
 
-        List<Map.Entry<String, List<HistoryEntry>>> entryList = historyGroup.entrySet().stream()
+        List<Map.Entry<String, List<JsonEntry>>> entryList = historyGroup.entrySet().stream()
                 .sorted(Comparator.comparing(el ->
                         PluginConstant.UNKNOWN.equals(el.getKey())
                                 ? LocalDate.MIN
@@ -192,18 +192,18 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                 .collect(Collectors.toList());
 
         Collections.reverse(entryList);
-        for (Map.Entry<String, List<HistoryEntry>> entry : entryList) {
+        for (Map.Entry<String, List<JsonEntry>> entry : entryList) {
             String key = entry.getKey();
-            List<HistoryEntry> value = entry.getValue();
+            List<JsonEntry> value = entry.getValue();
 
             // 排序List
-            value.sort(Comparator.comparing(HistoryEntry::getInsertTime).reversed());
+            value.sort(Comparator.comparing(JsonEntry::getInsertTime).reversed());
 
             // Map第一层是组节点
             HistoryTreeNode groupNode = new HistoryTreeNode(null, key, value.size(), HistoryTreeNodeType.GROUP);
 
             // 添加底层数据节点
-            for (HistoryEntry historyEntry : value) {
+            for (JsonEntry historyEntry : value) {
                 // Map第二层是具体数据节点
                 groupNode.add(new HistoryTreeNode(historyEntry, null, null, HistoryTreeNodeType.NODE));
             }
@@ -265,7 +265,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
             if (selectionPath != null) {
                 HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
                 if (HistoryTreeNodeType.NODE == node.getNodeType()) {
-                    HistoryEntry entry = node.getValue();
+                    JsonEntry entry = node.getValue();
                     String name = entry.getName();
                     String newName = Messages.showInputDialog(project, null, "指定记录名称", null, name, new NameValidator());
                     if (StrUtil.isNotBlank(newName)) {
@@ -285,7 +285,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                 HistoryTreeNode node = (HistoryTreeNode) selectionPath.getLastPathComponent();
                 if (HistoryTreeNodeType.NODE == node.getNodeType()) {
                     enabled = true;
-                    HistoryEntry value = node.getValue();
+                    JsonEntry value = node.getValue();
                     String name = value.getName();
                     if (StrUtil.isNotBlank(name)) {
                         presentation.setText(JsonAssistantBundle.message("action.structure.rename.text"));

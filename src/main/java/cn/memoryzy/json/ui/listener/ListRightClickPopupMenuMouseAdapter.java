@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.listener;
 
-import cn.memoryzy.json.model.HistoryEntry;
+import cn.memoryzy.json.model.JsonEntry;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,10 +14,10 @@ import java.util.Objects;
  */
 public class ListRightClickPopupMenuMouseAdapter extends MouseAdapter {
 
-    private final JList<HistoryEntry> showList;
+    private final JList<JsonEntry> showList;
     private final JPopupMenu popupMenu;
 
-    public ListRightClickPopupMenuMouseAdapter(JList<HistoryEntry> showList, JPopupMenu popupMenu) {
+    public ListRightClickPopupMenuMouseAdapter(JList<JsonEntry> showList, JPopupMenu popupMenu) {
         this.showList = showList;
         this.popupMenu = popupMenu;
     }
@@ -28,7 +28,7 @@ public class ListRightClickPopupMenuMouseAdapter extends MouseAdapter {
             int x = e.getX();
             int y = e.getY();
 
-            HistoryEntry selectedValue = showList.getSelectedValue();
+            JsonEntry selectedValue = showList.getSelectedValue();
             if (Objects.isNull(selectedValue)) {
                 int index = showList.locationToIndex(new Point(x, y));
                 if (index != -1) {

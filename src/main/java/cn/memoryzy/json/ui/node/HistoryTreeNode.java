@@ -2,7 +2,7 @@ package cn.memoryzy.json.ui.node;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
-import cn.memoryzy.json.model.HistoryEntry;
+import cn.memoryzy.json.model.JsonEntry;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Objects;
@@ -16,7 +16,7 @@ public class HistoryTreeNode extends DefaultMutableTreeNode {
     /**
      * 节点值（只有{@link HistoryTreeNodeType#NODE}类型才有值）
      */
-    private HistoryEntry value;
+    private JsonEntry value;
 
     /**
      * 组时间（只有{@link HistoryTreeNodeType#GROUP}类型才有值）
@@ -37,14 +37,14 @@ public class HistoryTreeNode extends DefaultMutableTreeNode {
     public HistoryTreeNode() {
     }
 
-    public HistoryTreeNode(HistoryEntry value, String groupTime, Integer size, HistoryTreeNodeType nodeType) {
+    public HistoryTreeNode(JsonEntry value, String groupTime, Integer size, HistoryTreeNodeType nodeType) {
         this.value = value;
         this.groupTime = groupTime;
         this.size = size;
         this.nodeType = nodeType;
     }
 
-    public HistoryEntry getValue() {
+    public JsonEntry getValue() {
         return value;
     }
 

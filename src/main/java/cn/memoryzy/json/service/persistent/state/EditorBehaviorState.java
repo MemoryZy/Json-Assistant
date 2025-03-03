@@ -44,6 +44,6 @@ public class EditorBehaviorState {
     /**
      * 自动导入剪贴板数据前提示
      */
-    public boolean promptBeforeImport = true;
+    public boolean promptBeforeImport = false;
 
 }

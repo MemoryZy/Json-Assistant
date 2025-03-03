@@ -1,6 +1,7 @@
 package cn.memoryzy.json.model;
 
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import com.intellij.openapi.project.Project;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/11/25
  */
-public class HistoryLimitedList extends LinkedList<HistoryEntry> {
+public class HistoryLimitedList extends LinkedList<JsonEntry> {
     private final int limit;
 
     public HistoryLimitedList(int limit) {
@@ -19,15 +20,15 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
         this.limit = limit;
     }
 
-    public HistoryEntry add(Project project, JsonWrapper jsonWrapper) {
-        HistoryEntry historyEntry = new HistoryEntry(HistoryEntry.calculateId(project), jsonWrapper);
+    public JsonEntry add(Project project, JsonWrapper jsonWrapper) {
+        JsonEntry historyEntry = new JsonEntry(calculateId(project), jsonWrapper);
         // 判断 Json 记录是否已经存在于记录内
         if (!exists(jsonWrapper)) {
             // 不存在，则将其添加到首位（add方法会判断容量是否超出而去除最老节点）
             add(0, historyEntry);
         } else {
             // 存在，则判断是否需要移动位置
-            HistoryEntry first = getFirst();
+            JsonEntry first = getFirst();
             // 判断其是否为第0位的元素，如果是，则不管，否则将其移动至首位
             if (!Objects.equals(first.getJsonWrapper(), jsonWrapper)) {
                 // 移除该元素
@@ -41,7 +42,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
     }
 
     @Override
-    public boolean add(HistoryEntry element) {
+    public boolean add(JsonEntry element) {
         boolean added = super.add(element);
         if (size() > limit) {
             // 移除最老的元素
@@ -52,7 +53,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
     }
 
     @Override
-    public void add(int index, HistoryEntry element) {
+    public void add(int index, JsonEntry element) {
         super.add(index, element);
         if (size() > limit) {
             // 移除最老的元素
@@ -61,7 +62,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
     }
 
     @Override
-    public boolean addAll(int index, java.util.Collection<? extends HistoryEntry> c) {
+    public boolean addAll(int index, java.util.Collection<? extends JsonEntry> c) {
         boolean added = super.addAll(index, c);
         while (size() > limit) {
             // 移除最老的元素
@@ -72,7 +73,7 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
     }
 
     @Override
-    public boolean addAll(java.util.Collection<? extends HistoryEntry> c) {
+    public boolean addAll(java.util.Collection<? extends JsonEntry> c) {
         boolean added = super.addAll(c);
         while (size() > limit) {
             // 移除最老的元素
@@ -94,5 +95,9 @@ public class HistoryLimitedList extends LinkedList<HistoryEntry> {
         return this.stream().anyMatch(el -> Objects.equals(addElement, el.getJsonWrapper()));
     }
 
-
+    public static int calculateId(Project project) {
+        HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).getHistory();
+        Integer id = history.stream().map(JsonEntry::getId).max(Integer::compareTo).orElse(-1);
+        return id + 1;
+    }
 }
