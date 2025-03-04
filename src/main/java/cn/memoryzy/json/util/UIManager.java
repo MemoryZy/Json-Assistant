@@ -21,10 +21,7 @@ import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.testFramework.LightVirtualFile;
-import com.intellij.ui.ColorUtil;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.EditorTextField;
-import com.intellij.ui.ScrollPaneFactory;
+import com.intellij.ui.*;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Function;
@@ -242,6 +239,14 @@ public class UIManager implements Disposable {
                                                     boolean highlightAllOccurrences) {
         // ListWithFilter 用于文本检索
         return ListWithFilter.wrap(list, ScrollPaneFactory.createScrollPane(list), namer, highlightAllOccurrences);
+    }
+
+    public static void rebuildListWithFilter(JList<?> list) {
+        ListWithFilter<?> listWithFilter = ComponentUtil.getParentOfType(ListWithFilter.class, list);
+        if (listWithFilter != null) {
+            listWithFilter.getSpeedSearch().update();
+            if (list.getModel().getSize() == 0) listWithFilter.resetFilter();
+        }
     }
 
     public static JBFont consolasFont(int size) {

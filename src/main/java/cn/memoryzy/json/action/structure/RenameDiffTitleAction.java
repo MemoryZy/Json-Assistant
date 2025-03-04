@@ -1,18 +1,19 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.hutool.core.util.ReflectUtil;
+import cn.memoryzy.json.action.JsonTextDiffAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.dialog.DiffNameDialog;
+import com.intellij.diff.editor.SimpleDiffVirtualFile;
+import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.util.DiffSplitter;
 import com.intellij.diff.tools.util.SimpleDiffPanel;
 import com.intellij.diff.tools.util.side.TwosideContentPanel;
 import com.intellij.diff.util.InvisibleWrapper;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -47,6 +49,27 @@ public class RenameDiffTitleAction extends DumbAwareAction {
         }
 
         new DiffNameDialog(pair.getLeft(), pair.getRight()).show();
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabledAndVisible(isEnabled(e.getDataContext()));
+    }
+
+    private boolean isEnabled(DataContext dataContext) {
+        boolean enable = false;
+        VirtualFile virtualFile = CommonDataKeys.VIRTUAL_FILE.getData(dataContext);
+        if (virtualFile instanceof SimpleDiffVirtualFile) {
+            SimpleDiffRequest diffRequest = virtualFile.getUserData(JsonTextDiffAction.DIFF_REQUEST_KEY);
+            if (Objects.nonNull(diffRequest)) {
+                ImmutablePair<JBLabel, JBLabel> pair = getTwoLabel(dataContext);
+                if (pair != null && pair.getLeft() != null && pair.getRight() != null) {
+                    enable = true;
+                }
+            }
+        }
+
+        return enable;
     }
 
     public static ImmutablePair<JBLabel, JBLabel> getTwoLabel(DataContext dataContext) {

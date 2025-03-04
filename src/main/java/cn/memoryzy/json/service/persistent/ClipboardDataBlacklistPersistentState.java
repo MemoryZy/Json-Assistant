@@ -1,6 +1,6 @@
 package cn.memoryzy.json.service.persistent;
 
-import cn.memoryzy.json.model.JsonEntry;
+import cn.memoryzy.json.model.BlacklistEntry;
 import cn.memoryzy.json.service.persistent.converter.BlacklistConverter;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -24,7 +24,7 @@ public class ClipboardDataBlacklistPersistentState implements PersistentStateCom
     }
 
     @Attribute(converter = BlacklistConverter.class)
-    public LinkedList<JsonEntry> blacklist = new LinkedList<>();
+    public LinkedList<BlacklistEntry> blacklist = new LinkedList<>();
 
     @Override
     public @Nullable ClipboardDataBlacklistPersistentState getState() {

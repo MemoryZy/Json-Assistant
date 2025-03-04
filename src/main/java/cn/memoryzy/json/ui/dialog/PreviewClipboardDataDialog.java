@@ -5,7 +5,7 @@ import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.JsonEntry;
+import cn.memoryzy.json.model.BlacklistEntry;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
@@ -13,7 +13,6 @@ import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -41,15 +40,17 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
     private final EditorEx editor;
     private final String parseType;
     private final String jsonString;
+    private final String originalText;
     private ViewerModeLanguageTextEditor showTextField;
 
 
-    public PreviewClipboardDataDialog(@Nullable Project project, EditorEx editor, String parseType, String jsonString) {
+    public PreviewClipboardDataDialog(@Nullable Project project, EditorEx editor, String parseType, String jsonString, String originalText) {
         super(project, true);
         this.project = project;
         this.editor = editor;
         this.parseType = parseType;
         this.jsonString = jsonString;
+        this.originalText = originalText;
 
         // setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.preview.clipboard.title"));
@@ -67,19 +68,17 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         tipLabel.setBorder(JBUI.Borders.emptyLeft(5));
         TitledSeparator titledSeparator = new TitledSeparator();
 
-        BorderLayoutPanel topPanel = new BorderLayoutPanel()
-                .addToTop(tipLabel)
-                .addToCenter(titledSeparator);
+        BorderLayoutPanel topPanel = new BorderLayoutPanel().addToTop(tipLabel).addToCenter(titledSeparator);
 
         if (isJson) {
-            titledSeparator.setBorder(JBUI.Borders.empty(5, 0, 8, 0));
+            titledSeparator.setBorder(JBUI.Borders.empty(5, 0, 8, 5));
 
         } else {
-            titledSeparator.setBorder(JBUI.Borders.empty(3, 0));
+            titledSeparator.setBorder(JBUI.Borders.empty(3, 0, 0, 5));
 
             JBLabel tipImportLabel = new JBLabel(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.preview.clipboard.tipImport")));
-            tipImportLabel.setIcon(AllIcons.Actions.IntentionBulb);
-            tipImportLabel.setBorder(JBUI.Borders.empty(0, 2, 6, 0));
+            // tipImportLabel.setIcon(AllIcons.Actions.IntentionBulb);
+            tipImportLabel.setBorder(JBUI.Borders.empty(4, 5, 6, 0));
             topPanel.addToBottom(tipImportLabel);
         }
 
@@ -102,7 +101,7 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         if (getCancelAction().isEnabled()) {
             // 添加被拒绝的JSON
             JsonWrapper wrapper = DataTypeConstant.JSON5.equals(parseType) ? Json5Util.parse(jsonString) : JsonUtil.parse(jsonString);
-            addToBlacklist(wrapper);
+            addToBlacklist(parseType, originalText, wrapper);
             close(CANCEL_EXIT_CODE);
         }
     }
@@ -135,14 +134,14 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
     }
 
 
-    public static void addToBlacklist(JsonWrapper wrapper) {
-        LinkedList<JsonEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
-        Integer id = blacklist.stream().map(JsonEntry::getId).max(Integer::compareTo).orElse(-1);
-        blacklist.addFirst(new JsonEntry(id + 1, wrapper));
+    public static void addToBlacklist(String parseType, String originalText, JsonWrapper wrapper) {
+        LinkedList<BlacklistEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
+        Integer id = blacklist.stream().map(BlacklistEntry::getId).max(Integer::compareTo).orElse(-1);
+        blacklist.addFirst(new BlacklistEntry(id + 1, originalText, parseType, wrapper));
     }
 
     public static boolean existsInBlacklist(JsonWrapper wrapper) {
-        LinkedList<JsonEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
+        LinkedList<BlacklistEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
         return blacklist.stream().anyMatch(el -> Objects.equals(wrapper, el.getJsonWrapper()));
     }
 }

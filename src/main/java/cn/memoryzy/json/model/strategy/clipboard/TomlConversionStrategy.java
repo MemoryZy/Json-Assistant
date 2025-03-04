@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model.strategy.clipboard;
 
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.util.TomlUtil;
 
@@ -11,7 +12,7 @@ public class TomlConversionStrategy implements ClipboardTextConversionStrategy {
 
     @Override
     public String type() {
-        return "Toml";
+        return DataTypeConstant.TOML;
     }
 
     @Override

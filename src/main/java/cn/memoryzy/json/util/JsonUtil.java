@@ -269,18 +269,17 @@ public class JsonUtil {
         try {
             // 转义判断
             String json = StringEscapeUtils.unescapeJson(includeJsonStr);
-            if (isJson(json)) {
-                return json;
-            }
-
-            json = extractJsonStringOnRegular(includeJsonStr);
-            if (StrUtil.isNotBlank(json)) {
-                return json;
-            }
-
-            json = extractJsonString(includeJsonStr);
-            // 判断是否是JSON字符串
             return isJson(json) ? json : "";
+
+            // 2025/3/4 去除从杂乱文本中提取 JSON 的功能（不精确）
+            // json = extractJsonStringOnRegular(includeJsonStr);
+            // if (StrUtil.isNotBlank(json)) {
+            //     return json;
+            // }
+            //
+            // json = extractJsonString(includeJsonStr);
+            // // 判断是否是JSON字符串
+            // return isJson(json) ? json : "";
         } catch (Exception e) {
             return "";
         }

@@ -3,6 +3,7 @@
 ## [Unreleased]
 - 检测 JSON 中是否存在时间戳，并提供了时间戳转为时间格式的快速修复功能。
 - 新增对比窗口两侧标题的编辑功能。
+- 在工具窗口编辑器中新增自动导入剪贴板数据前的确认提示。
 - 新增两项扩展功能
   - 将 JSON 内所有时间戳转为时间格式。
   - 将 JSON 内所有嵌套 JSON 字符串转为 JSON 对象。
@@ -11,6 +12,7 @@
 - BUG修复。
 - Detects whether timestamp exists in JSON, and provides a quick repair function to convert timestamp into time format.
 - Added the ability to edit the titles on both sides of the comparison window.
+- Added a confirmation prompt before automatically importing clipboard data in the Tool Window Editor.
 - Two new extensions
   - Converts all timestamps in JSON to time format.
   - Converts all nested JSON strings in JSON to JSON objects.

@@ -30,13 +30,18 @@ public class EditorInitData {
      */
     private final String parseType;
 
+    /**
+     * 原文
+     */
+    private final String originalText;
 
     // region 构造器与Getter
-    public EditorInitData(boolean hasText, String jsonString, TextSourceType sourceType, String parseType) {
+    public EditorInitData(boolean hasText, String jsonString, TextSourceType sourceType, String parseType, String originalText) {
         this.hasText = hasText;
         this.jsonString = jsonString;
         this.sourceType = sourceType;
         this.parseType = parseType;
+        this.originalText = originalText;
     }
 
     public boolean isHasText() {
@@ -53,6 +58,10 @@ public class EditorInitData {
 
     public String getParseType() {
         return parseType;
+    }
+
+    public String getOriginalText() {
+        return originalText;
     }
 
     // endregion

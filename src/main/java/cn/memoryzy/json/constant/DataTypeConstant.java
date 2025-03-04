@@ -14,6 +14,8 @@ public interface DataTypeConstant {
 
     String XML = "Xml";
 
+    String TOML = "Toml";
+
     String URL_PARAM = "URL Param";
 
 }

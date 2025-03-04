@@ -30,7 +30,6 @@ import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.content.Content;
-import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.speedSearch.NameFilteringListModel;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.util.ui.JBUI;
@@ -80,7 +79,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
         showList = new JBList<>(fillHistoryListModel());
         showList.setFont(UIManager.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        showList.addListSelectionListener(new UpdateEditorListSelectionListener(showList, showTextField));
+        showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new StyleListCellRenderer());
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
         showList.addMouseListener(new ListRightClickPopupMenuMouseAdapter(showList, buildRightMousePopupMenu()));
@@ -107,7 +106,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
         borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, JsonEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
-        rebuildListWithFilter();
+        UIManager.rebuildListWithFilter(showList);
 
         JBSplitter splitter = new JBSplitter(true, 0.3f);
         splitter.setFirstComponent(borderLayoutPanel);
@@ -158,14 +157,6 @@ public class JsonHistoryListChooser extends DialogWrapper {
                     toolWindow.show();
                 }
             }
-        }
-    }
-
-    private void rebuildListWithFilter() {
-        ListWithFilter<?> listWithFilter = ComponentUtil.getParentOfType(ListWithFilter.class, showList);
-        if (listWithFilter != null) {
-            listWithFilter.getSpeedSearch().update();
-            if (showList.getModel().getSize() == 0) listWithFilter.resetFilter();
         }
     }
 
@@ -284,7 +275,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
                 }
             }
 
-            rebuildListWithFilter();
+            UIManager.rebuildListWithFilter(showList);
         }
 
         @Override
@@ -304,15 +295,8 @@ public class JsonHistoryListChooser extends DialogWrapper {
         }
     }
 
-    public static class UpdateEditorListSelectionListener implements ListSelectionListener {
+     class UpdateEditorListSelectionListener implements ListSelectionListener {
         private int lastLineCount = 0;
-        private final JBList<JsonEntry> showList;
-        private final EditorTextField showTextField;
-
-        public UpdateEditorListSelectionListener(JBList<JsonEntry> showList, EditorTextField showTextField) {
-            this.showList = showList;
-            this.showTextField = showTextField;
-        }
 
         @Override
         public void valueChanged(ListSelectionEvent e) {

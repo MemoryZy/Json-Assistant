@@ -160,6 +160,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         String jsonString = initData.getJsonString();
         TextSourceType sourceType = initData.getSourceType();
         String parseType = initData.getParseType();
+        String originalText = initData.getOriginalText();
+
         boolean isClipboard = TextSourceType.FROM_CLIPBOARD.equals(sourceType);
         boolean needPrompt = hasText && isClipboard && editorBehaviorState.promptBeforeImport;
 
@@ -176,7 +178,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         // 是否需要提示询问
         if (needPrompt) {
-            new PreviewClipboardDataDialog(project, editor, parseType, jsonString).show();
+            new PreviewClipboardDataDialog(project, editor, parseType, jsonString, originalText).show();
         }
 
         if (hasText && !needPrompt) {
@@ -257,6 +259,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         String jsonString = "";
         TextSourceType sourceType = null;
         String parseType = null;
+        String originalText = null;
 
         if (initTab) {
             if (editorBehaviorState.recognizeOtherFormats) {
@@ -270,6 +273,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                         sourceType = TextSourceType.FROM_CLIPBOARD;
                         ClipboardTextConversionStrategy strategy = context.getStrategy();
                         parseType = strategy.type();
+                        originalText = StrUtil.trim(clipboard);
 
                         JsonWrapper wrapper;
                         if (strategy instanceof Json5ConversionStrategy) {
@@ -297,7 +301,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             }
         }
 
-        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, sourceType, parseType);
+        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, sourceType, parseType, originalText);
     }
 
 
@@ -329,7 +333,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                         }
 
                         if (editorBehaviorState.promptBeforeImport) {
-                            new PreviewClipboardDataDialog(project, editor, strategy.type(), formattedStr).show();
+                            new PreviewClipboardDataDialog(project, editor, strategy.type(), formattedStr, StrUtil.trim(clipboard)).show();
                         } else {
                             WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
                             // 提示粘贴成功的消息

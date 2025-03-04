@@ -2,9 +2,10 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.JsonEntry;
+import cn.memoryzy.json.model.BlacklistEntry;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
@@ -77,9 +78,9 @@ public class EditorDialog extends DialogWrapper {
         }
 
         JsonWrapper wrapper = isJson ? JsonUtil.parse(text) : Json5Util.parse(text);
-        LinkedList<JsonEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
-        Integer id = blacklist.stream().map(JsonEntry::getId).max(Integer::compareTo).orElse(-1);
-        blacklist.addFirst(new JsonEntry(id + 1, wrapper));
+        LinkedList<BlacklistEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
+        Integer id = blacklist.stream().map(BlacklistEntry::getId).max(Integer::compareTo).orElse(-1);
+        blacklist.addFirst(new BlacklistEntry(id + 1, text, isJson ? DataTypeConstant.JSON : DataTypeConstant.JSON5, wrapper));
 
         return true;
     }
