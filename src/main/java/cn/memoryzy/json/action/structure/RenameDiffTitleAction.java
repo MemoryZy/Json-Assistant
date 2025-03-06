@@ -9,7 +9,6 @@ import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.diff.tools.util.DiffSplitter;
 import com.intellij.diff.tools.util.SimpleDiffPanel;
 import com.intellij.diff.tools.util.side.TwosideContentPanel;
-import com.intellij.diff.util.InvisibleWrapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -95,8 +94,8 @@ public class RenameDiffTitleAction extends DumbAwareAction {
         JComponent firstPanel = diffSplitter.getFirstComponent();
         JComponent secondPanel = diffSplitter.getSecondComponent();
 
-        InvisibleWrapper myTitleFirst = (InvisibleWrapper) ReflectUtil.getFieldValue(firstPanel, "myTitle");
-        InvisibleWrapper myTitleSecond = (InvisibleWrapper) ReflectUtil.getFieldValue(secondPanel, "myTitle");
+        Component myTitleFirst = (Component) ReflectUtil.getFieldValue(firstPanel, "myTitle");
+        Component myTitleSecond = (Component) ReflectUtil.getFieldValue(secondPanel, "myTitle");
 
         JBLabel leftSourceLabel = findDeepNestedComponent(myTitleFirst, JBLabel.class);
         JBLabel rightSourceLabel = findDeepNestedComponent(myTitleSecond, JBLabel.class);
