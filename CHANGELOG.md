@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.7.7] - 2025-03-06
+
 - 检测 JSON 中是否存在时间戳，并提供了时间戳转为时间格式的快速修复功能。
 - 新增对比窗口两侧标题的编辑功能。
 - 在工具窗口编辑器中新增自动导入剪贴板数据前的确认提示。
@@ -19,6 +22,8 @@
 - Solve plugin compatibility issues.
 - User experience optimization and improvement.
 - BUG fixes.
+- 解决在 GoLand、PyCharm 平台上的兼容问题。
+- Resolve compatibility issues on GoLand and PyCharm platforms.
 
 ## [1.7.7-beta] - 2025-02-22
 
@@ -274,7 +279,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7-beta...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7...HEAD
+[1.7.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7-beta...v1.7.7
 [1.7.7-beta]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.6...v1.7.7-beta
 [1.7.6]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.5...v1.7.6
 [1.7.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.2...v1.7.5
