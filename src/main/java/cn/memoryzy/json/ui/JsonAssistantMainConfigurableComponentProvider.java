@@ -65,14 +65,17 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private TitledSeparator historyLabel;
     private JBLabel historyStyleTitle;
     private JBCheckBox recordHistory;
-    private JBRadioButton historyTree;
-    private JBRadioButton historyList;
+    private ComboBox<HistoryViewType> historyStyleBox;
     private TitledSeparator generalLabel;
     private JBLabel treeDisplayModeTitle;
     private JBLabel treeDisplayModeDesc;
     private ComboBox<TreeDisplayMode> treeDisplayModeBox;
     private JBCheckBox promptBeforeImportCb;
     private JBLabel promptBeforeImportDesc;
+    private JBLabel autoStoreHistoryTitle;
+    private JBRadioButton autoStoreRb;
+    private JBRadioButton manualStoreRb;
+    private JBLabel autoStoreHistoryDesc;
     // endregion
 
     // 区分亮暗，防止配置界面还存在时，主题被切换
@@ -260,19 +263,32 @@ public class JsonAssistantMainConfigurableComponentProvider {
         historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
         recordHistory.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
         historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
-        historyTree.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.tree.text"));
-        historyList.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.list.text"));
+        for (HistoryViewType value : HistoryViewType.values()) {
+            historyStyleBox.addItem(value);
+        }
+
+        autoStoreHistoryTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
+        autoStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
+        manualStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.manual.text"));
+        UIManager.setHelpLabel(autoStoreHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
+
         ButtonGroup group = new ButtonGroup();
-        group.add(historyTree);
-        group.add(historyList);
+        group.add(autoStoreRb);
+        group.add(manualStoreRb);
 
         recordHistory.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIManager.controlEnableRadioButton(historyTree, true);
-                UIManager.controlEnableRadioButton(historyList, true);
+                UIManager.controlEnableRadioButton(autoStoreRb, true);
+                UIManager.controlEnableRadioButton(manualStoreRb, true);
+                if (!historyStyleBox.isEnabled()) {
+                    historyStyleBox.setEnabled(true);
+                }
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIManager.controlEnableRadioButton(historyTree, false);
-                UIManager.controlEnableRadioButton(historyList, false);
+                UIManager.controlEnableRadioButton(autoStoreRb, false);
+                UIManager.controlEnableRadioButton(manualStoreRb, false);
+                if (historyStyleBox.isEnabled()) {
+                    historyStyleBox.setEnabled(false);
+                }
             }
         });
     }
@@ -324,18 +340,25 @@ public class JsonAssistantMainConfigurableComponentProvider {
         HistoryState historyState = persistentState.historyState;
         boolean switchHistory = historyState.switchHistory;
         recordHistory.setSelected(switchHistory);
-        if (historyState.historyViewType == HistoryViewType.TREE) {
-            historyTree.setSelected(true);
+        historyStyleBox.setItem(historyState.historyViewType);
+        if (historyState.autoStore) {
+            autoStoreRb.setSelected(true);
         } else {
-            historyList.setSelected(true);
+            manualStoreRb.setSelected(true);
         }
 
         if (switchHistory) {
-            UIManager.controlEnableRadioButton(historyTree, true);
-            UIManager.controlEnableRadioButton(historyList, true);
+            UIManager.controlEnableRadioButton(autoStoreRb, true);
+            UIManager.controlEnableRadioButton(manualStoreRb, true);
+            if (!historyStyleBox.isEnabled()) {
+                historyStyleBox.setEnabled(true);
+            }
         } else {
-            UIManager.controlEnableRadioButton(historyTree, false);
-            UIManager.controlEnableRadioButton(historyList, false);
+            UIManager.controlEnableRadioButton(autoStoreRb, false);
+            UIManager.controlEnableRadioButton(manualStoreRb, false);
+            if (historyStyleBox.isEnabled()) {
+                historyStyleBox.setEnabled(false);
+            }
         }
 
         if (recognizeOtherFormats) {
@@ -396,6 +419,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         // 历史记录
         HistoryState historyState = persistentState.historyState;
         boolean oldSwitchHistory = historyState.switchHistory;
+        boolean oldAutoStore = historyState.autoStore;
         HistoryViewType oldHistoryViewType = historyState.historyViewType;
 
         // 常规
@@ -425,7 +449,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 历史记录
         boolean newSwitchHistory = recordHistory.isSelected();
-        HistoryViewType newHistoryViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
+        boolean newAutoStore = autoStoreRb.isSelected();
+        HistoryViewType newHistoryViewType = historyStyleBox.getItem();
 
         // 常规
         TreeDisplayMode newTreeDisplayMode = treeDisplayModeBox.getItem();
@@ -451,6 +476,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
                 || !Objects.equals(oldPromptBeforeImport, newPromptBeforeImport)
                 || !Objects.equals(oldSwitchHistory, newSwitchHistory)
+                || !Objects.equals(oldAutoStore, newAutoStore)
                 || !Objects.equals(oldHistoryViewType, newHistoryViewType)
                 || !Objects.equals(oldTreeDisplayMode, newTreeDisplayMode)
 
@@ -477,7 +503,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
         // 历史记录
         HistoryState historyState = persistentState.historyState;
         historyState.switchHistory = recordHistory.isSelected();
-        historyState.historyViewType = historyTree.isSelected() ? HistoryViewType.TREE : HistoryViewType.LIST;
+        historyState.autoStore = autoStoreRb.isSelected();
+        historyState.historyViewType = historyStyleBox.getItem();
 
         // 外观
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;

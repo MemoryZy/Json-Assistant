@@ -124,11 +124,6 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
     }
 
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
-        return showTextField;
-    }
-
-    @Override
     protected @NonNls @Nullable String getHelpId() {
         return UrlType.DEFAULT.getId();
     }

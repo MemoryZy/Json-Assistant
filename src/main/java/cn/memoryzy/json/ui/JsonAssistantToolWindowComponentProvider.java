@@ -1,10 +1,10 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.TextSourceType;
@@ -28,11 +28,9 @@ import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.ActionToolbar;
-import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -47,6 +45,7 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
@@ -54,14 +53,17 @@ import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.Consumer;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
@@ -69,7 +71,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
-    private static final ScheduledThreadPoolExecutor EXECUTOR = ThreadUtil.createScheduledExecutor(2);
+    public static final String MANUAL_HISTORY_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".MANUAL_HISTORY_GUIDE_KEY";
 
     private final Project project;
     private final FileType editorFileType;
@@ -78,10 +80,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private final EditorBehaviorState editorBehaviorState;
     private final EditorAppearanceState editorAppearanceState;
     private final HistoryState historyOptionState;
+    private final PropertiesComponent propertiesComponent;
     private EditorEx editor;
 
     private Content content;
 
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
 
     public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initTab) {
         this.project = project;
@@ -92,6 +97,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         this.editorBehaviorState = persistentState.editorBehaviorState;
         this.editorAppearanceState = persistentState.editorAppearanceState;
         this.historyOptionState = persistentState.historyState;
+        this.propertiesComponent = PropertiesComponent.getInstance();
     }
 
     public JComponent createComponent() {
@@ -187,6 +193,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                     : JsonAssistantBundle.messageOnSystem("hint.import.json"));
         }
 
+        // 第一次提示
+        String value = propertiesComponent.getValue(MANUAL_HISTORY_GUIDE_KEY);
+        if (StrUtil.isBlank(value)) {
+            // 提示
+            // TODO 添加Action，一个跳到设置，一个不显示
+            Notifications.showFullStickyNotification("Json Assistant", JsonAssistantBundle.messageOnSystem("notification.manual.history.content"), NotificationType.INFORMATION, project);
+        }
+
         return editor;
     }
 
@@ -217,6 +231,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         editor.addFocusListener(new FocusListenerImpl());
         editor.getDocument().addDocumentListener(new DocumentListenerImpl(editor));
+
+        // 手动储存历史记录
+        DumbAwareAction.create(new ManuallySaveHistoryAction())
+                .registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl S"), editor.getComponent());
 
         JComponent component = editor.getComponent();
         component.setFont(UIManager.consolasFont(15));
@@ -356,30 +374,58 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         });
     }
 
-    private void addJsonToHistory() {
-        if (historyOptionState.switchHistory && !editor.isViewer()) {
-            HistoryLimitedList historyList = historyState.getHistory();
 
-            EXECUTOR.schedule(() -> {
-                String text = StrUtil.trim(editor.getDocument().getText());
-                JsonWrapper jsonWrapper = null;
-                if (JsonUtil.isJson(text)) {
-                    jsonWrapper = JsonUtil.parse(text);
+    private void scheduleDebouncedAction() {
+        // 取消之前的任务
+        cancelPendingTask();
 
-                } else if (Json5Util.isJson5(text)) {
-                    jsonWrapper = Json5Util.parse(text);
-                }
+        // 提交新任务（500ms防抖窗口）
+        ScheduledFuture<?> newTask = executor.schedule(() ->
+                        SwingUtilities.invokeLater(this::performAction),
+                3000, TimeUnit.MILLISECONDS
+        );
 
-                if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
-                    historyList.add(project, jsonWrapper);
-                }
-            }, 3, TimeUnit.SECONDS);
+        pendingTask.set(newTask);
+    }
+
+
+    private void performAction() {
+        HistoryLimitedList historyList = historyState.getHistory();
+
+        String text = StrUtil.trim(editor.getDocument().getText());
+        JsonWrapper jsonWrapper = null;
+        if (JsonUtil.isJson(text)) {
+            jsonWrapper = JsonUtil.parse(text);
+
+        } else if (Json5Util.isJson5(text)) {
+            jsonWrapper = Json5Util.parse(text);
+        }
+
+        if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
+            historyList.add(project, jsonWrapper);
+        }
+    }
+
+    private void cancelPendingTask() {
+        ScheduledFuture<?> task = pendingTask.getAndSet(null);
+        if (task != null && !task.isDone()) {
+            task.cancel(false);
         }
     }
 
     @Override
     public void dispose() {
         EditorFactory.getInstance().releaseEditor(editor);
+        // 清理资源
+        cancelPendingTask();
+        executor.shutdownNow();
+        try {
+            if (!executor.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                LOG.error("The Executor does not shut down properly");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public static void toggleLineNumbers(EditorEx editor, boolean display) {
@@ -471,7 +517,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         public void focusLost(@NotNull Editor editor) {
             // --------------------------- 失去焦点时
             // 添加当前编辑器的 JSON 至历史记录
-            addJsonToHistory();
+            if (historyOptionState.switchHistory && historyOptionState.autoStore) {
+                scheduleDebouncedAction();
+            }
         }
     }
 
@@ -510,6 +558,16 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
             } catch (Error error) {
                 LOG.warn(error);
+            }
+        }
+    }
+
+    private class ManuallySaveHistoryAction implements Consumer<AnActionEvent> {
+        @Override
+        public void consume(AnActionEvent event) {
+            if (historyOptionState.switchHistory && !historyOptionState.autoStore) {
+                performAction();
+                HintUtil.showInformationHint(editor, JsonAssistantBundle.messageOnSystem("hint.add.history"));
             }
         }
     }

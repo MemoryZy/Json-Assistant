@@ -18,4 +18,9 @@ public class HistoryState {
      */
     public HistoryViewType historyViewType = HistoryViewType.TREE;
 
+    /**
+     * 是否自动记录
+     */
+    public boolean autoStore = false;
+
 }

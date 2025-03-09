@@ -120,6 +120,22 @@ public class Notifications {
     /**
      * 展示不被折叠的通知
      */
+    public static void showFullNotification(String title, String content, NotificationType notificationType, List<? extends @NotNull AnAction> actions, Project project) {
+        FullContentNotification notification = new FullContentNotification(getBalloonLogNotificationGroup().getDisplayId(), title, content, notificationType);
+        actions.forEach(notification::addAction);
+        notification.notify(project);
+    }
+
+    /**
+     * 展示不被折叠的通知
+     */
+    public static void showFullStickyNotification(String title, String content, NotificationType notificationType, Project project) {
+        new FullContentNotification(getStickyLogNotificationGroup().getDisplayId(), title, content, notificationType).notify(project);
+    }
+
+    /**
+     * 展示不被折叠的通知
+     */
     public static void showFullStickyNotification(String title, String content, NotificationType notificationType,
                                                   Project project, List<? extends @NotNull AnAction> actions) {
         FullContentNotification notification = new FullContentNotification(getStickyLogNotificationGroup().getDisplayId(), title, content, notificationType);
