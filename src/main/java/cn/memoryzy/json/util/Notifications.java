@@ -137,7 +137,7 @@ public class Notifications {
      * 展示不被折叠的通知
      */
     public static void showFullStickyNotification(String title, String content, NotificationType notificationType,
-                                                  Project project, List<? extends @NotNull AnAction> actions) {
+                                                  List<? extends @NotNull AnAction> actions, Project project) {
         FullContentNotification notification = new FullContentNotification(getStickyLogNotificationGroup().getDisplayId(), title, content, notificationType);
         actions.forEach(notification::addAction);
         notification.notify(project);

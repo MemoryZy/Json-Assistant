@@ -190,8 +190,8 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
                         "Json Assistant",
                         JsonAssistantBundle.messageOnSystem("notification.recover.content", oldHistory.size()),
                         NotificationType.INFORMATION,
-                        project,
-                        notificationActions);
+                        notificationActions,
+                        project);
             });
         }
     }

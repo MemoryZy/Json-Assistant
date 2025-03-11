@@ -10,6 +10,7 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.TextSourceType;
 import cn.memoryzy.json.model.EditorInitData;
 import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
@@ -22,12 +23,15 @@ import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
+import cn.memoryzy.json.ui.dialog.JsonHistoryTreeChooser;
 import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
+import com.google.common.collect.Lists;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
@@ -45,8 +49,10 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.tools.SimpleActionGroup;
@@ -59,6 +65,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -197,8 +204,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         String value = propertiesComponent.getValue(MANUAL_HISTORY_GUIDE_KEY);
         if (StrUtil.isBlank(value)) {
             // 提示
-            // TODO 添加Action，一个跳到设置，一个不显示
-            Notifications.showFullStickyNotification("Json Assistant", JsonAssistantBundle.messageOnSystem("notification.manual.history.content"), NotificationType.INFORMATION, project);
+            NotificationAction configureAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.configure.text"),
+                    () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, JsonAssistantBundle.message("setting.display.name")));
+            NotificationAction notAskAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.not.ask.text"), () -> {
+            });
+            ArrayList<NotificationAction> notificationActions = Lists.newArrayList(configureAction, notAskAction);
+            Notifications.showFullStickyNotification("Json Assistant", JsonAssistantBundle.messageOnSystem("notification.manual.history.content"), NotificationType.INFORMATION, notificationActions, project);
+            propertiesComponent.setValue(MANUAL_HISTORY_GUIDE_KEY, "1");
         }
 
         return editor;
@@ -381,7 +393,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         // 提交新任务（500ms防抖窗口）
         ScheduledFuture<?> newTask = executor.schedule(() ->
-                        SwingUtilities.invokeLater(this::performAction),
+                        SwingUtilities.invokeLater(() -> performAction(true)),
                 3000, TimeUnit.MILLISECONDS
         );
 
@@ -389,7 +401,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     }
 
 
-    private void performAction() {
+    private void performAction(boolean auto) {
         HistoryLimitedList historyList = historyState.getHistory();
 
         String text = StrUtil.trim(editor.getDocument().getText());
@@ -402,7 +414,26 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         }
 
         if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
-            historyList.add(project, jsonWrapper);
+            if (auto) {
+                historyList.add(project, jsonWrapper);
+            } else {
+                JsonEntry jsonEntry = historyList.filterItem(jsonWrapper);
+                String oldName = (null == jsonEntry) ? "" : jsonEntry.getName();
+
+                String newName = Messages.showInputDialog(
+                        project,
+                        null,
+                        JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"),
+                        null,
+                        oldName,
+                        new JsonHistoryTreeChooser.NameValidator());
+
+                if (StrUtil.isNotBlank(newName)) {
+                    JsonEntry entry = historyList.add(project, jsonWrapper);
+                    entry.setName(newName);
+                    HintUtil.showInformationHint(editor, JsonAssistantBundle.messageOnSystem("hint.add.history"));
+                }
+            }
         }
     }
 
@@ -566,8 +597,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         @Override
         public void consume(AnActionEvent event) {
             if (historyOptionState.switchHistory && !historyOptionState.autoStore) {
-                performAction();
-                HintUtil.showInformationHint(editor, JsonAssistantBundle.messageOnSystem("hint.add.history"));
+                performAction(false);
             }
         }
     }

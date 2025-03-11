@@ -35,6 +35,8 @@ public class HistoryLimitedList extends LinkedList<JsonEntry> {
                 removeIf(el -> Objects.equals(el.getJsonWrapper(), jsonWrapper));
                 // 再添加到首位
                 add(0, historyEntry);
+            } else {
+                return first;
             }
         }
 
@@ -93,6 +95,10 @@ public class HistoryLimitedList extends LinkedList<JsonEntry> {
      */
     public boolean exists(JsonWrapper addElement) {
         return this.stream().anyMatch(el -> Objects.equals(addElement, el.getJsonWrapper()));
+    }
+
+    public JsonEntry filterItem(JsonWrapper element) {
+        return this.stream().filter(el -> Objects.equals(element, el.getJsonWrapper())).findFirst().orElse(null);
     }
 
     public static int calculateId(Project project) {

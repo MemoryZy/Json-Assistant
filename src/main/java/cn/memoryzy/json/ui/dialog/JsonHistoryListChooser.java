@@ -213,7 +213,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
             JsonEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
                 String name = selectedValue.getName();
-                String newName = Messages.showInputDialog(project, null, "指定记录名称", null, name, new JsonHistoryTreeChooser.NameValidator());
+                String newName = Messages.showInputDialog(project, null, JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"), null, name, new JsonHistoryTreeChooser.NameValidator());
                 if (StrUtil.isNotBlank(newName)) {
                     selectedValue.setName(newName);
                     UIManager.repaintComponent(showList);

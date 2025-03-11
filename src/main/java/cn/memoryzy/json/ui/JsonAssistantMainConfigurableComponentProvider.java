@@ -8,6 +8,7 @@ import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.ui.icon.CircleIcon;
+import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColorPicker;
@@ -61,6 +62,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel backgroundColorTitle;
     private ComboBox<ColorScheme> backgroundColorBox;
     private TitledSeparator windowAppearanceLabel;
+    private JPanel backgroundColorPanel;
     private JBLabel backgroundColorDesc;
     private TitledSeparator historyLabel;
     private JBLabel historyStyleTitle;
@@ -87,6 +89,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
      */
     private boolean isLoading = false;
     private final JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+    private final boolean isIdea = PlatformUtil.isIdea();
 
     public JPanel createComponent() {
         configureGeneralComponents();
@@ -141,13 +144,17 @@ public class JsonAssistantMainConfigurableComponentProvider {
         recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
         UIManager.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
 
-        xmlFormatsCb.setText("Xml");
-        yamlFormatsCb.setText("Yaml");
-        tomlFormatsCb.setText("Toml");
-        urlParamFormatsCb.setText("Url Param");
+        xmlFormatsCb.setText("XML");
+        yamlFormatsCb.setText("YAML");
+        tomlFormatsCb.setText("TOML");
+        urlParamFormatsCb.setText("URL Param");
 
         int left = UIUtil.getCheckBoxTextHorizontalOffset(recognizeOtherFormatsCb);
         formatCbPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
+
+        // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
+        promptBeforeImportCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
+        UIManager.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
 
         recognizeOtherFormatsCb.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -155,17 +162,15 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 UIManager.controlEnableCheckBox(yamlFormatsCb, true);
                 UIManager.controlEnableCheckBox(tomlFormatsCb, true);
                 UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
+                UIManager.controlEnableCheckBox(promptBeforeImportCb, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                 UIManager.controlEnableCheckBox(xmlFormatsCb, false);
                 UIManager.controlEnableCheckBox(yamlFormatsCb, false);
                 UIManager.controlEnableCheckBox(tomlFormatsCb, false);
                 UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
+                UIManager.controlEnableCheckBox(promptBeforeImportCb, false);
             }
         });
-
-        // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
-        promptBeforeImportCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
-        UIManager.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
     }
 
     /**
@@ -173,87 +178,95 @@ public class JsonAssistantMainConfigurableComponentProvider {
      */
     private void configureToolWindowAppearanceComponents() {
         windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
-
-        backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
-        for (ColorScheme value : ColorScheme.values()) {
-            backgroundColorBox.addItem(value);
-        }
-
-        UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
         displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
         foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
+        // 单独设定背景色
+        configureBackGroundColorComponents();
+    }
 
-        // 当有焦点时，表示内部活动完毕，此时才允许用户选择颜色
-        backgroundColorBox.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                isLoading = false;
+    private void configureBackGroundColorComponents() {
+        if (isIdea) {
+            backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
+            for (ColorScheme value : ColorScheme.values()) {
+                backgroundColorBox.addItem(value);
             }
-        });
 
-        backgroundColorBox.addActionListener(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ColorScheme item = backgroundColorBox.getItem();
-                if (ColorScheme.Custom.equals(item) && !isLoading) {
-                    backgroundColorBox.hidePopup();
-                    boolean darkTheme = UIUtil.isUnderDarcula();
-                    EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-                    Color preselectedColor = darkTheme ? editorAppearanceState.customDarkcolor : editorAppearanceState.customLightColor;
-                    String title = darkTheme ? JsonAssistantBundle.messageOnSystem("dialog.choose.dark.color.title") : JsonAssistantBundle.messageOnSystem("dialog.choose.light.color.title");
+            UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
 
-                    Color selectedColor = ColorPicker.showDialog(
-                            backgroundColorBox, title,
-                            preselectedColor, true, null, true);
+            // 当有焦点时，表示内部活动完毕，此时才允许用户选择颜色
+            backgroundColorBox.addFocusListener(new FocusAdapter() {
+                @Override
+                public void focusGained(FocusEvent e) {
+                    isLoading = false;
+                }
+            });
 
-                    if (null != selectedColor) {
-                        if (darkTheme) {
-                            selectedDarkColor = selectedColor;
-                        } else {
-                            selectedLightColor = selectedColor;
+            backgroundColorBox.addActionListener(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    ColorScheme item = backgroundColorBox.getItem();
+                    if (ColorScheme.Custom.equals(item) && !isLoading) {
+                        backgroundColorBox.hidePopup();
+                        boolean darkTheme = UIUtil.isUnderDarcula();
+                        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
+                        Color preselectedColor = darkTheme ? editorAppearanceState.customDarkcolor : editorAppearanceState.customLightColor;
+                        String title = darkTheme ? JsonAssistantBundle.messageOnSystem("dialog.choose.dark.color.title") : JsonAssistantBundle.messageOnSystem("dialog.choose.light.color.title");
+
+                        Color selectedColor = ColorPicker.showDialog(
+                                backgroundColorBox, title,
+                                preselectedColor, true, null, true);
+
+                        if (null != selectedColor) {
+                            if (darkTheme) {
+                                selectedDarkColor = selectedColor;
+                            } else {
+                                selectedLightColor = selectedColor;
+                            }
+
+                            UIManager.repaintComponent(backgroundColorBox);
                         }
-
-                        UIManager.repaintComponent(backgroundColorBox);
                     }
                 }
-            }
-        });
+            });
 
-        backgroundColorBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                // 调用父类方法
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                Color color = getColor((ColorScheme) value);
+            backgroundColorBox.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    // 调用父类方法
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    Color color = getColor((ColorScheme) value);
 
-                setIcon(Objects.isNull(color)
-                        // 创建一个空白图标
-                        ? new ImageIcon(new BufferedImage(14, 14, BufferedImage.TYPE_INT_ARGB))
-                        // 创建圆形图标
-                        : new CircleIcon(14, color));
+                    setIcon(Objects.isNull(color)
+                            // 创建一个空白图标
+                            ? new ImageIcon(new BufferedImage(14, 14, BufferedImage.TYPE_INT_ARGB))
+                            // 创建圆形图标
+                            : new CircleIcon(14, color));
 
-                return this;
-            }
-
-            @Nullable
-            private Color getColor(ColorScheme colorScheme) {
-                Color color = colorScheme.getColor();
-                boolean darkTheme = UIUtil.isUnderDarcula();
-                Color selectColor = darkTheme ? selectedDarkColor : selectedLightColor;
-
-                // 实现自定义中，颜色选择后，颜色图标跟随变化
-                // 选择的颜色默认是null，当选择后才会被赋值
-                // 只要与持久化中的颜色不同，那么表示选中了新颜色，即切换颜色图标
-                if (ColorScheme.Custom.equals(colorScheme)
-                        && Objects.nonNull(selectColor)
-                        && Objects.nonNull(color)
-                        && !Objects.equals(selectColor, color)) {
-                    color = selectColor;
+                    return this;
                 }
 
-                return color;
-            }
-        });
+                @Nullable
+                private Color getColor(ColorScheme colorScheme) {
+                    Color color = colorScheme.getColor();
+                    boolean darkTheme = UIUtil.isUnderDarcula();
+                    Color selectColor = darkTheme ? selectedDarkColor : selectedLightColor;
+
+                    // 实现自定义中，颜色选择后，颜色图标跟随变化
+                    // 选择的颜色默认是null，当选择后才会被赋值
+                    // 只要与持久化中的颜色不同，那么表示选中了新颜色，即切换颜色图标
+                    if (ColorScheme.Custom.equals(colorScheme)
+                            && Objects.nonNull(selectColor)
+                            && Objects.nonNull(color)
+                            && !Objects.equals(selectColor, color)) {
+                        color = selectColor;
+                    }
+
+                    return color;
+                }
+            });
+        } else {
+            backgroundColorPanel.setVisible(false);
+        }
     }
 
     /**
@@ -332,7 +345,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 外观
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        resetBackgroundColorItem(editorAppearanceState);
+        if (isIdea) {
+            resetBackgroundColorItem(editorAppearanceState);
+        }
+
         displayLineNumbersCb.setSelected(editorAppearanceState.displayLineNumbers);
         foldingOutlineCb.setSelected(editorAppearanceState.foldingOutline);
 
@@ -373,7 +389,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
             UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
         }
 
-        UIManager.repaintComponent(backgroundColorBox);
+        if (isIdea) {
+            UIManager.repaintComponent(backgroundColorBox);
+        }
 
         // 常规
         GeneralState generalState = persistentState.generalState;
@@ -461,10 +479,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldRecognitionJacksonAnnotation, newRecognitionJacksonAnnotation)
 
                 || !Objects.equals(oldImportHistory, newImportHistory)
-                || !Objects.equals(oldColorScheme, newColorScheme)
-                || (ColorScheme.Custom.equals(newColorScheme)
+
+                || (isIdea && !Objects.equals(oldColorScheme, newColorScheme))
+                || (isIdea && (ColorScheme.Custom.equals(newColorScheme)
                 // 自定义颜色比较
-                && !Objects.equals(oldLightColor, selectedLightColor) || !Objects.equals(oldDarkcolor, selectedDarkColor))
+                && !Objects.equals(oldLightColor, selectedLightColor) || !Objects.equals(oldDarkcolor, selectedDarkColor)))
 
                 || !Objects.equals(oldDisplayLineNumbers, newDisplayLineNumbers)
                 || !Objects.equals(oldFoldingOutline, newFoldingOutline)
@@ -510,17 +529,20 @@ public class JsonAssistantMainConfigurableComponentProvider {
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
         editorAppearanceState.displayLineNumbers = displayLineNumbersCb.isSelected();
         editorAppearanceState.foldingOutline = foldingOutlineCb.isSelected();
-        ColorScheme selectedScheme = backgroundColorBox.getItem();
-        editorAppearanceState.colorScheme = selectedScheme;
 
-        // 如果选择的是Custom，那么将选择的颜色赋值给customColor，这个color可以暂时缓存起来
-        if (ColorScheme.Custom.equals(selectedScheme)) {
-            if (Objects.nonNull(selectedDarkColor)) {
-                editorAppearanceState.customDarkcolor = selectedDarkColor;
-            }
+        if (isIdea) {
+            ColorScheme selectedScheme = backgroundColorBox.getItem();
+            editorAppearanceState.colorScheme = selectedScheme;
 
-            if (Objects.nonNull(selectedLightColor)) {
-                editorAppearanceState.customLightColor = selectedLightColor;
+            // 如果选择的是Custom，那么将选择的颜色赋值给customColor，这个color可以暂时缓存起来
+            if (ColorScheme.Custom.equals(selectedScheme)) {
+                if (Objects.nonNull(selectedDarkColor)) {
+                    editorAppearanceState.customDarkcolor = selectedDarkColor;
+                }
+
+                if (Objects.nonNull(selectedLightColor)) {
+                    editorAppearanceState.customLightColor = selectedLightColor;
+                }
             }
         }
 

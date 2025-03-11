@@ -16,6 +16,7 @@ import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
@@ -384,6 +385,14 @@ public class PlatformUtil {
 
         assert document != null;
         return EditorFactory.getInstance().createEditor(document, project, sourceVirtualFile, isViewer, kind);
+    }
+
+    public static String getFullProductName() {
+        return ApplicationNamesInfo.getInstance().getFullProductName();
+    }
+
+    public static boolean isIdea() {
+        return Objects.equals("IntelliJ IDEA", getFullProductName());
     }
 
 }
