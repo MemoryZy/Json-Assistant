@@ -277,6 +277,11 @@ public class JsonAssistantUtil {
      * @return 格式化后的日期时间字符串
      */
     public static String formatDateBasedOnTimestampDetails(long timestamp) {
+        String timestampStr = timestamp + "";
+        if (timestampStr.length() == 10) { // Seconds-based timestamp
+            timestamp = timestamp * 1000;
+        }
+
         LocalDateTime localDateTime = LocalDateTimeUtil.of(timestamp);
 
         int hour = localDateTime.getHour();
