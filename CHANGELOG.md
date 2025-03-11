@@ -2,8 +2,10 @@
 
 ## [Unreleased]
  - 将历史记录保存切换为手动模式。
+ - 解决时间戳转换的问题。
  - 兼容性优化。
 - Switch history saving to manual mode.
+- Resolve timestamp conversion issues.
 - Compatibility optimization.
 
 ## [1.7.7] - 2025-03-06
