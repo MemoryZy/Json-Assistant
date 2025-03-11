@@ -1,6 +1,10 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+ - 将历史记录保存切换为手动模式。
+ - 兼容性优化。
+- Switch history saving to manual mode.
+- Compatibility optimization.
 
 ## [1.7.7] - 2025-03-06
 
