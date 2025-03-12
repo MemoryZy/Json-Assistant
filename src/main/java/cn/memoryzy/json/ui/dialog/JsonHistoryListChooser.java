@@ -232,6 +232,9 @@ public class JsonHistoryListChooser extends DialogWrapper {
                 if (StrUtil.isNotBlank(name)) {
                     presentation.setText(JsonAssistantBundle.message("action.structure.rename.text"));
                     presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.rename.description"));
+                } else {
+                    presentation.setText(JsonAssistantBundle.message("action.structure.setName.text"));
+                    presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.setName.description"));
                 }
             }
 

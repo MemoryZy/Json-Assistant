@@ -47,8 +47,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBCheckBox jacksonCb;
     private JBLabel jacksonDesc;
     private TitledSeparator windowBehaviorLabel;
-    private JBCheckBox importHistoryCb;
-    private JBLabel importHistoryDesc;
     private JBCheckBox displayLineNumbersCb;
     private JBCheckBox foldingOutlineCb;
     private ActionLink donateLink;
@@ -137,9 +135,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
      */
     private void configureToolWindowBehaviorComponents() {
         windowBehaviorLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
-
-        importHistoryCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.history.text"));
-        UIManager.setCommentLabel(importHistoryDesc, importHistoryCb, JsonAssistantBundle.messageOnSystem("setting.component.import.history.desc"));
 
         recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
         UIManager.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
@@ -332,7 +327,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 行为
         EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        importHistoryCb.setSelected(editorBehaviorState.importHistory);
         // 控制全部CheckBox
         boolean recognizeOtherFormats = editorBehaviorState.recognizeOtherFormats;
         recognizeOtherFormatsCb.setSelected(recognizeOtherFormats);
@@ -341,7 +335,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         tomlFormatsCb.setSelected(editorBehaviorState.recognizeTomlFormat);
         urlParamFormatsCb.setSelected(editorBehaviorState.recognizeUrlParamFormat);
         promptBeforeImportCb.setSelected(editorBehaviorState.promptBeforeImport);
-
 
         // 外观
         EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
@@ -382,11 +375,13 @@ public class JsonAssistantMainConfigurableComponentProvider {
             UIManager.controlEnableCheckBox(yamlFormatsCb, true);
             UIManager.controlEnableCheckBox(tomlFormatsCb, true);
             UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
+            UIManager.controlEnableCheckBox(promptBeforeImportCb, true);
         } else {
             UIManager.controlEnableCheckBox(xmlFormatsCb, false);
             UIManager.controlEnableCheckBox(yamlFormatsCb, false);
             UIManager.controlEnableCheckBox(tomlFormatsCb, false);
             UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
+            UIManager.controlEnableCheckBox(promptBeforeImportCb, false);
         }
 
         if (isIdea) {
@@ -417,7 +412,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 行为
         EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        boolean oldImportHistory = editorBehaviorState.importHistory;
         boolean oldRecognizeOtherFormats = editorBehaviorState.recognizeOtherFormats;
         boolean oldRecognizeXmlFormat = editorBehaviorState.recognizeXmlFormat;
         boolean oldRecognizeYamlFormat = editorBehaviorState.recognizeYamlFormat;
@@ -452,7 +446,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newRecognitionJacksonAnnotation = jacksonCb.isSelected();
 
         // 外观
-        boolean newImportHistory = importHistoryCb.isSelected();
         ColorScheme newColorScheme = backgroundColorBox.getItem();
         boolean newDisplayLineNumbers = displayLineNumbersCb.isSelected();
         boolean newFoldingOutline = foldingOutlineCb.isSelected();
@@ -477,8 +470,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
                 || !Objects.equals(oldRecognitionFastJsonAnnotation, newRecognitionFastJsonAnnotation)
                 || !Objects.equals(oldRecognitionJacksonAnnotation, newRecognitionJacksonAnnotation)
-
-                || !Objects.equals(oldImportHistory, newImportHistory)
 
                 || (isIdea && !Objects.equals(oldColorScheme, newColorScheme))
                 || (isIdea && (ColorScheme.Custom.equals(newColorScheme)
@@ -511,7 +502,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 行为
         EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        editorBehaviorState.importHistory = importHistoryCb.isSelected();
         editorBehaviorState.recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
         editorBehaviorState.recognizeXmlFormat = xmlFormatsCb.isSelected();
         editorBehaviorState.recognizeYamlFormat = yamlFormatsCb.isSelected();

@@ -83,7 +83,7 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         }
 
         BorderLayoutPanel rootPanel = new BorderLayoutPanel().addToTop(topPanel).addToCenter(showTextField);
-        rootPanel.setPreferredSize(new JBDimension(390, 410));
+        rootPanel.setPreferredSize(new JBDimension(400, 420));
         return rootPanel;
     }
 

@@ -48,6 +48,6 @@ public class JsonFileEditorProvider implements FileEditorProvider, DumbAware {
 
     @Override
     public void writeState(@NotNull FileEditorState state, @NotNull Project project, @NotNull Element targetElement) {
-        System.out.println("called writeState()");
+        // System.out.println("called writeState()");
     }
 }

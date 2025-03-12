@@ -1,7 +1,5 @@
 package cn.memoryzy.json.model;
 
-import cn.memoryzy.json.enums.TextSourceType;
-
 /**
  * 工具窗口编辑器初次打开时的默认信息
  *
@@ -21,11 +19,6 @@ public class EditorInitData {
     private final String jsonString;
 
     /**
-     * 文本来源
-     */
-    private final TextSourceType sourceType;
-
-    /**
      * 解析类型
      */
     private final String parseType;
@@ -36,10 +29,9 @@ public class EditorInitData {
     private final String originalText;
 
     // region 构造器与Getter
-    public EditorInitData(boolean hasText, String jsonString, TextSourceType sourceType, String parseType, String originalText) {
+    public EditorInitData(boolean hasText, String jsonString, String parseType, String originalText) {
         this.hasText = hasText;
         this.jsonString = jsonString;
-        this.sourceType = sourceType;
         this.parseType = parseType;
         this.originalText = originalText;
     }
@@ -50,10 +42,6 @@ public class EditorInitData {
 
     public String getJsonString() {
         return jsonString;
-    }
-
-    public TextSourceType getSourceType() {
-        return sourceType;
     }
 
     public String getParseType() {

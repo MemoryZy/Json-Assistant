@@ -9,14 +9,6 @@ package cn.memoryzy.json.service.persistent.state;
 public class EditorBehaviorState {
 
     /**
-     * 自动导入最新 JSON 记录至编辑器
-     */
-    public boolean importHistory = false;
-
-
-    // ---------------------------------
-
-    /**
      * 自动识别并转换其他格式数据（总开关）
      */
     public boolean recognizeOtherFormats = true;

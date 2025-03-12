@@ -1,13 +1,11 @@
 package cn.memoryzy.json.ui;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.enums.TextSourceType;
 import cn.memoryzy.json.model.EditorInitData;
 import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.model.JsonEntry;
@@ -171,12 +169,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         EditorInitData initData = getInitData();
         boolean hasText = initData.isHasText();
         String jsonString = initData.getJsonString();
-        TextSourceType sourceType = initData.getSourceType();
         String parseType = initData.getParseType();
         String originalText = initData.getOriginalText();
-
-        boolean isClipboard = TextSourceType.FROM_CLIPBOARD.equals(sourceType);
-        boolean needPrompt = hasText && isClipboard && editorBehaviorState.promptBeforeImport;
+        boolean needPrompt = hasText && editorBehaviorState.promptBeforeImport;
 
         EditorEx editor = (EditorEx) PlatformUtil.createEditor(
                 project,
@@ -195,9 +190,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         }
 
         if (hasText && !needPrompt) {
-            hintEditor(500, isClipboard
-                    ? JsonAssistantBundle.messageOnSystem("hint.paste.json")
-                    : JsonAssistantBundle.messageOnSystem("hint.import.json"));
+            hintEditor(500, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
         }
 
         // 第一次提示
@@ -287,7 +280,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
      */
     private EditorInitData getInitData() {
         String jsonString = "";
-        TextSourceType sourceType = null;
         String parseType = null;
         String originalText = null;
 
@@ -300,7 +292,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                     String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
 
                     if (StrUtil.isNotBlank(processedText)) {
-                        sourceType = TextSourceType.FROM_CLIPBOARD;
                         ClipboardTextConversionStrategy strategy = context.getStrategy();
                         parseType = strategy.type();
                         originalText = StrUtil.trim(clipboard);
@@ -321,17 +312,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                     }
                 }
             }
-
-            if (historyOptionState.switchHistory && editorBehaviorState.importHistory && StrUtil.isBlank(jsonString)) {
-                HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(project).getHistory();
-                if (CollUtil.isNotEmpty(historyList)) {
-                    sourceType = TextSourceType.FROM_HISTORY;
-                    jsonString = historyList.getFirst().getJsonString();
-                }
-            }
         }
 
-        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, sourceType, parseType, originalText);
+        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, parseType, originalText);
     }
 
 
