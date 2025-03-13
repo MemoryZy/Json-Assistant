@@ -127,6 +127,7 @@ public class GlobalJsonConverter {
     }
 
     public static String parseJson(GlobalTextConversionProcessorContext context, EditorData editorData) {
+        if (Objects.isNull(editorData)) return null;
         JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData);
         return GlobalTextConverter.applyConversionProcessors(context, processors);
     }

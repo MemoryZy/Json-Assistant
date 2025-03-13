@@ -241,6 +241,8 @@ public class JsonValueHandler {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         // 解析编辑器信息
         EditorData editorData = GlobalTextConverter.resolveEditor(PlatformUtil.getEditor(dataContext));
+        // 验证
+        if (Objects.isNull(editorData)) return;
         // 获取解析器集合
         JsonConversionProcessor[] processors = GlobalTextConversionProcessorContext.getOriginalAllJsonProcessors(editorData);
         // 解析JSON
@@ -375,6 +377,7 @@ public class JsonValueHandler {
     private static boolean containsSpecialTypeInJson(DataContext dataContext, JsonValueHandleType handleType) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
+        if (StrUtil.isBlank(json)) return false;
         JsonWrapper wrapper = GlobalJsonConverter.isValidJson(context.getProcessor()) ? JsonUtil.parse(json) : Json5Util.parse(json);
 
         if (wrapper instanceof ObjectWrapper) {
