@@ -40,7 +40,7 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.query.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.query.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt P"), simpleToolWindowPanel);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt Q"), simpleToolWindowPanel);
     }
 
     @Override

@@ -69,7 +69,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         group.add(new FloatingWindowAction(toolWindowEx));
         group.add(new EditInNewWindowAction(toolWindowEx));
         group.add(Separator.create());
-        group.add(new ManageClipboardDataBlacklistAction());
+        group.add(new ManageClipboardDataBlacklistAction(toolWindowEx));
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         group.add(Separator.create());

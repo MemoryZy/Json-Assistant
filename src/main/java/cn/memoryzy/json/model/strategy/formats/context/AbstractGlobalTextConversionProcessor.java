@@ -1,6 +1,5 @@
 package cn.memoryzy.json.model.strategy.formats.context;
 
-import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.TextResolveStatus;
@@ -136,7 +135,7 @@ public abstract class AbstractGlobalTextConversionProcessor implements GlobalTex
     }
 
     public Boolean isNeedBeautify() {
-        return BooleanUtil.isTrue(needBeautify);
+        return needBeautify;
     }
 
     public FileTypeData getFileTypeData() {

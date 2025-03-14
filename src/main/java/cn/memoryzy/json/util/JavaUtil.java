@@ -749,8 +749,23 @@ public class JavaUtil {
             return null;
         }
 
+        PsiClass result = null;
         JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
-        return psiFacade.findClass(qualifiedName, GlobalSearchScope.allScope(project));
+        if (qualifiedName.contains("$")) {
+            String[] split = qualifiedName.split("\\$");
+            String mainClassQName = split[0];
+            String innerClassName = split[1];
+
+            PsiClass mainClass = psiFacade.findClass(mainClassQName, GlobalSearchScope.allScope(project));
+            if (null != mainClass) {
+                result = mainClass.findInnerClassByName(innerClassName, true);
+            }
+
+        } else {
+            result = psiFacade.findClass(qualifiedName, GlobalSearchScope.allScope(project));
+        }
+
+        return result;
     }
 
     /**

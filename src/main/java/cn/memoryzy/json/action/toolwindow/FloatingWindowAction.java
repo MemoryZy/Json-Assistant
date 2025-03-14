@@ -23,7 +23,7 @@ public class FloatingWindowAction extends ToggleAction implements DumbAware {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.floating.window.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.floating.window.description"));
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt F"), toolWindow.getComponent());
+        registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl alt F"), toolWindow.getComponent());
     }
 
     @Override

@@ -297,15 +297,9 @@ public class JsonAssistantUtil {
         } else if (millis > 0) {
             // 如果毫秒部分存在值，则包含毫秒的格式化表达式
             format = DatePattern.NORM_DATETIME_MS_PATTERN;
-        } else if (second > 0) {
-            // 如果秒部分存在值，则包含秒的格式化表达式
-            format = DatePattern.NORM_DATETIME_PATTERN;
-        } else if (minute > 0 || hour > 0) {
-            // 如果分钟或小时部分存在值，则包含时和分的格式化表达式
-            format = DatePattern.NORM_DATETIME_MINUTE_PATTERN;
         } else {
-            // 默认情况下仅显示日期
-            format = DatePattern.NORM_DATE_PATTERN;
+            // 当秒为0时也使用 NORM_DATETIME_PATTERN 格式化时间
+            format = DatePattern.NORM_DATETIME_PATTERN;
         }
 
         return LocalDateTimeUtil.format(localDateTime, format);
