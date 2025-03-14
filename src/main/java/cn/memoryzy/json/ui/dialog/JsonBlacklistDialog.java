@@ -98,7 +98,7 @@ public class JsonBlacklistDialog extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlType.DEFAULT.getId();
+        return UrlType.RECOGNIZE.getId();
     }
 
     @Override

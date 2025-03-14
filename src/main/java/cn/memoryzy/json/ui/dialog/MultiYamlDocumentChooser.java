@@ -107,7 +107,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlType.DEFAULT.getId();
+        return UrlType.YAML_DIALOG.getId();
     }
 
     @Override

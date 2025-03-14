@@ -46,6 +46,21 @@ public enum UrlType {
      */
     SITE_TO_JAVA_BEAN(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#SITE_TO_JAVA_BEAN", Urls.JSON_TO_JAVA_BEAN_LINK),
 
+    /**
+     * 识别其他格式相关介绍
+     */
+    RECOGNIZE(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#RECOGNIZE", Urls.RECOGNIZE),
+
+    /**
+     * 关于历史记录相关介绍的页面
+     */
+    HISTORY(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#HISTORY", Urls.HISTORY),
+
+    /**
+     * 关于 YAML 弹窗相关介绍的页面
+     */
+    YAML_DIALOG(JsonAssistantPlugin.PLUGIN_ID_NAME + ".#YAML_DIALOG", Urls.YAML_DIALOG),
+
     ;
 
     private final String id;

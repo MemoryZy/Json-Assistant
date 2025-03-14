@@ -127,7 +127,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
 
     @Override
     protected @NonNls @Nullable String getHelpId() {
-        return UrlType.DEFAULT.getId();
+        return UrlType.HISTORY.getId();
     }
 
     @Override
