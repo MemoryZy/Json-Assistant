@@ -40,7 +40,7 @@
   - Properties
   - URL Params
 - 扩展
-  - 将 JSON 中的时间戳类型转换为时间格式
+  - 将 JSON 中的时间戳类型转换为可读格式
   - 将嵌套的 JSON 文本扩展为 JSON 对象/数组
 
 <br/>

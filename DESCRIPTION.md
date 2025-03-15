@@ -32,7 +32,7 @@
   - Properties
   - URL Params
 - Extend
-  - Convert timestamp types in JSON to time formats
+  - Convert timestamps to readable time
   - Expands the nested JSON text into a JSON object/array
 
 <br/>

@@ -44,7 +44,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Properties
   - URL Params
 - Extend
-  - Convert timestamp types in JSON to time formats
+  - Convert timestamps to readable time
   - Expands the nested JSON text into a JSON object/array
 
 <br/>
