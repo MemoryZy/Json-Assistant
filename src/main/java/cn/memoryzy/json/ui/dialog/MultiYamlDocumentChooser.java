@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
@@ -74,11 +75,9 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         UIManager.updateComponentColorsScheme(showTextField);
 
         JBLabel label = new JBLabel();
-        label.setForeground(JBColor.GRAY);
-        label.setFont(JBFont.label().deriveFont(12F));
-        label.setText(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint"));
-        label.setIcon(AllIcons.Actions.IntentionBulb);
-        label.setBorder(JBUI.Borders.emptyBottom(8));
+        label.setFont(JBFont.label().deriveFont(13F));
+        label.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint")));
+        label.setBorder(JBUI.Borders.emptyBottom(10));
 
         JComponent wrapComponent = UIManager.wrapListWithFilter(showList, YamlDocEntry::getShortText, true);
         rebuildListWithFilter();
