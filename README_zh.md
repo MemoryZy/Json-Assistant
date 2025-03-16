@@ -125,12 +125,12 @@
     <tr align="center">
       <td>
         <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank" rel="noopener noreferrer">
-          <img src="src/main/resources/images/wechat_pay.png" alt="微信赞赏">
+          <img src="https://github.com/MemoryZy/Json-Assistant/blob/main/src/main/resources/images/wechat_pay.png" alt="微信赞赏">
         </a>
       </td>
       <td>
         <a href="https://global.alipay.com" target="_blank" rel="noopener noreferrer">
-          <img src="src/main/resources/images/alipay.png" alt="支付宝">
+          <img src="https://github.com/MemoryZy/Json-Assistant/blob/main/src/main/resources/images/alipay.png" alt="支付宝">
         </a>
       </td>
     </tr>
