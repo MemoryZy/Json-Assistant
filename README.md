@@ -137,8 +137,6 @@ You can contribute and support the project in the following ways:
     </tr>
   </table>
 
-<a href="https://github.com/MemoryZy/Json-Assistant" data-test="external-link " rel="noopener noreferrer" class="link link--external" id="-ap2wgb_18" target="_blank">在 GitHub 上为 Json Assistant 点个🌟</a>
-
   > **Note**
   >
   > When donating via wechat or Alipay, please provide your <i>name (nickname)</i> and <i>website link</i> in the message.
