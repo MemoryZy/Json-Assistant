@@ -119,23 +119,25 @@ You can contribute and support the project in the following ways:
   <table>
     <thead align="center">
       <tr>
-        <th><a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">WeChat Pay</a></th>
-        <th><a href="https://global.alipay.com" target="_blank">Alipay</a></th>
+        <th><a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank" rel="noopener noreferrer">WeChat Pay</a></th>
+        <th><a href="https://global.alipay.com" target="_blank" rel="noopener noreferrer">Alipay</a></th>
       </tr>
     </thead>
     <tr align="center">
       <td>
-        <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">
+        <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank" rel="noopener noreferrer">
           <img src="src/main/resources/images/wechat_pay.png" alt="WeChat Pay">
         </a>
       </td>
       <td>
-        <a href="https://global.alipay.com" target="_blank">
+        <a href="https://global.alipay.com" target="_blank" rel="noopener noreferrer">
           <img src="src/main/resources/images/alipay.png" alt="Alipay">
         </a>
       </td>
     </tr>
   </table>
+
+<a href="https://github.com/MemoryZy/Json-Assistant" data-test="external-link " rel="noopener noreferrer" class="link link--external" id="-ap2wgb_18" target="_blank">在 GitHub 上为 Json Assistant 点个🌟</a>
 
   > **Note**
   >

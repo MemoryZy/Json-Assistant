@@ -116,18 +116,18 @@
   <table>
     <thead align="center">
       <tr>
-        <th><a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">微信赞赏</a></th>
-        <th><a href="https://global.alipay.com" target="_blank">支付宝</a></th>
+        <th><a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank" rel="noopener noreferrer">微信赞赏</a></th>
+        <th><a href="https://global.alipay.com" target="_blank" rel="noopener noreferrer">支付宝</a></th>
       </tr>
     </thead>
     <tr align="center">
       <td>
-        <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">
+        <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank" rel="noopener noreferrer">
           <img src="src/main/resources/images/wechat_pay.png" alt="微信赞赏">
         </a>
       </td>
       <td>
-        <a href="https://global.alipay.com" target="_blank">
+        <a href="https://global.alipay.com" target="_blank" rel="noopener noreferrer">
           <img src="src/main/resources/images/alipay.png" alt="支付宝">
         </a>
       </td>
