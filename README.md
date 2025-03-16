@@ -126,12 +126,12 @@ You can contribute and support the project in the following ways:
     <tr align="center">
       <td>
         <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank" rel="noopener noreferrer">
-          <img src="src/main/resources/images/wechat_pay.png" alt="WeChat Pay">
+          <img src="https://cdn.jsdelivr.net/gh/MemoryZy/Json-Assistant/src/main/resources/images/wechat_pay.png" alt="WeChat Pay">
         </a>
       </td>
       <td>
         <a href="https://global.alipay.com" target="_blank" rel="noopener noreferrer">
-          <img src="src/main/resources/images/alipay.png" alt="Alipay">
+          <img src="https://cdn.jsdelivr.net/gh/MemoryZy/Json-Assistant/src/main/resources/images/alipay.png" alt="Alipay">
         </a>
       </td>
     </tr>
