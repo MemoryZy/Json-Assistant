@@ -104,15 +104,11 @@ For more operations, please refer to the [plugin documentation][plugin:docs].
 
 <br/>
 
-## Feedback
-If you find any problem during use, you can submit [Issue][gh:issue] and [PR][gh:pr] at any time, thank you for your support.
-
-<br/>
-
 ## Support / Donations
 You can contribute and support the project in the following ways:
 - Star the project on GitHub
 - Light up a five-star review for the plugin on the [**Marketplace**][jb:plugin-reviews]
+- Submit [**Issue**][gh:issue] and [**PR**][gh:pr]
 - Share the plugin with your friends/colleagues
 - If you like this plugin, please consider supporting me with a donation, your support will motivate me to keep improving this project:
 
