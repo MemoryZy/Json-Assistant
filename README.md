@@ -17,11 +17,20 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 [![Downloads][shields:download]][jb:plugin-link]
 
 
-<br/>
+---
 
+- [Key Features](#key-features)
+- [Getting Started](#getting-started-)
+- [Compatibility](#compatibility)
+- [Installation](#installation)
+- [Feedback](#feedback)
+- [Support/Donations](#support--donations)
+  - [Donors list](#donors-list)
+
+---
 
 ## Key Features
-- Support [JSON5](https://json5.org/)
+- Support [JSON5][json5]
 - JSON Window
   - History
   - JSONPath/JMESPath Evaluator
@@ -54,6 +63,30 @@ When in or selecting JSON data, you can press the shortcut key `Alt+K` or right-
 
 For more operations, please refer to the [plugin documentation][plugin:docs].
 
+<br/>
+
+## Compatibility
+- Android Studio — Arctic Fox | 2020.3.1+
+- AppCode — 2020.3+
+- Aqua — 2024.1.1+
+- CLion — 2020.3+
+- Code With Me Guest — 1.0+
+- DataGrip — 2020.3+
+- DataSpell — 2021.3+
+- GoLand — 2020.3+
+- IntelliJ IDEA Community — 2020.3+
+- IntelliJ IDEA Ultimate — 2020.3+
+- JetBrains Client — 1.0+
+- JetBrains Gateway — 2022.2+
+- MPS — 2020.3+
+- PhpStorm — 2020.3+
+- PyCharm Community — 2020.3+
+- PyCharm Professional — 2020.3+
+- Rider — 2020.3+
+- RubyMine — 2020.3+
+- RustRover — 2024.1+
+- WebStorm — 2020.3+
+- Writerside — 2024.1+
 
 <br/>
 
@@ -76,7 +109,47 @@ If you find any problem during use, you can submit [Issue][gh:issue] and [PR][gh
 
 <br/>
 
-## Donors List
+## Support / Donations
+You can contribute and support the project in the following ways:
+- Star the project on GitHub
+- Light up a five-star review for the plugin on the [**Marketplace**][jb:plugin-reviews]
+- Share the plugin with your friends/colleagues
+- If you like this plugin, please consider supporting me with a donation, your support will motivate me to keep improving this project:
+
+  <table>
+    <thead align="center">
+      <tr>
+        <th><a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">WeChat Pay</a></th>
+        <th><a href="https://global.alipay.com" target="_blank">Alipay</a></th>
+      </tr>
+    </thead>
+    <tr align="center">
+      <td>
+        <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">
+          <img src="src/main/resources/images/wechat_pay.png" alt="WeChat Pay">
+        </a>
+      </td>
+      <td>
+        <a href="https://global.alipay.com" target="_blank">
+          <img src="src/main/resources/images/alipay.png" alt="Alipay">
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  > **Note**
+  >
+  > When donating via wechat or Alipay, please provide your <i>name (nickname)</i> and <i>website link</i> in the message.
+  >
+  > The donation information will be added to the [**donation list**](#donors-list) for public acknowledgement.
+  >
+  > For further information or questions, please feel free to contact me at [**memoryzk@outlook.com**][mailto].
+
+**Thank you for your support!**
+
+<br/>
+
+### Donors List
 
 Heartfelt thanks to every donor who supports us! Your generosity helps us improve and enhance the project. Thank you for your support!❤️
 
@@ -98,9 +171,12 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 [shields:version]: https://img.shields.io/jetbrains/plugin/v/24738-json-assistant.svg?label=Version&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTIwLjUwMiA1LjkyMkwxMiAxTDMuNDk4IDUuOTIyTDEyIDEwLjg0NXpNMi41IDcuNjU2VjE3LjVsOC41IDQuOTIxdi05Ljg0NHpNMTMgMjIuNDJsOC41LTQuOTIxVjcuNjU2bC04LjUgNC45MnoiLz48L3N2Zz4=
 [shields:download]: https://img.shields.io/jetbrains/plugin/d/24738-json-assistant.svg?label=Download&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0ibTEyIDE2bC01LTVsMS40LTEuNDVsMi42IDIuNlY0aDJ2OC4xNWwyLjYtMi42TDE3IDExem0tNiA0cS0uODI1IDAtMS40MTItLjU4N1Q0IDE4di0zaDJ2M2gxMnYtM2gydjNxMCAuODI1LS41ODcgMS40MTNUMTggMjB6Ii8+PC9zdmc+
 [jb:plugin-link]: https://plugins.jetbrains.com/plugin/24738-json-assistant
+[jb:plugin-reviews]: https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews
 [gh:pr]: https://github.com/MemoryZy/Json-Assistant/pulls
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues/new/choose
 [gh:release]: https://github.com/MemoryZy/Json-Assistant/releases/latest
 [jb:version]: https://plugins.jetbrains.com/plugin/24738-json-assistant/versions
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
 [plugin:docs]: https://json.memoryzy.cn/overview
+[json5]: https://json5.org/
+[mailto]: mailto:memoryzk@outlook.com

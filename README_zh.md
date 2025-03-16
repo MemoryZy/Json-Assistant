@@ -14,9 +14,19 @@
 &nbsp;
 [![Downloads][shields:download]][jb:version]
 
-<br/>
+---
 
-## 功能 
+- [功能](#功能)
+- [快速开始](#快速开始-)
+- [兼容](#兼容)
+- [安装](#安装)
+- [反馈](#反馈)
+- [支持/捐赠](#支持--捐赠)
+  - [捐赠名单](#捐赠名单)
+
+---
+
+## 功能
 - 完全支持 [JSON5][json5]
 - JSON 窗口
   - 历史记录
@@ -42,6 +52,11 @@
 - 扩展
   - 将 JSON 中的时间戳类型转换为可读格式
   - 将嵌套的 JSON 文本扩展为 JSON 对象/数组
+
+<br/>
+
+## 快速开始 🚀
+当编辑器中仅包含或选中了有效的 JSON 文本时，可以按下快捷键 `Alt+K` 或右键单击并选择 `Json Assistant` 以弹出操作菜单。 更多操作请参考[插件文档][plugin:docs]。
 
 <br/>
 
@@ -91,7 +106,50 @@
 
 <br/>
 
-## 捐赠列表
+## 支持 / 捐赠
+您可以通过以下方式为该项目做出贡献与支持：
+- 在 **GitHub** 上为此项目点个免费的🌟
+- 在 [**Marketplace**][jb:plugin-reviews] 上点亮五星好评🌟
+- 将插件分享给您的朋友/同事
+- 如果您喜欢这款插件，请考虑捐赠支持我，您的支持将激励我持续改进此项目：
+
+  <table>
+    <thead align="center">
+      <tr>
+        <th><a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">微信赞赏</a></th>
+        <th><a href="https://global.alipay.com" target="_blank">支付宝</a></th>
+      </tr>
+    </thead>
+    <tr align="center">
+      <td>
+        <a href="https://pay.weixin.qq.com/index.php/public/wechatpay_en" target="_blank">
+          <img src="src/main/resources/images/wechat_pay.png" alt="微信赞赏">
+        </a>
+      </td>
+      <td>
+        <a href="https://global.alipay.com" target="_blank">
+          <img src="src/main/resources/images/alipay.png" alt="支付宝">
+        </a>
+      </td>
+    </tr>
+  </table>
+
+  > **说明**
+  >
+  > 通过微信或支付宝捐赠时，请在留言中提供 <i>名称（昵称）</i>和 <i>网站链接</i>。
+  >
+  > 捐赠信息将被添加到 [**捐赠名单**](#捐赠名单) 中，公开鸣谢。
+  >
+  > 如需进一步了解或有任何疑问，可通过邮箱 [**memoryzk@outlook.com**][mailto] 联系。
+
+
+**感谢您的支持！**
+
+
+
+<br/>
+
+### 捐赠名单
 衷心感谢每一位支持我们的捐赠者！您的慷慨帮助我们改进和完善项目。感谢您的支持！❤️
 
 | 名称         | 网站链接                     | 留言                                                                                       | 捐赠总额      |
@@ -112,6 +170,7 @@
 [shields:version]: https://img.shields.io/jetbrains/plugin/v/24738-json-assistant.svg?label=Version&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTIwLjUwMiA1LjkyMkwxMiAxTDMuNDk4IDUuOTIyTDEyIDEwLjg0NXpNMi41IDcuNjU2VjE3LjVsOC41IDQuOTIxdi05Ljg0NHpNMTMgMjIuNDJsOC41LTQuOTIxVjcuNjU2bC04LjUgNC45MnoiLz48L3N2Zz4=
 [shields:download]: https://img.shields.io/jetbrains/plugin/d/24738-json-assistant.svg?label=Download&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0ibTEyIDE2bC01LTVsMS40LTEuNDVsMi42IDIuNlY0aDJ2OC4xNWwyLjYtMi42TDE3IDExem0tNiA0cS0uODI1IDAtMS40MTItLjU4N1Q0IDE4di0zaDJ2M2gxMnYtM2gydjNxMCAuODI1LS41ODcgMS40MTNUMTggMjB6Ii8+PC9zdmc+
 [jb:plugin-link]: https://plugins.jetbrains.com/plugin/24738-json-assistant
+[jb:plugin-reviews]: https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews
 [gh:pr]: https://github.com/MemoryZy/Json-Assistant/pulls
 [gh:issue]: https://github.com/MemoryZy/Json-Assistant/issues/new/choose
 [gh:release]: https://github.com/MemoryZy/Json-Assistant/releases/latest
@@ -119,3 +178,4 @@
 [gh:build]: https://github.com/MemoryZy/Json-Assistant/actions/workflows/build.yml
 [plugin:docs]: https://json.memoryzy.cn/overview
 [json5]: https://json5.org/
+[mailto]: mailto:memoryzk@outlook.com
