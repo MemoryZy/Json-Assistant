@@ -30,10 +30,10 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 ---
 
 ## Key Features
-- Support [JSON5][json5]
+- Full [JSON5][json5] Support
 - JSON Window
   - History
-  - JSONPath/JMESPath Evaluator
+  - JSONPath/JMESPath Query
 - JSON Processing
   - Beautify
   - Minify
@@ -41,9 +41,9 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Compare
   - Escape
 - Serialization
-  - JavaBean to JSON
-  - Runtime Objects to JSON
-  - JSON to JavaBean
+  - JavaBean to JSON Conversion
+  - Runtime Object to JSON Conversion
+  - JSON to JavaBean Conversion
   - Kotlin Properties to JSON
   - Extract Java Constants to JSON
 - Format Conversion
@@ -52,14 +52,14 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Toml
   - Properties
   - URL Params
-- Extend
-  - Convert timestamps to readable time
-  - Expands the nested JSON text into a JSON object/array
+- Extensions
+  - Convert Timestamp to Readable Format
+  - Expand Nested JSON
 
 <br/>
 
 ## Getting Started 🚀
-When in or selecting JSON data, you can press the shortcut key `Alt+K` or right-click and choose `Json Assistant` to bring up the action menu.
+When the editor contains only valid JSON text or when valid JSON is selected, you can use the `Alt+K` shortcut or right-click and choose `Json Assistant` to bring up the action menu.
 
 For more operations, please refer to the [plugin documentation][plugin:docs].
 
@@ -106,10 +106,10 @@ For more operations, please refer to the [plugin documentation][plugin:docs].
 
 ## Support / Donations
 You can contribute and support the project in the following ways:
-- Star the project on GitHub
-- Light up a five-star review for the plugin on the [**Marketplace**][jb:plugin-reviews]
-- Submit [**Issue**][gh:issue] and [**PR**][gh:pr]
-- Share the plugin with your friends/colleagues
+- Star the project on GitHub.
+- Light up a five-star review for the plugin on the [**Marketplace**][jb:plugin-reviews].
+- Submit an [**Issue**][gh:issue] or [**PR**][gh:pr].
+- Share the plugin with your friends/colleagues.
 - If you like this plugin, please consider supporting me with a donation, your support will motivate me to keep improving this project:
 
   <table>
@@ -160,6 +160,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | **权        |                          |                                                                                              | 1.00 CNY       |
 | **程        |                          |                                                                                              | 10.00 CNY      |
 | AC         |                          |                                                                                              | 8.88 CNY       |
+| ◎♪TEL      |                          |                                                                                              | 10.00 CNY      |
 | 听风逝夜       | https://coolrequest.dev/ | Plugin: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY       |
 
 [shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48ZyBmaWxsPSJub25lIj48cGF0aCBkPSJNMjQgMHYyNEgwVjB6TTEyLjU5MyAyMy4yNThsLS4wMTEuMDAybC0uMDcxLjAzNWwtLjAyLjAwNGwtLjAxNC0uMDA0bC0uMDcxLS4wMzVxLS4wMTYtLjAwNS0uMDI0LjAwNWwtLjAwNC4wMWwtLjAxNy40MjhsLjAwNS4wMmwuMDEuMDEzbC4xMDQuMDc0bC4wMTUuMDA0bC4wMTItLjAwNGwuMTA0LS4wNzRsLjAxMi0uMDE2bC4wMDQtLjAxN2wtLjAxNy0uNDI3cS0uMDA0LS4wMTYtLjAxNy0uMDE4bS4yNjUtLjExM2wtLjAxMy4wMDJsLS4xODUuMDkzbC0uMDEuMDFsLS4wMDMuMDExbC4wMTguNDNsLjAwNS4wMTJsLjAwOC4wMDdsLjIwMS4wOTNxLjAxOS4wMDUuMDI5LS4wMDhsLjAwNC0uMDE0bC0uMDM0LS42MTRxLS4wMDUtLjAxOS0uMDItLjAyMm0tLjcxNS4wMDJhLjAyLjAyIDAgMCAwLS4wMjcuMDA2bC0uMDA2LjAxNGwtLjAzNC42MTRxLjAwMS4wMTguMDE3LjAyNGwuMDE1LS4wMDJsLjIwMS0uMDkzbC4wMS0uMDA4bC4wMDQtLjAxMWwuMDE3LS40M2wtLjAwMy0uMDEybC0uMDEtLjAxeiIvPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMiA5YTMgMyAwIDAgMSAzLTNoMi44NTNjLjI5NyAwIC40OC0uMzA5LjM2Ni0uNTgzQTIuNSAyLjUgMCAwIDEgOC4wODMgNWMtLjMzMS0xLjQ4Ny43OTItMyAyLjQxNy0zYzEuNjI2IDAgMi43NDggMS41MTMgMi40MTcgM2EyLjUgMi41IDAgMCAxLS4xMzYuNDE3Yy0uMTE1LjI3NC4wNjkuNTgzLjM2Ni41ODNIMTVhMyAzIDAgMCAxIDMgM3YxLjg1M2MwIC4yOTcuMzA4LjQ4LjU4My4zNjZjLjEzNS0uMDU2LjI3My0uMTA0LjQxNy0uMTM2YzEuNDg3LS4zMzEgMyAuNzkxIDMgMi40MTdzLTEuNTEzIDIuNzQ4LTMgMi40MTdhMi41IDIuNSAwIDAgMS0uNDE3LS4xMzZjLS4yNzQtLjExNS0uNTgzLjA2OS0uNTgzLjM2NlYxOWEzIDMgMCAwIDEtMyAzaC0xLjg5M2MtLjI4OCAwLS40NzMtLjI5MS0uMzktLjU2NnEuMDYzLS4yMS4wODUtLjQzNGEyLjMxIDIuMzEgMCAxIDAtNC42MDQgMHEuMDIxLjIyNC4wODYuNDM0Yy4wODIuMjc1LS4xMDMuNTY2LS4zOS41NjZINWEzIDMgMCAwIDEtMy0zdi0yLjg5M2MwLS4yODguMjkxLS40NzMuNTY2LS4zOXEuMjEuMDYzLjQzNC4wODVhMi4zMSAyLjMxIDAgMSAwIDAtNC42MDRxLS4yMjQuMDIxLS40MzQuMDg2Yy0uMjc1LjA4Mi0uNTY2LS4xMDMtLjU2Ni0uMzl6Ii8+PC9nPjwvc3ZnPg==

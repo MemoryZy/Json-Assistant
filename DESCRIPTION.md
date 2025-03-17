@@ -9,10 +9,10 @@
 <br/>
 
 ## Key Features
-- Support [JSON5](https://json5.org/)
+- Full [JSON5][json5] Support
 - JSON Window
   - History
-  - JSONPath/JMESPath Evaluator
+  - JSONPath/JMESPath Query
 - JSON Processing
   - Beautify
   - Minify
@@ -20,9 +20,9 @@
   - Compare
   - Escape
 - Serialization
-  - JavaBean to JSON
-  - Runtime Objects to JSON
-  - JSON to JavaBean
+  - JavaBean to JSON Conversion
+  - Runtime Object to JSON Conversion
+  - JSON to JavaBean Conversion
   - Kotlin Properties to JSON
   - Extract Java Constants to JSON
 - Format Conversion
@@ -31,13 +31,13 @@
   - Toml
   - Properties
   - URL Params
-- Extend
-  - Convert timestamps to readable time
-  - Expands the nested JSON text into a JSON object/array
+- Extensions
+  - Convert Timestamp to Readable Format
+  - Expand Nested JSON
 
 <br/>
 
 ## Getting Started
-When in or selecting JSON data, you can press the shortcut key `Alt+K` or right-click and choose `Json Assistant` to bring up the action menu.
+When the editor contains only valid JSON text or when valid JSON is selected, you can use the `Alt+K` shortcut or right-click and choose `Json Assistant` to bring up the action menu.
 
 For more operations, please refer to the [plugin documentation](https://json.memoryzy.cn/overview).

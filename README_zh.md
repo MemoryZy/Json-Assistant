@@ -56,7 +56,7 @@
 <br/>
 
 ## 快速开始 🚀
-当编辑器中仅包含或选中了有效的 JSON 文本时，可以按下快捷键 `Alt+K` 或右键单击并选择 `Json Assistant` 以弹出操作菜单。 
+当编辑器仅包含有效 JSON 文本或用户选中了有效 JSON 时，可使用 `Alt+K` 快捷键或右键选择 `Json Assistant` 调出操作菜单。
 
 更多操作请参考[插件文档][plugin:docs]。
 
@@ -161,6 +161,7 @@
 | **权        |                          |                                                                                          | 1.00 CNY  |
 | **程        |                          |                                                                                          | 10.00 CNY |
 | AC         |                          |                                                                                          | 8.88 CNY  |
+| ◎♪TEL      |                          |                                                                                          | 10.00 CNY |
 | 听风逝夜       | https://coolrequest.dev/ | 插件: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY  |
 
 [shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTEwIDE5di01aDR2NWMwIC41NS40NSAxIDEgMWgzYy41NSAwIDEtLjQ1IDEtMXYtN2gxLjdjLjQ2IDAgLjY4LS41Ny4zMy0uODdMMTIuNjcgMy42Yy0uMzgtLjM0LS45Ni0uMzQtMS4zNCAwbC04LjM2IDcuNTNjLS4zNC4zLS4xMy44Ny4zMy44N0g1djdjMCAuNTUuNDUgMSAxIDFoM2MuNTUgMCAxLS40NSAxLTEiLz48L3N2Zz4=
