@@ -102,6 +102,7 @@ public class GlobalJsonConverter {
      */
     public static String parseJson(Editor editor, boolean needBeautify) {
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        if (Objects.isNull(editorData)) return "";
 
         JsonConversionProcessor[] processors = needBeautify
                 ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData)

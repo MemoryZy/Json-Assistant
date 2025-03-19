@@ -97,8 +97,8 @@ public class JavaUtil {
                     } else {
                         // 嵌套Map（为了实现嵌套属性）
                         Map<String, Object> nestedJsonMap;
-                        // 判断属性中是否存在本类类型的嵌套
-                        if (Objects.equals(psiClass, fieldClz)) {
+                        // 判断属性中是否存在本类或之前类的类型的嵌套
+                        if (ignoreMap.containsKey(fieldClz.getQualifiedName())) {
                             nestedJsonMap = null;
                         } else {
                             nestedJsonMap = new LinkedHashMap<>();
@@ -118,11 +118,14 @@ public class JavaUtil {
                 if (psiClz != null) {
                     PsiClassType classType = PsiTypesUtil.getClassType(psiClz);
                     if (JavaUtil.isApplicationClsType(classType)) {
-                        Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
-                        // 递归
-                        recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, persistentState);
-                        // 添加至list
-                        list.add(nestedJsonMap);
+                        // 判断属性中是否存在本类或之前类的类型的嵌套
+                        if (!ignoreMap.containsKey(psiClz.getQualifiedName())) {
+                            Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
+                            // 递归
+                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, persistentState);
+                            // 添加至list
+                            list.add(nestedJsonMap);
+                        }
                     } else {
                         Object defaultValue = getDefaultValue(psiField, classType, persistentState.includeRandomValues);
                         if (Objects.nonNull(defaultValue)) {

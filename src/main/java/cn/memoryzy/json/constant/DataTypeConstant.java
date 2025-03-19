@@ -10,11 +10,11 @@ public interface DataTypeConstant {
 
     String JSON5 = "JSON5";
 
-    String YAML = "Yaml";
+    String YAML = "YAML";
 
-    String XML = "Xml";
+    String XML = "XML";
 
-    String TOML = "Toml";
+    String TOML = "TOML";
 
     String URL_PARAM = "URL Param";
 

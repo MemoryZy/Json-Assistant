@@ -4,12 +4,16 @@
  - 将历史记录保存切换为手动模式。
  - 解决【运行时对象转 JSON】功能中无法处理内部类的问题。
  - 解决时间戳转换的问题。
+ - 解决序列化时的类的嵌套递归问题。
  - 解决之前的遗留问题。
+ - 优化插件展示的文本。
  - 兼容性优化。
 - Switch history saving to manual mode.
 - Fixed an issue where inner classes could not be handled in the runtime Object to JSON function.
 - Resolve timestamp conversion issues.
+- Solves the problem of nested recursion of classes when serializing.
 - Solve the remaining problems.
+- Optimize the text displayed by the plugin.
 - Compatibility optimization.
 
 ## [1.7.7] - 2025-03-06

@@ -9,7 +9,7 @@
 <br/>
 
 ## Key Features
-- Full [JSON5][json5] Support
+- Full [JSON5](https://json5.org/) Support
 - JSON Window
   - History
   - JSONPath/JMESPath Query
