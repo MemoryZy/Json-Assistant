@@ -29,8 +29,8 @@ import java.util.Objects;
  * @author Memory
  * @since 2025/2/27
  */
-public class RenameDiffTitleAction extends DumbAwareAction {
-    // TODO EDT
+public class RenameDiffTitleAction extends DumbAwareAction implements UpdateInBackground {
+
     public RenameDiffTitleAction() {
         super();
         setEnabledInModalContext(true);

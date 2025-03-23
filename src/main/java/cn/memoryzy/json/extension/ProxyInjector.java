@@ -3,9 +3,12 @@ package cn.memoryzy.json.extension;
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.AppLifecycleListener;
 import com.intellij.openapi.actionSystem.AnAction;
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.DynamicType;
+import net.bytebuddy.implementation.FixedValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -19,9 +22,10 @@ import java.util.Objects;
 public class ProxyInjector implements AppLifecycleListener {
 
     @Override
+    @SuppressWarnings("StatementWithEmptyBody")
     public void appFrameCreated(@NotNull List<String> commandLineArgs) {
         if (canInjectProxy()) {
-            PlatformUtil.setClipboard("can --------------");
+            // 当有需要时，可以将操作改为动态注册，注入代理类
         }
     }
 
@@ -30,6 +34,27 @@ public class ProxyInjector implements AppLifecycleListener {
         Class<?> clz = JsonAssistantUtil.getClassByName("com.intellij.openapi.actionSystem.ActionUpdateThread");
         Method method = ReflectUtil.getMethodByName(AnAction.class, "getActionUpdateThread");
         return ClassUtil.isEnum(clz) && Objects.nonNull(method);
+    }
+
+    private boolean isByteBuddyGenerated(Class<?> clz) {
+        return clz.getName().contains("$ByteBuddy$");
+    }
+
+
+    private Class<?> generateProxyClassWithMethod(Class<?> clz, String methodName, Object returnValue) {
+        try (DynamicType.Unloaded<?> dynamicType = new ByteBuddy()
+                .subclass(clz)
+                .defineMethod(methodName, returnValue.getClass(), Visibility.PUBLIC)
+                .intercept(FixedValue.value(returnValue))
+                .make()) {
+
+            return dynamicType
+                    .load(ClassLoader.getSystemClassLoader())
+                    .getLoaded();
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }
