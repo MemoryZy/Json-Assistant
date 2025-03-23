@@ -5,10 +5,6 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.ide.AppLifecycleListener;
 import com.intellij.openapi.actionSystem.AnAction;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.modifier.Visibility;
-import net.bytebuddy.dynamic.DynamicType;
-import net.bytebuddy.implementation.FixedValue;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -41,20 +37,20 @@ public class ProxyInjector implements AppLifecycleListener {
     }
 
 
-    private Class<?> generateProxyClassWithMethod(Class<?> clz, String methodName, Object returnValue) {
-        try (DynamicType.Unloaded<?> dynamicType = new ByteBuddy()
-                .subclass(clz)
-                .defineMethod(methodName, returnValue.getClass(), Visibility.PUBLIC)
-                .intercept(FixedValue.value(returnValue))
-                .make()) {
-
-            return dynamicType
-                    .load(ClassLoader.getSystemClassLoader())
-                    .getLoaded();
-
-        } catch (Exception e) {
-            return null;
-        }
-    }
+    // private Class<?> generateProxyClassWithMethod(Class<?> clz, String methodName, Object returnValue) {
+    //     try (DynamicType.Unloaded<?> dynamicType = new ByteBuddy()
+    //             .subclass(clz)
+    //             .defineMethod(methodName, returnValue.getClass(), Visibility.PUBLIC)
+    //             .intercept(FixedValue.value(returnValue))
+    //             .make()) {
+    //
+    //         return dynamicType
+    //                 .load(ClassLoader.getSystemClassLoader())
+    //                 .getLoaded();
+    //
+    //     } catch (Exception e) {
+    //         return null;
+    //     }
+    // }
 
 }
