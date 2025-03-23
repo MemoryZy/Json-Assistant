@@ -18,7 +18,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/12/26
  */
-public class OptionsGroup extends DefaultActionGroup {
+public class OptionsGroup extends DefaultActionGroup implements UpdateInBackground {
 
     private final Module module;
     private final DeserializerState deserializerState;

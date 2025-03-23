@@ -1,10 +1,7 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowType;
@@ -12,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class FloatingWindowAction extends ToggleAction implements DumbAware {
+public class FloatingWindowAction extends ToggleAction implements DumbAware, UpdateInBackground {
 
     private final ToolWindow toolWindow;
 

@@ -14,6 +14,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -26,7 +27,7 @@ import java.util.*;
  * @author Memory
  * @since 2025/2/19
  */
-public class OptimizeSortAction extends DumbAwareAction {
+public class OptimizeSortAction extends DumbAwareAction implements UpdateInBackground {
 
     public OptimizeSortAction() {
         super();

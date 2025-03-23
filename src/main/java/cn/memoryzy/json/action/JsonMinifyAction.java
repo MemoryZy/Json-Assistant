@@ -6,6 +6,7 @@ import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/6/21
  */
-public class JsonMinifyAction extends DumbAwareAction {
+public class JsonMinifyAction extends DumbAwareAction implements UpdateInBackground {
 
     public JsonMinifyAction() {
         super();

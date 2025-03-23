@@ -5,10 +5,7 @@ import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/2/14
  */
-public class RuntimeObjectToJsonAction extends AnAction {
+public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackground {
 
     private static final Logger LOG = Logger.getInstance(RuntimeObjectToJsonAction.class);
 

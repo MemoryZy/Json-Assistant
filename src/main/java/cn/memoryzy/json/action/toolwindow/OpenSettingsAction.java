@@ -5,6 +5,7 @@ import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.options.ShowSettingsUtil;
@@ -19,7 +20,7 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/9/11
  */
-public class OpenSettingsAction extends DumbAwareAction implements CustomComponentAction {
+public class OpenSettingsAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     public OpenSettingsAction() {
         super();

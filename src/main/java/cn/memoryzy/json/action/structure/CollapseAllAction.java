@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.ui.DumbAwareActionButton;
 import com.intellij.ui.treeStructure.Tree;
 import icons.JsonAssistantIcons;
@@ -13,7 +14,7 @@ import javax.swing.*;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-public class CollapseAllAction extends DumbAwareActionButton {
+public class CollapseAllAction extends DumbAwareActionButton implements UpdateInBackground {
 
     /**
      * 树

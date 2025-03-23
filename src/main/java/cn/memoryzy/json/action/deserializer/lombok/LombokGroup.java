@@ -4,6 +4,7 @@ import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @author Memory
  * @since 2025/1/21
  */
-public class LombokGroup extends DefaultActionGroup {
+public class LombokGroup extends DefaultActionGroup implements UpdateInBackground {
 
     private final DeserializerState deserializerState;
 

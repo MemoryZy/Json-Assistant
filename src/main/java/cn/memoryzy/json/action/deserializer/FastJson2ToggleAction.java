@@ -3,13 +3,14 @@ package cn.memoryzy.json.action.deserializer;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
  * @since 2025/1/21
  */
-public class FastJson2ToggleAction extends ToggleAction {
+public class FastJson2ToggleAction extends ToggleAction implements UpdateInBackground {
 
     private final DeserializerState deserializerState;
 

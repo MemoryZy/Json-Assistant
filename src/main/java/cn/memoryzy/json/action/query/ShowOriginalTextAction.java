@@ -5,6 +5,7 @@ import cn.memoryzy.json.service.persistent.state.QueryState;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareToggleAction;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/12/27
  */
-public class ShowOriginalTextAction extends DumbAwareToggleAction {
+public class ShowOriginalTextAction extends DumbAwareToggleAction implements UpdateInBackground {
 
     private final QueryState queryState;
     private final JsonQueryComponentProvider queryComponentProvider;

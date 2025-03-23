@@ -2,10 +2,7 @@ package cn.memoryzy.json.action.group;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAware;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/8/3
  */
-public class ConvertOtherFormatsGroup extends DefaultActionGroup implements DumbAware {
+public class ConvertOtherFormatsGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
 
     public ConvertOtherFormatsGroup() {
         super();

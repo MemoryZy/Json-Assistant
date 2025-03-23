@@ -76,6 +76,7 @@
 
     <applicationListeners>
         <listener class="cn.memoryzy.json.service.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+        <listener class="cn.memoryzy.json.extension.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>
     </applicationListeners>
 
     <actions>
@@ -97,7 +98,7 @@
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
 
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
-        <action id="JsonAssistant.Action.OptimizeCompareAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
+        <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
 
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
@@ -149,7 +150,7 @@
         <!-- Diff组 -->
         <group id="JsonAssistant.Group.DiffGroup">
             <reference ref="JsonAssistant.Action.RenameDiffTitleAction"/>
-            <reference ref="JsonAssistant.Action.OptimizeCompareAction"/>
+            <reference ref="JsonAssistant.Action.OptimizeSortAction"/>
 
             <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
         </group>

@@ -38,7 +38,7 @@ import java.util.Optional;
  * @author Memory
  * @since 2024/6/20
  */
-public class JsonStructureAction extends DumbAwareAction {
+public class JsonStructureAction extends DumbAwareAction implements UpdateInBackground{
 
     public JsonStructureAction() {
         super();

@@ -11,6 +11,7 @@ import com.intellij.find.FindBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -27,7 +28,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/8/21
  */
-public class ShowHistoryAction extends DumbAwareAction {
+public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackground {
 
     public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
     public static final String JMES_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JmesPathHistory";

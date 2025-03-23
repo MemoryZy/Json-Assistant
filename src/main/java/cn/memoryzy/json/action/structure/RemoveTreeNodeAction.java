@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.util.Map;
 
-public class RemoveTreeNodeAction extends DumbAwareAction {
+public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBackground {
 
     private final Tree tree;
 

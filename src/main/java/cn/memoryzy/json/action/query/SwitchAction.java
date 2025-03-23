@@ -5,6 +5,7 @@ import cn.memoryzy.json.service.persistent.state.QueryState;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.tools.SimpleActionGroup;
@@ -17,7 +18,7 @@ import java.awt.*;
  * @author Memory
  * @since 2024/12/27
  */
-public class SwitchAction extends DumbAwareAction {
+public class SwitchAction extends DumbAwareAction implements UpdateInBackground {
 
     private final QueryState queryState;
     private final JsonQueryComponentProvider queryComponentProvider;

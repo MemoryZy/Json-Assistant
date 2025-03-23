@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2025/2/25
  */
-public class ExtendGroup extends DefaultActionGroup implements DumbAware {
+public class ExtendGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
 
     public ExtendGroup() {
         super();

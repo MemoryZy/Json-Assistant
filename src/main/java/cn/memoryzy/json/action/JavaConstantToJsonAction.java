@@ -10,6 +10,7 @@ import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/9/6
  */
-public class JavaConstantToJsonAction extends AnAction {
+public class JavaConstantToJsonAction extends AnAction implements UpdateInBackground {
 
     public JavaConstantToJsonAction() {
         super();

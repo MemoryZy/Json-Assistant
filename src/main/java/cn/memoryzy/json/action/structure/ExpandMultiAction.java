@@ -6,6 +6,7 @@ import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.tree.TreePath;
 import java.util.Objects;
 
-public class ExpandMultiAction extends DumbAwareAction {
+public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackground {
 
     private final Tree tree;
 

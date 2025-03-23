@@ -4,10 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -30,7 +27,7 @@ import java.util.Optional;
  * @author Memory
  * @since 2024/8/27
  */
-public class EditInNewWindowAction extends DumbAwareAction {
+public class EditInNewWindowAction extends DumbAwareAction implements UpdateInBackground {
     private final ToolWindow toolWindow;
 
     public EditInNewWindowAction(ToolWindow toolWindow) {

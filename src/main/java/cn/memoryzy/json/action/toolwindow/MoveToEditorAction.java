@@ -6,6 +6,7 @@ import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -26,7 +27,7 @@ import java.util.Optional;
  * @author Memory
  * @since 2024/8/21
  */
-public class MoveToEditorAction extends DumbAwareAction {
+public class MoveToEditorAction extends DumbAwareAction implements UpdateInBackground {
     private final ToolWindow toolWindow;
 
     public MoveToEditorAction(ToolWindow toolWindow) {

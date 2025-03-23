@@ -8,6 +8,7 @@ import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CopyValueAction extends DumbAwareAction {
+public class CopyValueAction extends DumbAwareAction implements UpdateInBackground {
     private final Tree tree;
 
     public CopyValueAction(Tree tree) {

@@ -5,6 +5,7 @@ import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/8/6
  */
-public class OnlineDocAction extends DumbAwareAction {
+public class OnlineDocAction extends DumbAwareAction implements UpdateInBackground {
     private final boolean popupAction;
 
     public OnlineDocAction() {

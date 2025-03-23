@@ -5,6 +5,7 @@ import cn.memoryzy.json.ui.dialog.JsonBlacklistDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/3/3
  */
-public class ManageClipboardDataBlacklistAction extends DumbAwareAction {
+public class ManageClipboardDataBlacklistAction extends DumbAwareAction implements UpdateInBackground {
 
     public ManageClipboardDataBlacklistAction(ToolWindowEx toolWindowEx) {
         super();

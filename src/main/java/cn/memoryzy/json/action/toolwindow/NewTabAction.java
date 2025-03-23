@@ -7,6 +7,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.content.ContentFactory;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/8/20
  */
-public class NewTabAction extends DumbAwareAction {
+public class NewTabAction extends DumbAwareAction implements UpdateInBackground {
 
     private final ContentFactory contentFactory;
     private final ToolWindowEx toolWindow;

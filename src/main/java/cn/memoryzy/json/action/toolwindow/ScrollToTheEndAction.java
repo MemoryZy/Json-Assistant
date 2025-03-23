@@ -5,6 +5,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.ScrollToTheEndToolbarAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/12/20
  */
-public class ScrollToTheEndAction extends ScrollToTheEndToolbarAction {
+public class ScrollToTheEndAction extends ScrollToTheEndToolbarAction implements UpdateInBackground {
 
     private final Editor editor;
     private final SimpleToolWindowPanel simpleToolWindowPanel;

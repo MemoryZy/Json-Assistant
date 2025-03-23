@@ -30,7 +30,7 @@ import java.util.Objects;
  * @since 2025/2/27
  */
 public class RenameDiffTitleAction extends DumbAwareAction {
-
+    // TODO EDT
     public RenameDiffTitleAction() {
         super();
         setEnabledInModalContext(true);

@@ -8,6 +8,7 @@ import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +21,7 @@ import java.util.List;
  * @author Memory
  * @since 2025/1/20
  */
-public class CopyNodePathAction extends DumbAwareAction {
+public class CopyNodePathAction extends DumbAwareAction implements UpdateInBackground {
 
     private final Tree tree;
 

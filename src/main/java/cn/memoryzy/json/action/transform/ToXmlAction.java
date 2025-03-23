@@ -11,6 +11,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/8/3
  */
-public class ToXmlAction extends DumbAwareAction {
+public class ToXmlAction extends DumbAwareAction implements UpdateInBackground {
 
     private static final Logger LOG = Logger.getInstance(ToXmlAction.class);
 

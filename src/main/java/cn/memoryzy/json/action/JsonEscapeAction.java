@@ -7,6 +7,7 @@ import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2024/11/5
  */
-public class JsonEscapeAction extends DumbAwareAction {
+public class JsonEscapeAction extends DumbAwareAction implements UpdateInBackground {
 
     public JsonEscapeAction() {
         super();

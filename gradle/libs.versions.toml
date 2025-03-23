@@ -8,6 +8,7 @@ commons-lang3 = "3.16.0"
 toml4j = "0.7.2"
 tnjson = "2.0"
 jmespath = "0.6.0"
+bytebuddy = "1.17.2"
 
 # plugins
 dokka = "1.8.10"
@@ -26,6 +27,7 @@ commonlang = { group = "org.apache.commons", name = "commons-lang3", version.ref
 toml4j = { group = "com.moandjiezana.toml", name = "toml4j", version.ref = "toml4j" }
 tnjson = { group = "com.github.anymaker", name = "tnjson", version.ref = "tnjson" }
 jmespath = { group = "io.burt", name = "jmespath-jackson", version.ref = "jmespath" }
+bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "bytebuddy" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

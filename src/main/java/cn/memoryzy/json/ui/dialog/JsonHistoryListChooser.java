@@ -202,7 +202,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
     }
 
 
-    class SetNameAction extends DumbAwareAction {
+    class SetNameAction extends DumbAwareAction implements UpdateInBackground {
 
         public SetNameAction() {
             super(JsonAssistantBundle.message("action.structure.setName.text"), JsonAssistantBundle.messageOnSystem("action.structure.setName.description"), null);
@@ -242,7 +242,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
         }
     }
 
-    class RemoveElementAction extends DumbAwareAction {
+    class RemoveElementAction extends DumbAwareAction implements UpdateInBackground {
 
         public RemoveElementAction() {
             super(JsonAssistantBundle.message("action.history.remove.text"), JsonAssistantBundle.messageOnSystem("action.history.remove.description"), null);

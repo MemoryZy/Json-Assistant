@@ -4,10 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonValueHandleType;
 import cn.memoryzy.json.util.JsonValueHandler;
 import com.intellij.json.psi.JsonFile;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -17,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/2/25
  */
-public class ExpandAllNestedJsonAction extends DumbAwareAction {
+public class ExpandAllNestedJsonAction extends DumbAwareAction implements UpdateInBackground {
 
     public ExpandAllNestedJsonAction() {
         super();

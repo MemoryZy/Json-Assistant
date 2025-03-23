@@ -136,7 +136,7 @@ public class JsonBlacklistDialog extends DialogWrapper {
     }
 
 
-    class RemoveAction extends DumbAwareAction {
+    class RemoveAction extends DumbAwareAction implements UpdateInBackground {
 
         public RemoveAction() {
             super(JsonAssistantBundle.message("action.history.remove.text"), JsonAssistantBundle.messageOnSystem("action.history.remove.description"), null);

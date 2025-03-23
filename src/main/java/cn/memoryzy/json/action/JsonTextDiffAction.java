@@ -13,10 +13,7 @@ import com.intellij.diff.contents.DocumentContent;
 import com.intellij.diff.editor.DiffVirtualFile;
 import com.intellij.diff.editor.SimpleDiffVirtualFile;
 import com.intellij.diff.requests.SimpleDiffRequest;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -35,7 +32,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/14
  */
-public class JsonTextDiffAction extends DumbAwareAction {
+public class JsonTextDiffAction extends DumbAwareAction implements UpdateInBackground {
 
     public static final Key<SimpleDiffRequest> DIFF_REQUEST_KEY = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".DiffRequest");
 

@@ -48,7 +48,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/9
  */
-public class JsonHistoryAction extends DumbAwareAction implements CustomComponentAction {
+public class JsonHistoryAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     private static final Logger LOG = Logger.getInstance(JsonHistoryAction.class);
 
