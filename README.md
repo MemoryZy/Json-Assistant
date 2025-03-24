@@ -23,7 +23,6 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 - [Getting Started](#getting-started-)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
-- [Feedback](#feedback)
 - [Support/Donations](#support--donations)
   - [Donors list](#donors-list)
 
