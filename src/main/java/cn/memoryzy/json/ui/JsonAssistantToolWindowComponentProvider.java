@@ -409,7 +409,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                         JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"),
                         null,
                         oldName,
-                        new JsonHistoryTreeChooser.NameValidator());
+                        new JsonHistoryTreeChooser.NameValidator(historyList));
 
                 if (StrUtil.isNotBlank(newName)) {
                     JsonEntry entry = historyList.add(project, jsonWrapper);

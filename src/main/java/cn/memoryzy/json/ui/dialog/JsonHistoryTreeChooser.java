@@ -267,7 +267,13 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                 if (HistoryTreeNodeType.NODE == node.getNodeType()) {
                     JsonEntry entry = node.getValue();
                     String name = entry.getName();
-                    String newName = Messages.showInputDialog(project, null, "指定记录名称", null, name, new NameValidator());
+                    String newName = Messages.showInputDialog(
+                            project,
+                            null,
+                            JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"),
+                            null,
+                            name,
+                            new NameValidator(JsonHistoryPersistentState.getInstance(project).getHistory()));
                     if (StrUtil.isNotBlank(newName)) {
                         entry.setName(newName);
                         UIManager.repaintComponent(tree);
@@ -528,9 +534,17 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     }
 
     public static class NameValidator implements InputValidator {
+        private final HistoryLimitedList historyList;
+
+        public NameValidator(HistoryLimitedList historyList) {
+            this.historyList = historyList;
+        }
+
         @Override
         public boolean checkInput(String inputString) {
-            return StrUtil.isNotBlank(inputString) && inputString.length() <= 50;
+            return StrUtil.isNotBlank(inputString)
+                    && inputString.length() <= 50
+                    && historyList.stream().noneMatch(element -> inputString.equals(element.getName()));
         }
 
         @Override
