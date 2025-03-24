@@ -16,16 +16,17 @@
 
 ---
 
-- [功能](#功能)
-- [快速开始](#快速开始-)
-- [兼容](#兼容)
-- [安装](#安装)
-- [支持/捐赠](#支持--捐赠)
-  - [捐赠名单](#捐赠名单)
+- [功能](#key-features)
+- [快速开始](#getting-started)
+- [兼容](#compatibility)
+- [安装](#installation)
+- [支持/捐赠](#support-donations)
+  - [捐赠名单](#donors-list)
 
 ---
 
-## 功能
+## <span id="key-features">功能</span>
+
 - 完全支持 [JSON5][json5]
 - JSON 窗口
   - 历史记录
@@ -54,14 +55,16 @@
 
 <br/>
 
-## 快速开始 🚀
+## <span id="getting-started">快速开始 🚀</span>
+
 当编辑器仅包含有效 JSON 文本或用户选中了有效 JSON 时，可使用 `Alt+K` 快捷键或右键选择 `Json Assistant` 调出操作菜单。
 
 更多操作请参考[插件文档][plugin:docs]。
 
 <br/>
 
-## 兼容
+## <span id="compatibility">兼容</span>
+
  - Android Studio — Arctic Fox | 2020.3.1+
  - AppCode — 2020.3+
  - Aqua — 2024.1.1+
@@ -86,7 +89,7 @@
 
 <br/>
 
-## 安装
+## <span id="installation">安装</span>
 
 - 使用 IDE 内置插件系统：
 
@@ -102,7 +105,8 @@
 
 <br/>
 
-## 支持 / 捐赠
+## <span id="support-donations">支持 / 捐赠</span>
+
 您可以通过以下方式为该项目做出贡献与支持：
 - 在 **GitHub** 上为此项目点个免费的🌟
 - 在 [**Marketplace**][jb:plugin-reviews] 上点亮五星好评🌟
@@ -146,7 +150,8 @@
 
 <br/>
 
-### 捐赠名单
+### <span id="donors-list">捐赠名单</span>
+
 衷心感谢每一位支持我们的捐赠者！您的慷慨帮助我们改进和完善项目。感谢您的支持！❤️
 
 | 名称         | 网站链接                     | 留言                                                                                       | 捐赠总额      |

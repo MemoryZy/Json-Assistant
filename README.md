@@ -20,10 +20,10 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 ---
 
 - [Key Features](#key-features)
-- [Getting Started](#getting-started-)
+- [Getting Started](#getting-started)
 - [Compatibility](#compatibility)
 - [Installation](#installation)
-- [Support/Donations](#support--donations)
+- [Support/Donations](#support-donations)
   - [Donors list](#donors-list)
 
 ---
@@ -57,7 +57,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 
 <br/>
 
-## Getting Started 🚀
+## <span id="getting-started">Getting Started 🚀</span>
 When the editor contains only valid JSON text or when valid JSON is selected, you can use the `Alt+K` shortcut or right-click and choose `Json Assistant` to bring up the action menu.
 
 For more operations, please refer to the [plugin documentation][plugin:docs].
@@ -103,7 +103,7 @@ For more operations, please refer to the [plugin documentation][plugin:docs].
 
 <br/>
 
-## Support / Donations
+## <span id="support-donations">Support / Donations</span>
 You can contribute and support the project in the following ways:
 - Star the project on GitHub.
 - Light up a five-star review for the plugin on the [**Marketplace**][jb:plugin-reviews].
