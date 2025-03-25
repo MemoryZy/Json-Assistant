@@ -9,6 +9,7 @@ toml4j = "0.7.2"
 tnjson = "2.0"
 jmespath = "0.6.0"
 bytebuddy = "1.17.2"
+woodstox = "7.1.0"
 
 # plugins
 dokka = "1.8.10"
@@ -28,6 +29,7 @@ toml4j = { group = "com.moandjiezana.toml", name = "toml4j", version.ref = "toml
 tnjson = { group = "com.github.anymaker", name = "tnjson", version.ref = "tnjson" }
 jmespath = { group = "io.burt", name = "jmespath-jackson", version.ref = "jmespath" }
 bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "bytebuddy" }
+woodstox = { group = "com.fasterxml.woodstox", name = "woodstox-core", version.ref = "woodstox" }
 
 [plugins]
 changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }

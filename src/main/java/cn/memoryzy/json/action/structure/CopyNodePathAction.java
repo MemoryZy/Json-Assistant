@@ -45,10 +45,12 @@ public class CopyNodePathAction extends DumbAwareAction implements UpdateInBackg
                     JsonTreeNode node = (JsonTreeNode) pathElement;
                     JsonTreeNodeType nodeType = node.getNodeType();
 
-                    if (JsonTreeNodeType.JSONArrayElement == nodeType) {
+                    if (JsonTreeNodeType.JSONArrayElement == nodeType
+                            || JsonTreeNodeType.JSONArrayElementArray == nodeType
+                            || JsonTreeNodeType.JSONObjectElement == nodeType) {
                         JsonStructureComponentProvider.appendArrayElementPath(node, pathString);
                     } else {
-                        pathString.append(pathString.length() > 0 ? " > " : "").append(node.getUserObject());
+                        pathString.append(pathString.length() > 0 ? "." : "").append(node.getUserObject());
                     }
                 }
 

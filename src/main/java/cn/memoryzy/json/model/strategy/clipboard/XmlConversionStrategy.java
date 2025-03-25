@@ -14,6 +14,7 @@ public class XmlConversionStrategy implements ClipboardTextConversionStrategy {
     public String type() {
         return DataTypeConstant.XML;
     }
+
     @Override
     public boolean canConvert(String text) {
         return XmlUtil.isXML(text);

@@ -155,7 +155,14 @@ public class JsonStructureComponentProvider {
         } else if (jsonWrapper instanceof ArrayWrapper) {
             ArrayWrapper jsonArray = (ArrayWrapper) jsonWrapper;
             // 为了确定图标
-            node.setNodeType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
+            if (Objects.isNull(node.getNodeType())) {
+                node.setNodeType(JsonTreeNodeType.JSONArray);
+            }
+
+            if (Objects.isNull(node.getSize())) {
+                node.setSize(jsonArray.size());
+            }
+
             if (Objects.isNull(node.getValue())) {
                 node.setValue(jsonArray);
             }
@@ -177,7 +184,7 @@ public class JsonStructureComponentProvider {
             } else if (el instanceof ArrayWrapper) {
                 ArrayWrapper jsonArrayElement = (ArrayWrapper) el;
                 JsonTreeNode childNodeElement = new JsonTreeNode(
-                        "item" + i, el, JsonTreeNodeType.JSONArrayElement, jsonArrayElement.size());
+                        "item" + i, el, JsonTreeNodeType.JSONArrayElementArray, jsonArrayElement.size());
 
                 convertToTreeNode(jsonArrayElement, childNodeElement);
                 childNode.add(childNodeElement);
@@ -293,6 +300,18 @@ public class JsonStructureComponentProvider {
                         break;
                     }
 
+                    case JSONArrayElementArray: {
+                        squareBracketsStart = " [";
+                        nodeTypeStr = "array_array";
+                        squareBracketsEnd = "]";
+                        sizeStrPre = " (";
+                        sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.array.singular.text" : "dialog.structure.size.array.plural.text");
+                        sizeStrPost = ")";
+
+                        icon = JsonAssistantIcons.Structure.JSON_ARRAY;
+                        break;
+                    }
+
                     case JSONArrayElement: {
                         icon = JsonAssistantIcons.Structure.JSON_ITEM;
                         String valueStr;
@@ -398,7 +417,9 @@ public class JsonStructureComponentProvider {
                         JsonTreeNode node = (JsonTreeNode) pathElements[i];
                         JsonTreeNodeType parentNodeType = node.getNodeType();
 
-                        if (JsonTreeNodeType.JSONArrayElement == parentNodeType) {
+                        if (JsonTreeNodeType.JSONArrayElement == parentNodeType
+                                || JsonTreeNodeType.JSONArrayElementArray == parentNodeType
+                                || JsonTreeNodeType.JSONObjectElement == parentNodeType) {
                             appendArrayElementPath(node, pathString);
                         } else {
                             appendObjectElementPath(node, pathString, i, pathElements.length);
@@ -426,7 +447,7 @@ public class JsonStructureComponentProvider {
 
     private static void appendObjectElementPath(JsonTreeNode node, StringBuilder pathString, int currentIndex, int totalLength) {
         boolean isLastElement = currentIndex == totalLength - 1;
-        String separator = (pathString.length() > 0 && !isLastElement) ? " > " : "";
+        String separator = (pathString.length() > 0 && !isLastElement) ? "." : "";
         String elementValue = isLastElement ? "" : String.valueOf(node.getUserObject());
 
         pathString.append(separator).append(elementValue);

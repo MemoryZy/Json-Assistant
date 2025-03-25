@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.toml4j)
     implementation(libs.tnjson)
     implementation(libs.jmespath)
+    implementation(libs.woodstox)
 //    implementation(libs.bytebuddy)
 }
 
