@@ -1,14 +1,17 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
- - 将历史记录保存切换为手动模式。
- - 解决【运行时对象转 JSON】功能中无法解析内部类的问题。
- - 解决时间戳转换的问题。
- - 解决序列化时的类的嵌套递归问题。
- - 解决之前的遗留问题。
- - 优化 XML 文本判断逻辑。
- - 用户体验优化与改进。
- - 兼容性优化。
+
+## [1.7.8] - 2025-03-25
+
+- 将历史记录保存切换为手动模式。
+- 解决【运行时对象转 JSON】功能中无法解析内部类的问题。
+- 解决时间戳转换的问题。
+- 解决序列化时的类的嵌套递归问题。
+- 解决之前的遗留问题。
+- 优化 XML 文本判断逻辑。
+- 用户体验优化与改进。
+- 兼容性优化。
 - Switch history saving to manual mode.
 - Fixed an issue where inner classes could not be handled in the runtime Object to JSON function.
 - Resolve timestamp conversion issues.
@@ -295,7 +298,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.8...HEAD
+[1.7.8]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7...v1.7.8
 [1.7.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7-beta...v1.7.7
 [1.7.7-beta]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.6...v1.7.7-beta
 [1.7.6]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.5...v1.7.6
