@@ -1,6 +1,8 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 解决 JSON5 处理时的大数值丢失精度问题。
+- Solve the problem of losing precision of large values in json5 processing.
 
 ## [1.7.8] - 2025-03-25
 
