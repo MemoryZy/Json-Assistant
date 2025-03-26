@@ -30,7 +30,7 @@ dependencies {
     implementation(libs.jsonpath)
     implementation(libs.commonlang)
     implementation(libs.toml4j)
-    implementation(libs.tnjson)
+//    implementation(libs.tnjson)
     implementation(libs.jmespath)
     implementation(libs.woodstox)
 //    implementation(libs.bytebuddy)

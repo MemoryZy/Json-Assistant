@@ -1,5 +1,6 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.ConstantExpressionEvaluator;
@@ -25,25 +26,39 @@ public class PsiUtil {
      * @return 结果
      */
     public static Object computeLiteralExpression(PsiLiteralExpression literalExpression) {
-        return literalExpression.getValue();
+        return Objects.isNull(literalExpression) ? null : literalExpression.getValue();
     }
 
     public static String computeStringExpression(DataContext dataContext) {
+        String jsonStr = null;
         // 不做方法返回值的处理
         PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
         PsiField psiField = PsiTreeUtil.getParentOfType(element, PsiField.class);
         PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
+        PsiPolyadicExpression psiPolyadicExpression = PsiTreeUtil.getParentOfType(element, PsiPolyadicExpression.class);
 
-        String jsonStr = null;
-        if (null != psiField) {
-            String canonicalText = psiField.getType().getCanonicalText();
-            jsonStr = String.class.getName().equals(canonicalText) ? String.valueOf(computeConstantExpression(psiField)) : null;
-        } else if (null != localVariable) {
-            String canonicalText = localVariable.getType().getCanonicalText();
-            jsonStr = String.class.getName().equals(canonicalText) ? String.valueOf(computeConstantExpression(localVariable)) : null;
+        if (Objects.isNull(psiField) && Objects.isNull(localVariable) && Objects.isNull(psiPolyadicExpression)) {
+            PsiLiteralExpression psiLiteralExpression = PsiTreeUtil.getParentOfType(element, PsiLiteralExpression.class);
+            if (element instanceof PsiJavaToken) {
+                // 处理Java文本块和Java单行文本
+                jsonStr = String.valueOf(computeLiteralExpression(psiLiteralExpression));
+            }
+
+        } else {
+            if (null != psiPolyadicExpression) {
+                jsonStr = String.valueOf(computePolyadicExpression(psiPolyadicExpression));
+
+            } else if (null != psiField) {
+                String canonicalText = psiField.getType().getCanonicalText();
+                jsonStr = String.class.getName().equals(canonicalText) ? String.valueOf(computeConstantExpression(psiField)) : null;
+
+            } else {
+                String canonicalText = localVariable.getType().getCanonicalText();
+                jsonStr = String.class.getName().equals(canonicalText) ? String.valueOf(computeConstantExpression(localVariable)) : null;
+            }
         }
 
-        return jsonStr;
+        return StrUtil.isBlank(jsonStr) || Objects.equals("null", jsonStr) ? null : jsonStr;
     }
 
     public static Object computeConstantExpression(PsiField field) {

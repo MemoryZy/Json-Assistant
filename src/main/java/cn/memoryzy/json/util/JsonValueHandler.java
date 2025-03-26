@@ -137,8 +137,8 @@ public class JsonValueHandler {
 
         } else if (jsonValue instanceof JsonNumberLiteral) {
             // double长数值默认表示为科学计数法形式，需转为原样
-            double value = ((JsonNumberLiteral) jsonValue).getValue();
-            BigDecimal bigDecimalValue = new BigDecimal(value + "");
+            String valueText = jsonValue.getText();
+            BigDecimal bigDecimalValue = JsonAssistantUtil.parseNumber(valueText);
             long longValue = bigDecimalValue.longValue();
 
             // 若为有效时间戳
@@ -214,8 +214,8 @@ public class JsonValueHandler {
 
             } else if (jsonValue instanceof JsonNumberLiteral) {
                 // double长数值默认表示为科学计数法形式，需转为原样
-                double value = ((JsonNumberLiteral) jsonValue).getValue();
-                BigDecimal bigDecimalValue = new BigDecimal(value + "");
+                String valueText = jsonValue.getText();
+                BigDecimal bigDecimalValue = JsonAssistantUtil.parseNumber(valueText);
                 long longValue = bigDecimalValue.longValue();
 
                 // 若为有效时间戳

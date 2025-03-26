@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -324,6 +325,14 @@ public class JsonAssistantUtil {
             }
         } catch (NumberFormatException e) {
             return false; // Not a valid number
+        }
+    }
+
+    public static BigDecimal parseNumber(String value) {
+        try {
+            return new BigDecimal(value);
+        } catch (Exception e) {
+            return new BigDecimal("0");
         }
     }
 

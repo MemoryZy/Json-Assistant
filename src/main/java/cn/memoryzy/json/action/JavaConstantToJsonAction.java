@@ -31,7 +31,11 @@ public class JavaConstantToJsonAction extends AnAction implements UpdateInBackgr
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), PsiUtil.computeStringExpression(event.getDataContext()), FileTypeHolder.JSON5);
+        String json = PsiUtil.computeStringExpression(event.getDataContext());
+        // 格式化
+        String formatted = JsonUtil.isJson(json) ? JsonUtil.formatJson(json) : Json5Util.formatJson5(json);
+        // 输出
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), formatted, FileTypeHolder.JSON5);
     }
 
     @Override

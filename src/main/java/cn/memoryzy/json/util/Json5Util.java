@@ -1,14 +1,14 @@
 package cn.memoryzy.json.util;
 
-import a2u.tn.utils.json.MapNavigator;
-import a2u.tn.utils.json.TnJson;
-import a2u.tn.utils.json.TnJsonBuilder;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import org.apache.commons.lang3.StringEscapeUtils;
+import thirdparty.a2u.tn.utils.json.MapNavigator;
+import thirdparty.a2u.tn.utils.json.TnJson;
+import thirdparty.a2u.tn.utils.json.TnJsonBuilder;
 
 import java.util.List;
 import java.util.Map;

@@ -2,7 +2,11 @@
 
 ## [Unreleased]
 - 解决 JSON5 处理时的大数值丢失精度问题。
+- 优化时间戳转换功能中数值识别的逻辑。
+- 优化Java常量转为JSON功能中的判断逻辑，支持更多方式定义的常量。
 - Solve the problem of losing precision of large values in json5 processing.
+- Optimize the logic for numeric recognition in the timestamp conversion functionality.
+- Optimize the judgment logic in the functionality of converting Java constants to JSON, supporting constants defined in more ways.
 
 ## [1.7.8] - 2025-03-25
 
