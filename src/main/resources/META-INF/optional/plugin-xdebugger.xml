@@ -1,10 +1,13 @@
 <idea-plugin>
     <actions>
         <action id="JsonAssistant.Action.RuntimeObjectToJsonAction" class="cn.memoryzy.json.action.debug.RuntimeObjectToJsonAction"/>
+        <action id="JsonAssistant.Action.RuntimeObjectToJson5Action" class="cn.memoryzy.json.action.debug.RuntimeObjectToJson5Action"/>
 
         <group id="JsonAssistant.Group.XDebuggerGroup">
             <separator/>
             <reference ref="JsonAssistant.Action.RuntimeObjectToJsonAction"/>
+            <separator/>
+            <reference ref="JsonAssistant.Action.RuntimeObjectToJson5Action"/>
             <separator/>
 
             <add-to-group group-id="XDebugger.ValueGroup" relative-to-action="XDebugger.CopyName" anchor="after"/>

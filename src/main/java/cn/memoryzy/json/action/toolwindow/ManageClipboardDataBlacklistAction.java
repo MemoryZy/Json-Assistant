@@ -23,7 +23,7 @@ public class ManageClipboardDataBlacklistAction extends DumbAwareAction implemen
         presentation.setText(JsonAssistantBundle.message("action.manage.clipboard.data.blacklist.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.manage.clipboard.data.blacklist.description"));
 
-        registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl alt L"), toolWindowEx.getComponent());
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt L"), toolWindowEx.getComponent());
     }
 
     @Override

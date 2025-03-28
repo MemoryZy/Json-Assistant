@@ -9,6 +9,7 @@ import cn.hutool.core.util.*;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
+import cn.memoryzy.json.enums.SwaggerAnnotations;
 import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -24,6 +25,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.JavaCodeStyleManager;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.impl.source.PsiImmediateClassType;
+import com.intellij.psi.javadoc.PsiDocComment;
+import com.intellij.psi.javadoc.PsiDocToken;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
@@ -44,14 +47,26 @@ public class JavaUtil {
      * @param psiClass        class
      * @param jsonMap         Map
      * @param ignoreMap       忽略元素列表
+     * @param commentMap      最外层的注释Map
+     * @param resolveComment  是否解析注释
      * @param persistentState 持久化配置
      */
-    public static void recursionAddProperty(Project project, PsiClass psiClass, Map<String, Object> jsonMap,
-                                            Map<String, List<String>> ignoreMap, AttributeSerializationState persistentState) {
+    public static void recursionAddProperty(Project project,
+                                            PsiClass psiClass,
+                                            Map<String, Object> jsonMap,
+                                            Map<String, List<String>> ignoreMap,
+                                            Map<String, String> commentMap,
+                                            boolean resolveComment,
+                                            AttributeSerializationState persistentState) {
         // 获取该类所有字段
         PsiField[] allFields = JavaUtil.getNonStaticFields(psiClass);
         List<String> fieldNameList = new ArrayList<>();
         ignoreMap.put(psiClass.getQualifiedName(), fieldNameList);
+
+        if (resolveComment) {
+            // 添加注释Map
+            jsonMap.put(PluginConstant.COMMENT_KEY, commentMap);
+        }
 
         for (PsiField psiField : allFields) {
             String fieldName = psiField.getName();
@@ -71,6 +86,14 @@ public class JavaUtil {
 
             // 字段名
             String propertyName = (StrUtil.isBlank(jsonKeyName)) ? fieldName : jsonKeyName;
+
+            // 解析字段注释
+            if (resolveComment) {
+                String fieldComment = resolveFieldComment(psiField);
+                if (StrUtil.isNotBlank(fieldComment)) {
+                    commentMap.put(propertyName, fieldComment);
+                }
+            }
 
             // 字段类型
             PsiType psiType = psiField.getType();
@@ -102,8 +125,9 @@ public class JavaUtil {
                             nestedJsonMap = null;
                         } else {
                             nestedJsonMap = new LinkedHashMap<>();
+                            Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, persistentState);
+                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, nestedCommentMap, resolveComment, persistentState);
                         }
                         // 添加至主Map
                         jsonMap.put(propertyName, nestedJsonMap);
@@ -121,8 +145,9 @@ public class JavaUtil {
                         // 判断属性中是否存在本类或之前类的类型的嵌套
                         if (!ignoreMap.containsKey(psiClz.getQualifiedName())) {
                             Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
+                            Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, persistentState);
+                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, nestedCommentMap, resolveComment, persistentState);
                             // 添加至list
                             list.add(nestedJsonMap);
                         }
@@ -140,6 +165,28 @@ public class JavaUtil {
                 jsonMap.put(propertyName, getDefaultValueWithAnnotation(psiField, psiType, persistentState));
             }
         }
+    }
+
+    private static String resolveFieldComment(PsiField psiField) {
+        String comment = null;
+        // 注解与注释
+        PsiAnnotation apiModelPropertyAnnotation = psiField.getAnnotation(SwaggerAnnotations.API_MODEL_PROPERTY.getValue());
+        PsiAnnotation schemaAnnotation = psiField.getAnnotation(SwaggerAnnotations.SCHEMA.getValue());
+        PsiDocComment docComment = psiField.getDocComment();
+
+        if (Objects.nonNull(apiModelPropertyAnnotation)) {
+            comment = StrUtil.trim(getMemberValue(apiModelPropertyAnnotation, "value"));
+        }
+
+        if (StrUtil.isBlank(comment) && Objects.nonNull(schemaAnnotation)) {
+            comment = StrUtil.trim(getMemberValue(schemaAnnotation, "description"));
+        }
+
+        if (StrUtil.isBlank(comment) && Objects.nonNull(docComment)) {
+            comment = StrUtil.trim(getDocComment(docComment));
+        }
+
+        return comment;
     }
 
     private static Object getDefaultValueWithAnnotation(PsiField psiField, PsiType psiType, AttributeSerializationState persistentState) {
@@ -809,6 +856,51 @@ public class JavaUtil {
 
     public static boolean isMissingJacksonLib(Module module) {
         return !hasJacksonLib(module);
+    }
+
+    public static PsiClass getCurrentCursorPositionClass(Project project, DataContext dataContext) {
+        PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
+        // 本地变量
+        PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
+        // 引用
+        PsiJavaCodeReferenceElement referenceElement = PsiTreeUtil.getParentOfType(element, PsiJavaCodeReferenceElement.class);
+
+        PsiClass psiClass = null;
+        if (localVariable != null) {
+            psiClass = resolveLocalVariable(project, localVariable);
+
+        } else if (referenceElement != null) {
+            psiClass = JavaUtil.getPsiClass(referenceElement);
+        }
+
+        // 获取当前类
+        return (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) ? psiClass : JavaUtil.getPsiClass(dataContext);
+    }
+
+    private static PsiClass resolveLocalVariable(Project project, PsiLocalVariable localVariable) {
+        PsiType psiType = localVariable.getType();
+        if (JavaUtil.isCollectionOrArray(psiType)) {
+            return JavaUtil.getGenericTypeOfCollection(project, psiType);
+        } else {
+            return JavaUtil.getPsiClass(localVariable.getType());
+        }
+    }
+
+    public static String getDocComment(PsiDocComment docComment) {
+        PsiElement[] descriptionElements = docComment.getDescriptionElements();
+        if (ArrayUtil.isEmpty(descriptionElements)) {
+            return null;
+        }
+
+        List<String> list = new ArrayList<>();
+        for (PsiElement descriptionElement : descriptionElements) {
+            if (descriptionElement instanceof PsiDocToken) {
+                list.add(StrUtil.trim(descriptionElement.getText()));
+            }
+        }
+
+        list.removeIf(StrUtil::isBlank);
+        return StrUtil.join("\n", list);
     }
 
 }

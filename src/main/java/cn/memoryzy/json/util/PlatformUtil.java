@@ -39,6 +39,7 @@ import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
@@ -78,6 +79,10 @@ public class PlatformUtil {
         }
     }
 
+    public static PsiFile getPsiFile(Project project, Document document) {
+        return PsiDocumentManager.getInstance(project).getPsiFile(document);
+    }
+
     /**
      * 通过当前光标的偏移量获取当前所在的Psi元素
      * <p>亦可配合 PsiTreeUtil.getParentOfType(element, PsiClass.class)方法来获取该PsiElement所处的区域</p>
@@ -113,6 +118,23 @@ public class PlatformUtil {
         return dataContext.getData(CommonDataKeys.EDITOR);
     }
 
+    public static void reformatText(Editor editor) {
+        if (Objects.isNull(editor)) {
+            return;
+        }
+
+        Project project = editor.getProject();
+        if (Objects.isNull(project)) {
+            return;
+        }
+
+        Document document = editor.getDocument();
+        PsiFile psiFile = getPsiFile(project, document);
+
+        WriteCommandAction.runWriteCommandAction(
+                project,
+                () -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
+    }
 
     /**
      * 设置剪贴板内容

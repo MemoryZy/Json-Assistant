@@ -25,7 +25,12 @@ public class Json5Util {
     /**
      * Json5格式化、单引号包裹字符串、保持null元素（若允许多行文本，在编辑器会有展示问题）
      */
-    public static final TnJsonBuilder FORMAT_JSON5 = TnJson.builder().readable().formated().withoutKeyQuote().singleQuote().keepNull()/*.allowMultiRowString()*/;
+    public static final TnJsonBuilder FORMAT_JSON5 = TnJson.builder().readable().formated().withoutKeyQuote().singleQuote().keepNull().allowComments()/*.allowMultiRowString()*/;
+
+    /**
+     * Json5格式化、双引号包裹字符串、保持null元素（若允许多行文本，在编辑器会有展示问题）
+     */
+    public static final TnJsonBuilder FORMAT_DOUBLE_QUOTE_JSON5 = TnJson.builder().readable().formated().keepNull().allowComments()/*.allowMultiRowString()*/;
 
     /**
      * Json5压缩、保持null元素、单引号包裹字符串
@@ -75,6 +80,16 @@ public class Json5Util {
      */
     public static String formatJson5(Object data) {
         return toJson5Str(data, FORMAT_JSON5);
+    }
+
+    /**
+     * 格式化Json5文本（双引号）
+     *
+     * @param data 对象
+     * @return 格式化后的Json5文本
+     */
+    public static String formatJson5WithDoubleQuote(Object data) {
+        return toJson5Str(data, FORMAT_DOUBLE_QUOTE_JSON5);
     }
 
     /**

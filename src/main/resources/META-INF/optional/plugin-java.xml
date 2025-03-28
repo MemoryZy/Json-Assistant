@@ -5,12 +5,19 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
+        <action id="JsonAssistant.Action.JavaBeanToJson5Action" class="cn.memoryzy.json.action.JavaBeanToJson5Action">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt L"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift L"/>
+        </action>
+
         <action id="JsonAssistant.Action.JsonToJavaBeanAction" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
         <action id="JsonAssistant.Action.JavaConstantToJsonAction" class="cn.memoryzy.json.action.JavaConstantToJsonAction"/>
 
         <group id="JsonAssistant.Group.JavaBeanToJsonGroup">
             <separator/>
             <reference ref="JsonAssistant.Action.JavaBeanToJsonAction"/>
+            <separator/>
+            <reference ref="JsonAssistant.Action.JavaBeanToJson5Action"/>
             <separator/>
             <reference ref="JsonAssistant.Action.JavaConstantToJsonAction"/>
             <separator/>

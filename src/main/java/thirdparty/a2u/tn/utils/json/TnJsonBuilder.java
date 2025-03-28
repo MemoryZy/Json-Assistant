@@ -17,6 +17,8 @@ public class TnJsonBuilder extends TnJson {
   boolean isAllowMultiRowString = false;
   boolean isKeepNull = false;
 
+  // 新增注释支持
+  boolean isAllowComments = false;
 
   /**
    * Interfase for handing generating json in concrete path
@@ -115,6 +117,11 @@ public class TnJsonBuilder extends TnJson {
    */
   public TnJsonBuilder keepNull() {
     isKeepNull = true;
+    return this;
+  }
+
+  public TnJsonBuilder allowComments() {
+    isAllowComments = true;
     return this;
   }
 

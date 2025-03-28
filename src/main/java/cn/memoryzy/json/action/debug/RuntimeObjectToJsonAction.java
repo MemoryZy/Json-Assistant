@@ -44,13 +44,16 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        boolean enable = false;
+        e.getPresentation().setEnabledAndVisible(isEnabled(e.getDataContext()));
+    }
+
+    public static boolean isEnabled(DataContext dataContext) {
         Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
         Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
         if (languageClz != null && classClz != null) {
-            enable = true;
+            return JavaDebugUtil.isObjectOrListWithChildren(dataContext);
         }
 
-        e.getPresentation().setEnabledAndVisible(enable && JavaDebugUtil.isObjectOrListWithChildren(e.getDataContext()));
+        return false;
     }
 }

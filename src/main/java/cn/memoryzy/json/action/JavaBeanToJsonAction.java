@@ -13,9 +13,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.psi.util.PsiTypesUtil;
+import com.intellij.psi.PsiClass;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,9 +44,9 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         Project project = event.getProject();
         DataContext dataContext = event.getDataContext();
         // 在此判断当前光标是在某个对象 或 对象实例 及 List、数组上，那就将该对象 或 对象实例解析为JSON
-        PsiClass psiClass = getCurrentCursorPositionClass(project, dataContext);
+        PsiClass psiClass = JavaUtil.getCurrentCursorPositionClass(project, dataContext);
         // 执行操作
-        convertAttributesToJsonAndNotify(project, psiClass, JsonUtil::formatJson, LOG);
+        convertAttributesToJsonAndNotify(project, psiClass, JsonUtil::formatJson, false, LOG);
     }
 
 
@@ -62,21 +60,26 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     /**
      * 将 Java 属性转换为 JSON/JSON5 并复制到剪贴板，同时显示忽略的字段（如果有的话）
      *
-     * @param project       项目对象
-     * @param psiClass      当前类对象
-     * @param jsonConverter JSON 转换器
+     * @param project        项目对象
+     * @param psiClass       当前类对象
+     * @param jsonConverter  JSON 转换器
+     * @param resolveComment 是否解析注释
+     * @param log            日志对象
      */
-    public static void convertAttributesToJsonAndNotify(Project project, PsiClass psiClass, Function<Map<String, Object>, String> jsonConverter, Logger log) {
+    public static void convertAttributesToJsonAndNotify(Project project, PsiClass psiClass, Function<Map<String, Object>, String> jsonConverter, boolean resolveComment, Logger log) {
         // JsonMap
         Map<String, Object> jsonMap = new LinkedHashMap<>();
         // 忽略的属性
         Map<String, List<String>> ignoreMap = new LinkedHashMap<>();
+        // 最外层的注释Map
+        Map<String, String> commentMap = new HashMap<>();
+
         // 相关配置
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, persistentState.attributeSerializationState);
+            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, commentMap, resolveComment, persistentState.attributeSerializationState);
         } catch (Error e) {
             log.error(e);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("error.serialize.recursion"), NotificationType.ERROR, project);
@@ -104,33 +107,6 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         }
     }
 
-    private static PsiClass getCurrentCursorPositionClass(Project project, DataContext dataContext) {
-        PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
-        // 本地变量
-        PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
-        // 引用
-        PsiJavaCodeReferenceElement referenceElement = PsiTreeUtil.getParentOfType(element, PsiJavaCodeReferenceElement.class);
-
-        PsiClass psiClass = null;
-        if (localVariable != null) {
-            psiClass = resolveLocalVariable(project, localVariable);
-
-        } else if (referenceElement != null) {
-            psiClass = JavaUtil.getPsiClass(referenceElement);
-        }
-
-        // 获取当前类
-        return (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) ? psiClass : JavaUtil.getPsiClass(dataContext);
-    }
-
-    public static PsiClass resolveLocalVariable(Project project, PsiLocalVariable localVariable) {
-        PsiType psiType = localVariable.getType();
-        if (JavaUtil.isCollectionOrArray(psiType)) {
-            return JavaUtil.getGenericTypeOfCollection(project, psiType);
-        } else {
-            return JavaUtil.getPsiClass(localVariable.getType());
-        }
-    }
 
     public static boolean isEnable(Project project, DataContext dataContext) {
         if (Objects.isNull(project)) {
@@ -141,7 +117,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
             return false;
         }
 
-        PsiClass psiClass = getCurrentCursorPositionClass(project, dataContext);
+        PsiClass psiClass = JavaUtil.getCurrentCursorPositionClass(project, dataContext);
         if (psiClass == null) {
             return false;
         }

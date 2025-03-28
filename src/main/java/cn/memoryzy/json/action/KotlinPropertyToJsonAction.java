@@ -36,7 +36,7 @@ public class KotlinPropertyToJsonAction extends AnAction implements UpdateInBack
         // 获取当前类
         PsiClass currentPsiClass = KotlinUtil.getPsiClass(event.getDataContext());
         // 执行操作
-        JavaBeanToJsonAction.convertAttributesToJsonAndNotify(project, currentPsiClass, JsonUtil::formatJson, LOG);
+        JavaBeanToJsonAction.convertAttributesToJsonAndNotify(project, currentPsiClass, JsonUtil::formatJson, false, LOG);
     }
 
     @Override

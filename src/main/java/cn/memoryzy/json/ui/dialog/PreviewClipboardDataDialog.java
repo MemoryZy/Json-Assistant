@@ -41,6 +41,7 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
     private final String parseType;
     private final String jsonString;
     private final String originalText;
+    private final boolean isJson5;
     private ViewerModeLanguageTextEditor showTextField;
 
 
@@ -51,6 +52,7 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         this.parseType = parseType;
         this.jsonString = jsonString;
         this.originalText = originalText;
+        this.isJson5 = DataTypeConstant.JSON5.equals(parseType);
 
         // setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.preview.clipboard.title"));
@@ -61,7 +63,7 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        boolean isJson = DataTypeConstant.JSON.equals(parseType) || DataTypeConstant.JSON5.equals(parseType);
+        boolean isJson = DataTypeConstant.JSON.equals(parseType) || isJson5;
         String key = isJson ? "dialog.preview.clipboard.tip" : "dialog.preview.clipboard.tipWithTransform";
 
         JBLabel tipLabel = new JBLabel(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem(key, parseType)));
@@ -100,21 +102,32 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
     public void doCancelAction() {
         if (getCancelAction().isEnabled()) {
             // 添加被拒绝的JSON
-            JsonWrapper wrapper = DataTypeConstant.JSON5.equals(parseType) ? Json5Util.parse(jsonString) : JsonUtil.parse(jsonString);
+            JsonWrapper wrapper = isJson5 ? Json5Util.parse(jsonString) : JsonUtil.parse(jsonString);
             addToBlacklist(parseType, originalText, wrapper);
             close(CANCEL_EXIT_CODE);
         }
     }
 
     private void executeOkAction() {
-        WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), jsonString));
+        WriteCommandAction.runWriteCommandAction(project, () -> {
+            String text = isJson5 ? showTextField.getText() : jsonString;
+            PlatformUtil.setDocumentText(editor.getDocument(), text);
+        });
     }
 
     @Override
     protected void init() {
-        this.showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, jsonString, true);
+        // 如果是JSON5，即保留注释
+        String value = isJson5 ? originalText : jsonString;
+        this.showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, value, true);
         this.showTextField.setFont(UIManager.consolasFont(13));
         this.showTextField.addNotify();
+
+        if (isJson5) {
+            // 进行格式化
+            PlatformUtil.reformatText(showTextField.getEditor());
+        }
+
         super.init();
     }
 

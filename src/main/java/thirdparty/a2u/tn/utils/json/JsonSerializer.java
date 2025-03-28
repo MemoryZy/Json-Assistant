@@ -5,14 +5,14 @@
  */
 package thirdparty.a2u.tn.utils.json;
 
+import cn.memoryzy.json.constant.PluginConstant;
+
 import java.lang.reflect.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 /**
  * MAP to JSON converter.<br>
@@ -213,9 +213,25 @@ class JsonSerializer {
     b.append("{");
     endLine(b, builder);
 
+    Map<?, ?> commentsMap = null;
+    // 格式化才能显示注释
+    if (builder.isAllowComments && builder.isFormated) {
+      // 注释
+      Object commentsObj = map.get(PluginConstant.COMMENT_KEY);
+      // 默认会使用 LinkedHashMap 作反序列化，但注释Map是 HashMap，判断一下，杜绝有同名的Key
+      if (commentsObj instanceof HashMap && !(commentsObj instanceof LinkedHashMap)) {
+        commentsMap = (Map<?, ?>) commentsObj;
+      }
+    }
+
     boolean hasEntry = false;
     for(Object keyObj : map.keySet()) {
       String key = String.valueOf(keyObj);
+      // 缓存一个原始键
+      String originalKey = key;
+      // 跳过注释元数据键
+      if (PluginConstant.COMMENT_KEY.equals(key)) continue;
+
       Object value = map.get(keyObj);
       String valuePath = path+"."+key;
 
@@ -231,12 +247,28 @@ class JsonSerializer {
 
       key = codeKey(key, builder);
 
+      // 先处理逗号分隔符
       if (hasEntry) {
         b.append(",");
         endLine(b, builder);
       }
       else {
         hasEntry = true;
+      }
+
+      // 生成注释
+      if (builder.isAllowComments && commentsMap != null) {
+        Object commentObj = commentsMap.get(originalKey);
+        if (commentObj != null) {
+          String comment = commentObj.toString().replaceAll("[\r\n]+", " "); // 确保单行
+          if (builder.isFormated) {
+            startLine(b, builder, valuelevel);
+            b.append("// ").append(comment);
+            endLine(b, builder); // 换行
+          } else {
+            b.append("// ").append(comment).append(' ');
+          }
+        }
       }
 
       startLine(b, builder, valuelevel);
