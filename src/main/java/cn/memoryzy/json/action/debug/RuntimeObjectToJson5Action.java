@@ -1,11 +1,11 @@
 package cn.memoryzy.json.action.debug;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.*;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Memory
@@ -23,11 +23,24 @@ public class RuntimeObjectToJson5Action extends AnAction implements UpdateInBack
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-
+        DataContext dataContext = e.getDataContext();
+        RuntimeObjectToJsonAction.handleObjectReferenceResolution(e.getProject(), dataContext, el -> convertResult(el, dataContext), true);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
+        // TODO 判断逻辑需要改，改为识别为JavaBean的，或者List包含JavaBean的才显示
         e.getPresentation().setEnabledAndVisible(RuntimeObjectToJsonAction.isEnabled(e.getDataContext()));
+    }
+
+    private String convertResult(Object result, DataContext dataContext) {
+        if (result instanceof Map) {
+
+
+        } else if (result instanceof List) {
+
+        }
+
+        return null;
     }
 }

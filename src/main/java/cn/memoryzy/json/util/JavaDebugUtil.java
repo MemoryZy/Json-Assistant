@@ -4,9 +4,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.action.debug.RuntimeObjectToJsonAction;
 import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.FileTypes;
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.JavaStackFrame;
@@ -21,7 +24,9 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiClassType;
+import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiKeyword;
+import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiTypesUtil;
 import com.intellij.xdebugger.*;
 import com.intellij.xdebugger.evaluation.EvaluationMode;
@@ -114,11 +119,11 @@ public class JavaDebugUtil {
     /**
      * 处理复杂节点（对象、集合、Map、数组）
      *
-     * @param dataContext 数据上下文
+     * @param project
+     * @param dataContext    数据上下文
      * @return 根据节点类型返回对应类型值
      */
-    public static Object resolveObjectReference(DataContext dataContext) {
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+    public static Object resolveObjectReference(Project project, DataContext dataContext) {
         // 获取调试树
         XDebuggerTree tree = XDebuggerTree.getTree(dataContext);
         if (Objects.isNull(tree)) {
@@ -339,6 +344,29 @@ public class JavaDebugUtil {
         for (Field field : fields) {
             Value value = objectReference.getValue(field);
             resultMap.put(field.name(), getValue(project, value));
+        }
+
+        Boolean resolveComment = project.getUserData(RuntimeObjectToJsonAction.RESOLVE_COMMENT_KEY);
+        if (BooleanUtil.isTrue(resolveComment)) {
+            String name = objectReference.referenceType().name();
+            PsiClass psiClass = JavaUtil.findClass(project, name);
+            if (psiClass != null) {
+                Map<String, String> commentMap = new HashMap<>();
+                PsiField[] psiFields = psiClass.getAllFields();
+
+                for (PsiField psiField : psiFields) {
+                    String fieldName = psiField.getName();
+                    PsiDocComment docComment = psiField.getDocComment();
+                    if (docComment != null) {
+                        String comment = JavaUtil.getDocComment(docComment);
+                        if (StrUtil.isNotBlank(comment)) {
+                            commentMap.put(fieldName, comment);
+                        }
+                    }
+                }
+
+                resultMap.put(PluginConstant.COMMENT_KEY, commentMap);
+            }
         }
 
         return resultMap;
