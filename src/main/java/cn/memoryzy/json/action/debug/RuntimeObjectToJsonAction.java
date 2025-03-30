@@ -11,6 +11,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
@@ -39,15 +40,14 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(isEnabled(e.getDataContext()));
+        e.getPresentation().setEnabledAndVisible(isEnabled(e.getProject(), e.getDataContext()));
     }
 
-    public static boolean isEnabled(DataContext dataContext) {
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+    private static boolean isEnabled(@Nullable Project project, DataContext dataContext) {
         Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
         Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
         if (project != null && languageClz != null && classClz != null) {
-            return JavaDebugUtil.isObjectOrListWithChildren(dataContext);
+            return JavaDebugUtil.isObjectOrListWithChildren(project, dataContext);
         }
 
         return false;

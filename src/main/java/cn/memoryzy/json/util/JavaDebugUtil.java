@@ -19,7 +19,6 @@ import com.intellij.debugger.engine.events.DebuggerContextCommandImpl;
 import com.intellij.debugger.impl.DebuggerContextImpl;
 import com.intellij.debugger.jdi.ThreadReferenceProxyImpl;
 import com.intellij.debugger.ui.impl.watch.ValueDescriptorImpl;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiClass;
@@ -33,14 +32,13 @@ import com.intellij.xdebugger.evaluation.EvaluationMode;
 import com.intellij.xdebugger.evaluation.XDebuggerEvaluator;
 import com.intellij.xdebugger.frame.XValue;
 import com.intellij.xdebugger.impl.ui.tree.XDebuggerTree;
-import com.intellij.xdebugger.impl.ui.tree.nodes.MessageTreeNode;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XEvaluationCallbackBase;
 import com.intellij.xdebugger.impl.ui.tree.nodes.XValueNodeImpl;
 import com.sun.jdi.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -60,11 +58,12 @@ public class JavaDebugUtil {
     /**
      * 判断DataContext中选中的节点是否为对象或者含有子元素的列表。
      *
+     * @param project     项目
      * @param dataContext 当前数据上下文环境，包含了当前操作需要的所有信息。
      * @return 如果选中的节点是对象或含有子元素的列表，则返回true；否则返回false。
      */
-    public static boolean isObjectOrListWithChildren(DataContext dataContext) {
-        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+    @SuppressWarnings("DuplicatedCode")
+    public static boolean isObjectOrListWithChildren(@Nullable Project project, DataContext dataContext) {
         XDebuggerTree tree = XDebuggerTree.getTree(dataContext);
         if (Objects.isNull(tree)) {
             return false;
@@ -103,7 +102,7 @@ public class JavaDebugUtil {
             return ((ArrayReference) objectValue).length() > 0;
 
         } else if (isCollection(objectValue) || isMap(objectValue)) {
-            return hasChildren(selectedNode);
+            return hasElements(project, objectValue);
 
         } else {
             // 拒绝包装类型及JDK内部类型
@@ -115,12 +114,89 @@ public class JavaDebugUtil {
         }
     }
 
+    /**
+     * 判断选中的节点是否为 JavaBean 或存在 JavaBean 的集合
+     *
+     * @return 为 JavaBean 或存在 JavaBean 的集合，则为true；反之为false
+     */
+    @SuppressWarnings("DuplicatedCode")
+    public static boolean isJavaBeanOrContainsJavaBeans(Project project, DataContext dataContext) {
+        XDebuggerTree tree = XDebuggerTree.getTree(dataContext);
+        if (Objects.isNull(tree)) {
+            return false;
+        }
+
+        TreePath[] selectionPaths = tree.getSelectionPaths();
+        // 只允许选择一个节点
+        if (ArrayUtil.isEmpty(selectionPaths) || selectionPaths.length > 1) {
+            return false;
+        }
+
+        TreePath path = selectionPaths[0];
+        XValueNodeImpl selectedNode = getSelectedNode(path);
+        XValue selectedValue = getSelectedValue(selectedNode);
+
+        // 判断是否为 Java-Debug 模式
+        if (!(selectedValue instanceof JavaValue)) {
+            return false;
+        }
+
+        // 获取类全限定名，判断是否为JavaBean，若是，则取该节点下的那些节点（递归）组合成JSON，再创建标签页
+        ValueDescriptorImpl descriptor = ((JavaValue) selectedValue).getDescriptor();
+        Value value = descriptor.getValue();
+
+        if (Objects.isNull(value) || Objects.isNull(value.type())) {
+            return false;
+        }
+
+        // 非对象或字符
+        if (!(value instanceof ObjectReference) || value instanceof StringReference) {
+            return false;
+        }
+
+        ObjectReference objectValue = (ObjectReference) value;
+        if (objectValue instanceof ArrayReference) {
+            // 数组判断
+            return areArrayElementsJavaBeans(project, (ArrayReference) objectValue);
+
+        } else if (isCollection(objectValue)) {
+            // 集合判断，不处理 Map 类型
+            return areCollectionElementsJavaBeans(project, objectValue);
+
+        } else {
+            // 拒绝包装类型及JDK内部类型
+            if (!isBeanType(project, objectValue)) {
+                return false;
+            }
+
+            return hasFields(objectValue);
+        }
+    }
+
+    private static boolean areCollectionElementsJavaBeans(Project project, ObjectReference reference) {
+        // toArray 之后就是数组
+        Value value = invokeMethod(project, reference, "toArray");
+        if (value != null) {
+            return areArrayElementsJavaBeans(project, (ArrayReference) value);
+        }
+
+        return false;
+    }
+
+    private static boolean areArrayElementsJavaBeans(Project project, ArrayReference arrayReference) {
+        if (arrayReference.length() <= 0) {
+            return false;
+        }
+
+        // 若存在JavaBean类型，返回true；反之为false
+        return arrayReference.getValues().stream().anyMatch(value -> value instanceof ObjectReference && isBeanType(project, (ObjectReference) value));
+    }
 
     /**
      * 处理复杂节点（对象、集合、Map、数组）
      *
-     * @param project
-     * @param dataContext    数据上下文
+     * @param project     项目
+     * @param dataContext 数据上下文
      * @return 根据节点类型返回对应类型值
      */
     public static Object resolveObjectReference(Project project, DataContext dataContext) {
@@ -545,12 +621,13 @@ public class JavaDebugUtil {
     /**
      * 解析集合类型
      *
-     * @param selectedNode 选中节点
+     * @param project   项目
+     * @param reference 对象
      * @return 集合类型值列表
      */
-    private static boolean hasChildren(XValueNodeImpl selectedNode) {
-        List<? extends TreeNode> children = selectedNode.getChildren();
-        return CollUtil.isNotEmpty(children) && !hasMessageNode(children);
+    private static boolean hasElements(Project project, ObjectReference reference) {
+        BooleanValue isEmptyValue = (BooleanValue) invokeMethod(project, reference, "isEmpty");
+        return isEmptyValue != null && !isEmptyValue.value();
     }
 
     /**
@@ -717,6 +794,7 @@ public class JavaDebugUtil {
      * @param expressionText 表达式文本
      * @return 字段值列表
      */
+    @SuppressWarnings("unused")
     public static List<Value> evaluate(Project project, String expressionText) {
         List<Value> values = new ArrayList<>();
         Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
@@ -797,16 +875,6 @@ public class JavaDebugUtil {
      */
     public static XValue getSelectedValue(XValueNodeImpl node) {
         return node != null ? node.getValueContainer() : null;
-    }
-
-    /**
-     * 判断是否有消息节点
-     *
-     * @param nodes 节点列表
-     * @return 是否有消息节点
-     */
-    public static boolean hasMessageNode(List<? extends TreeNode> nodes) {
-        return nodes.stream().anyMatch(el -> el instanceof MessageTreeNode);
     }
 
 }

@@ -1,11 +1,14 @@
 package cn.memoryzy.json.action.debug;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.util.JavaDebugUtil;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Map;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Memory
@@ -24,23 +27,22 @@ public class RuntimeObjectToJson5Action extends AnAction implements UpdateInBack
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         DataContext dataContext = e.getDataContext();
-        RuntimeObjectToJsonAction.handleObjectReferenceResolution(e.getProject(), dataContext, el -> convertResult(el, dataContext), true);
+        RuntimeObjectToJsonAction.handleObjectReferenceResolution(e.getProject(), dataContext, Json5Util::toJson5StrWithDoubleQuote, true);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        // TODO 判断逻辑需要改，改为识别为JavaBean的，或者List包含JavaBean的才显示
-        e.getPresentation().setEnabledAndVisible(RuntimeObjectToJsonAction.isEnabled(e.getDataContext()));
+        e.getPresentation().setEnabledAndVisible(isEnabled(e.getProject(), e.getDataContext()));
     }
 
-    private String convertResult(Object result, DataContext dataContext) {
-        if (result instanceof Map) {
-
-
-        } else if (result instanceof List) {
-
+    private static boolean isEnabled(@Nullable Project project, DataContext dataContext) {
+        Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
+        Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
+        if (project != null && languageClz != null && classClz != null) {
+            return JavaDebugUtil.isJavaBeanOrContainsJavaBeans(project, dataContext);
         }
 
-        return null;
+        return false;
     }
+
 }

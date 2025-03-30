@@ -187,6 +187,16 @@ public class Json5Util {
         return toJson5Str(obj, FORMAT_JSON5);
     }
 
+    /**
+     * 将Json5对象转换为Json文本
+     *
+     * @param obj Json5对象
+     * @return Json文本
+     */
+    public static String toJson5StrWithDoubleQuote(Object obj) {
+        return toJson5Str(obj, FORMAT_DOUBLE_QUOTE_JSON5);
+    }
+
 
     /**
      * 将对象转换为Json文本
