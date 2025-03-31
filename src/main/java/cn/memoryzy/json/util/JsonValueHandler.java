@@ -3,7 +3,6 @@ package cn.memoryzy.json.util;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.JsonValueHandleType;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
-import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.model.strategy.formats.context.AbstractGlobalTextConversionProcessor;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
@@ -12,6 +11,7 @@ import cn.memoryzy.json.model.strategy.formats.processor.json.JsonConversionProc
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
+import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.json.psi.*;
 import com.intellij.json.psi.impl.JsonRecursiveElementVisitor;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -24,6 +24,7 @@ import com.intellij.psi.PsiFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +44,11 @@ public class JsonValueHandler {
      * @return 如果找到指定类型的JSON值，则返回true；否则返回false
      */
     public static boolean containsSpecialType(@NotNull DataContext dataContext, JsonValueHandleType handleType) {
+        Project project = CommonDataKeys.PROJECT.getData(dataContext);
+        if (Objects.isNull(project)) {
+            return false;
+        }
+
         PsiFile psiFile = CommonDataKeys.PSI_FILE.getData(dataContext);
         if (psiFile instanceof JsonFile) {
             return containsSpecialTypeInElement(psiFile, handleType);
@@ -63,7 +69,7 @@ public class JsonValueHandler {
      * @param psiFile    Psi文件
      * @param handleType 指定类型
      */
-    public static void handleAllElement(Project project, PsiFile psiFile, JsonValueHandleType handleType) {
+    public static void handleAllElement(Project project, PsiFile psiFile, EditorData editorData, JsonValueHandleType handleType) {
         WriteCommandAction.runWriteCommandAction(project, () -> {
             psiFile.accept(new JsonRecursiveElementVisitor() {
                 @Override
@@ -86,6 +92,13 @@ public class JsonValueHandler {
                 }
             });
         });
+
+        Editor editor = editorData.getEditor();
+        String hintText = editorData.getSelectionData().isHasSelection()
+                ? handleType.getSelectionConvertSuccessMessage()
+                : handleType.getGlobalConvertSuccessMessage();
+
+        HintManager.getInstance().showInformationHint(editor, hintText);
     }
 
     // region Element 方法
@@ -116,6 +129,19 @@ public class JsonValueHandler {
             if (timestamp != 0) {
                 String time = "\"" + JsonAssistantUtil.formatDateBasedOnTimestampDetails(timestamp) + "\"";
                 jsonValue.replace(generator.createValue(time));
+            }
+
+        } else if (JsonValueHandleType.READABLE_TIME == handleType) {
+            if (jsonValue instanceof JsonStringLiteral) {
+                String value = ((JsonStringLiteral) jsonValue).getValue();
+                // 不为时间戳
+                if (StrUtil.isNotBlank(value) && !JsonAssistantUtil.isValidTimestamp(value)) {
+                    // 是否可以被转为时间
+                    Date date = JsonAssistantUtil.getDateAndFilterTime(value);
+                    if (Objects.nonNull(date)) {
+                        jsonValue.replace(generator.createValue(date.getTime() + ""));
+                    }
+                }
             }
         }
     }
@@ -221,6 +247,15 @@ public class JsonValueHandler {
                 // 若为有效时间戳
                 return JsonAssistantUtil.isValidTimestamp(longValue + "");
             }
+
+        } else if (JsonValueHandleType.READABLE_TIME == handleType) {
+            if (jsonValue instanceof JsonStringLiteral) {
+                String value = ((JsonStringLiteral) jsonValue).getValue();
+                // 是否可以被转为时间
+                return StrUtil.isNotBlank(value)
+                        && !JsonAssistantUtil.isValidTimestamp(value)
+                        && Objects.nonNull(JsonAssistantUtil.getDateAndFilterTime(value));
+            }
         }
 
         return false;
@@ -237,10 +272,8 @@ public class JsonValueHandler {
      * @param dataContext 上下文数据，包含编辑器和其他相关信息
      * @param handleType  要处理的JSON值类型（例如嵌套JSON或时间戳）
      */
-    public static void handleAllWrapper(Project project, DataContext dataContext, JsonValueHandleType handleType) {
+    public static void handleAllWrapper(Project project, DataContext dataContext, EditorData editorData, JsonValueHandleType handleType) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        // 解析编辑器信息
-        EditorData editorData = GlobalTextConverter.resolveEditor(PlatformUtil.getEditor(dataContext));
         // 验证
         if (Objects.isNull(editorData)) return;
         // 获取解析器集合
@@ -362,6 +395,17 @@ public class JsonValueHandler {
             }
 
             return timestamp != 0 ? JsonAssistantUtil.formatDateBasedOnTimestampDetails(timestamp) : null;
+
+        } else if (JsonValueHandleType.READABLE_TIME == handleType) {
+            if (value instanceof String) {
+                String dateStr = (String) value;
+                if (StrUtil.isNotBlank(dateStr) && !JsonAssistantUtil.isValidTimestamp(dateStr)) {
+                    Date date = JsonAssistantUtil.getDateAndFilterTime(dateStr);
+                    if (Objects.nonNull(date)) {
+                        return date.getTime();
+                    }
+                }
+            }
         }
 
         return null;
@@ -453,6 +497,14 @@ public class JsonValueHandler {
             } else if (obj instanceof Number) {
                 long l = ((Number) obj).longValue();
                 return JsonAssistantUtil.isValidTimestamp(l + "");
+            }
+
+        } else if (JsonValueHandleType.READABLE_TIME == handleType) {
+            if (obj instanceof String) {
+                String value = (String) obj;
+                return StrUtil.isNotBlank(value)
+                        && !JsonAssistantUtil.isValidTimestamp(value)
+                        && Objects.nonNull(JsonAssistantUtil.getDateAndFilterTime(value));
             }
         }
 

@@ -83,6 +83,19 @@ public class PlatformUtil {
         return PsiDocumentManager.getInstance(project).getPsiFile(document);
     }
 
+    public static PsiFile getPsiFile(DataContext dataContext, Document document) {
+        PsiFile psiFile = getPsiFile(dataContext);
+        if (psiFile == null) {
+            Project project = CommonDataKeys.PROJECT.getData(dataContext);
+            if (project != null) {
+                psiFile = getPsiFile(project, document);
+            }
+        }
+
+        return psiFile;
+    }
+
+
     /**
      * 通过当前光标的偏移量获取当前所在的Psi元素
      * <p>亦可配合 PsiTreeUtil.getParentOfType(element, PsiClass.class)方法来获取该PsiElement所处的区域</p>

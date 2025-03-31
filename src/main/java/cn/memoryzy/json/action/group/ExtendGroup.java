@@ -31,6 +31,7 @@ public class ExtendGroup extends DefaultActionGroup implements DumbAware, Update
         return new AnAction[]{
                 ActionHolder.EXPAND_ALL_NESTED_JSON_ACTION,
                 ActionHolder.CONVERT_ALL_TIMESTAMP_ACTION,
+                ActionHolder.CONVERT_ALL_READABLE_TIME_ACTION,
         };
     }
 
@@ -39,6 +40,8 @@ public class ExtendGroup extends DefaultActionGroup implements DumbAware, Update
         DataContext dataContext = e.getDataContext();
         e.getPresentation().setEnabledAndVisible(
                 JsonValueHandler.containsSpecialType(dataContext, JsonValueHandleType.TIMESTAMP)
-                        || JsonValueHandler.containsSpecialType(dataContext, JsonValueHandleType.NESTED_JSON));
+                        || JsonValueHandler.containsSpecialType(dataContext, JsonValueHandleType.NESTED_JSON)
+                        || JsonValueHandler.containsSpecialType(dataContext, JsonValueHandleType.READABLE_TIME)
+        );
     }
 }

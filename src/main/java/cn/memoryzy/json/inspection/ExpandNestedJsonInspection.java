@@ -92,7 +92,7 @@ public class ExpandNestedJsonInspection extends LocalInspectionTool {
 
         @Override
         public @NotNull String getFamilyName() {
-            return getText();
+            return JsonAssistantBundle.message("inspection.expand.json.familyName");
         }
     }
 

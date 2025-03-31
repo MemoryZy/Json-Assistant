@@ -10,7 +10,12 @@ public enum JsonValueHandleType {
 
     NESTED_JSON("hint.selection.ExpandAllNestedJson", "hint.global.ExpandAllNestedJson"),
 
-    TIMESTAMP("hint.selection.convertAllTimestamp", "hint.global.convertAllTimestamp");
+    TIMESTAMP("hint.selection.convertAllTimestamp", "hint.global.convertAllTimestamp"),
+
+    READABLE_TIME("hint.selection.convertAllReadableTime", "hint.global.convertAllReadableTime"),
+
+
+    ;
 
     private final String selectionConvertSuccessMessageKey;
     private final String globalConvertSuccessMessageKey;

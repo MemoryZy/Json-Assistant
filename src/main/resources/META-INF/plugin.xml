@@ -58,18 +58,25 @@
         <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonFileEditorProvider"/>
 
         <localInspection language="JSON"
-                         displayName="Expand Nested JSON"
+                         key="inspection.expand.json.familyName"
+                         bundle="messages.JsonAssistantBundle"
                          groupName="JSON and JSON5"
                          enabledByDefault="true"
                          level="INFO"
                          implementationClass="cn.memoryzy.json.inspection.ExpandNestedJsonInspection"/>
 
         <localInspection language="JSON"
-                         displayName="Convert to time format"
+                         key="inspection.convert.timestamp.familyName"
+                         bundle="messages.JsonAssistantBundle"
                          groupName="JSON and JSON5"
                          enabledByDefault="true"
                          level="INFO"
                          implementationClass="cn.memoryzy.json.inspection.ConvertTimestampInspection"/>
+
+        <intentionAction>
+            <className>cn.memoryzy.json.intention.ConvertReadableTimeIntention</className>
+            <category>JSON</category>
+        </intentionAction>
 
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
@@ -88,6 +95,7 @@
         <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>
         <action id="JsonAssistant.Action.ExpandAllNestedJsonAction" class="cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction"/>
+        <action id="JsonAssistant.Action.ConvertAllReadableTimeAction" class="cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction"/>
 
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>

@@ -19,16 +19,16 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
- * @since 2025/2/25
+ * @since 2025/3/31
  */
-public class ExpandAllNestedJsonAction extends DumbAwareAction implements UpdateInBackground {
+public class ConvertAllReadableTimeAction extends DumbAwareAction implements UpdateInBackground {
 
-    public ExpandAllNestedJsonAction() {
+    public ConvertAllReadableTimeAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.expand.nested.Json.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.expand.nested.Json.description"));
+        presentation.setText(JsonAssistantBundle.message("action.convert.to.timestamp.text"));
+        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.convert.to.timestamp.description"));
     }
 
     @Override
@@ -41,14 +41,14 @@ public class ExpandAllNestedJsonAction extends DumbAwareAction implements Update
         PsiFile psiFile = PlatformUtil.getPsiFile(dataContext, editor.getDocument());
 
         if (psiFile instanceof JsonFile) {
-            JsonValueHandler.handleAllElement(project, psiFile, editorData, JsonValueHandleType.NESTED_JSON);
+            JsonValueHandler.handleAllElement(project, psiFile, editorData, JsonValueHandleType.READABLE_TIME);
         } else {
-            JsonValueHandler.handleAllWrapper(project, dataContext, editorData, JsonValueHandleType.NESTED_JSON);
+            JsonValueHandler.handleAllWrapper(project, dataContext, editorData, JsonValueHandleType.READABLE_TIME);
         }
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(JsonValueHandler.containsSpecialType(e.getDataContext(), JsonValueHandleType.NESTED_JSON));
+        e.getPresentation().setEnabledAndVisible(JsonValueHandler.containsSpecialType(e.getDataContext(), JsonValueHandleType.READABLE_TIME));
     }
 }

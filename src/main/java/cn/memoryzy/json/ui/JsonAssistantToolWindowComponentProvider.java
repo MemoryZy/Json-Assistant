@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
@@ -53,6 +54,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
@@ -173,13 +176,17 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         String originalText = initData.getOriginalText();
         boolean needPrompt = hasText && editorBehaviorState.promptBeforeImport;
 
+        // 若是json5，则粘贴原文
+        boolean isJson5 = DataTypeConstant.JSON5.equals(parseType);
+        String editorText = isJson5 ? originalText : jsonString;
+
         EditorEx editor = (EditorEx) PlatformUtil.createEditor(
                 project,
                 "View." + editorFileType.getDefaultExtension(),
                 editorFileType,
                 false,
                 EditorKind.MAIN_EDITOR,
-                needPrompt ? "" : jsonString);
+                needPrompt ? "" : editorText);
 
         // 补充编辑器的外观
         changeEditorAppearance(editor, hasText);
@@ -190,6 +197,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         }
 
         if (hasText && !needPrompt) {
+            // 格式化文本
+            if (isJson5) {
+                DocumentEx document = editor.getDocument();
+                PsiFile psiFile = PlatformUtil.getPsiFile(project, document);
+                WriteCommandAction.runWriteCommandAction(project,
+                        () -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
+            }
+
             hintEditor(500, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
         }
 
@@ -322,7 +337,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         if (initTab && editorBehaviorState.recognizeOtherFormats) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
-                String clipboard = PlatformUtil.getClipboard();
+                String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
                     ClipboardTextConversionContext context = new ClipboardTextConversionContext();
@@ -345,10 +360,19 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                             return;
                         }
 
+                        String type = strategy.type();
                         if (editorBehaviorState.promptBeforeImport) {
-                            new PreviewClipboardDataDialog(project, editor, strategy.type(), formattedStr, StrUtil.trim(clipboard)).show();
+                            new PreviewClipboardDataDialog(project, editor, type, formattedStr, clipboard).show();
                         } else {
-                            WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), formattedStr));
+                            WriteCommandAction.runWriteCommandAction(project, () -> {
+                                boolean isJson5 = DataTypeConstant.JSON5.equals(type);
+                                DocumentEx document = editor.getDocument();
+                                PsiFile psiFile = PlatformUtil.getPsiFile(project, document);
+
+                                PlatformUtil.setDocumentText(document, isJson5 ? clipboard : formattedStr);
+                                CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength());
+                            });
+
                             // 提示粘贴成功的消息
                             hintEditor(400, JsonAssistantBundle.messageOnSystem("hint.paste.json"));
                         }

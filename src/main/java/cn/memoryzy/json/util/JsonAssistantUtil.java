@@ -162,7 +162,7 @@ public class JsonAssistantUtil {
         return null;
     }
 
-    public static Object getDate(String str) {
+    public static Date getDate(String str) {
         try {
             return DateUtil.parse(str);
         } catch (Exception ignored) {
@@ -170,6 +170,20 @@ public class JsonAssistantUtil {
 
         return null;
     }
+
+    public static Date getDateAndFilterTime(String str) {
+        try {
+            if (NumberUtil.isNumber(str)) {
+                return null;
+            }
+
+            return DateUtil.parse(str);
+        } catch (Exception ignored) {
+        }
+
+        return null;
+    }
+
 
 
     public static String unicodeToString(String unicodeString) {

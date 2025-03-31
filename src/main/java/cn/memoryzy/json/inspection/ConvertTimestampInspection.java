@@ -109,7 +109,7 @@ public class ConvertTimestampInspection extends LocalInspectionTool {
 
         @Override
         public @NotNull String getFamilyName() {
-            return getText();
+            return JsonAssistantBundle.message("inspection.convert.timestamp.familyName");
         }
     }
 }

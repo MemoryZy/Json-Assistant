@@ -2,9 +2,16 @@ package cn.memoryzy.json.action.extend;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonValueHandleType;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.util.JsonValueHandler;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.json.psi.JsonFile;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
@@ -28,11 +35,15 @@ public class ConvertAllTimestampAction extends DumbAwareAction implements Update
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = getEventProject(e);
         DataContext dataContext = e.getDataContext();
-        PsiFile psiFile = CommonDataKeys.PSI_FILE.getData(dataContext);
+        // 解析编辑器信息
+        Editor editor = PlatformUtil.getEditor(dataContext);
+        EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        PsiFile psiFile = PlatformUtil.getPsiFile(dataContext, editor.getDocument());
+
         if (psiFile instanceof JsonFile) {
-            JsonValueHandler.handleAllElement(project, psiFile, JsonValueHandleType.TIMESTAMP);
+            JsonValueHandler.handleAllElement(project, psiFile, editorData, JsonValueHandleType.TIMESTAMP);
         } else {
-            JsonValueHandler.handleAllWrapper(project, dataContext, JsonValueHandleType.TIMESTAMP);
+            JsonValueHandler.handleAllWrapper(project, dataContext, editorData, JsonValueHandleType.TIMESTAMP);
         }
     }
 
