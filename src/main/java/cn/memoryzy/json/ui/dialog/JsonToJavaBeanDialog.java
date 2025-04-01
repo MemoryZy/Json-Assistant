@@ -5,7 +5,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.deserializer.OptionsGroup;
+import cn.memoryzy.json.action.group.OptionsGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
@@ -88,6 +88,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.module = module;
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
         this.deserializerState = persistentState.deserializerState;
+
+        if (this.deserializerState == null) {
+            LOG.error("Deserialized configuration object is empty!");
+            throw new IllegalArgumentException("Deserialized configuration object is empty!");
+        }
 
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.deserialize.title"));
         setOKButtonText(JsonAssistantBundle.messageOnSystem("dialog.deserialize.ok"));
@@ -520,7 +525,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         // ----------------- Json5解析
         if (Json5Util.isJson5Array(jsonText)) {
-            ArrayWrapper arrayWrapper = Json5Util.parseArray(jsonText);
+            ArrayWrapper arrayWrapper = Json5Util.parseArrayWithComment(jsonText);
             if (CollUtil.isEmpty(arrayWrapper)) {
                 jsonErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.json"));
                 return null;
@@ -535,7 +540,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             // 转为JsonObject
             return (ObjectWrapper) arrayWrapper.get(0);
         } else if (Json5Util.isJson5Object(jsonText)) {
-            return Json5Util.parseObject(jsonText);
+            return Json5Util.parseObjectWithComment(jsonText);
         }
 
         return null;

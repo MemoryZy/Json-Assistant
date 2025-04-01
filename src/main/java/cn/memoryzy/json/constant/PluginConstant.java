@@ -54,7 +54,7 @@ public interface PluginConstant {
     String ERROR_VALUE = "error";
     String UNKNOWN = "unknown";
 
-    String COMMENT_KEY = "_comments";
+    String COMMENT_KEY = "#$__comments__";
 
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),

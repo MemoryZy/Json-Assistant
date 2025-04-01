@@ -1,5 +1,11 @@
-package cn.memoryzy.json.action.deserializer;
+package cn.memoryzy.json.action.group;
 
+import cn.memoryzy.json.action.deserializer.FastJson2ToggleAction;
+import cn.memoryzy.json.action.deserializer.FastJsonToggleAction;
+import cn.memoryzy.json.action.deserializer.JacksonToggleAction;
+import cn.memoryzy.json.action.deserializer.KeepCamelToggleAction;
+import cn.memoryzy.json.action.deserializer.comment.SwaggerToggleAction;
+import cn.memoryzy.json.action.deserializer.comment.SwaggerV3ToggleAction;
 import cn.memoryzy.json.action.deserializer.lombok.LombokGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
@@ -37,12 +43,20 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         List<AnAction> actions = new ArrayList<>();
         Separator attributeSeparator = Separator.create(JsonAssistantBundle.messageOnSystem("separator.attribute"));
+        Separator json5Separator = Separator.create("JSON5");
 
         if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
             actions.add(new LombokGroup(deserializerState));
         }
 
         actions.add(Separator.create());
+        if (JavaUtil.hasJacksonLib(module)) {
+            if (!actions.contains(attributeSeparator)) {
+                actions.add(attributeSeparator);
+            }
+            actions.add(new JacksonToggleAction(deserializerState));
+        }
+
         if (JavaUtil.hasFastJsonLib(module)) {
             if (!actions.contains(attributeSeparator)) {
                 actions.add(attributeSeparator);
@@ -57,11 +71,21 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
             actions.add(new FastJson2ToggleAction(deserializerState));
         }
 
-        if (JavaUtil.hasJacksonLib(module)) {
-            if (!actions.contains(attributeSeparator)) {
-                actions.add(attributeSeparator);
+        // ------------------------------------------
+
+        actions.add(Separator.create());
+        if (JavaUtil.hasSwaggerLib(module)) {
+            if (!actions.contains(json5Separator)) {
+                actions.add(json5Separator);
             }
-            actions.add(new JacksonToggleAction(deserializerState));
+            actions.add(new SwaggerToggleAction(deserializerState));
+        }
+
+        if (JavaUtil.hasSwaggerV3Lib(module)) {
+            if (!actions.contains(json5Separator)) {
+                actions.add(json5Separator);
+            }
+            actions.add(new SwaggerV3ToggleAction(deserializerState));
         }
 
         actions.add(Separator.create());

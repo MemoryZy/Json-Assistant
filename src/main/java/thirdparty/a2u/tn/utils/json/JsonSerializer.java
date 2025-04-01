@@ -2,6 +2,8 @@
  * Original code modified from tnjson (Unlicense License).
  * Source: https://github.com/anymaker/tnjson
  * Original package: a2u.tn.utils.json
+ * Modifications:
+ *  - Added ability to serialize comments.
  */
 package thirdparty.a2u.tn.utils.json;
 

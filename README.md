@@ -41,8 +41,10 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Escape
 - Serialization
   - JavaBean to JSON Conversion
+  - JavaBean to JSON5 Conversion (Including Comments)
   - Runtime Object to JSON Conversion
   - JSON to JavaBean Conversion
+  - JSON5 to JavaBean Conversion (Including Comments)
   - Kotlin Properties to JSON
   - Extract Java Constants to JSON
 - Format Conversion

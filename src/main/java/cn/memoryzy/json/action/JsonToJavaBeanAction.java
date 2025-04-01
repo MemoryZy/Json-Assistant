@@ -43,7 +43,6 @@ public class JsonToJavaBeanAction extends AnAction implements UpdateInBackground
         presentation.setText(JsonAssistantBundle.message("action.deserialize.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.deserialize.description"));
         presentation.setIcon(JsonAssistantIcons.GROUP_BY_CLASS);
-        // 注：由DumbAwareAction切换为AnAction，防止出现IndexNotReadyException异常
     }
 
     @Override

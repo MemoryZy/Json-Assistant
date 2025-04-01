@@ -39,8 +39,10 @@
   - 转义
 - 序列化
   - JavaBean 转换为 JSON
+  - JavaBean 转换为 JSON5 (支持解析注释)
   - 运行时对象转换为 JSON
   - JSON 转换为 JavaBean
+  - JSON5 转换为 JavaBean (支持解析注释)
   - Kotlin 属性转为 JSON
   - 提取 Java 常量为 JSON
 - 格式转换

@@ -144,6 +144,17 @@ public class TnJson {
     }
   }
 
+  public static Map<String, Object> parseWithComment(String data) {
+    try {
+      JsonParser p = new JsonParser(true);
+      return p.doParse(data);
+    }
+    catch (ParseException px) {
+      //Hide unnecessary log trace. If you want full trace - change it.
+      throw new ParseException(px.getMessage(), px.getPosition(), px.getPath());
+    }
+  }
+
   TnJson() {
     //hide constructor
   }

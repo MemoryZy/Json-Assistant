@@ -48,4 +48,14 @@ public class DeserializerState {
      */
     public boolean setterLombokAnnotation = false;
 
+    /**
+     * 添加 Swagger 字段描述注解
+     */
+    public boolean swaggerAnnotation = false;
+
+    /**
+     * 添加 Swagger v3 字段描述注解
+     */
+    public boolean swaggerV3Annotation = false;
+
 }

@@ -846,6 +846,14 @@ public class JavaUtil {
         return Objects.nonNull(JavaUtil.findClass(module, JsonAnnotations.JACKSON_JSON_PROPERTY.getValue()));
     }
 
+    public static boolean hasSwaggerLib(Module module) {
+        return Objects.nonNull(JavaUtil.findClass(module, SwaggerAnnotations.API_MODEL_PROPERTY.getValue()));
+    }
+
+    public static boolean hasSwaggerV3Lib(Module module) {
+        return Objects.nonNull(JavaUtil.findClass(module, SwaggerAnnotations.SCHEMA.getValue()));
+    }
+
     public static boolean isMissingFastJsonLib(Module module) {
         return !hasFastJsonLib(module);
     }

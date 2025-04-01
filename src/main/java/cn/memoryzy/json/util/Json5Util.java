@@ -139,7 +139,17 @@ public class Json5Util {
      * @return ObjectWrapper包装对象
      */
     public static ObjectWrapper parseObject(String text) {
-        return new ObjectWrapper(resolveJson5(text));
+        return new ObjectWrapper(resolveJson5(text, false));
+    }
+
+    /**
+     * 将Json5文本解析为ObjectWrapper（对象）
+     *
+     * @param text 文本
+     * @return ObjectWrapper包装对象
+     */
+    public static ObjectWrapper parseObjectWithComment(String text) {
+        return new ObjectWrapper(resolveJson5(text, true));
     }
 
 
@@ -150,7 +160,18 @@ public class Json5Util {
      * @return ArrayWrapper包装对象
      */
     public static ArrayWrapper parseArray(String text) {
-        return new ArrayWrapper(resolveJson5(text));
+        return new ArrayWrapper(resolveJson5(text, false));
+    }
+
+
+    /**
+     * 将Json5文本解析为ArrayWrapper（数组）
+     *
+     * @param text 文本
+     * @return ArrayWrapper包装对象
+     */
+    public static ArrayWrapper parseArrayWithComment(String text) {
+        return new ArrayWrapper(resolveJson5(text, true));
     }
 
 
@@ -161,7 +182,7 @@ public class Json5Util {
      * @return Json文本
      */
     public static String convertJson5ToJson(String json5Str) {
-        Object data = resolveJson5(json5Str);
+        Object data = resolveJson5(json5Str, false);
         return Objects.isNull(data) ? null : JsonUtil.formatJson(data);
     }
 
@@ -224,7 +245,7 @@ public class Json5Util {
      */
     public static Object tryResolveJson5(String text) {
         // 判断是否为 Json，再判断是否为 Json5
-        return JsonUtil.isJson(text) ? null : resolveJson5(text);
+        return JsonUtil.isJson(text) ? null : resolveJson5(text, false);
     }
 
 
@@ -235,12 +256,12 @@ public class Json5Util {
      * @return 若为对象，则返回 Map；若为 List，则返回 List；否则返回 null
      */
     @SuppressWarnings("deprecation")
-    public static Object resolveJson5(String text) {
+    public static Object resolveJson5(String text, boolean parseComment) {
         if (StrUtil.isBlank(text)) return null;
 
         Map<String, Object> map = null;
         try {
-            map = TnJson.parse(text);
+            map = parseComment ? TnJson.parseWithComment(text) : TnJson.parse(text);
         } catch (Exception ignored) {
         }
 
@@ -249,7 +270,7 @@ public class Json5Util {
                 // 尝试转义
                 text = StringEscapeUtils.unescapeJson(text);
                 // 再次解析
-                map = TnJson.parse(text);
+                map = parseComment ? TnJson.parseWithComment(text) : TnJson.parse(text);
             }
 
             if (MapUtil.isNotEmpty(map)) {

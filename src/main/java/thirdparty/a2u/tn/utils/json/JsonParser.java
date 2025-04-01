@@ -1,5 +1,18 @@
+/**
+ * Original code modified from tnjson (Unlicense License).
+ * Source: https://github.com/anymaker/tnjson
+ * Original package: a2u.tn.utils.json
+ * Modifications:
+ *  - When parsing JSON5, use BigDecimal to accept large values.
+ *  - Added the ability to parse comments.
+ */
 package thirdparty.a2u.tn.utils.json;
 
+import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.constant.PluginConstant;
+import com.intellij.openapi.diagnostic.Logger;
+
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -9,6 +22,8 @@ import java.util.*;
  *
  */
 class JsonParser {
+
+  private static final Logger LOG = Logger.getInstance(JsonParser.class);
 
   /**
    * This name will get element in a returned map when json-string will be an array of values.
@@ -22,12 +37,17 @@ class JsonParser {
    */
   public static final String PATH_ROOT_KEY = "root";
 
-  // 使用包含非标准字符的组合键名（符合JSON5键名规范）
-  private static final String COMMENT_MARKER = "#$__comments__";
-
   private IGetCollection listener;
 
-  private String lastComment = null; // 存储最近捕获的注释
+  /**
+   * 是否解析注释
+   */
+  private boolean parseComment = false;
+
+  /**
+   * 存储最近捕获的注释
+   */
+  private String lastComment = null;
 
   /**
    * Inner immutable class for represent path by root of json-object
@@ -76,7 +96,9 @@ class JsonParser {
     this.listener = listener;
   }
 
-
+  JsonParser(boolean parseComment) {
+    this.parseComment = parseComment;
+  }
 
   /**
    * Prepare and start parsing
@@ -126,16 +148,20 @@ class JsonParser {
         return map;
       }
 
-      // 捕获键前注释
-      String keyComment = lastComment;
-      lastComment = null;
-
-      String key = extractIdenty(path);
-      if (COMMENT_MARKER.equals(key)) {
-        throw new ParseException("Key '" + COMMENT_MARKER + "' is reserved for internal use", index, path.getName());
+      String keyComment = null;
+      if (parseComment) {
+        // 捕获键前注释
+        keyComment = lastComment;
+        lastComment = null;
       }
 
-      if (keyComment != null) {
+      String key = extractIdenty(path);
+      if (parseComment && PluginConstant.COMMENT_KEY.equals(key)) {
+        LOG.warn(StrUtil.format("Key '{}' is reserved for internal use, at position {}, path '{}'.",
+                PluginConstant.COMMENT_KEY, index, path.getName()));
+      }
+
+      if (parseComment && keyComment != null) {
         addCommentToMap(map, key, keyComment, path);
       }
 
@@ -149,18 +175,32 @@ class JsonParser {
       Object val = extractValue(path.add(key));
       map.put(key, val);
 
-      // 处理行内注释（值后）
-      if (val != null) {
-        checkInlineComment(map, key, path);
-      }
-
       c = getTokenBegin();
       if (c == '}') {
         index++;
+
+        if (parseComment) {
+          // 若结尾已经到达，同行的注释将在skipToxxx()方法中被解析
+          keyComment = lastComment;
+          lastComment = null;
+          if (keyComment != null) {
+            addCommentToMap(map, key, keyComment, path);
+          }
+        }
+
         return map;
       }
+
       if (c == ',') {
         index++;
+
+        if (parseComment) {
+          // 判断是否存在行尾注释
+          // 处理行内注释（值后）
+          checkInlineComment(map, key, path);
+          lastComment = null;
+        }
+
         continue;
       }
 
@@ -173,8 +213,6 @@ class JsonParser {
   @SuppressWarnings("unchecked")
   private Collection parseList(Path path) {
     Collection list = getCollectionForList(path);
-    int elementIndex = 0;
-    Map<String, Object> parentMap = getParentMapForList(path);
 
     while (index < maxLength) {
       char c = getTokenBegin();
@@ -189,65 +227,73 @@ class JsonParser {
         continue;
       }
 
-      // 捕获元素前注释
-      String elementComment = lastComment;
-      lastComment = null;
-
       Object val = extractValue(path);
       list.add(val);
 
-      if (elementComment != null && parentMap != null) {
-        addCommentToMap(parentMap, String.valueOf(elementIndex), elementComment, path);
-      }
-
-      elementIndex++;
     }
 
     return list;
   }
 
-  // 获取列表的父Map（假设路径最后为列表键）
-  private Map<String, Object> getParentMapForList(Path path) {
-    // 实现根据路径查找父Map的逻辑，此处简化为resultMap
-    return resultMap;
-  }
 
   private void addCommentToMap(Map<String, Object> map, String key, String comment, Path path) {
-    // 检查冲突
-    if (map.containsKey(COMMENT_MARKER)) {
-      Object existing = map.get(COMMENT_MARKER);
-      if (!(existing instanceof Map)) {
-        throw new ParseException("Conflict with reserved key: " + COMMENT_MARKER, index, path.getName());
+    try {
+      // 检查冲突
+      if (map.containsKey(PluginConstant.COMMENT_KEY)) {
+        Object existing = map.get(PluginConstant.COMMENT_KEY);
+        if (!(existing instanceof Map)) {
+          throw new ParseException("Conflict with reserved key: " + PluginConstant.COMMENT_KEY, index, path.getName());
+        }
       }
-    }
 
-    @SuppressWarnings("unchecked")
-    Map<String, String> comments = (Map<String, String>) map.get(COMMENT_MARKER);
-    if (comments == null) {
-      comments = new HashMap<>();
-      map.put(COMMENT_MARKER, comments);
+      @SuppressWarnings("unchecked")
+      Map<String, String> comments = (Map<String, String>) map.get(PluginConstant.COMMENT_KEY);
+      if (comments == null) {
+        comments = new HashMap<>();
+        map.put(PluginConstant.COMMENT_KEY, comments);
+      }
+
+      // 如果注释中已存在此key，则跳过
+      if (!comments.containsKey(key)) {
+        comments.put(key, comment);
+      }
+
+    } catch (ParseException e) {
+      LOG.warn(StrUtil.format("Conflict with reserved key: '{}', at position {}, path '{}'.",
+              PluginConstant.COMMENT_KEY, index, path.getName()));
     }
-    comments.put(key, comment);
   }
 
   // 检查值后的行内注释
   private void checkInlineComment(Map<String, Object> map, String key, Path path) {
-    int currentIndex = index;
-    while (currentIndex < maxLength) {
-      char c = content.charAt(currentIndex);
-      if (c == '/') {
-        if (currentIndex + 1 < maxLength && content.charAt(currentIndex + 1) == '/') {
-          int commentStart = currentIndex + 2;
-          int commentEnd = findLineEnd(commentStart);
-          String inlineComment = content.substring(commentStart, commentEnd).trim();
-          addCommentToMap(map, key, inlineComment, path);
-          index = commentEnd; // 更新索引
+    try {
+      // 先判断是否已存在此key，若存在则跳过
+      @SuppressWarnings("unchecked")
+      Map<String, String> comments = (Map<String, String>) map.get(PluginConstant.COMMENT_KEY);
+      if (Objects.nonNull(comments) && comments.containsKey(key)) {
+        return;
+      }
+
+      int currentIndex = index;
+      while (currentIndex < maxLength) {
+        char c = content.charAt(currentIndex);
+        if (c == '/') {
+          if (currentIndex + 1 < maxLength && content.charAt(currentIndex + 1) == '/') {
+            int commentStart = currentIndex + 2;
+            int commentEnd = findLineEnd(commentStart);
+            String inlineComment = content.substring(commentStart, commentEnd).trim();
+            addCommentToMap(map, key, inlineComment, path);
+            index = commentEnd; // 更新索引
+            break;
+          }
+        } else if (!isWhiteSpace(c) || isLineTerminator(c)) {
+          // 遇到行终止，切换下一个键值对
           break;
         }
-      } else if (!isWhiteSpace(c)) {
-        break;
+        currentIndex++;
       }
-      currentIndex++;
+    } catch (Exception e) {
+      LOG.warn(StrUtil.format("Parsing error, key '{}', at position {}, path '{}'.", key, index, path.getName(), e.getMessage()), e);
     }
   }
 
@@ -267,15 +313,17 @@ class JsonParser {
     while (index < maxLength) {
       char c = content.charAt(index);
 
-      if (c == '/') {
-        if (index + 1 >= maxLength) return 0;
-        char next = content.charAt(index + 1);
-        if (next == '/') {
-          skipToEndLine();
-          continue;
-        } else if (next == '*') {
-          skipToEndComent();
-          continue;
+      if (parseComment) {
+        if (c == '/') {
+          if (index + 1 >= maxLength) return 0;
+          char next = content.charAt(index + 1);
+          if (next == '/') {
+            skipToEndLine();
+            continue;
+          } else if (next == '*') {
+            skipToEndComent();
+            continue;
+          }
         }
       }
 
@@ -285,6 +333,19 @@ class JsonParser {
 
       if (c == '\\') {
         return c;
+      }
+
+      if (!parseComment) {
+        if (c == '/') {
+          char next = content.charAt(index + 1);
+          if (next == '/') {
+            skipToEndLine();
+          }
+          else if (next == '*') {
+            index += 2;
+            skipToEndComent();
+          }
+        }
       }
 
       index++;
@@ -297,26 +358,39 @@ class JsonParser {
     while (index < maxLength) {
       char c = content.charAt(index);
       if (isLineTerminator(c)) {
-        lastComment = content.substring(start, index).trim();
-        index++;
+        if (parseComment) {
+          lastComment = content.substring(start, index).trim();
+          index++;
+        }
         return;
       }
       index++;
     }
-    lastComment = content.substring(start).trim();
+    if (parseComment) lastComment = content.substring(start).trim();
   }
 
   private void skipToEndComent() {
     int start = index + 2; // 跳过 '/*'
     while (index < maxLength) {
-      if (content.charAt(index) == '*' && index + 1 < maxLength && content.charAt(index + 1) == '/') {
-        lastComment = content.substring(start, index).trim();
-        index += 2;
-        return;
+      if (parseComment) {
+        if (content.charAt(index) == '*' && index + 1 < maxLength && content.charAt(index + 1) == '/') {
+          lastComment = content.substring(start, index).trim();
+          index += 2;
+          return;
+        }
+      } else {
+        char c = content.charAt(index);
+        if (c == '*') {
+          index++;
+          c = content.charAt(index);
+          if (c == '/') {
+            return;
+          }
+        }
       }
       index++;
     }
-    lastComment = content.substring(start).trim();
+    if (parseComment) lastComment = content.substring(start).trim();
   }
 
 
@@ -429,7 +503,8 @@ class JsonParser {
     boolean hasX = literal.indexOf('x') >= 0;
 
     if (hasDot || (hasE && ! hasX)) {
-      return Double.parseDouble(literal);
+      return new BigDecimal(literal);
+      // return Double.parseDouble(literal);
     }
 
     // Integer.MAX_VALUE dec == 2147483647 - 10 characters
@@ -630,5 +705,4 @@ class JsonParser {
     }
     return result;
   }
-
 }
