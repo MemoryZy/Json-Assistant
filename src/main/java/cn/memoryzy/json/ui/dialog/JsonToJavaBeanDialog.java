@@ -12,6 +12,7 @@ import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.LombokAnnotations;
+import cn.memoryzy.json.enums.SwaggerAnnotations;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
@@ -182,7 +183,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         // 获取 ClassName
         String className = classNameTextField.getText();
         if (StringUtils.isBlank(className)) {
-            className = "FromJson" + StrUtil.upperFirst(IdUtil.simpleUUID().substring(0, 4));
+            className = "AnonymousClass" + StrUtil.upperFirst(IdUtil.simpleUUID().substring(0, 4));
         } else {
             // 存在名字，校验
             ClassValidator classValidator = new ClassValidator(project, directory);
@@ -208,9 +209,17 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return false;
         }
 
+        // TODO 在这里分出一个方法，用模板生成类，用进度条的方式
+        // TODO 再创建一个 code 类型模板，用于生成内部类，若模板方法失败，则使用psi操作
+
+
+
+
         // 先生成Java文件
         JavaDirectoryService directoryService = JavaDirectoryService.getInstance();
         PsiClass newClass = directoryService.createClass(directory, className);
+
+
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             try {
@@ -248,12 +257,35 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
 
     private void recursionAddProperty(ObjectWrapper jsonObject, PsiClass psiClass, PsiElementFactory factory, Set<String> needImportList) {
+        // 提取注释
+        Map<?, ?> commentsMap = null;
+        Object commentsObj = jsonObject.get(PluginConstant.COMMENT_KEY);
+        // 默认会使用 LinkedHashMap 作反序列化，但注释Map是 HashMap，判断一下，杜绝有同名的Key
+        if (commentsObj instanceof HashMap && !(commentsObj instanceof LinkedHashMap)) {
+            commentsMap = (Map<?, ?>) commentsObj;
+        }
+
         // 循环所有Json字段
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             String key = entry.getKey();
+            // 注释
+            if (PluginConstant.COMMENT_KEY.equals(key)) {
+                continue;
+            }
+
             Object value = entry.getValue();
             // 处理后的key
             String processedKey = getFieldName(key);
+
+            // 获取注释
+            String comment = null;
+            if (commentsMap != null) {
+                Object commentObj = commentsMap.get(key);
+                if (commentObj != null) {
+                    // 确保单行
+                    comment = commentObj.toString().replaceAll("[\r\n]+", " ");
+                }
+            }
 
             // ------------- 如果value是ObjectWrapper，表示是对象
             if (value instanceof ObjectWrapper) {
@@ -271,7 +303,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 // 构建字段对象
                 PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
                 // 添加注解
-                addFieldLevelAnnotation(key, psiClass, psiField, factory);
+                addFieldLevelAnnotation(key, comment, psiClass, psiField, factory);
+                // 添加注释，作为第一位元素，等后续注解添加时，就可以以注释为第一位元素
+                addFieldDocComment(psiField, comment, factory);
+
                 // 添加到Class
                 psiClass.add(psiField);
 
@@ -302,8 +337,13 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                     String fieldText = StrUtil.format("{} List<{}> {};", PsiModifier.PRIVATE, innerClassName, processedKey);
                     // 构建字段对象
                     PsiField psiField = factory.createFieldFromText(fieldText, psiClass);
+
                     // 添加注解
-                    addFieldLevelAnnotation(key, psiClass, psiField, factory);
+                    addFieldLevelAnnotation(key, comment, psiClass, psiField, factory);
+
+                    // 添加注释，作为第一位元素，等后续注解添加时，就可以以注释为第一位元素
+                    addFieldDocComment(psiField, comment, factory);
+
                     // 添加到Class
                     psiClass.add(psiField);
 
@@ -331,7 +371,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 }
 
                 // 添加注解
-                addFieldLevelAnnotation(key, psiClass, psiField, factory);
+                addFieldLevelAnnotation(key, comment, psiClass, psiField, factory);
+
+                // 添加注释，作为第一位元素，等后续注解添加时，就可以以注释为第一位元素
+                addFieldDocComment(psiField, comment, factory);
 
                 // 添加到Class
                 psiClass.add(psiField);
@@ -339,10 +382,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         }
     }
 
-    private void addFieldLevelAnnotation(String originalKey, PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
+    private void addFieldLevelAnnotation(String originalKey, String comment, PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
         // 是否存在FastJson依赖
         boolean hasFastJsonLib = JavaUtil.hasFastJsonLib(module);
         boolean hasFastJson2Lib = JavaUtil.hasFastJson2Lib(module);
+
         // 当选择了添加 fastJson/fastJson2 注解，且存在 fastJson/fastJson2 注解
         if ((deserializerState.fastJsonAnnotation || deserializerState.fastJson2Annotation) && (hasFastJsonLib || hasFastJson2Lib)) {
             addFieldLevelFastJsonAnnotation(originalKey, newClass, psiField, factory, hasFastJsonLib, hasFastJson2Lib);
@@ -350,13 +394,22 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         // 是否存在Jackson依赖
         if (deserializerState.jacksonAnnotation && JavaUtil.hasJacksonLib(module)) {
-            addFieldLevelJacksonAnnotation(originalKey, newClass, psiField, factory);
+            addFieldLevelAnnotation(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue(), "value", originalKey, newClass, psiField, factory);
+        }
+
+        if (StrUtil.isNotBlank(comment)) {
+            // swagger
+            if (deserializerState.swaggerAnnotation && JavaUtil.hasSwaggerLib(module)) {
+                addFieldLevelAnnotation(SwaggerAnnotations.API_MODEL_PROPERTY.getValue(), "value", comment, newClass, psiField, factory);
+            }
+
+            // swagger v3
+            if (deserializerState.swaggerV3Annotation && JavaUtil.hasSwaggerV3Lib(module)) {
+                addFieldLevelAnnotation(SwaggerAnnotations.SCHEMA.getValue(), "description", comment, newClass, psiField, factory);
+            }
         }
     }
 
-    private void addFieldLevelJacksonAnnotation(String originalKey, PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
-        addFieldLevelJsonAnnotation(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue(), "value", originalKey, newClass, psiField, factory);
-    }
 
     private void addFieldLevelFastJsonAnnotation(String originalKey, PsiClass newClass, PsiField psiField,
                                                  PsiElementFactory factory, boolean hasFastJsonLib, boolean hasFastJson2Lib) {
@@ -373,14 +426,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return;
         }
 
-        addFieldLevelJsonAnnotation(annotationName, "name", originalKey, newClass, psiField, factory);
+        addFieldLevelAnnotation(annotationName, "name", originalKey, newClass, psiField, factory);
     }
 
 
-    private void addFieldLevelJsonAnnotation(String annotationName, String attributeName, String originalKey,
-                                             PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
+    private void addFieldLevelAnnotation(String annotationName, String attributeName, String attributeValue,
+                                         PsiClass newClass, PsiField psiField, PsiElementFactory factory) {
         // 增加注解
-        String formatted = StrUtil.format("@{}({} = \"{}\")", StringUtil.getShortName(annotationName), attributeName, originalKey);
+        String formatted = StrUtil.format("@{}({} = \"{}\")", StringUtil.getShortName(annotationName), attributeName, attributeValue);
         // 导入类
         JavaUtil.importClassesInClass(project, newClass, annotationName);
 
@@ -493,6 +546,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             documentManager.doPostponedOperationsAndUnblockDocument(document);
             document.setText(result);
         });
+    }
+
+    private void addFieldDocComment(PsiField psiField, String comment, PsiElementFactory factory) {
+        if (StrUtil.isNotBlank(comment)) {
+            PsiDocComment docComment = factory.createDocCommentFromText(
+                    StrUtil.format(PluginConstant.PROPERTY_COMMENT_TEMPLATE, comment), psiField);
+            psiField.addBefore(docComment, psiField.getFirstChild());
+        }
     }
 
     private ObjectWrapper resolveJson(String jsonText) {

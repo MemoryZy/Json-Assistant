@@ -74,18 +74,18 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
         // ------------------------------------------
 
         actions.add(Separator.create());
-        if (JavaUtil.hasSwaggerLib(module)) {
-            if (!actions.contains(json5Separator)) {
-                actions.add(json5Separator);
-            }
-            actions.add(new SwaggerToggleAction(deserializerState));
-        }
-
         if (JavaUtil.hasSwaggerV3Lib(module)) {
             if (!actions.contains(json5Separator)) {
                 actions.add(json5Separator);
             }
             actions.add(new SwaggerV3ToggleAction(deserializerState));
+        }
+
+        if (JavaUtil.hasSwaggerLib(module)) {
+            if (!actions.contains(json5Separator)) {
+                actions.add(json5Separator);
+            }
+            actions.add(new SwaggerToggleAction(deserializerState));
         }
 
         actions.add(Separator.create());

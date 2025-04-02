@@ -7,6 +7,7 @@
  */
 package thirdparty.a2u.tn.utils.json;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 
 import java.lang.reflect.*;
@@ -262,13 +263,16 @@ class JsonSerializer {
       if (builder.isAllowComments && commentsMap != null) {
         Object commentObj = commentsMap.get(originalKey);
         if (commentObj != null) {
-          String comment = commentObj.toString().replaceAll("[\r\n]+", " "); // 确保单行
-          if (builder.isFormated) {
-            startLine(b, builder, valuelevel);
-            b.append("// ").append(comment);
-            endLine(b, builder); // 换行
-          } else {
-            b.append("// ").append(comment).append(' ');
+          // 确保单行
+          String comment = commentObj.toString().replaceAll("[\r\n]+", " ");
+          if (StrUtil.isNotBlank(comment)) {
+            if (builder.isFormated) {
+              startLine(b, builder, valuelevel);
+              b.append("// ").append(comment);
+              endLine(b, builder); // 换行
+            } else {
+              b.append("// ").append(comment).append(' ');
+            }
           }
         }
       }

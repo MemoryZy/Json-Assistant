@@ -1,0 +1,31 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+
+## 导入区
+#foreach($IMPORT in $IMPORTS)
+import ${IMPORT};
+#end
+
+## 类注解区
+#parse("File Header.java")
+#foreach($ANNO in $CLASS_ANNOTATIONS)
+    ${ANNO.ANNOTATION_STRING}
+#end
+public class ${NAME} {
+
+#foreach($FIELD in $FIELDS)
+    ## 注释
+    #if( $!{FIELD.COMMENT} && "$!FIELD.COMMENT" != "" )
+    /**
+     * ${FIELD.COMMENT}
+     */
+    #end
+    ## 注解
+    #foreach($ANNO in ${FIELD.ANNOTATIONS})
+        ${ANNO.ANNOTATION_STRING}
+    #end
+    ## 字段声明
+    private ${FIELD.TYPE} ${FIELD.NAME};
+
+#end
+
+}

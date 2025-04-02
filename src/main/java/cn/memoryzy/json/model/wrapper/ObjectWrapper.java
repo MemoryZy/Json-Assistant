@@ -1,6 +1,9 @@
 package cn.memoryzy.json.model.wrapper;
 
+import cn.memoryzy.json.constant.PluginConstant;
+
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -32,8 +35,14 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
             Object value = entry.getValue();
 
             if (value instanceof Map) {
-                // 递归转换嵌套的 Map
-                put(key, new ObjectWrapper(value));
+                // 特殊处理 注释 键
+                if (PluginConstant.COMMENT_KEY.equals(key)
+                        && (value instanceof HashMap) && !(value instanceof LinkedHashMap)) {
+                    put(key, value);
+                } else {
+                    // 递归转换嵌套的 Map
+                    put(key, new ObjectWrapper(value));
+                }
             } else if (value instanceof Collection) {
                 // 转换嵌套的 List
                 put(key, new ArrayWrapper(value));

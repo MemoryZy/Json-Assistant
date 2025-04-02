@@ -56,6 +56,13 @@ public interface PluginConstant {
 
     String COMMENT_KEY = "#$__comments__";
 
+    String PROPERTY_COMMENT_TEMPLATE = "/**\n" +
+            "* {}\n" +
+            "*/";
+
+    String NEW_CLASS_TEMPLATE_NAME = "New Class.java";
+    String INNER_CLASS_TEMPLATE_NAME = "Inner Class.java";
+
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),
             Collection.class.getName(),

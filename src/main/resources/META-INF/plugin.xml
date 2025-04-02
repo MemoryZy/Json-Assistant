@@ -78,6 +78,8 @@
             <category>JSON</category>
         </intentionAction>
 
+        <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
+        
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
 
