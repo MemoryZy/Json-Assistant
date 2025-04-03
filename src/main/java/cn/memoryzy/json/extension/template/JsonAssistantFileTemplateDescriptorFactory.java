@@ -17,7 +17,6 @@ public class JsonAssistantFileTemplateDescriptorFactory implements FileTemplateG
     public FileTemplateGroupDescriptor getFileTemplatesDescriptor() {
         FileTemplateGroupDescriptor group = new FileTemplateGroupDescriptor(JsonAssistantPlugin.PLUGIN_NAME, AllIcons.FileTypes.Custom);
         group.addTemplate(new FileTemplateDescriptor(PluginConstant.NEW_CLASS_TEMPLATE_NAME, AllIcons.FileTypes.Java));
-        group.addTemplate(new FileTemplateDescriptor(PluginConstant.INNER_CLASS_TEMPLATE_NAME, AllIcons.FileTypes.Java));
         return group;
     }
 

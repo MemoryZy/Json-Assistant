@@ -34,6 +34,10 @@ public class AnnotationModel implements TemplateModel {
         return new AnnotationModel(name).addAttribute(attrName, attrValue);
     }
 
+    public static AnnotationModel of(String name) {
+        return new AnnotationModel(name);
+    }
+
     /**
      * 判断是否有属性
      */

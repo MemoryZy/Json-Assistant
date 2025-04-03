@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class ModelToMapConverter {
 
-    public static Map<String, Object> convert(Object model) throws Exception {
+    public static Map<String, Object> convert(Object model) {
         Map<String, Object> result = new LinkedHashMap<>();
 
         Class<?> clz = model.getClass();
@@ -20,15 +20,14 @@ public class ModelToMapConverter {
             MapKey annotation = field.getAnnotation(MapKey.class);
             if (annotation == null) continue;
 
-            ReflectUtil.setAccessible(field);
-            Object value = field.get(model);
-
+            Object value = ReflectUtil.getFieldValue(model, field);
             result.put(annotation.value(), processValue(value));
         }
+
         return result;
     }
 
-    private static Object processValue(Object value) throws Exception {
+    private static Object processValue(Object value) {
         if (value == null) return null;
 
         // 处理集合类型
@@ -50,7 +49,7 @@ public class ModelToMapConverter {
         return value;
     }
 
-    private static List<Object> processCollection(Collection<?> collection) throws Exception {
+    private static List<Object> processCollection(Collection<?> collection) {
         List<Object> list = new ArrayList<>();
         for (Object item : collection) {
             list.add(processCollectionItem(item));
@@ -58,7 +57,7 @@ public class ModelToMapConverter {
         return list;
     }
 
-    private static List<Object> processArray(Object array) throws Exception {
+    private static List<Object> processArray(Object array) {
         List<Object> list = new ArrayList<>();
         int length = Array.getLength(array);
         for (int i = 0; i < length; i++) {
@@ -68,7 +67,7 @@ public class ModelToMapConverter {
         return list;
     }
 
-    private static Object processCollectionItem(Object item) throws Exception {
+    private static Object processCollectionItem(Object item) {
         return (item instanceof TemplateModel) ? convert(item) : item;
     }
 

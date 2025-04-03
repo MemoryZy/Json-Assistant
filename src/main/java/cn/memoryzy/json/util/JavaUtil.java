@@ -9,6 +9,7 @@ import cn.hutool.core.util.*;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
+import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.SwaggerAnnotations;
 import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
@@ -852,6 +853,10 @@ public class JavaUtil {
 
     public static boolean hasSwaggerV3Lib(Module module) {
         return Objects.nonNull(JavaUtil.findClass(module, SwaggerAnnotations.SCHEMA.getValue()));
+    }
+
+    public static boolean hasLombokLib(Module module){
+        return Objects.nonNull(JavaUtil.findClass(module, LombokAnnotations.DATA.getValue()));
     }
 
     public static boolean isMissingFastJsonLib(Module module) {

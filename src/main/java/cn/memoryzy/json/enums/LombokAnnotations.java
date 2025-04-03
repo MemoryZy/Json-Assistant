@@ -6,23 +6,28 @@ package cn.memoryzy.json.enums;
  */
 public enum LombokAnnotations {
 
-    DATA("lombok.Data"),
+    DATA("lombok.Data", "Data"),
 
-    ACCESSORS("lombok.experimental.Accessors"),
+    ACCESSORS("lombok.experimental.Accessors", "Accessors"),
 
-    GETTER("lombok.Getter"),
+    GETTER("lombok.Getter", "Getter"),
 
-    SETTER("lombok.Setter"),
+    SETTER("lombok.Setter", "Setter"),
     ;
 
     private final String value;
+    private final String simpleName;
 
-    LombokAnnotations(String value) {
+    LombokAnnotations(String value, String simpleName) {
         this.value = value;
+        this.simpleName = simpleName;
     }
 
     public String getValue() {
         return value;
     }
 
+    public String getSimpleName() {
+        return simpleName;
+    }
 }

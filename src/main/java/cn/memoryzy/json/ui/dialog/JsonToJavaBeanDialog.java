@@ -14,6 +14,10 @@ import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.SwaggerAnnotations;
 import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.model.template.AnnotationModel;
+import cn.memoryzy.json.model.template.ClassModel;
+import cn.memoryzy.json.model.template.FieldModel;
+import cn.memoryzy.json.model.template.ModelToMapConverter;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
@@ -23,6 +27,9 @@ import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
+import com.intellij.ide.fileTemplates.FileTemplate;
+import com.intellij.ide.fileTemplates.FileTemplateManager;
+import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -61,6 +68,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
@@ -209,17 +217,242 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             return false;
         }
 
-        // TODO 在这里分出一个方法，用模板生成类，用进度条的方式
-        // TODO 再创建一个 code 类型模板，用于生成内部类，若模板方法失败，则使用psi操作
+        try {
+            generateByTemplate(jsonObject, className);
+        } catch (Exception e) {
+            LOG.error(e);
+            // generateWithPsi(jsonObject, className);
+        }
+
+        return true;
+    }
 
 
+    private void generateByTemplate(ObjectWrapper jsonObject, String className) throws Exception {
+        ClassModel classModel = new ClassModel(false);
+        Set<String> importList = classModel.getImports();
+        FileTemplate fileTemplate = FileTemplateManager.getInstance(project).getJ2eeTemplate(PluginConstant.NEW_CLASS_TEMPLATE_NAME);
+        fileTemplate.setReformatCode(true);
+
+        // 递归处理
+        recursionHandleProperty(jsonObject, classModel, fileTemplate, importList);
+        // 添加类级别注解
+        addClassLevelAnnotationModel(classModel, importList);
+
+        // 转换
+        Map<String, Object> map = ModelToMapConverter.convert(classModel);
+        Properties p = FileTemplateManager.getInstance(project).getDefaultProperties();
+        FileTemplateUtil.putAll(map, p);
+
+        // 生成
+        PsiClass newClass = (PsiClass) FileTemplateUtil.createFromTemplate(fileTemplate, className, map, directory, null);
+        // 编辑器定位到新建类
+        newClass.navigate(true);
+    }
+
+    private void recursionHandleProperty(ObjectWrapper jsonObject, ClassModel classModel, FileTemplate fileTemplate, Set<String> importList) throws IOException {
+        // 提取注释Map
+        Map<?, ?> commentsMap = getCommentsMap(jsonObject);
+
+        // 循环所有Json字段
+        for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
+            String key = entry.getKey();
+            // 注释
+            if (PluginConstant.COMMENT_KEY.equals(key)) {
+                continue;
+            }
+
+            Object value = entry.getValue();
+            // 处理后的key
+            String processedKey = getFieldName(key);
+            // 获取注释
+            String comment = getComment(commentsMap, key);
+
+            FieldModel fieldModel;
+            // ------------- 如果value是ObjectWrapper，表示是对象
+            if (value instanceof ObjectWrapper) {
+                ObjectWrapper childJsonObject = (ObjectWrapper) value;
+
+                // 声明内部类
+                String innerClassName = StrUtil.upperFirst(processedKey);
+                ClassModel innerClassModel = new ClassModel(innerClassName, true);
+
+                // 添加类级别注解
+                addClassLevelAnnotationModel(innerClassModel, importList);
+                // 递归添加属性
+                recursionHandleProperty(childJsonObject, innerClassModel, fileTemplate, importList);
+                // 转换为代码片段并添加
+                classModel.addInnerSnippet(convertToClassSnippet(innerClassModel, fileTemplate));
+
+                // 构建字段
+                fieldModel = new FieldModel()
+                        .setName(processedKey)
+                        .setType(innerClassName)
+                        .setComment(comment);
+
+            } else if (value instanceof ArrayWrapper) {
+                ArrayWrapper jsonArray = (ArrayWrapper) value;
+                // 有值
+                String innerClassName;
+                if (CollUtil.isNotEmpty(jsonArray)) {
+                    Object element = jsonArray.get(0);
+
+                    // 对象
+                    if (element instanceof ObjectWrapper) {
+                        ObjectWrapper childJsonObject = (ObjectWrapper) element;
+                        // 对象值
+                        innerClassName = StrUtil.upperFirst(processedKey + "Bean");
+                        // 声明内部类
+                        ClassModel innerClassModel = new ClassModel(innerClassName, true);
+                        // 添加类级别注解
+                        addClassLevelAnnotationModel(innerClassModel, importList);
+                        // 递归添加属性
+                        recursionHandleProperty(childJsonObject, innerClassModel, fileTemplate, importList);
+                        // 转换为代码片段并添加
+                        classModel.addInnerSnippet(convertToClassSnippet(innerClassModel, fileTemplate));
+
+                    } else {
+                        // 普通值
+                        innerClassName = (Objects.nonNull(element)) ? element.getClass().getSimpleName() : Object.class.getSimpleName();
+                    }
+
+                } else {
+                    // 无值
+                    innerClassName = "?";
+                }
+
+                // 添加导入
+                importList.add(List.class.getName());
+
+                // 构建字段
+                fieldModel = new FieldModel()
+                        .setName(processedKey)
+                        .setType(StrUtil.format("List<{}>", innerClassName))
+                        .setComment(comment);
+
+            } else {
+                // ------------- 非对象，则直接添加字段
+                // 获取字段类型
+                String propertyType = JavaUtil.getStrType(value);
+
+                if (Objects.equals(propertyType, Date.class.getSimpleName())) {
+                    importList.add(Date.class.getName());
+                } else if (propertyType.startsWith(List.class.getSimpleName())) {
+                    importList.add(List.class.getName());
+                }
+
+                fieldModel = new FieldModel()
+                        .setName(processedKey)
+                        .setType(propertyType)
+                        .setComment(comment);
+            }
+
+            // 添加注解
+            addFieldLevelAnnotationModel(fieldModel, key, comment, importList);
+
+            // 添加字段
+            classModel.addField(fieldModel);
+        }
+    }
+
+    private String convertToClassSnippet(ClassModel classModel, FileTemplate fileTemplate) throws IOException {
+        Map<String, Object> modelMap = ModelToMapConverter.convert(classModel);
+        return fileTemplate.getText(modelMap);
+    }
+
+    private void addClassLevelAnnotationModel(ClassModel classModel, Set<String> importList) {
+        if (JavaUtil.hasLombokLib(module)) {
+            // 增加注解
+            if (deserializerState.dataLombokAnnotation) {
+                importList.add(LombokAnnotations.DATA.getValue());
+                classModel.addAnnotation(AnnotationModel.of(LombokAnnotations.DATA.getSimpleName()));
+            }
+
+            if (deserializerState.accessorsChainLombokAnnotation) {
+                importList.add(LombokAnnotations.ACCESSORS.getValue());
+                classModel.addAnnotation(AnnotationModel.withAttribute(LombokAnnotations.ACCESSORS.getSimpleName(), "chain", true));
+            }
+
+            if (deserializerState.setterLombokAnnotation) {
+                importList.add(LombokAnnotations.SETTER.getValue());
+                classModel.addAnnotation(AnnotationModel.of(LombokAnnotations.SETTER.getSimpleName()));
+            }
+
+            if (deserializerState.getterLombokAnnotation) {
+                importList.add(LombokAnnotations.GETTER.getValue());
+                classModel.addAnnotation(AnnotationModel.of(LombokAnnotations.GETTER.getSimpleName()));
+            }
+        }
+    }
+
+    private void addFieldLevelAnnotationModel(FieldModel fieldModel, String key, String comment, Set<String> importList) {
+        // 是否存在FastJson依赖
+        if (deserializerState.fastJsonAnnotation && JavaUtil.hasFastJsonLib(module)) {
+            // 如果选择添加 fastJson 注解，且存在 fastJson 库
+            importList.add(JsonAnnotations.FAST_JSON_JSON_FIELD.getValue());
+            fieldModel.addAnnotation(AnnotationModel.withAttribute(JsonAnnotations.FAST_JSON_JSON_FIELD.getSimpleName(), "name", key));
+
+        } else if (deserializerState.fastJson2Annotation && JavaUtil.hasFastJson2Lib(module)) {
+            // 如果选择添加 fastJson2 注解，且存在 fastJson2 库
+            importList.add(JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue());
+            fieldModel.addAnnotation(AnnotationModel.withAttribute(JsonAnnotations.FAST_JSON2_JSON_FIELD.getSimpleName(), "name", key));
+        }
+
+        // 是否存在Jackson依赖
+        if (deserializerState.jacksonAnnotation && JavaUtil.hasJacksonLib(module)) {
+            importList.add(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue());
+            fieldModel.addAnnotation(AnnotationModel.withAttribute(JsonAnnotations.JACKSON_JSON_PROPERTY.getSimpleName(), "value", key));
+        }
+
+        if (StrUtil.isNotBlank(comment)) {
+            // swagger
+            if (deserializerState.swaggerAnnotation && JavaUtil.hasSwaggerLib(module)) {
+                importList.add(SwaggerAnnotations.API_MODEL_PROPERTY.getValue());
+                fieldModel.addAnnotation(AnnotationModel.withAttribute(SwaggerAnnotations.API_MODEL_PROPERTY.getSimpleName(), "value", comment));
+            }
+
+            // swagger v3
+            if (deserializerState.swaggerV3Annotation && JavaUtil.hasSwaggerV3Lib(module)) {
+                importList.add(SwaggerAnnotations.SCHEMA.getValue());
+                fieldModel.addAnnotation(AnnotationModel.withAttribute(SwaggerAnnotations.SCHEMA.getSimpleName(), "description", comment));
+            }
+        }
+    }
 
 
+    private Map<?, ?> getCommentsMap(ObjectWrapper jsonObject) {
+        Map<?, ?> commentsMap = null;
+        Object commentsObj = jsonObject.get(PluginConstant.COMMENT_KEY);
+        // 默认会使用 LinkedHashMap 作反序列化，但注释Map是 HashMap，判断一下，杜绝有同名的Key
+        if (commentsObj instanceof HashMap && !(commentsObj instanceof LinkedHashMap)) {
+            commentsMap = (Map<?, ?>) commentsObj;
+        }
+
+        return commentsMap;
+    }
+
+
+    private String getComment(Map<?, ?> commentsMap, String key) {
+        String comment = null;
+        if (commentsMap != null) {
+            Object commentObj = commentsMap.get(key);
+            if (commentObj != null) {
+                // 确保单行
+                comment = commentObj.toString().replaceAll("[\r\n]+", " ");
+            }
+        }
+
+        return comment;
+    }
+
+
+    // ----------------------------------------------- 旧方法
+
+
+    private void generateWithPsi(ObjectWrapper jsonObject, String className) {
         // 先生成Java文件
         JavaDirectoryService directoryService = JavaDirectoryService.getInstance();
         PsiClass newClass = directoryService.createClass(directory, className);
-
-
 
         WriteCommandAction.runWriteCommandAction(project, () -> {
             try {
@@ -248,8 +481,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 LOG.error(e.getMessage(), e);
             }
         });
-
-        return true;
     }
 
 

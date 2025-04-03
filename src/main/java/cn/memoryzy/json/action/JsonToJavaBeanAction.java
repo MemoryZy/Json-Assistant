@@ -56,47 +56,6 @@ public class JsonToJavaBeanAction extends AnAction implements UpdateInBackground
             return;
         }
 
-
-
-        // FieldModel fieldModel1 = new FieldModel()
-        //         .setName("a")
-        //         .setType("String")
-        //         .setComment(null)
-        //         .addAnnotation(AnnotationModel.withAttribute("JsonFed", "value", "xxxxx"));
-        //
-        // FieldModel fieldModel2 = new FieldModel()
-        //         .setName("b")
-        //         .setType("Integer")
-        //         .setComment("注释b")
-        //         .addAnnotation(AnnotationModel.withAttribute("Jsonxxx", "desc", "aaa"))
-        //         .addAnnotation(AnnotationModel.withAttribute("Jsonxxx", "desc", "bbb"));
-        //
-        // List<FieldModel> fieldModelList = List.of(fieldModel1, fieldModel2);
-        //
-        // ClassModel classModel = new ClassModel()
-        //         .setFields(fieldModelList)
-        //         .addImports("com.memory.cn")
-        //         .addImports("com.memory.cn222")
-        //         .addClassAnnotation(AnnotationModel.withAttribute("Data", "name", "属实是"))
-        //         .addClassAnnotation(AnnotationModel.withAttribute("Acc", "vv", "酷酷酷"));
-        //
-        //
-        // FileTemplate fileTemplate = FileTemplateManager.getInstance(project).getJ2eeTemplate(PluginConstant.NEW_CLASS_TEMPLATE_NAME);
-        //
-        //
-        // try {
-        //     Map<String, Object> convert = ModelToMapConverter.convert(classModel);
-        //     Properties p = FileTemplateManager.getInstance(project).getDefaultProperties();
-        //     FileTemplateUtil.putAll(convert, p);
-        //
-        //     PsiElement ace = FileTemplateUtil.createFromTemplate(fileTemplate, "Lj3", convert, directory, null);
-        //
-        //     System.out.println();
-        // } catch (Exception e) {
-        //     throw new RuntimeException(e);
-        // }
-
-
         // 当前 module
         Module module = ModuleUtil.findModuleForPsiElement(directory);
         // 窗口
