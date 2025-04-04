@@ -13,7 +13,10 @@ import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.util.JavaUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.ListPopup;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +29,8 @@ import java.util.List;
  */
 public class OptionsGroup extends DefaultActionGroup implements UpdateInBackground {
 
+    private static final Logger LOG = Logger.getInstance(OptionsGroup.class);
+
     private final Module module;
     private final DeserializerState deserializerState;
 
@@ -37,6 +42,14 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
         presentation.setIcon(AllIcons.General.Settings);
 
         // com.intellij.openapi.actionSystem.impl.ActionButton.paintDownArrow 渲染图标下标记，表示菜单的意思
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        DataContext dataContext = e.getDataContext();
+        ListPopup popup = JBPopupFactory.getInstance()
+                .createActionGroupPopup(null, this, dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true);
+        popup.showInBestPositionFor(dataContext);
     }
 
     @Override
