@@ -14,11 +14,11 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/12/16
  */
-public class JsonEditorComponentProvider {
+public class JsonTreeEditorComponentProvider {
 
     private final JsonStructureComponentProvider componentProvider;
 
-    public JsonEditorComponentProvider(Project project, String content) {
+    public JsonTreeEditorComponentProvider(Project project, String content) {
         this.componentProvider = new JsonStructureComponentProvider(getJsonWrapper(content), UIManager.getWindowComponent(project), StructureConfig.of(false));
     }
 

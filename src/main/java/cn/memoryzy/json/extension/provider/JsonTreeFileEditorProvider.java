@@ -1,7 +1,7 @@
 package cn.memoryzy.json.extension.provider;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.extension.editor.JsonFileEditor;
+import cn.memoryzy.json.extension.editor.JsonTreeFileEditor;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
@@ -28,7 +28,7 @@ public class JsonTreeFileEditorProvider implements FileEditorProvider {
 
     @Override
     public @NotNull FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-        return new JsonFileEditor(project, file);
+        return new JsonTreeFileEditor(project, file);
     }
 
     @Override

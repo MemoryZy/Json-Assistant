@@ -1,6 +1,6 @@
 package cn.memoryzy.json.extension.editor;
 
-import cn.memoryzy.json.ui.JsonEditorComponentProvider;
+import cn.memoryzy.json.ui.JsonTreeEditorComponentProvider;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
@@ -20,17 +20,17 @@ import java.beans.PropertyChangeListener;
  * @author Memory
  * @since 2024/12/16
  */
-public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
+public class JsonTreeFileEditor extends UserDataHolderBase implements FileEditor {
 
     private final Project project;
     private final VirtualFile file;
-    private final JsonEditorComponentProvider provider;
+    private final JsonTreeEditorComponentProvider provider;
 
-    public JsonFileEditor(Project project, VirtualFile file) {
+    public JsonTreeFileEditor(Project project, VirtualFile file) {
         this.project = project;
         this.file = file;
         // 第一次加载，不加载树
-        this.provider = new JsonEditorComponentProvider(project, null);
+        this.provider = new JsonTreeEditorComponentProvider(project, null);
     }
 
     @Override
