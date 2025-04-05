@@ -40,6 +40,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.psi.util.PsiUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.jcef.JBCefApp;
 import com.intellij.util.ui.TextTransferable;
@@ -408,6 +409,17 @@ public class PlatformUtil {
         }
 
         return content;
+    }
+
+    public static String getFileRealContent(Project project, VirtualFile file) {
+        try {
+            PsiFile psiFile = PsiUtil.getPsiFile(project, file);
+            return psiFile.getText();
+        } catch (Exception e) {
+            LOG.error("Failed to get text", e);
+        }
+
+        return null;
     }
 
 

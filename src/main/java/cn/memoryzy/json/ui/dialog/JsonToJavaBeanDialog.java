@@ -22,7 +22,7 @@ import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.DeserializerState;
-import cn.memoryzy.json.ui.component.ActionGroupButton;
+import cn.memoryzy.json.ui.component.ActionGroupPopupButton;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.UIManager;
@@ -151,7 +151,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         OptionsGroup group = new OptionsGroup(module, deserializerState);
         Presentation presentation = new Presentation();
         presentation.copyFrom(group.getTemplatePresentation());
-        return new ActionGroupButton(group, presentation, ActionPlaces.UNKNOWN, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
+        return new ActionGroupPopupButton(group, presentation, ActionPlaces.UNKNOWN, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
     }
 
     @Override

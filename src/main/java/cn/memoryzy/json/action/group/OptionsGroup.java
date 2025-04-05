@@ -48,7 +48,7 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
     public void actionPerformed(@NotNull AnActionEvent e) {
         DataContext dataContext = e.getDataContext();
         ListPopup popup = JBPopupFactory.getInstance()
-                .createActionGroupPopup(null, this, dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true);
+                .createActionGroupPopup("", this, dataContext, JBPopupFactory.ActionSelectionAid.SPEEDSEARCH, true);
         popup.showInBestPositionFor(dataContext);
     }
 

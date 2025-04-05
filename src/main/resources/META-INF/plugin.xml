@@ -55,7 +55,7 @@
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
 
-        <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonFileEditorProvider"/>
+        <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonTreeFileEditorProvider"/>
 
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"

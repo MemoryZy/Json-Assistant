@@ -16,11 +16,11 @@ import java.awt.*;
  * @author Memory
  * @since 2025/4/4
  */
-public class ActionGroupButton extends ActionButton {
+public class ActionGroupPopupButton extends ActionButton {
 
-    private static final Logger LOG = Logger.getInstance(ActionGroupButton.class);
+    private static final Logger LOG = Logger.getInstance(ActionGroupPopupButton.class);
 
-    public ActionGroupButton(@NotNull AnAction action, Presentation presentation, String place, @NotNull Dimension minimumSize) {
+    public ActionGroupPopupButton(@NotNull AnAction action, Presentation presentation, String place, @NotNull Dimension minimumSize) {
         super(action, presentation, place, minimumSize);
     }
 

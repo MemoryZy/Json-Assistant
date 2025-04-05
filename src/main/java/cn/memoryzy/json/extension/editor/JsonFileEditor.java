@@ -22,12 +22,15 @@ import java.beans.PropertyChangeListener;
  */
 public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
 
+    private final Project project;
     private final VirtualFile file;
     private final JsonEditorComponentProvider provider;
 
     public JsonFileEditor(Project project, VirtualFile file) {
+        this.project = project;
         this.file = file;
-        this.provider = new JsonEditorComponentProvider(project, PlatformUtil.getFileContent(file));
+        // 第一次加载，不加载树
+        this.provider = new JsonEditorComponentProvider(project, null);
     }
 
     @Override
@@ -47,7 +50,6 @@ public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
 
     @Override
     public void setState(@NotNull FileEditorState state) {
-
     }
 
     @Override
@@ -72,19 +74,15 @@ public class JsonFileEditor extends UserDataHolderBase implements FileEditor {
 
     @Override
     public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
     }
 
     @Override
     public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
     }
 
     @Override
     public void selectNotify() {
-        // 确保应用程序中的文件状态与物理文件系统的状态同步
-        file.refresh(true, true, null);
-        provider.selectNotify(PlatformUtil.getFileContent(file));
+        provider.selectNotify(PlatformUtil.getFileRealContent(project, file));
     }
 
     @Override
