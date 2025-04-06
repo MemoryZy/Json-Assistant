@@ -252,7 +252,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private void recursionHandleProperty(ObjectWrapper jsonObject, ClassModel classModel, FileTemplate fileTemplate, Set<String> importList) throws IOException {
         // 提取注释Map
-        Map<?, ?> commentsMap = getCommentsMap(jsonObject);
+        Map<?, ?> commentsMap = Json5Util.getCommentsMap(jsonObject);
 
         // 循环所有Json字段
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
@@ -266,7 +266,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             // 处理后的key
             String processedKey = getFieldName(key);
             // 获取注释
-            String comment = getComment(commentsMap, key);
+            String comment = Json5Util.getComment(commentsMap, key);
 
             FieldModel fieldModel;
             // ------------- 如果value是ObjectWrapper，表示是对象
@@ -417,32 +417,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                 fieldModel.addAnnotation(AnnotationModel.withAttribute(SwaggerAnnotations.SCHEMA.getSimpleName(), "description", comment));
             }
         }
-    }
-
-
-    private Map<?, ?> getCommentsMap(ObjectWrapper jsonObject) {
-        Map<?, ?> commentsMap = null;
-        Object commentsObj = jsonObject.get(PluginConstant.COMMENT_KEY);
-        // 默认会使用 LinkedHashMap 作反序列化，但注释Map是 HashMap，判断一下，杜绝有同名的Key
-        if (commentsObj instanceof HashMap && !(commentsObj instanceof LinkedHashMap)) {
-            commentsMap = (Map<?, ?>) commentsObj;
-        }
-
-        return commentsMap;
-    }
-
-
-    private String getComment(Map<?, ?> commentsMap, String key) {
-        String comment = null;
-        if (commentsMap != null) {
-            Object commentObj = commentsMap.get(key);
-            if (commentObj != null) {
-                // 确保单行
-                comment = commentObj.toString().replaceAll("[\r\n]+", " ");
-            }
-        }
-
-        return comment;
     }
 
 

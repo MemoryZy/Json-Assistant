@@ -29,7 +29,13 @@ public class Json5ConversionProcessor extends JsonConversionProcessor {
     public String postprocessing(String text) {
         Boolean needBeautify = isNeedBeautify();
         if (Objects.nonNull(needBeautify)) {
-            return needBeautify ? Json5Util.formatJson5(text) : Json5Util.compressJson5(text);
+            boolean parseComment = editorData.isParseComment();
+            if (needBeautify) {
+                text = parseComment ? Json5Util.formatJson5WithComment(text) : Json5Util.formatJson5(text);
+            } else {
+                // 压缩后就不存在注释了
+                text = Json5Util.compressJson5(text);
+            }
         }
 
         return text;

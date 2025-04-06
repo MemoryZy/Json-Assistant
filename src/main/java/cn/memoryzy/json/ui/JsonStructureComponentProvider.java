@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
@@ -10,6 +11,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -128,10 +130,20 @@ public class JsonStructureComponentProvider {
 
             node.setSize(jsonObject.size());
 
+            // 提取注释Map
+            Map<?, ?> commentsMap = Json5Util.getCommentsMap(jsonObject);
+
             for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
                 String key = entry.getKey();
+                // 注释
+                if (PluginConstant.COMMENT_KEY.equals(key)) {
+                    continue;
+                }
+
                 Object value = entry.getValue();
-                JsonTreeNode childNode = new JsonTreeNode(key);
+                // 获取注释
+                String comment = Json5Util.getComment(commentsMap, key);
+                JsonTreeNode childNode = new JsonTreeNode(key).setComment(comment);
 
                 if (value instanceof ObjectWrapper) {
                     ObjectWrapper nestedJsonObject = (ObjectWrapper) value;
@@ -244,6 +256,8 @@ public class JsonStructureComponentProvider {
             SimpleTextAttributes stringColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(6, 125, 23), new Color(104, 169, 114)));
             SimpleTextAttributes booleanWithNullColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(0, 51, 179), new Color(206, 141, 108)));
             SimpleTextAttributes numberColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(25, 80, 234), new Color(41, 171, 183)));
+
+            SimpleTextAttributes pathColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(120, 80, 130), new Color(180, 140, 170)));
 
             Icon icon = JsonAssistantIcons.Structure.JSON_KEY;
 
@@ -406,6 +420,12 @@ public class JsonStructureComponentProvider {
                 append(jsonValue, attributes, Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType));
             }
 
+            // 添加注释（如有）
+            String comment = jsonTreeNode.getComment();
+            if (StrUtil.isNotBlank(comment)) {
+                append( "  " + comment, SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES, false);
+            }
+
             if (jsonTreeNode.equals(hoverNode)) {
                 TreeNode[] pathElements = jsonTreeNode.getPath();
                 // 不显示根节点与第二层的节点路径
@@ -429,7 +449,9 @@ public class JsonStructureComponentProvider {
                     String pathResult = pathString.toString();
                     // 同时显示工具提示
                     setToolTipText(pathResult);
-                    append(" " + pathResult, lightAttributes, false);
+
+                    // 路径换个颜色
+                    append("  " + pathResult, pathColorAttributes, false);
                 }
             } else {
                 setToolTipText(null);

@@ -31,6 +31,10 @@ public class EditorData {
      */
     private Editor editor;
 
+    /**
+     * 解析并保留注释（只限于 JSON5 格式）
+     */
+    private boolean parseComment = false;
 
     // ----------------------- GETTER/SETTER -----------------------
 
@@ -67,6 +71,15 @@ public class EditorData {
 
     public EditorData setEditor(Editor editor) {
         this.editor = editor;
+        return this;
+    }
+
+    public boolean isParseComment() {
+        return parseComment;
+    }
+
+    public EditorData setParseComment(boolean parseComment) {
+        this.parseComment = parseComment;
         return this;
     }
 }

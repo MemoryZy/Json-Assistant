@@ -26,6 +26,10 @@ public class JsonTreeNode extends DefaultMutableTreeNode {
      */
     private Integer size;
 
+    /**
+     * 节点注释
+     */
+    private String comment;
 
     public JsonTreeNode(Object userObject) {
         super(userObject);
@@ -62,6 +66,15 @@ public class JsonTreeNode extends DefaultMutableTreeNode {
 
     public JsonTreeNode setSize(Integer size) {
         this.size = size;
+        return this;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public JsonTreeNode setComment(String comment) {
+        this.comment = comment;
         return this;
     }
 

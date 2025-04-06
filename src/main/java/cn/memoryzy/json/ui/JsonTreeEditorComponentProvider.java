@@ -44,7 +44,7 @@ public class JsonTreeEditorComponentProvider {
         }
 
         if (Json5Util.isJson5(content)) {
-            return Json5Util.parse(content);
+            return Json5Util.parseWithComment(content);
         }
 
         return null;

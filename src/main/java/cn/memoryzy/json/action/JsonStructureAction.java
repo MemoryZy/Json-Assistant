@@ -7,7 +7,9 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.enums.TreeDisplayMode;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.GeneralState;
@@ -63,14 +65,20 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
                         : StructureActionSource.OUTSIDE;
 
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
-        String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
+        EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        if (null == editorData) {
+            return;
+        }
+
+        editorData.setParseComment(true);
+        String json = GlobalJsonConverter.parseJson(context, editorData);
         show(event.getDataContext(), json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, editorFlag);
     }
 
 
     public static void show(DataContext dataContext, String text, boolean isJson, StructureActionSource source, boolean editorFlag) {
         Project project = dataContext.getData(CommonDataKeys.PROJECT);
-        JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parse(text);
+        JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parseWithComment(text);
 
         TreeDisplayMode treeDisplayMode;
         if (editorFlag) {

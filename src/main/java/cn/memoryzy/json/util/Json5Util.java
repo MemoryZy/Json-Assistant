@@ -2,6 +2,7 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
@@ -10,9 +11,7 @@ import thirdparty.a2u.tn.utils.json.MapNavigator;
 import thirdparty.a2u.tn.utils.json.TnJson;
 import thirdparty.a2u.tn.utils.json.TnJsonBuilder;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Json5 处理
@@ -103,6 +102,16 @@ public class Json5Util {
     }
 
     /**
+     * 格式化Json5文本
+     *
+     * @param json json字符串
+     * @return 格式化后的Json5文本
+     */
+    public static String formatJson5WithComment(String json) {
+        return toJson5Str(tryResolveJson5WithComment(json), FORMAT_JSON5);
+    }
+
+    /**
      * 将Json5压缩成一行
      *
      * @param json json字符串
@@ -127,6 +136,21 @@ public class Json5Util {
             return parseObject(json);
         } else if (isJson5Array(json)) {
             return parseArray(json);
+        }
+        return null;
+    }
+
+    /**
+     * 解析Json5文本（注释），若解析失败，返回null
+     *
+     * @param json json字符串
+     * @return JsonWrapper包装对象，若解析失败，返回null
+     */
+    public static JsonWrapper parseWithComment(String json) {
+        if (isJson5Object(json)) {
+            return parseObjectWithComment(json);
+        } else if (isJson5Array(json)) {
+            return parseArrayWithComment(json);
         }
         return null;
     }
@@ -248,6 +272,17 @@ public class Json5Util {
         return JsonUtil.isJson(text) ? null : resolveJson5(text, false);
     }
 
+    /**
+     * 解析Json5文本，若解析失败，返回null
+     *
+     * @param text 文本
+     * @return 若为对象，则返回 Map；若为 List，则返回 List；否则返回 null
+     */
+    public static Object tryResolveJson5WithComment(String text) {
+        // 判断是否为 Json，再判断是否为 Json5
+        return JsonUtil.isJson(text) ? null : resolveJson5(text, true);
+    }
+
 
     /**
      * 解析Json5文本，若解析失败，返回null
@@ -288,5 +323,31 @@ public class Json5Util {
 
         return null;
     }
+
+    public static Map<?, ?> getCommentsMap(ObjectWrapper jsonObject) {
+        Map<?, ?> commentsMap = null;
+        Object commentsObj = jsonObject.get(PluginConstant.COMMENT_KEY);
+        // 默认会使用 LinkedHashMap 作反序列化，但注释Map是 HashMap，判断一下，杜绝有同名的Key
+        if (commentsObj instanceof HashMap && !(commentsObj instanceof LinkedHashMap)) {
+            commentsMap = (Map<?, ?>) commentsObj;
+        }
+
+        return commentsMap;
+    }
+
+
+    public static String getComment(Map<?, ?> commentsMap, String key) {
+        String comment = null;
+        if (commentsMap != null) {
+            Object commentObj = commentsMap.get(key);
+            if (commentObj != null) {
+                // 确保单行
+                comment = commentObj.toString().replaceAll("[\r\n]+", " ");
+            }
+        }
+
+        return comment;
+    }
+
 
 }

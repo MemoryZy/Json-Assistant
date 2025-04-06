@@ -3,20 +3,26 @@
 ## [Unreleased]
 - 新增 JavaBean 转 JSON5（包含属性注释）功能。
 - 新增 运行时对象 转 JSON5（包含属性注释）功能。
+- 在 JSON 树结构中新增注释展示功能。
 - 支持 JSON 反序列化为 JavaBean 时带上注释或 Swagger 注解。
 - 增加 时间转时间戳 的意图操作和全局操作。
 - 解决 JSON5 处理时的大数值丢失精度问题。
 - 优化时间戳转换功能中数值识别的逻辑。
 - 优化 JSON 反序列化为 JavaBean 功能的实现方式，提升效率。
 - 优化 Java 常量转为 JSON 功能中的判断逻辑，支持更多方式定义的常量。
+- 用户体验优化与改进。
+- 兼容性优化。
 - Added functionality to convert JavaBeans to JSON5 (including property comments).
 - Added functionality to convert runtime objects to JSON5 (including property comments).
+- Added a comment display feature to the JSON tree structure.
 - Supports JSON deserialization to Javabeans with comments or Swagger annotations.
 - Increased the intent operation and global operation for converting time to timestamp.
 - Solve the problem of losing precision of large values in json5 processing.
 - Optimize the logic for numeric recognition in the timestamp conversion functionality.
 - Optimize the implementation of JSON deserialization to JavaBean functionality to improve efficiency.
 - Optimize the judgment logic in the functionality of converting Java constants to JSON, supporting constants defined in more ways.
+- User experience optimization and improvement.
+- Compatibility optimization.
 
 ## [1.7.8] - 2025-03-25
 

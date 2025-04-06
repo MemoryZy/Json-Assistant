@@ -4,6 +4,9 @@ import cn.memoryzy.json.action.JsonStructureAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
+import cn.memoryzy.json.model.strategy.GlobalTextConverter;
+import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,8 +38,15 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        String text = editor.getDocument().getText();
-        JsonStructureAction.show(event.getDataContext(), text, JsonUtil.canResolveToJson(text), StructureActionSource.TOOLWINDOW_TOOLBAR, false);
+        GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
+        EditorData editorData = GlobalTextConverter.resolveEditor(editor);
+        if (null == editorData) {
+            return;
+        }
+
+        editorData.setParseComment(true);
+        String json = GlobalJsonConverter.parseJson(context, editorData);
+        JsonStructureAction.show(event.getDataContext(), json, JsonUtil.canResolveToJson(json), StructureActionSource.TOOLWINDOW_TOOLBAR, false);
     }
 
     @Override
