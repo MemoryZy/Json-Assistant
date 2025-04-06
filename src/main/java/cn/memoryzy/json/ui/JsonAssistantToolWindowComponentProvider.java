@@ -420,6 +420,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             jsonWrapper = Json5Util.parse(text);
         }
 
+        // TODO 保存时还需要保存原文，只限JSON5
         if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
             if (auto) {
                 historyList.add(project, jsonWrapper);
@@ -604,6 +605,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         @Override
         public void consume(AnActionEvent event) {
             if (historyOptionState.switchHistory && !historyOptionState.autoStore) {
+                // TODO 需要手动提示（自定义弹出窗），存在同名的记录，则提示
                 performAction(false);
             }
         }

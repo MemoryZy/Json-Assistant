@@ -128,7 +128,9 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
-        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
+
+        // TODO 示例得改，或者加个弹窗提示
+        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE2);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
         jsonTextField.addNotify();
