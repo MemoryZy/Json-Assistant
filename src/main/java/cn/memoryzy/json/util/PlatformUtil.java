@@ -10,6 +10,7 @@ import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
+import com.intellij.ide.IdeBundle;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
@@ -24,7 +25,12 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
+import com.intellij.openapi.fileEditor.impl.text.TextEditorImpl;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
@@ -58,6 +64,7 @@ import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -414,7 +421,15 @@ public class PlatformUtil {
     public static String getFileRealContent(Project project, VirtualFile file) {
         try {
             PsiFile psiFile = PsiUtil.getPsiFile(project, file);
-            return psiFile.getText();
+            String text = psiFile.getText();
+
+            if (StrUtil.isBlank(text)) {
+                text = Optional.ofNullable(PsiDocumentManager.getInstance(project).getDocument(psiFile))
+                        .map(Document::getText)
+                        .orElse(null);
+            }
+
+            return text;
         } catch (Exception e) {
             LOG.error("Failed to get text", e);
         }
@@ -440,6 +455,21 @@ public class PlatformUtil {
 
     public static boolean isIdea() {
         return Objects.equals("IntelliJ IDEA", getFullProductName());
+    }
+
+    public static EditorEx getEditor(Project project, VirtualFile file) {
+        FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+        FileEditor[] fileEditors = fileEditorManager.getEditors(file);
+
+        for (FileEditor fileEditor : fileEditors) {
+            String name = fileEditor.getName();
+            EditorEx editorEx = EditorUtil.getEditorEx(fileEditor);
+            if (Objects.nonNull(editorEx) && Objects.equals(IdeBundle.message("tab.title.text"), name) && fileEditor instanceof TextEditorImpl) {
+                return editorEx;
+            }
+        }
+
+        return null;
     }
 
 }

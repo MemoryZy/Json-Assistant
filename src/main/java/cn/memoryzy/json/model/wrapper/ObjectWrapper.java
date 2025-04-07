@@ -1,9 +1,8 @@
 package cn.memoryzy.json.model.wrapper;
 
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.util.Json5Util;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,23 +25,42 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
             throw new IllegalArgumentException("source is not a Map: " + source);
         }
 
-        initMap((Map<String, Object>) source);
+        initMap((Map<String, Object>) source, true);
     }
 
-    private void initMap(Map<String, Object> source) {
+    @SuppressWarnings("unchecked")
+    public ObjectWrapper(Object source, boolean containsCommentKey) {
+        super();
+        if (!(source instanceof Map)) {
+            throw new IllegalArgumentException("source is not a Map: " + source);
+        }
+
+        initMap((Map<String, Object>) source, containsCommentKey);
+    }
+
+
+    private void initMap(Map<String, Object> source, boolean containsCommentKey) {
         for (Map.Entry<String, Object> entry : source.entrySet()) {
             String key = entry.getKey();
             Object value = entry.getValue();
 
             if (value instanceof Map) {
-                // 特殊处理 注释 键
-                if (PluginConstant.COMMENT_KEY.equals(key)
-                        && (value instanceof HashMap) && !(value instanceof LinkedHashMap)) {
-                    put(key, value);
+                boolean isCommentKey = Json5Util.isCommentKey(key, value);
+                if (containsCommentKey) {
+                    // 特殊处理 注释 键
+                    if (isCommentKey) {
+                        put(key, value);
+                    } else {
+                        // 递归转换嵌套的 Map
+                        put(key, new ObjectWrapper(value));
+                    }
+
                 } else {
-                    // 递归转换嵌套的 Map
-                    put(key, new ObjectWrapper(value));
+                    if (!isCommentKey) {
+                        put(key, new ObjectWrapper(value));
+                    }
                 }
+
             } else if (value instanceof Collection) {
                 // 转换嵌套的 List
                 put(key, new ArrayWrapper(value));
@@ -71,6 +89,11 @@ public class ObjectWrapper extends LinkedHashMap<String, Object> implements Json
     @Override
     public String toString() {
         return toJsonString();
+    }
+
+    @Override
+    public ObjectWrapper cloneAndRemoveCommentKey() {
+        return new ObjectWrapper(this, false);
     }
 
     public static boolean isWrapper(Object object) {

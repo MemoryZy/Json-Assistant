@@ -14,6 +14,8 @@ public interface JsonWrapper {
 
     boolean noItems();
 
+    JsonWrapper cloneAndRemoveCommentKey();
+
     default String toJsonString() {
         return JsonUtil.formatJson(this);
     }

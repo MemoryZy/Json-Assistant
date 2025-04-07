@@ -1,7 +1,6 @@
 package cn.memoryzy.json.extension.editor;
 
 import cn.memoryzy.json.ui.JsonTreeEditorComponentProvider;
-import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorLocation;
 import com.intellij.openapi.fileEditor.FileEditorState;
@@ -30,7 +29,7 @@ public class JsonTreeFileEditor extends UserDataHolderBase implements FileEditor
         this.project = project;
         this.file = file;
         // 第一次加载，不加载树
-        this.provider = new JsonTreeEditorComponentProvider(project, null);
+        this.provider = new JsonTreeEditorComponentProvider(project, file);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class JsonTreeFileEditor extends UserDataHolderBase implements FileEditor
 
     @Override
     public void selectNotify() {
-        provider.selectNotify(PlatformUtil.getFileRealContent(project, file));
+        provider.compareAndRefresh(project, file);
     }
 
     @Override

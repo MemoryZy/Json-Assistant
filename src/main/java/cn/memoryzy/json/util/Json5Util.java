@@ -349,5 +349,7 @@ public class Json5Util {
         return comment;
     }
 
-
+    public static boolean isCommentKey(String key, Object value) {
+        return PluginConstant.COMMENT_KEY.equals(key) && (value instanceof HashMap) && !(value instanceof LinkedHashMap);
+    }
 }

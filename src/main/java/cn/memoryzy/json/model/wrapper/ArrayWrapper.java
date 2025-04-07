@@ -17,17 +17,27 @@ public class ArrayWrapper extends ArrayList<Object> implements JsonWrapper {
             throw new IllegalArgumentException("source is not a Collection: " + source);
         }
 
-        initCollection((Collection<Object>) source);
+        initCollection((Collection<Object>) source, true);
     }
 
-    private void initCollection(Collection<Object> source) {
+    @SuppressWarnings("unchecked")
+    public ArrayWrapper(Object source, boolean containsCommentKey) {
+        super();
+        if (!(source instanceof Collection)) {
+            throw new IllegalArgumentException("source is not a Collection: " + source);
+        }
+
+        initCollection((Collection<Object>) source, containsCommentKey);
+    }
+
+    private void initCollection(Collection<Object> source, boolean containsCommentKey) {
         for (Object item : source) {
             if (item instanceof Map) {
                 // 递归转换嵌套的 Map
-                add(new ObjectWrapper(item));
+                add(new ObjectWrapper(item, containsCommentKey));
             } else if (item instanceof Collection) {
                 // 转换嵌套的 List
-                add(new ArrayWrapper(item));
+                add(new ArrayWrapper(item, containsCommentKey));
             } else {
                 // 直接添加其他类型的值
                 add(item);
@@ -53,6 +63,11 @@ public class ArrayWrapper extends ArrayList<Object> implements JsonWrapper {
     @Override
     public String toString() {
         return toJsonString();
+    }
+
+    @Override
+    public ArrayWrapper cloneAndRemoveCommentKey() {
+        return new ArrayWrapper(this, false);
     }
 
     public static boolean isWrapper(Object object) {

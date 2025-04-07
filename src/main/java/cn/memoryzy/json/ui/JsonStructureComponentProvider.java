@@ -9,6 +9,8 @@ import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
+import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.service.persistent.state.StructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
@@ -43,6 +45,7 @@ public class JsonStructureComponentProvider {
     private Tree tree;
     private JPanel treeComponent;
     private Object hoverNode;
+    private final StructureState structureState;
 
     /**
      * 构造器
@@ -52,6 +55,7 @@ public class JsonStructureComponentProvider {
      * @param config    配置
      */
     public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
+        this.structureState = JsonAssistantPersistentState.getInstance().structureState;
         init(wrapper, component, config);
     }
 
@@ -91,7 +95,8 @@ public class JsonStructureComponentProvider {
         ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree);
         if (config.isNeedToolbar()) {
             decorator.addExtraAction(new ExpandAllAction(tree, component, true))
-                    .addExtraAction(new CollapseAllAction(tree, component, true));
+                    .addExtraAction(new CollapseAllAction(tree, component, true))
+                    .addExtraAction(AnActionButton.fromAction(new DisplayNodePathAction(structureState)));
         } else {
             decorator.setPanelBorder(JBUI.Borders.empty());
         }
@@ -423,10 +428,10 @@ public class JsonStructureComponentProvider {
             // 添加注释（如有）
             String comment = jsonTreeNode.getComment();
             if (StrUtil.isNotBlank(comment)) {
-                append( "  " + comment, SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES, false);
+                append("  " + comment, SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES, false);
             }
 
-            if (jsonTreeNode.equals(hoverNode)) {
+            if (structureState.displayNodePath && jsonTreeNode.equals(hoverNode)) {
                 TreeNode[] pathElements = jsonTreeNode.getPath();
                 // 不显示根节点与第二层的节点路径
                 if (pathElements.length > 2) {

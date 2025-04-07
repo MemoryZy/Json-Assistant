@@ -5,14 +5,14 @@
     </extensions>
 
     <actions>
-        <action id="JsonAssistant.Action.KotlinPropertyToJsonAction" class="cn.memoryzy.json.action.KotlinPropertyToJsonAction">
+        <action id="JsonAssistant.Action.KotlinClassToJsonAction" class="cn.memoryzy.json.action.KotlinClassToJsonAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
         </action>
 
         <group id="JsonAssistant.Group.KtClassPropertyToJsonGroup">
             <separator/>
-            <reference ref="JsonAssistant.Action.KotlinPropertyToJsonAction"/>
+            <reference ref="JsonAssistant.Action.KotlinClassToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>

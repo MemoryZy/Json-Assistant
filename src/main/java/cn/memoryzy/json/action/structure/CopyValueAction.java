@@ -45,7 +45,16 @@ public class CopyValueAction extends DumbAwareAction implements UpdateInBackgrou
                     valueList.add(Objects.nonNull(value) ? value.toString() : "null");
                 } else {
                     JsonWrapper json = (JsonWrapper) value;
-                    String item = Objects.nonNull(json) ? JsonUtil.formatJson(json) : "null";
+
+                    String item;
+                    // 深度拷贝为另一个对象，并去除注释
+                    if (Objects.nonNull(json)) {
+                        json = json.cloneAndRemoveCommentKey();
+                        item = JsonUtil.formatJson(json);
+                    } else {
+                        item = "null";
+                    }
+
                     valueList.add(item);
                 }
             }

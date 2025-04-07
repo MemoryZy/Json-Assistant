@@ -63,6 +63,12 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
     @Attribute(converter = QueryStateConverter.class)
     public QueryState queryState = new QueryState();
 
+    /**
+     * 结构设置项
+     */
+    @Attribute(converter = StructureStateConverter.class)
+    public StructureState structureState = new StructureState();
+
     @Override
     public @Nullable JsonAssistantPersistentState getState() {
         return this;
@@ -77,5 +83,6 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
         this.generalState = state.generalState;
         this.deserializerState = state.deserializerState;
         this.queryState = state.queryState;
+        this.structureState = state.structureState;
     }
 }
