@@ -45,13 +45,15 @@ public interface PluginConstant {
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
 
-    String JSON_EXAMPLE = " {\"name\": \"王铁柱\", \"age\": 18}";
-    String JSON_EXAMPLE2 = " {\n" +
-            "  // 姓名\n" +
-            "  \"name\": \"王铁柱\",\n" +
-            "  // 年龄\n" +
+    String JSON_EXAMPLE = " {\"name\": \"Memory\", \"age\": 18}";
+    String JSON_EXAMPLE_COMMENTS = "{\n" +
+            "  // {}\n" +
+            "  \"name\": \"Memory\",\n" +
+            "  // {}\n" +
             "  \"age\": 18\n" +
             "}";
+
+    String JSON_EXAMPLE_ID = JsonAssistantPlugin.PLUGIN_ID_NAME + "#EXAMPLE";
 
     String JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME = "View";
     String AUXILIARY_TREE_TOOL_WINDOW_DISPLAY_NAME = "Tab";

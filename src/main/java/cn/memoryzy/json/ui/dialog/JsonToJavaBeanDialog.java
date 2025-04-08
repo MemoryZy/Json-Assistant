@@ -46,6 +46,8 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.InputValidatorEx;
+import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.pom.java.LanguageLevel;
 import com.intellij.psi.*;
@@ -53,8 +55,10 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.javadoc.PsiDocComment;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.ui.EditorTextField;
+import com.intellij.ui.HyperlinkAdapter;
 import com.intellij.ui.JBSplitter;
 import com.intellij.ui.TitledSeparator;
+import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.IncorrectOperationException;
@@ -67,7 +71,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
@@ -113,6 +120,33 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         classNameTextField = new JBTextField();
+        classNameTextField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                // TODO 判断是否为首次
+                RelativePoint relativePoint = new RelativePoint(jsonTextField, new Point(jsonTextField.getWidth() / 2, jsonTextField.getY() / 8));
+                JBPopupFactory.getInstance()
+                        .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.example.tip.text", PluginConstant.JSON_EXAMPLE_ID),
+                                null,
+                                JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
+                                new HyperlinkAdapter() {
+                                    @Override
+                                    protected void hyperlinkActivated(HyperlinkEvent e) {
+                                        // TODO 填充示例数据
+
+                                    }
+                                })
+                        .setShadow(true)
+                        .setHideOnAction(true)
+                        .setHideOnClickOutside(true)
+                        .setHideOnFrameResize(true)
+                        .setHideOnKeyOutside(true)
+                        .setHideOnLinkClick(true)
+                        .createBalloon()
+                        .show(relativePoint, Balloon.Position.above);
+            }
+        });
+
         JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.deserialize.label.class.name"));
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
@@ -130,7 +164,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         jsonTextField.setFont(UIManager.consolasFont(15));
 
         // TODO 示例得改，或者加个弹窗提示
-        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE2);
+        jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
         jsonTextField.addNotify();
