@@ -35,7 +35,7 @@ public class JsonAssistantToolWindowPanel extends JPanel {
         cardLayout.toggleCard(cardName);
         if (Objects.equals(PluginConstant.JSON_TREE_CARD_NAME, cardName)) {
             // 重新生成根节点
-            treeProvider.rebuildTree(wrapper);
+            treeProvider.rebuildTree(wrapper, 3);
         } else if (Objects.equals(PluginConstant.JSON_QUERY_CARD_NAME, cardName)) {
             queryProvider.setDocumentText(editor.getDocument().getText());
         }

@@ -41,10 +41,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.List;
+import java.util.*;
 
 
 /**
@@ -445,4 +443,35 @@ public class UIManager implements Disposable {
         }
     }
 
+    public static void expandSpecifiedLevelNode(JTree tree, int level) {
+        DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        // 展开根节点，显示二级节点
+        expandNode(tree, rootNode);
+        if (level == 1) {
+            return;
+        }
+
+        // 遍历二级节点，存在子节点时，则展开
+        List<? extends TreeNode> secondLevelNodeList = JsonAssistantUtil.enumerationToList(rootNode.children());
+        for (TreeNode secondLevelNode : secondLevelNodeList) {
+            // 展开二级节点，显示三级节点
+            expandNode(tree, (DefaultMutableTreeNode) secondLevelNode);
+            if (level == 2) {
+                continue;
+            }
+
+            List<? extends TreeNode> threeLevelNodeList = JsonAssistantUtil.enumerationToList(secondLevelNode.children());
+            for (TreeNode threeLevelNode : threeLevelNodeList) {
+                // 展开三级节点，显示四级节点
+                expandNode(tree, (DefaultMutableTreeNode) threeLevelNode);
+            }
+        }
+    }
+
+    public static void expandNode(JTree tree, DefaultMutableTreeNode node) {
+        // 创建一个TreePath，该路径从树的根节点一直到指定的node
+        TreePath path = new TreePath(node.getPath());
+        // 使用expandPath方法展开指定的路径
+        tree.expandPath(path);
+    }
 }

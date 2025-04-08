@@ -29,7 +29,7 @@ public class JsonTreeEditorComponentProvider {
 
     public JsonTreeEditorComponentProvider(Project project, VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
-        this.componentProvider = new JsonStructureComponentProvider(null, UIManager.getWindowComponent(project), StructureConfig.of(false));
+        this.componentProvider = new JsonStructureComponentProvider(null, UIManager.getWindowComponent(project), StructureConfig.of(false, 3));
     }
 
     public JComponent getComponent() {
@@ -81,7 +81,7 @@ public class JsonTreeEditorComponentProvider {
         int childCount = rootNode.getChildCount();
         if (childCount == 0) {
             // 初次加载
-            componentProvider.rebuildTree(newWrapper);
+            componentProvider.rebuildTree(newWrapper, 3);
 
         } else {
             // 结构相同无需操作，不同则重建树
@@ -89,7 +89,7 @@ public class JsonTreeEditorComponentProvider {
 
             // 结构不同，重构树
             if (!Objects.equals(oldWrapper, newWrapper)) {
-                componentProvider.rebuildTree(newWrapper);
+                componentProvider.rebuildTree(newWrapper, 3);
             }
         }
     }

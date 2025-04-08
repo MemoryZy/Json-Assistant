@@ -98,6 +98,23 @@ public class TextEditorErrorPopupDecorator {
         myErrorPopup.show(myErrorShowPoint);
     }
 
+    public void setWarning(String warning) {
+        ValidationInfo validationInfo = new ValidationInfo(warning, myTextField).asWarning();
+        ComponentPopupBuilder popupBuilder = ComponentValidator.createPopupBuilder(validationInfo, errorHint -> {
+                    Insets insets = myTextField.getInsets();
+                    hintSize = errorHint.getPreferredSize();
+                    int y = insets.top - JBUIScale.scale(6) - hintSize.height;
+                    Point point = new Point(2, y);
+                    myErrorShowPoint = new RelativePoint(myTextField, point);
+                }).setCancelOnWindowDeactivation(false)
+                .setCancelOnClickOutside(true)
+                .setRequestFocus(false)
+                .addUserData("SIMPLE_WINDOW");
+
+        myErrorPopup = (AbstractPopup) popupBuilder.createPopup();
+        myErrorPopup.show(myErrorShowPoint);
+    }
+
     private void disposePopup() {
         if (myErrorPopup != null && !myErrorPopup.isDisposed()) Disposer.dispose(myErrorPopup);
     }

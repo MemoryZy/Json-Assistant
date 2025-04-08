@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CheckedActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.project.DumbAware;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -17,7 +18,7 @@ public class DisplayNodePathAction extends ToggleAction implements CheckedAction
     private final StructureState structureState;
 
     public DisplayNodePathAction(StructureState structureState) {
-        super(JsonAssistantBundle.messageOnSystem("action.displayNodePath.text"), JsonAssistantBundle.messageOnSystem("action.displayNodePath.description"), null);
+        super(JsonAssistantBundle.messageOnSystem("action.displayNodePath.text"), JsonAssistantBundle.messageOnSystem("action.displayNodePath.description"), JsonAssistantIcons.Structure.PATH);
         this.structureState = structureState;
     }
 

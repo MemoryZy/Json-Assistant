@@ -29,7 +29,7 @@ public class AuxiliaryTreeToolWindowComponentProvider {
 
     public JComponent createComponent(@NotNull JComponent component) {
         // 创建树结构
-        JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component, StructureConfig.of(false));
+        JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component, StructureConfig.of(false, 3));
         JPanel treeComponent = provider.getTreeComponent();
         Tree tree = provider.getTree();
 

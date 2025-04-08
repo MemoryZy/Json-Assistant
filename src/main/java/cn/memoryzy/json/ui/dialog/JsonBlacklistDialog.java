@@ -74,6 +74,8 @@ public class JsonBlacklistDialog extends DialogWrapper {
         UIManager.updateComponentColorsScheme(showList);
         UIManager.updateComponentColorsScheme(showTextField);
 
+        // TODO 这里要加 toolbar，展示一个按钮，切换原文和json
+
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
         borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, BlacklistEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));

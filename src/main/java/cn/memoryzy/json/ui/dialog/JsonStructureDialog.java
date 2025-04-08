@@ -39,7 +39,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        JsonStructureComponentProvider componentProvider = new JsonStructureComponentProvider(wrapper, getRootPane(), StructureConfig.of(true));
+        JsonStructureComponentProvider componentProvider = new JsonStructureComponentProvider(wrapper, getRootPane(), StructureConfig.of(true, 2));
         tree = componentProvider.getTree();
         JPanel rootPanel = componentProvider.getTreeComponent();
         rootPanel.setPreferredSize(new Dimension(400, 470));

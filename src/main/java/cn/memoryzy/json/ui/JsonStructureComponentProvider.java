@@ -107,11 +107,13 @@ public class JsonStructureComponentProvider {
                     .setScrollPaneBorder(JBUI.Borders.empty(0, 1));
         }
 
+        UIManager.expandSpecifiedLevelNode(tree, config.getExpandLevel());
+
         this.treeComponent = new JPanel(new BorderLayout());
         this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
     }
 
-    public void rebuildTree(JsonWrapper wrapper) {
+    public void rebuildTree(JsonWrapper wrapper, int expandLevel) {
         JsonTreeNode rootNode = new JsonTreeNode("root");
         if (wrapper != null) {
             convertToTreeNode(wrapper, rootNode);
@@ -119,6 +121,11 @@ public class JsonStructureComponentProvider {
 
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         model.setRoot(rootNode);
+
+        UIManager.repaintComponent(tree);
+
+        // 默认展开前3级节点
+        UIManager.expandSpecifiedLevelNode(tree, expandLevel);
     }
 
     private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {

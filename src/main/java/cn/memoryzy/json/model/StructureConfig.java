@@ -10,9 +10,17 @@ public class StructureConfig {
 
     private boolean needToolbar;
 
+    private int expandLevel = 2;
+
     public StructureConfig(boolean needBorder, boolean needToolbar) {
         this.needBorder = needBorder;
         this.needToolbar = needToolbar;
+    }
+
+    public StructureConfig(boolean needBorder, boolean needToolbar, int expandLevel) {
+        this.needBorder = needBorder;
+        this.needToolbar = needToolbar;
+        this.expandLevel = expandLevel;
     }
 
     public static StructureConfig of() {
@@ -25,6 +33,10 @@ public class StructureConfig {
 
     public static StructureConfig of(boolean needBorder, boolean needToolbar) {
         return new StructureConfig(needBorder, needToolbar);
+    }
+
+    public static StructureConfig of(boolean needBorder, int expandLevel) {
+        return new StructureConfig(needBorder, true, expandLevel);
     }
 
     public boolean isNeedBorder() {
@@ -41,5 +53,13 @@ public class StructureConfig {
 
     public void setNeedToolbar(boolean needToolbar) {
         this.needToolbar = needToolbar;
+    }
+
+    public int getExpandLevel() {
+        return expandLevel;
+    }
+
+    public void setExpandLevel(int expandLevel) {
+        this.expandLevel = expandLevel;
     }
 }

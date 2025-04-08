@@ -67,7 +67,6 @@ public interface PluginConstant {
             "*/";
 
     String NEW_CLASS_TEMPLATE_NAME = "New Class.java";
-    String INNER_CLASS_TEMPLATE_NAME = "Inner Class.java";
 
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),

@@ -3,13 +3,9 @@ package cn.memoryzy.json.ui.dialog;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.HistoryLimitedList;
-import cn.memoryzy.json.model.JsonEntry;
-import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.event.DocumentEvent;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -20,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -27,19 +24,16 @@ import javax.swing.*;
  */
 public class ManuallySaveHistoryDialog extends DialogWrapper {
 
-    private final Project project;
-    private final String documentText;
+    private final HistoryLimitedList historyList;
     private final LanguageTextField languageTextField;
     private final TextEditorErrorPopupDecorator editorErrorDecorator;
-    private final JsonHistoryPersistentState historyState;
 
-    public ManuallySaveHistoryDialog(@NotNull Project project, String documentText) {
+    private String newName;
+
+    public ManuallySaveHistoryDialog(@NotNull Project project, HistoryLimitedList historyList, String oldName) {
         super(project, true);
-        this.project = project;
-        this.documentText = documentText;
-        this.historyState = JsonHistoryPersistentState.getInstance(project);
-
-        this.languageTextField = new LanguageTextField(PlainTextLanguage.INSTANCE, project, "");
+        this.historyList = historyList;
+        this.languageTextField = new LanguageTextField(PlainTextLanguage.INSTANCE, project, (null == oldName ? "" : oldName));
         this.editorErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), languageTextField);
 
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"));
@@ -50,16 +44,12 @@ public class ManuallySaveHistoryDialog extends DialogWrapper {
     protected @Nullable JComponent createCenterPanel() {
         languageTextField.setShowPlaceholderWhenFocused(true);
         languageTextField.setPlaceholder("Name");
+        languageTextField.getDocument().addDocumentListener(new ValidateSameName());
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(languageTextField);
         borderLayoutPanel.setPreferredSize(new JBDimension(280, 35));
 
         return borderLayoutPanel;
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override
@@ -78,21 +68,6 @@ public class ManuallySaveHistoryDialog extends DialogWrapper {
     }
 
     private boolean executeOkAction() {
-        HistoryLimitedList historyList = historyState.getHistory();
-
-        String text = StrUtil.trim(documentText);
-        JsonWrapper jsonWrapper = null;
-        if (JsonUtil.isJson(text)) {
-            jsonWrapper = JsonUtil.parse(text);
-
-        } else if (Json5Util.isJson5(text)) {
-            jsonWrapper = Json5Util.parse(text);
-        }
-
-        JsonEntry jsonEntry = historyList.filterItem(jsonWrapper);
-        String oldName = (null == jsonEntry) ? "" : jsonEntry.getName();
-        languageTextField.setText(oldName);
-
         String nameText = StrUtil.trim(languageTextField.getText());
         if (StrUtil.isBlank(nameText)) {
             editorErrorDecorator.setError(JsonAssistantBundle.messageOnSystem("error.ManuallySaveHistory.blank"));
@@ -104,8 +79,22 @@ public class ManuallySaveHistoryDialog extends DialogWrapper {
             return false;
         }
 
+        this.newName = nameText;
+        return true;
+    }
 
-        return false;
+    public String getNewName() {
+        return newName;
+    }
+
+    private class ValidateSameName implements DocumentListener {
+        @Override
+        public void documentChanged(@NotNull DocumentEvent event) {
+            String name = languageTextField.getText();
+            if (historyList.stream().anyMatch(el -> Objects.equals(name, el.getName()))) {
+                editorErrorDecorator.setWarning(JsonAssistantBundle.messageOnSystem("warning.ManuallySaveHistory.sameName"));
+            }
+        }
     }
 
 }

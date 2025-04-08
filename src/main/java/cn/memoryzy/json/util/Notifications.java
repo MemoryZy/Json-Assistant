@@ -95,6 +95,16 @@ public class Notifications {
     }
 
     /**
+     * 展示通知（瞬态通知）
+     */
+    public static void showNotification(String title, String content, NotificationType notificationType, List<? extends @NotNull AnAction> actions, Project project) {
+        // 使用通知组创建通知
+        Notification notification = getBalloonNotificationGroup().createNotification(content, notificationType).setTitle(title);
+        actions.forEach(notification::addAction);
+        notification.notify(project);
+    }
+
+    /**
      * 展示通知（通知记录在 Event Log 或 Notifications 中）
      */
     public static void showLogNotification(String content, NotificationType notificationType, Project project) {

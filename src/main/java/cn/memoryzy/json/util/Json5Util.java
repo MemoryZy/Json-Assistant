@@ -108,7 +108,7 @@ public class Json5Util {
      * @return 格式化后的Json5文本
      */
     public static String formatJson5WithComment(String json) {
-        return toJson5Str(tryResolveJson5WithComment(json), FORMAT_JSON5);
+        return toJson5Str(tryResolveJson5WithComment(json), FORMAT_DOUBLE_QUOTE_JSON5);
     }
 
     /**

@@ -21,7 +21,15 @@ public class HistoryLimitedList extends LinkedList<JsonEntry> {
     }
 
     public JsonEntry add(Project project, JsonWrapper jsonWrapper) {
-        JsonEntry historyEntry = new JsonEntry(calculateId(project), jsonWrapper);
+        return judgeAndAdd(new JsonEntry(calculateId(project), jsonWrapper));
+    }
+
+    public JsonEntry add(Project project, JsonWrapper jsonWrapper, String jsonString) {
+        return judgeAndAdd(new JsonEntry(calculateId(project), jsonString, jsonWrapper));
+    }
+
+    private JsonEntry judgeAndAdd(JsonEntry historyEntry) {
+        JsonWrapper jsonWrapper = historyEntry.getJsonWrapper();
         // 判断 Json 记录是否已经存在于记录内
         if (!exists(jsonWrapper)) {
             // 不存在，则将其添加到首位（add方法会判断容量是否超出而去除最老节点）
