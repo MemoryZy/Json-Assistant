@@ -46,11 +46,26 @@ public interface PluginConstant {
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
 
     String JSON_EXAMPLE = " {\"name\": \"Memory\", \"age\": 18}";
-    String JSON_EXAMPLE_COMMENTS = "{\n" +
+
+    String JSON_EXAMPLE_COMMENTS = "// {}\n" +
+            "{\n" +
             "  // {}\n" +
             "  \"name\": \"Memory\",\n" +
             "  // {}\n" +
-            "  \"age\": 18\n" +
+            "  \"age\": 18,\n" +
+            "  // {}\n" +
+            "  \"hobbies\": [\"reading\", \"swimming\", \"coding\"],\n" +
+            "  // {}\n" +
+            "  \"dateOfBirth\": \"1999-03-19\",\n" +
+            "  // {}\n" +
+            "  \"address\": {\n" +
+            "    // {}\n" +
+            "    \"country\": \"China\",\n" +
+            "    // {}\n" +
+            "    \"province\": \"Guangdong\",\n" +
+            "    // {}\n" +
+            "    \"city\": \"Guangzhou\",\n" +
+            "  }\n" +
             "}";
 
     String JSON_EXAMPLE_ID = JsonAssistantPlugin.PLUGIN_ID_NAME + "#EXAMPLE";

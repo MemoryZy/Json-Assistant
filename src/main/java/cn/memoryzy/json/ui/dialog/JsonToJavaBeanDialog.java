@@ -8,6 +8,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.group.OptionsGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
@@ -28,9 +29,11 @@ import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
+import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.FileTemplateUtil;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
@@ -86,6 +89,8 @@ import java.util.*;
 public class JsonToJavaBeanDialog extends DialogWrapper {
     private static final Logger LOG = Logger.getInstance(JsonToJavaBeanDialog.class);
 
+    public static final String DESERIALIZER_EXAMPLE_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".DESERIALIZER_EXAMPLE_GUIDE";
+
     private JBTextField classNameTextField;
     private EditorTextField jsonTextField;
     private TextEditorErrorPopupDecorator classNameErrorDecorator;
@@ -96,12 +101,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     private final Module module;
 
     private final DeserializerState deserializerState;
+    private final PropertiesComponent propertiesComponent;
 
     public JsonToJavaBeanDialog(@Nullable Project project, PsiDirectory directory, Module module) {
         super(project, true);
         this.project = project;
         this.directory = directory;
         this.module = module;
+        this.propertiesComponent = PropertiesComponent.getInstance();
         JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
         this.deserializerState = persistentState.deserializerState;
 
@@ -120,32 +127,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         classNameTextField = new JBTextField();
-        classNameTextField.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                // TODO 判断是否为首次
-                RelativePoint relativePoint = new RelativePoint(jsonTextField, new Point(jsonTextField.getWidth() / 2, jsonTextField.getY() / 8));
-                JBPopupFactory.getInstance()
-                        .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.example.tip.text", PluginConstant.JSON_EXAMPLE_ID),
-                                null,
-                                JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
-                                new HyperlinkAdapter() {
-                                    @Override
-                                    protected void hyperlinkActivated(HyperlinkEvent e) {
-                                        // TODO 填充示例数据
-
-                                    }
-                                })
-                        .setShadow(true)
-                        .setHideOnAction(true)
-                        .setHideOnClickOutside(true)
-                        .setHideOnFrameResize(true)
-                        .setHideOnKeyOutside(true)
-                        .setHideOnLinkClick(true)
-                        .createBalloon()
-                        .show(relativePoint, Balloon.Position.above);
-            }
-        });
+        registerFocusListener();
 
         JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.deserialize.label.class.name"));
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
@@ -162,8 +144,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIManager.consolasFont(15));
-
-        // TODO 示例得改，或者加个弹窗提示
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
@@ -181,6 +161,71 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         rootPanel.add(splitter, BorderLayout.CENTER);
         rootPanel.setPreferredSize(new Dimension(480, 450));
         return rootPanel;
+    }
+
+    private void registerFocusListener() {
+        classNameTextField.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                String value = propertiesComponent.getValue(DESERIALIZER_EXAMPLE_GUIDE_KEY);
+                if (Objects.isNull(value)) {
+                    RelativePoint relativePoint = new RelativePoint(jsonTextField, new Point(jsonTextField.getWidth() / 2, jsonTextField.getY() / 8));
+                    JBPopupFactory.getInstance()
+                            .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.example.tip.text", PluginConstant.JSON_EXAMPLE_ID),
+                                    AllIcons.Actions.IntentionBulb,
+                                    JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
+                                    new HyperlinkAdapter() {
+                                        @Override
+                                        protected void hyperlinkActivated(HyperlinkEvent e) {
+                                            boolean chineseLocale = PlatformUtil.isChineseLocale();
+                                            String example = StrUtil.format(PluginConstant.JSON_EXAMPLE_COMMENTS,
+                                                    chineseLocale ? "注意：注释应添加在 JSON 键的上方或右侧" : "Note: Comments should be added above or to the right of the JSON keys",
+                                                    chineseLocale ? "姓名" : "User's name",
+                                                    chineseLocale ? "年龄" : "User's age",
+                                                    chineseLocale ? "爱好" : "User's hobbies",
+                                                    chineseLocale ? "出生日期" : "User's birthday",
+                                                    chineseLocale ? "地址信息" : "Address information object",
+                                                    chineseLocale ? "国家" : "Country of residence",
+                                                    chineseLocale ? "省份" : "Province or state of residence",
+                                                    chineseLocale ? "城市" : "City of residence"
+                                            );
+
+                                            jsonTextField.setText(example);
+
+                                            // 提示ok键
+                                            JButton button = getButton(getOKAction());
+
+                                            if (button != null) {
+                                                RelativePoint buttonPoint = new RelativePoint(button, new Point(button.getWidth() / 2, button.getHeight() - button.getHeight() - 2));
+                                                JBPopupFactory.getInstance()
+                                                        .createHtmlTextBalloonBuilder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.example.tip.ok.text"),
+                                                                null,
+                                                                JBUI.CurrentTheme.NotificationInfo.backgroundColor(),
+                                                                null)
+                                                        .setShadow(true)
+                                                        .setHideOnAction(true)
+                                                        .setHideOnClickOutside(true)
+                                                        .setHideOnFrameResize(true)
+                                                        .setHideOnKeyOutside(true)
+                                                        .setHideOnLinkClick(true)
+                                                        .createBalloon()
+                                                        .show(buttonPoint, Balloon.Position.below);
+                                            }
+
+                                            propertiesComponent.setValue(DESERIALIZER_EXAMPLE_GUIDE_KEY, "true");
+                                        }
+                                    })
+                            .setShadow(true)
+                            .setHideOnAction(true)
+                            .setHideOnClickOutside(true)
+                            .setHideOnFrameResize(true)
+                            .setHideOnKeyOutside(true)
+                            .setHideOnLinkClick(true)
+                            .createBalloon()
+                            .show(relativePoint, Balloon.Position.above);
+                }
+            }
+        });
     }
 
     private JComponent createOptionsButton() {

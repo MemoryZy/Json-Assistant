@@ -75,6 +75,8 @@ public class JsonBlacklistDialog extends DialogWrapper {
         UIManager.updateComponentColorsScheme(showTextField);
 
         // TODO 这里要加 toolbar，展示一个按钮，切换原文和json
+        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(showList)
+                .setRemoveAction(new RemoveAction2());
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
         borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, BlacklistEntry::getShortText, true));
@@ -137,6 +139,36 @@ public class JsonBlacklistDialog extends DialogWrapper {
         }
     }
 
+
+    class RemoveAction2 implements AnActionButtonRunnable {
+        @Override
+        public void run(AnActionButton actionButton) {
+            int selectedIndex = showList.getSelectedIndex();
+            BlacklistEntry selectedValue = showList.getSelectedValue();
+
+            LinkedList<BlacklistEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
+            blacklist.removeIf(el -> Objects.equals(el.getId(), selectedValue.getId()));
+
+            // 替换List数据为最新的
+            NameFilteringListModel<BlacklistEntry> listModel = (NameFilteringListModel<BlacklistEntry>) showList.getModel();
+            listModel.replaceAll(blacklist);
+
+            int size = listModel.getSize();
+            if (size == 0) {
+                showTextField.setText("");
+            } else {
+                // 选中被删除元素的前一个元素
+                if (selectedIndex > 0) {
+                    showList.setSelectedIndex(selectedIndex - 1);
+                } else {
+                    // 如果还有元素，选中第一个元素
+                    showList.setSelectedIndex(0);
+                }
+            }
+
+            UIManager.rebuildListWithFilter(showList);
+        }
+    }
 
     class RemoveAction extends DumbAwareAction implements UpdateInBackground {
 
