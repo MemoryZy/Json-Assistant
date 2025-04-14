@@ -3,6 +3,9 @@ package cn.memoryzy.json.ui.dialog;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DataTypeConstant;
+import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.LanguageHolder;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.BlacklistEntry;
 import cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState;
@@ -11,10 +14,12 @@ import cn.memoryzy.json.ui.listener.ListRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIManager;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -44,12 +49,24 @@ import java.util.Objects;
 public class JsonBlacklistDialog extends DialogWrapper {
 
     private final Project project;
-    private EditorTextField showTextField;
+    private EditorTextField oriTextField;
+    private EditorTextField jsonTextField;
     private JBList<BlacklistEntry> showList;
+    private final JBCardLayout cardLayout;
+    private final JPanel cardPanel;
+    private final PropertiesComponent propertiesComponent;
+
+    private static final String DISPLAY_JSON_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JSON_DISPLAY";
+
+    private static final String ORI_CARD = "ori";
+    private static final String JSON_CARD = "json";
 
     public JsonBlacklistDialog(Project project) {
         super(project, true);
         this.project = project;
+        this.propertiesComponent = PropertiesComponent.getInstance();
+        this.cardLayout = new JBCardLayout();
+        this.cardPanel = new JPanel(cardLayout);
 
         setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.blacklist.title"));
@@ -58,10 +75,17 @@ public class JsonBlacklistDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        showTextField = new ViewerModeLanguageTextEditor(PlainTextLanguage.INSTANCE, project, "", true);
-        showTextField.setFont(UIManager.consolasFont(13));
-        showTextField.addNotify();
+        // 原文编辑器
+        oriTextField = new ViewerModeLanguageTextEditor(PlainTextLanguage.INSTANCE, project, "", true);
+        oriTextField.setFont(UIManager.consolasFont(13));
+        oriTextField.addNotify();
 
+        // JSON 编辑器
+        jsonTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
+        jsonTextField.setFont(UIManager.consolasFont(13));
+        jsonTextField.addNotify();
+
+        // List
         showList = new JBList<>(fillBlacklistModel());
         showList.setFont(UIManager.jetBrainsMonoFont(13));
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
@@ -72,20 +96,26 @@ public class JsonBlacklistDialog extends DialogWrapper {
         selectFirstItemInList();
 
         UIManager.updateComponentColorsScheme(showList);
-        UIManager.updateComponentColorsScheme(showTextField);
-
-        // TODO 这里要加 toolbar，展示一个按钮，切换原文和json
-        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(showList)
-                .setRemoveAction(new RemoveAction2());
+        UIManager.updateComponentColorsScheme(oriTextField);
+        UIManager.updateComponentColorsScheme(jsonTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
         borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, BlacklistEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
         UIManager.rebuildListWithFilter(showList);
 
+        cardPanel.add(oriTextField, ORI_CARD);
+        cardPanel.add(jsonTextField, JSON_CARD);
+
+        String value = propertiesComponent.getValue(DISPLAY_JSON_KEY);
+        String defaultCard = Boolean.TRUE.toString().equals(value) ? JSON_CARD : ORI_CARD;
+
+        // 默认显示
+        cardLayout.show(cardPanel, defaultCard);
+
         JBSplitter splitter = new JBSplitter(true, 0.3f);
         splitter.setFirstComponent(borderLayoutPanel);
-        splitter.setSecondComponent(showTextField);
+        splitter.setSecondComponent(cardPanel);
 
         ScrollingUtil.installActions(showList);
         ScrollingUtil.ensureSelectionExists(showList);
@@ -125,6 +155,8 @@ public class JsonBlacklistDialog extends DialogWrapper {
 
     private JPopupMenu buildRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
+        group.add(new SwitchJsonDisplayAction());
+        group.add(Separator.create());
         group.add(new RemoveAction());
 
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
@@ -136,37 +168,6 @@ public class JsonBlacklistDialog extends DialogWrapper {
         ListModel<BlacklistEntry> listModel = showList.getModel();
         if (listModel.getSize() > 0) {
             showList.setSelectedIndex(0);
-        }
-    }
-
-
-    class RemoveAction2 implements AnActionButtonRunnable {
-        @Override
-        public void run(AnActionButton actionButton) {
-            int selectedIndex = showList.getSelectedIndex();
-            BlacklistEntry selectedValue = showList.getSelectedValue();
-
-            LinkedList<BlacklistEntry> blacklist = ClipboardDataBlacklistPersistentState.getInstance().blacklist;
-            blacklist.removeIf(el -> Objects.equals(el.getId(), selectedValue.getId()));
-
-            // 替换List数据为最新的
-            NameFilteringListModel<BlacklistEntry> listModel = (NameFilteringListModel<BlacklistEntry>) showList.getModel();
-            listModel.replaceAll(blacklist);
-
-            int size = listModel.getSize();
-            if (size == 0) {
-                showTextField.setText("");
-            } else {
-                // 选中被删除元素的前一个元素
-                if (selectedIndex > 0) {
-                    showList.setSelectedIndex(selectedIndex - 1);
-                } else {
-                    // 如果还有元素，选中第一个元素
-                    showList.setSelectedIndex(0);
-                }
-            }
-
-            UIManager.rebuildListWithFilter(showList);
         }
     }
 
@@ -191,7 +192,7 @@ public class JsonBlacklistDialog extends DialogWrapper {
 
             int size = listModel.getSize();
             if (size == 0) {
-                showTextField.setText("");
+                oriTextField.setText("");
             } else {
                 // 选中被删除元素的前一个元素
                 if (selectedIndex > 0) {
@@ -207,25 +208,69 @@ public class JsonBlacklistDialog extends DialogWrapper {
 
         @Override
         public void update(@NotNull AnActionEvent event) {
-            event.getPresentation().setEnabled(Objects.nonNull(getEventProject(event)) && Objects.nonNull(showList.getSelectedValue()));
+            event.getPresentation().setEnabledAndVisible(Objects.nonNull(getEventProject(event)) && Objects.nonNull(showList.getSelectedValue()));
+        }
+    }
+
+    class SwitchJsonDisplayAction extends ToggleAction implements UpdateInBackground, DumbAware {
+
+        public SwitchJsonDisplayAction() {
+            super(JsonAssistantBundle.message("action.switchJsonDisplay.text"),
+                    JsonAssistantBundle.messageOnSystem("action.switchJsonDisplay.description"),
+                    JsonAssistantIcons.SWITCH_DISPLAY);
+        }
+
+        @Override
+        public boolean isSelected(@NotNull AnActionEvent e) {
+            String value = propertiesComponent.getValue(DISPLAY_JSON_KEY);
+            return Objects.equals(value, Boolean.TRUE.toString());
+        }
+
+        @Override
+        public void setSelected(@NotNull AnActionEvent e, boolean state) {
+            propertiesComponent.setValue(DISPLAY_JSON_KEY, Boolean.valueOf(state).toString());
+            // 切换
+            String defaultCard = state ? JSON_CARD : ORI_CARD;
+            cardLayout.show(cardPanel, defaultCard);
+        }
+
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            super.update(e);
+            e.getPresentation().setEnabledAndVisible(Objects.nonNull(getEventProject(e)) && Objects.nonNull(showList.getSelectedValue()));
         }
     }
 
     class UpdateEditorListSelectionListener implements ListSelectionListener {
         private int lastLineCount = 0;
+        private int lastJsonLineCount = 0;
 
         @Override
         public void valueChanged(ListSelectionEvent e) {
             BlacklistEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
-                showTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getOriginalText()));
+                oriTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getOriginalText()));
+                // TODO json5做特殊处理
+                if (DataTypeConstant.JSON5.equals(selectedValue.getOriginalDataType())) {
+
+                }
+
+
+                jsonTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getJsonWrapper().toJsonString()));
 
                 // -------------- 重新绘制
-                Document document = showTextField.getDocument();
+                Document document = oriTextField.getDocument();
                 int newLineCount = document.getLineCount();
                 if (lastLineCount != newLineCount) {
                     lastLineCount = newLineCount;
-                    UIManager.repaintEditor(Objects.requireNonNull(showTextField.getEditor()));
+                    UIManager.repaintEditor(Objects.requireNonNull(oriTextField.getEditor()));
+                }
+
+                Document jsonDocument = jsonTextField.getDocument();
+                int newJsonLineCount = jsonDocument.getLineCount();
+                if (lastJsonLineCount != newJsonLineCount) {
+                    lastJsonLineCount = newJsonLineCount;
+                    UIManager.repaintEditor(Objects.requireNonNull(jsonTextField.getEditor()));
                 }
             }
         }
