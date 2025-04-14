@@ -44,6 +44,7 @@ public class DiffNameDialog extends DialogWrapper {
         init();
     }
 
+
     @Override
     protected @Nullable JComponent createCenterPanel() {
         leftSideLabel.setText(JsonAssistantBundle.messageOnSystem("dialog.diffName.left.label"));
