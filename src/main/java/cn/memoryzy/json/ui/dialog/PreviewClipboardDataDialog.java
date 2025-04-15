@@ -103,7 +103,8 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         if (getCancelAction().isEnabled()) {
             // 添加被拒绝的JSON
             JsonWrapper wrapper = isJson5 ? Json5Util.parse(jsonString) : JsonUtil.parse(jsonString);
-            addToBlacklist(parseType, originalText, wrapper);
+            String text = isJson5 ? showTextField.getText() : originalText;
+            addToBlacklist(parseType, text, wrapper);
             close(CANCEL_EXIT_CODE);
         }
     }
