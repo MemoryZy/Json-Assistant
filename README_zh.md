@@ -52,8 +52,8 @@
   - Properties
   - URL Params
 - 扩展
-  - 将 JSON 中的时间戳类型转换为可读格式
-  - 将嵌套的 JSON 文本扩展为 JSON 对象/数组
+  - 时间戳与时间格式互相转换
+  - 解析嵌套 JSON 字符串为对象/数组
 
 <br/>
 

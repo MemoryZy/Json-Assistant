@@ -34,8 +34,8 @@
   - Properties
   - URL Params
 - Extensions
-  - Convert Timestamp to Readable Format
-  - Expand Nested JSON
+  - Convert between Timestamp and Standard Date Format
+  - Parse nested JSON strings into objects/arrays
 
 <br/>
 

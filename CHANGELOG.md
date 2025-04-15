@@ -12,6 +12,7 @@
 - 优化 Java 常量转为 JSON 功能中的判断逻辑，支持更多方式定义的常量。
 - 用户体验优化与改进。
 - 兼容性优化。
+- BUG修复。
 - Added functionality to convert JavaBeans to JSON5 (including property comments).
 - Added functionality to convert runtime objects to JSON5 (including property comments).
 - Added a comment display feature to the JSON tree structure.
@@ -23,6 +24,7 @@
 - Optimize the judgment logic in the functionality of converting Java constants to JSON, supporting constants defined in more ways.
 - User experience optimization and improvement.
 - Compatibility optimization.
+- BUG fixes.
 
 ## [1.7.8] - 2025-03-25
 
