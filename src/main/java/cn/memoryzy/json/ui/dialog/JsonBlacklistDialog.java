@@ -249,14 +249,14 @@ public class JsonBlacklistDialog extends DialogWrapper {
         public void valueChanged(ListSelectionEvent e) {
             BlacklistEntry selectedValue = showList.getSelectedValue();
             if (selectedValue != null) {
-                oriTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getOriginalText()));
-                // TODO json5做特殊处理
-                if (DataTypeConstant.JSON5.equals(selectedValue.getOriginalDataType())) {
+                String originalText = selectedValue.getOriginalText();
+                oriTextField.setText(JsonAssistantUtil.normalizeLineEndings(originalText));
 
-                }
+                String jsonString = DataTypeConstant.JSON5.equals(selectedValue.getOriginalDataType())
+                        ? originalText
+                        : selectedValue.getJsonWrapper().toJsonString();
 
-
-                jsonTextField.setText(JsonAssistantUtil.normalizeLineEndings(selectedValue.getJsonWrapper().toJsonString()));
+                jsonTextField.setText(JsonAssistantUtil.normalizeLineEndings(jsonString));
 
                 // -------------- 重新绘制
                 Document document = oriTextField.getDocument();
