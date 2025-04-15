@@ -235,6 +235,8 @@ public class JsonStructureComponentProvider {
         group.addSeparator();
         group.add(new CopyNodePathAction(tree));
         group.addSeparator();
+        group.add(new CopyNodeCommentAction(tree));
+        group.addSeparator();
         group.add(new ExpandMultiAction(tree));
         group.addSeparator();
         group.add(new CollapseMultiAction(tree));
