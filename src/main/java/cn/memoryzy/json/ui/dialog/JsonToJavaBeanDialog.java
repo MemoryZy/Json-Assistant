@@ -191,6 +191,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
                                             );
 
                                             jsonTextField.setText(example);
+                                            classNameTextField.setText("UserExample");
 
                                             // 提示ok键
                                             JButton button = getButton(getOKAction());
