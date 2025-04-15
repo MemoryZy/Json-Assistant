@@ -9,6 +9,7 @@ import cn.hutool.core.util.*;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
+import cn.memoryzy.json.enums.JsonConversionTarget;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.SwaggerAnnotations;
 import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
@@ -32,6 +33,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -522,6 +524,36 @@ public class JavaUtil {
         return psiClass;
     }
 
+    public static ImmutablePair<JsonConversionTarget, PsiClass> getPsiClass2(PsiJavaCodeReferenceElement referenceElement) {
+        PsiClass psiClass = null;
+        JsonConversionTarget target = null;
+
+        PsiElement resolve = referenceElement.resolve();
+        if (resolve instanceof PsiClass) {
+            psiClass = (PsiClass) resolve;
+            target = JsonConversionTarget.REFERENCED_CLASS;
+
+        } else if (resolve instanceof PsiLocalVariable) {
+            psiClass = getPsiClass(((PsiLocalVariable) resolve).getType());
+            target = JsonConversionTarget.LOCAL_VARIABLE;
+
+        } else if (resolve instanceof PsiField) {
+            PsiType psiType = ((PsiField) resolve).getType();
+            if (isApplicationClsType(psiType)) {
+                psiClass = PsiTypesUtil.getPsiClass(psiType);
+            } else if (isCollectionOrArray(psiType)) {
+                psiClass = getGenericTypeOfCollection(referenceElement.getProject(), psiType);
+            }
+            target = JsonConversionTarget.CLASS_FIELD;
+
+        } else if (resolve instanceof PsiParameter) {
+            psiClass = getPsiClass(((PsiParameter) resolve).getType());
+            target = JsonConversionTarget.METHOD_PARAMETER;
+        }
+
+        return ImmutablePair.of(target, psiClass);
+    }
+
     public static void addKeywordsToClass(PsiElementFactory factory, String keywordString, PsiClass psiClass) {
         PsiKeyword keyword = factory.createKeyword(keywordString);
         PsiModifierList modifierList = psiClass.getModifierList();
@@ -891,6 +923,33 @@ public class JavaUtil {
 
         // 获取当前类
         return (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) ? psiClass : JavaUtil.getPsiClass(dataContext);
+    }
+
+    public static ImmutablePair<JsonConversionTarget, PsiClass> getCurrentCursorPositionClass2(Project project, DataContext dataContext) {
+        PsiElement element = PlatformUtil.getPsiElementByOffset(dataContext);
+        // 本地变量
+        PsiLocalVariable localVariable = PsiTreeUtil.getParentOfType(element, PsiLocalVariable.class);
+        // 引用
+        PsiJavaCodeReferenceElement referenceElement = PsiTreeUtil.getParentOfType(element, PsiJavaCodeReferenceElement.class);
+
+        PsiClass psiClass = null;
+        JsonConversionTarget target = null;
+        if (localVariable != null) {
+            psiClass = resolveLocalVariable(project, localVariable);
+            target = JsonConversionTarget.LOCAL_VARIABLE;
+
+        } else if (referenceElement != null) {
+            ImmutablePair<JsonConversionTarget, PsiClass> pair = JavaUtil.getPsiClass2(referenceElement);
+            psiClass = pair.getRight();
+            target = pair.getLeft();
+        }
+
+        // 获取当前类
+        if (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) {
+            return ImmutablePair.of(target, psiClass);
+        } else {
+            return ImmutablePair.of(JsonConversionTarget.CURRENT_CLASS, JavaUtil.getPsiClass(dataContext));
+        }
     }
 
     private static PsiClass resolveLocalVariable(Project project, PsiLocalVariable localVariable) {

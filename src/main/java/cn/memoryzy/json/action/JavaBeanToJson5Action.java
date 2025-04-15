@@ -38,7 +38,9 @@ public class JavaBeanToJson5Action extends AnAction implements UpdateInBackgroun
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabledAndVisible(JavaBeanToJsonAction.isEnable(getEventProject(event), event.getDataContext()));
+        Presentation presentation = event.getPresentation();
+        presentation.setEnabledAndVisible(
+                JavaBeanToJsonAction.updateActionAndCheckEnablement(getEventProject(event), event.getDataContext(), presentation, true));
     }
 
 }

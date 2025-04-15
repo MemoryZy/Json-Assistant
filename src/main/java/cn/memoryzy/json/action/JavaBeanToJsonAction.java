@@ -3,6 +3,7 @@ package cn.memoryzy.json.action;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.JsonConversionTarget;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.util.JavaUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -15,6 +16,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiClass;
 import icons.JsonAssistantIcons;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -53,7 +55,8 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     @Override
     public void update(@NotNull AnActionEvent event) {
         // 设置可见性
-        event.getPresentation().setEnabledAndVisible(isEnable(getEventProject(event), event.getDataContext()));
+        Presentation presentation = event.getPresentation();
+        presentation.setEnabledAndVisible(updateActionAndCheckEnablement(getEventProject(event), event.getDataContext(), presentation, false));
     }
 
 
@@ -108,7 +111,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     }
 
 
-    public static boolean isEnable(Project project, DataContext dataContext) {
+    public static boolean updateActionAndCheckEnablement(Project project, DataContext dataContext, Presentation presentation, boolean isJson5) {
         if (Objects.isNull(project)) {
             return false;
         }
@@ -117,12 +120,28 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
             return false;
         }
 
-        PsiClass psiClass = JavaUtil.getCurrentCursorPositionClass(project, dataContext);
+        ImmutablePair<JsonConversionTarget, PsiClass> pair = JavaUtil.getCurrentCursorPositionClass2(project, dataContext);
+        JsonConversionTarget target = pair.getLeft();
+        PsiClass psiClass = pair.getRight();
         if (psiClass == null) {
             return false;
         }
 
-        return JavaUtil.hasJavaProperty(psiClass);
+        if (!JavaUtil.hasJavaProperty(psiClass)) {
+            return false;
+        }
+
+        // 更新Action
+        String newName = isJson5 ? target.getJson5Name() : target.getJsonName();
+        String newDescription = isJson5 ? target.getJson5Description() : target.getJsonDescription();
+
+        String oldName = presentation.getText();
+        String oldDescription = presentation.getDescription();
+
+        if (!Objects.equals(newName, oldName)) presentation.setText(newName);
+        if (!Objects.equals(newDescription, oldDescription)) presentation.setDescription(newDescription);
+
+        return true;
     }
 
 

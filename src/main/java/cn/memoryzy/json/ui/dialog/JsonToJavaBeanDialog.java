@@ -26,8 +26,8 @@ import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.ui.component.ActionGroupPopupButton;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
-import cn.memoryzy.json.util.UIManager;
 import cn.memoryzy.json.util.*;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -79,8 +79,8 @@ import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.IOException;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 /**
  * @author Memory
