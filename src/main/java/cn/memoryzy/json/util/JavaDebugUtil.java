@@ -431,13 +431,9 @@ public class JavaDebugUtil {
                 PsiField[] psiFields = psiClass.getAllFields();
 
                 for (PsiField psiField : psiFields) {
-                    String fieldName = psiField.getName();
-                    PsiDocComment docComment = psiField.getDocComment();
-                    if (docComment != null) {
-                        String comment = JavaUtil.getDocComment(docComment);
-                        if (StrUtil.isNotBlank(comment)) {
-                            commentMap.put(fieldName, comment);
-                        }
+                    String comment = JavaUtil.resolveFieldComment(psiField);
+                    if (StrUtil.isNotBlank(comment)) {
+                        commentMap.put(psiField.getName(), comment);
                     }
                 }
 

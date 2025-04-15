@@ -168,7 +168,7 @@ public class JavaUtil {
         }
     }
 
-    private static String resolveFieldComment(PsiField psiField) {
+    public static String resolveFieldComment(PsiField psiField) {
         String comment = null;
         // 注解与注释
         PsiAnnotation apiModelPropertyAnnotation = psiField.getAnnotation(SwaggerAnnotations.API_MODEL_PROPERTY.getValue());
@@ -177,6 +177,9 @@ public class JavaUtil {
 
         if (Objects.nonNull(apiModelPropertyAnnotation)) {
             comment = StrUtil.trim(getMemberValue(apiModelPropertyAnnotation, "value"));
+            if (StrUtil.isBlank(comment)) {
+                comment = StrUtil.trim(getMemberValue(apiModelPropertyAnnotation, "notes"));
+            }
         }
 
         if (StrUtil.isBlank(comment) && Objects.nonNull(schemaAnnotation)) {
@@ -855,7 +858,7 @@ public class JavaUtil {
         return Objects.nonNull(JavaUtil.findClass(module, SwaggerAnnotations.SCHEMA.getValue()));
     }
 
-    public static boolean hasLombokLib(Module module){
+    public static boolean hasLombokLib(Module module) {
         return Objects.nonNull(JavaUtil.findClass(module, LombokAnnotations.DATA.getValue()));
     }
 
