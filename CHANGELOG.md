@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.8.0] - 2025-04-16
+
 - 新增 JavaBean 转 JSON5（包含属性注释）功能。
 - 新增 运行时对象 转 JSON5（包含属性注释）功能。
 - 在 JSON 树结构中新增注释展示功能。
@@ -322,7 +325,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.8...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.8...v1.8.0
 [1.7.8]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7...v1.7.8
 [1.7.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7-beta...v1.7.7
 [1.7.7-beta]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.6...v1.7.7-beta
