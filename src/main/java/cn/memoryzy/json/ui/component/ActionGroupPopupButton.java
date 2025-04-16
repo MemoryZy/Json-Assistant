@@ -25,9 +25,10 @@ public class ActionGroupPopupButton extends ActionButton {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void showActionGroupPopup(@NotNull ActionGroup actionGroup, @NotNull AnActionEvent event) {
         HelpTooltip.hide(this);
-        ActionUtil.performActionDumbAwareWithCallbacks(myAction, event);
+        ActionUtil.performActionDumbAwareWithCallbacks(myAction, event, event.getDataContext());
     }
 
     @Override
