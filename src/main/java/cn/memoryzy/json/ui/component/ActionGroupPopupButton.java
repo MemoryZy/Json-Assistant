@@ -1,11 +1,11 @@
 package cn.memoryzy.json.ui.component;
 
+import cn.hutool.core.util.ReflectUtil;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.diagnostic.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -25,10 +25,9 @@ public class ActionGroupPopupButton extends ActionButton {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     protected void showActionGroupPopup(@NotNull ActionGroup actionGroup, @NotNull AnActionEvent event) {
         HelpTooltip.hide(this);
-        ActionUtil.performActionDumbAwareWithCallbacks(myAction, event, event.getDataContext());
+        ReflectUtil.invoke(actionGroup, "actionPerformed", event);
     }
 
     @Override
