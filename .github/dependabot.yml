@@ -6,7 +6,7 @@ updates:
   # Maintain dependencies for Gradle dependencies
   - package-ecosystem: "gradle"
     directory: "/"
-    target-branch: "next"
+    target-branch: "next" # 将其改为main，可自动升级组件
     schedule:
       interval: "daily"
   # Maintain dependencies for GitHub Actions
