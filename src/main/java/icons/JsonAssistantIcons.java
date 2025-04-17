@@ -55,6 +55,7 @@ public class JsonAssistantIcons {
         public static final Icon INTELLIJ_EXPAND_ALL = load("/icons/structure/intellij_expandAll.svg");
         public static final Icon COMPARE_STRUCTURE = load("/icons/structure/compare_structure.svg");
         public static final Icon PATH = load("/icons/structure/path.svg");
+        public static final Icon REFRESH = load("/icons/structure/refresh.svg");
 
     }
 

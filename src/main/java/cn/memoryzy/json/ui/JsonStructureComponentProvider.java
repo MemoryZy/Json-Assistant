@@ -74,6 +74,8 @@ public class JsonStructureComponentProvider {
         }
 
         // 构建树
+        this.treeComponent = new JPanel(new BorderLayout());
+
         tree = new Tree(new DefaultTreeModel(rootNode));
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
@@ -94,6 +96,10 @@ public class JsonStructureComponentProvider {
 
         ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree);
         if (config.isNeedToolbar()) {
+            if (config.isNeedRefresh()) {
+                decorator.addExtraAction(AnActionButton.fromAction(new RefreshStructureAction(this, config.getFile())));
+            }
+
             decorator.addExtraAction(new ExpandAllAction(tree, component, true))
                     .addExtraAction(new CollapseAllAction(tree, component, true))
                     .addExtraAction(AnActionButton.fromAction(new DisplayNodePathAction(structureState)));
@@ -109,7 +115,6 @@ public class JsonStructureComponentProvider {
 
         UIManager.expandSpecifiedLevelNode(tree, config.getExpandLevel());
 
-        this.treeComponent = new JPanel(new BorderLayout());
         this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
     }
 

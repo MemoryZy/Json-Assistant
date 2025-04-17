@@ -29,7 +29,10 @@ public class JsonTreeEditorComponentProvider {
 
     public JsonTreeEditorComponentProvider(Project project, VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
-        this.componentProvider = new JsonStructureComponentProvider(null, UIManager.getWindowComponent(project), StructureConfig.of(false, 3));
+        this.componentProvider = new JsonStructureComponentProvider(
+                null,
+                UIManager.getWindowComponent(project),
+                StructureConfig.of(false, 3, true, virtualFile));
     }
 
     public JComponent getComponent() {

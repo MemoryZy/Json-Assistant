@@ -29,6 +29,8 @@ public class JsonTreeFileEditor extends UserDataHolderBase implements FileEditor
         this.project = project;
         this.file = file;
         // 第一次加载，不加载树
+
+        // TODO 这里新增一个刷新按钮
         this.provider = new JsonTreeEditorComponentProvider(project, file);
     }
 
