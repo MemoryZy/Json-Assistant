@@ -2,7 +2,6 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
@@ -49,8 +48,10 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiUtil;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.jcef.JBCefApp;
+import com.intellij.util.ResourceUtil;
 import com.intellij.util.ui.TextTransferable;
 import com.intellij.util.ui.UIUtil;
+import icons.JsonAssistantIcons;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -58,6 +59,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -323,7 +325,7 @@ public class PlatformUtil {
         url = com.intellij.util.Urls.newFromEncoded(url).addParameters(parameters).toExternalForm();
 
         if (PlatformUtil.canBrowseInHTMLEditor() && useHtmlEditor) {
-            String timeoutContent = HtmlConstant.TIMEOUT_HTML
+            String timeoutContent = loadText("html", "Timeout.html")
                     .replace("__THEME__", darkTheme ? "theme-dark" : "")
                     .replace("__TITLE__", JsonAssistantBundle.messageOnSystem("open.html.timeout.title"))
                     .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.timeout.message"))
@@ -472,4 +474,21 @@ public class PlatformUtil {
         return null;
     }
 
+
+    /**
+     * 加载文件文本
+     *
+     * @param basePath 目录路径（resources目录下）
+     * @param fileName 文件名
+     * @return 文本
+     */
+    public static String loadText(String basePath, String fileName) {
+        try (InputStream stream = ResourceUtil.getResourceAsStream(JsonAssistantIcons.class.getClassLoader(), basePath, fileName)) {
+            return ResourceUtil.loadText(stream);
+        } catch (Exception e) {
+            LOG.error("Failed to load text", e);
+        }
+
+        return StrUtil.EMPTY;
+    }
 }
