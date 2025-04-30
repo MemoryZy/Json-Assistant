@@ -600,7 +600,7 @@ public class JavaDebugUtil {
 
         PsiClassType classType = PsiTypesUtil.getClassType(psiClass);
         // 引用类型 还需要List、Array类型
-        return JavaUtil.isApplicationClsType(classType);
+        return JavaUtil.isNonJdkType(classType);
     }
 
     /**

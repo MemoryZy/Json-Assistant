@@ -102,7 +102,7 @@ public class JavaUtil {
             PsiType psiType = psiField.getType();
 
             // 是否为引用类型
-            if (JavaUtil.isApplicationClsType(psiType)) {
+            if (JavaUtil.isNonJdkType(psiType)) {
                 // 获取类型对应的Class
                 PsiClass fieldClz = PsiTypesUtil.getPsiClass(psiType);
 
@@ -144,7 +144,7 @@ public class JavaUtil {
                 ArrayList<Object> list = new ArrayList<>();
                 if (psiClz != null) {
                     PsiClassType classType = PsiTypesUtil.getClassType(psiClz);
-                    if (JavaUtil.isApplicationClsType(classType)) {
+                    if (JavaUtil.isNonJdkType(classType)) {
                         // 判断属性中是否存在本类或之前类的类型的嵌套
                         if (!ignoreMap.containsKey(psiClz.getQualifiedName())) {
                             Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
@@ -282,7 +282,7 @@ public class JavaUtil {
     }
 
     public static boolean isCollectionOrArray(PsiType psiType) {
-        return isAssignType(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType;
+        return isTypeAssignableToAny(psiType, PluginConstant.COLLECTION_FQN) || psiType instanceof PsiArrayType;
     }
 
     public static PsiClass getGenericTypeOfCollection(Project project, PsiType psiType) {
@@ -384,15 +384,15 @@ public class JavaUtil {
             return includeRandomValues ? RandomUtil.randomInt(1000) : 0;
         } else if (PsiKeyword.FLOAT.equals(canonicalText) || Float.class.getName().equals(canonicalText)
                 || PsiKeyword.DOUBLE.equals(canonicalText) || Double.class.getName().equals(canonicalText)
-                || isAssignType(psiType, PluginConstant.BIGDECIMAL_FQN)) {
+                || isTypeAssignableToAny(psiType, PluginConstant.BIGDECIMAL_FQN)) {
             return includeRandomValues ? RandomUtil.randomFloat() : new BigDecimal("0.1");
-        } else if (isAssignType(psiType, PluginConstant.COLLECTION_FQN)) {
+        } else if (isTypeAssignableToAny(psiType, PluginConstant.COLLECTION_FQN)) {
             return new ArrayList<>();
-        } else if (isAssignType(psiType, PluginConstant.DATE_FQN)) {
+        } else if (isTypeAssignableToAny(psiType, PluginConstant.DATE_FQN)) {
             return DateUtil.format(new Date(), DatePattern.NORM_DATE_PATTERN);
-        } else if (isAssignType(psiType, PluginConstant.TIME_FQN)) {
+        } else if (isTypeAssignableToAny(psiType, PluginConstant.TIME_FQN)) {
             return DateUtil.format(new Date(), DatePattern.NORM_TIME_PATTERN);
-        } else if (isAssignType(psiType, PluginConstant.DATE_TIME_FQN)) {
+        } else if (isTypeAssignableToAny(psiType, PluginConstant.DATE_TIME_FQN)) {
             return DateUtil.format(new Date(), DatePattern.NORM_DATETIME_PATTERN);
         } else {
             return null;
@@ -400,37 +400,31 @@ public class JavaUtil {
     }
 
 
-    public static boolean isAssignType(PsiType psiType, String[] clsNameList) {
+    public static boolean isTypeAssignableToAny(PsiType psiType, String[] candidateClassNames) {
         // 顶级接口预判断（Collection 接口父接口只有 Iterable 接口）
         String canonicalText = psiType.getCanonicalText();
-        for (String className : clsNameList) {
+        for (String className : candidateClassNames) {
             if (canonicalText.startsWith(className)) {
                 return true;
             }
         }
 
-        Set<String> superTypeNameSet = new HashSet<>();
-        collTypeName(psiType.getSuperTypes(), superTypeNameSet);
+        Set<String> superTypeNames = new HashSet<>();
+        collectSuperTypeNames(psiType.getSuperTypes(), superTypeNames);
 
-        if (CollUtil.isNotEmpty(superTypeNameSet)) {
-            for (String typeName : superTypeNameSet) {
-                if (Arrays.stream(clsNameList).anyMatch(typeName::startsWith)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return superTypeNames.stream()
+                .anyMatch(superType ->
+                        Arrays.stream(candidateClassNames).anyMatch(superType::startsWith));
     }
 
 
-    private static void collTypeName(PsiType[] psiTypes, Set<String> superTypeNameSet) {
+    private static void collectSuperTypeNames(PsiType[] psiTypes, Set<String> collector) {
         for (PsiType psiType : psiTypes) {
-            superTypeNameSet.add(psiType.getCanonicalText());
+            collector.add(psiType.getCanonicalText());
             PsiType[] superTypes = psiType.getSuperTypes();
 
             if (ArrayUtil.isNotEmpty(superTypes)) {
-                collTypeName(superTypes, superTypeNameSet);
+                collectSuperTypeNames(superTypes, collector);
             }
         }
     }
@@ -442,7 +436,7 @@ public class JavaUtil {
      * @param psiType 类型
      * @return true，引用类型；false，不为引用类型
      */
-    public static boolean isApplicationClsType(PsiType psiType) {
+    public static boolean isNonJdkType(PsiType psiType) {
         // 不为引用类型
         if ((!(psiType instanceof PsiClassReferenceType)) && (!(psiType instanceof PsiImmediateClassType))) {
             return false;
@@ -452,11 +446,11 @@ public class JavaUtil {
         String canonicalText = psiType.getCanonicalText();
 
         // 排除可继承的类型，如果是 集合、BigDecimal、Date、Time等，不将其视为对象
-        if (isAssignType(psiType, PluginConstant.COLLECTION_FQN)
-                || isAssignType(psiType, PluginConstant.BIGDECIMAL_FQN)
-                || isAssignType(psiType, PluginConstant.DATE_TIME_FQN)
-                || isAssignType(psiType, PluginConstant.DATE_FQN)
-                || isAssignType(psiType, PluginConstant.TIME_FQN)) {
+        if (isTypeAssignableToAny(psiType, PluginConstant.COLLECTION_FQN)
+                || isTypeAssignableToAny(psiType, PluginConstant.BIGDECIMAL_FQN)
+                || isTypeAssignableToAny(psiType, PluginConstant.DATE_TIME_FQN)
+                || isTypeAssignableToAny(psiType, PluginConstant.DATE_FQN)
+                || isTypeAssignableToAny(psiType, PluginConstant.TIME_FQN)) {
             return false;
         }
 
@@ -512,7 +506,7 @@ public class JavaUtil {
             psiClass = getPsiClass(((PsiLocalVariable) resolve).getType());
         } else if (resolve instanceof PsiField) {
             PsiType psiType = ((PsiField) resolve).getType();
-            if (isApplicationClsType(psiType)) {
+            if (isNonJdkType(psiType)) {
                 psiClass = PsiTypesUtil.getPsiClass(psiType);
             } else if (isCollectionOrArray(psiType)) {
                 psiClass = getGenericTypeOfCollection(referenceElement.getProject(), psiType);
@@ -539,7 +533,7 @@ public class JavaUtil {
 
         } else if (resolve instanceof PsiField) {
             PsiType psiType = ((PsiField) resolve).getType();
-            if (isApplicationClsType(psiType)) {
+            if (isNonJdkType(psiType)) {
                 psiClass = PsiTypesUtil.getPsiClass(psiType);
             } else if (isCollectionOrArray(psiType)) {
                 psiClass = getGenericTypeOfCollection(referenceElement.getProject(), psiType);
@@ -922,7 +916,7 @@ public class JavaUtil {
         }
 
         // 获取当前类
-        return (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) ? psiClass : JavaUtil.getPsiClass(dataContext);
+        return (psiClass != null && JavaUtil.isNonJdkType(PsiTypesUtil.getClassType(psiClass))) ? psiClass : JavaUtil.getPsiClass(dataContext);
     }
 
     public static ImmutablePair<JsonConversionTarget, PsiClass> getCurrentCursorPositionClass2(Project project, DataContext dataContext) {
@@ -945,7 +939,7 @@ public class JavaUtil {
         }
 
         // 获取当前类
-        if (psiClass != null && JavaUtil.isApplicationClsType(PsiTypesUtil.getClassType(psiClass))) {
+        if (psiClass != null && JavaUtil.isNonJdkType(PsiTypesUtil.getClassType(psiClass))) {
             return ImmutablePair.of(target, psiClass);
         } else {
             return ImmutablePair.of(JsonConversionTarget.CURRENT_CLASS, JavaUtil.getPsiClass(dataContext));
