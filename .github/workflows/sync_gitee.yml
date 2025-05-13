@@ -32,5 +32,5 @@ jobs:
           GITEE_USER: ${{ secrets.GITEE_USER }}
           REPO_NAME: ${{ github.event.repository.name }}
         run: |
-          git remote add gitee git@gitee.com:$GITEE_USER/$REPO_NAME.git
+          git remote add gitee git@gitee.com:$GITEE_USER/json-assistant-private.git
           git push --force --mirror gitee
