@@ -1,0 +1,36 @@
+{
+  "icons": {
+    "expui": {
+      "groupByClass.svg": "icons/groupByClass.svg",
+      "json.svg": "icons/json.svg",
+      "extract.svg": "icons/extract.svg",
+      "donate.svg": "icons/donate.svg",
+      "esc.svg": "icons/esc.svg",
+      "book_page.svg": "icons/book_page.svg",
+      "book_reader.svg": "icons/book_reader.svg",
+      "group.svg": "icons/group.svg",
+      "fileTypes": {
+        "toml.svg": "icons/fileTypes/toml-file.svg",
+        "url.svg": "icons/fileTypes/url.svg",
+        "kv.svg": "icons/fileTypes/kv.svg"
+      },
+      "toolwindow": {
+        "logo.svg": "icons/toolwindow/logo.svg",
+        "structure_logo.svg": "icons/toolwindow/structure_logo.svg",
+        "minify.svg": "icons/toolwindow/minify.svg",
+        "save.svg": "icons/toolwindow/save.svg",
+        "search.svg": "icons/toolwindow/search.svg",
+        "structure.svg": "icons/toolwindow/structure.svg",
+        "delete.svg": "icons/toolwindow/delete.svg",
+        "magic.svg": "icons/toolwindow/magic.svg",
+        "scrollDown.svg": "icons/toolwindow/scrollDown.svg",
+        "softWrap.svg": "icons/toolwindow/softWrap.svg",
+        "switch.svg": "icons/toolwindow/switch.svg",
+        "text.svg": "icons/toolwindow/text.svg"
+      },
+      "structure": {
+        "compare_structure.svg": "icons/structure/compare_structure.svg"
+      }
+    }
+  }
+}

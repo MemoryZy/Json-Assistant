@@ -1,0 +1,15 @@
+<svg width="16.000000" height="16.000000" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip20_3">
+			<rect id="json_item" width="16.000000" height="16.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip20_3)">
+		<circle id="circle" cx="8.000000" cy="8.000000" r="6.500000" fill="#FFF7F7" fill-opacity="1.000000"/>
+		<circle id="circle" cx="8.000000" cy="8.000000" r="6.500000" stroke="#DB3B4B" stroke-opacity="1.000000" stroke-width="1.000000"/>
+		<path id="i" d="M8.65779 4.23038Q8.43201 4.09985 8.13077 4.09985Q7.78897 4.09985 7.5546 4.2561Q7.5285 4.27323 7.50531 4.29365Q7.32022 4.45667 7.32022 4.82983Q7.32022 5.18806 7.49901 5.35633Q7.52492 5.38072 7.5546 5.40112L7.55467 5.40117Q7.78903 5.55981 8.13077 5.55981Q8.42507 5.55981 8.64734 5.43329Q8.674 5.41812 8.69962 5.40112Q8.73396 5.37799 8.76337 5.34973Q8.93887 5.18112 8.93887 4.82983Q8.93887 4.46341 8.75669 4.29961Q8.73009 4.2757 8.69962 4.2561Q8.67904 4.24267 8.65779 4.23038ZM8.87051 11.7L8.87051 6.24097L7.37881 6.24097L7.37881 11.7L8.87051 11.7Z" fill="#DB3B4B" fill-opacity="1.000000" fill-rule="evenodd"/>
+	</g>
+</svg>

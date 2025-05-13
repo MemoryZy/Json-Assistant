@@ -1,0 +1,40 @@
+[versions]
+# libraries
+annotations = "24.0.1"
+hutool-all = "5.8.28"
+jackson-dataformat-xml = "2.16.1"
+json-path = "2.9.0"
+commons-lang3 = "3.16.0"
+toml4j = "0.7.2"
+tnjson = "2.0"
+jmespath = "0.6.0"
+bytebuddy = "1.17.2"
+woodstox = "7.1.0"
+
+# plugins
+dokka = "1.8.10"
+kotlin = "1.8.10"
+changelog = "2.2.0"
+gradleIntelliJPlugin = "1.17.3"
+qodana = "0.1.13"
+kover = "0.6.1"
+
+[libraries]
+annotations = { group = "org.jetbrains", name = "annotations", version.ref = "annotations" }
+hutool = { group = "cn.hutool", name = "hutool-all", version.ref = "hutool-all" }
+dataformat = { group = "com.fasterxml.jackson.dataformat", name = "jackson-dataformat-xml", version.ref = "jackson-dataformat-xml" }
+jsonpath = { group = "com.jayway.jsonpath", name = "json-path", version.ref = "json-path" }
+commonlang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons-lang3" }
+toml4j = { group = "com.moandjiezana.toml", name = "toml4j", version.ref = "toml4j" }
+tnjson = { group = "com.github.anymaker", name = "tnjson", version.ref = "tnjson" }
+jmespath = { group = "io.burt", name = "jmespath-jackson", version.ref = "jmespath" }
+bytebuddy = { group = "net.bytebuddy", name = "byte-buddy", version.ref = "bytebuddy" }
+woodstox = { group = "com.fasterxml.woodstox", name = "woodstox-core", version.ref = "woodstox" }
+
+[plugins]
+changelog = { id = "org.jetbrains.changelog", version.ref = "changelog" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+gradleIntelliJPlugin = { id = "org.jetbrains.intellij", version.ref = "gradleIntelliJPlugin" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+qodana = { id = "org.jetbrains.qodana", version.ref = "qodana" }

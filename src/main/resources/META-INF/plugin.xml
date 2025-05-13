@@ -1,0 +1,171 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <!-- Unique identifier of the plugin. It should be FQN. It cannot be changed between the plugin versions. -->
+    <id>cn.memoryzy.json</id>
+
+    <!-- Public plugin name should be written in Title Case.
+         Guidelines: https://plugins.jetbrains.com/docs/marketplace/plugin-overview-page.html#plugin-name -->
+    <name>Json Assistant</name>
+
+    <!-- A displayed Vendor name or Organization ID displayed on the Plugins Page. -->
+    <vendor email="memoryzk@outlook.com" url="https://github.com/MemoryZy">Memory</vendor>
+
+    <!-- Product and plugin compatibility requirements.
+         Read more: https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
+    <depends>com.intellij.modules.platform</depends>
+    <depends optional="true" config-file="optional/plugin-json.xml">com.intellij.modules.json</depends>
+    <depends optional="true" config-file="optional/plugin-xml.xml">com.intellij.modules.xml</depends>
+    <depends optional="true" config-file="optional/plugin-java.xml">com.intellij.java</depends>
+    <depends optional="true" config-file="optional/plugin-kotlin.xml">org.jetbrains.kotlin</depends>
+    <!-- 低版本的 IDE 无法加载 org.toml.lang，如 2020.3.1 -->
+    <depends optional="true" config-file="optional/plugin-toml.xml">org.toml.lang</depends>
+    <depends optional="true" config-file="optional/plugin-yaml.xml">org.jetbrains.plugins.yaml</depends>
+    <depends optional="true" config-file="optional/plugin-properties.xml">com.intellij.properties</depends>
+    <depends optional="true" config-file="optional/plugin-xdebugger.xml">com.intellij.modules.xdebugger</depends>
+
+    <resource-bundle>messages.JsonAssistantBundle</resource-bundle>
+
+    <!-- Extension points defined by the plugin.
+     Read more: https://plugins.jetbrains.com/docs/intellij/plugin-extension-points.html -->
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin" isLogByDefault="false"/>
+        <notificationGroup displayType="BALLOON" id="JsonAssistant Plugin Log" isLogByDefault="true"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="JsonAssistant Plugin Sticky" isLogByDefault="false"/>
+        <notificationGroup displayType="STICKY_BALLOON" id="JsonAssistant Plugin Sticky Log" isLogByDefault="true"/>
+        <toolWindow id="JsonAssistant.ToolWindow.JsonAssistant"
+                    factoryClass="cn.memoryzy.json.toolwindow.JsonAssistantToolWindowFactory"
+                    anchor="right"
+                    secondary="true"
+                    canCloseContents="true"
+                    doNotActivateOnStart="true"/>
+
+        <applicationConfigurable
+                id="JsonAssistant.Configurable.JsonAssistantMainConfigurable"
+                parentId="tools"
+                groupWeight="-100"
+                instance="cn.memoryzy.json.extension.configurable.JsonAssistantMainConfigurable"
+                bundle="messages.JsonAssistantBundle"
+                key="setting.display.name"/>
+
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
+        <projectService serviceImplementation="cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.JsonAssistantPersistentState"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
+        <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
+        <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
+        <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
+
+        <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonTreeFileEditorProvider"/>
+
+        <localInspection language="JSON"
+                         key="inspection.expand.json.familyName"
+                         bundle="messages.JsonAssistantBundle"
+                         groupName="JSON and JSON5"
+                         enabledByDefault="true"
+                         level="INFO"
+                         implementationClass="cn.memoryzy.json.inspection.ExpandNestedJsonInspection"/>
+
+        <localInspection language="JSON"
+                         key="inspection.convert.timestamp.familyName"
+                         bundle="messages.JsonAssistantBundle"
+                         groupName="JSON and JSON5"
+                         enabledByDefault="true"
+                         level="INFO"
+                         implementationClass="cn.memoryzy.json.inspection.ConvertTimestampInspection"/>
+
+        <intentionAction>
+            <className>cn.memoryzy.json.intention.ConvertReadableTimeIntention</className>
+            <category>JSON</category>
+        </intentionAction>
+
+        <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
+        
+        <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="cn.memoryzy.json.service.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
+<!--        <listener class="cn.memoryzy.json.extension.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>-->
+    </applicationListeners>
+
+    <actions>
+        <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.action.JsonBeautifyAction"/>
+        <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.action.JsonMinifyAction"/>
+        <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
+        <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.action.JsonTextDiffAction"/>
+        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
+        <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
+        <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>
+        <action id="JsonAssistant.Action.ExpandAllNestedJsonAction" class="cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction"/>
+        <action id="JsonAssistant.Action.ConvertAllReadableTimeAction" class="cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction"/>
+
+        <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
+        <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
+        <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
+        <action id="JsonAssistant.Action.ToUrlParamAction" class="cn.memoryzy.json.action.transform.ToUrlParamAction"/>
+        <action id="JsonAssistant.Action.ToPropertiesAction" class="cn.memoryzy.json.action.transform.ToPropertiesAction"/>
+        <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
+        <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
+
+        <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
+        <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
+
+<!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
+<!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
+<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt C"/>-->
+<!--            <keyboard-shortcut keymap="$default" first-keystroke="alt shift C"/>-->
+<!--        </action>-->
+
+        <action id="JsonAssistant.Action.OtherFormatsToJsonAction" class="cn.memoryzy.json.action.OtherFormatsToJsonAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt P"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
+        </action>
+
+        <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction">
+            <add-to-group group-id="HelpMenu" relative-to-action="OnlineDocAction" anchor="after"/>
+        </action>
+
+        <action id="JsonAssistant.Action.Main" class="cn.memoryzy.json.action.JsonAssistantAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
+        </action>
+
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
+        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
+        <group id="JsonAssistant.Group.ExtendGroup" class="cn.memoryzy.json.action.group.ExtendGroup"/>
+
+        <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
+            <separator/>
+            <reference ref="JsonAssistant.Action.Main"/>
+            <reference ref="JsonAssistant.Group.Main"/>
+            <separator/>
+
+            <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="EditorToggleColumnMode"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
+        </group>
+
+        <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
+            <separator/>
+            <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
+            <separator/>
+
+            <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
+        </group>
+
+        <!-- Diff组 -->
+        <group id="JsonAssistant.Group.DiffGroup">
+            <reference ref="JsonAssistant.Action.RenameDiffTitleAction"/>
+            <reference ref="JsonAssistant.Action.OptimizeSortAction"/>
+
+            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
+        </group>
+
+
+    </actions>
+
+</idea-plugin>

@@ -1,0 +1,21 @@
+<idea-plugin>
+    <!-- 兼容性处理 -->
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK1="true" supportsK2="true"/>
+    </extensions>
+
+    <actions>
+        <action id="JsonAssistant.Action.KotlinClassToJsonAction" class="cn.memoryzy.json.action.KotlinClassToJsonAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="alt N"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift N"/>
+        </action>
+
+        <group id="JsonAssistant.Group.KtClassPropertyToJsonGroup">
+            <separator/>
+            <reference ref="JsonAssistant.Action.KotlinClassToJsonAction"/>
+            <separator/>
+
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
+    </actions>
+</idea-plugin>

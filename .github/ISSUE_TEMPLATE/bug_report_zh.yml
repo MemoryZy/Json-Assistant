@@ -1,0 +1,52 @@
+name: "🐛 Bug报告"
+description: 报告错误或异常行为。
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间填写这份Bug报告！请确保在提交新报告之前[搜索现有问题](https://github.com/MemoryZy/Json-Assistant/issues)。
+  - type: textarea
+    id: description
+    attributes:
+      label: 📝 问题描述
+      description: 请清晰简洁地描述是什么样的问题，重现问题的步骤，发生了什么事，以及您期望的行为应该是什么。如果可以，请添加屏幕截图以帮助解释您的问题。
+      placeholder: |
+        例如：
+        1. 打开工具窗口
+        2. 工具窗口无法加载
+        3. 期望的行为是正常加载工具窗口
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 🏷 插件版本
+      description: 您正在运行的是哪个版本的插件？
+      placeholder: 例如：1.6.0
+    validations:
+      required: true
+  - type: textarea
+    id: runtime_env
+    attributes:
+      label: 💻 IDE及运行环境
+      description: 请提供您正在使用的 IDE 的详细信息，以及您的运行环境信息（操作系统、JRE版本等）。快速获取所有信息：IDE 主菜单 > Help > About > 点击 “Copy” 按钮拷贝到剪贴板。
+      placeholder: |
+        IntelliJ IDEA 2023.2.4 (Ultimate Edition)
+        Build #IU-232.10203.10, built on October 25, 2023
+        Licensed to gurgles tumbles
+        You have a perpetual fallback license for this version.
+        Subscription is active until September 14, 2026.
+        Runtime version: 17.0.8.1+7-b1000.32 amd64
+        VM: OpenJDK 64-Bit Server VM by JetBrains s.r.o.
+        Windows 11.0
+        ...
+      render: plain text
+    validations:
+      required: true
+  - type: textarea
+    id: stacktrace
+    attributes:
+      label: 📋 堆栈跟踪
+      description: 如果插件崩溃，且您能获取堆栈跟踪信息，请将其粘贴到此处。如果您不知道如何获取堆栈跟踪信息，请忽略此项。
+      render: plain text
