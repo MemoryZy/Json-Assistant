@@ -22,6 +22,7 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.*;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Function;
@@ -473,5 +474,27 @@ public class UIManager implements Disposable {
         TreePath path = new TreePath(node.getPath());
         // 使用expandPath方法展开指定的路径
         tree.expandPath(path);
+    }
+
+
+    public static JScrollPane wrapScrollPane(JComponent component) {
+        if (!(component instanceof JTree || component instanceof JTable || component instanceof JList)) {
+            return null;
+        }
+
+        JBScrollPane scrollPane = new JBScrollPane(component) {
+            @Override
+            public Dimension getPreferredSize() {
+                Dimension preferredSize = super.getPreferredSize();
+                if (!isPreferredSizeSet()) {
+                    setPreferredSize(new Dimension(0, preferredSize.height));
+                }
+                return preferredSize;
+            }
+        };
+
+        scrollPane.setBorder(JBUI.Borders.empty());
+        scrollPane.setViewportBorder(JBUI.Borders.empty());
+        return scrollPane;
     }
 }
