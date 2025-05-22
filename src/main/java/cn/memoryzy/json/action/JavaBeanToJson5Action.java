@@ -1,12 +1,10 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.util.JavaUtil;
 import cn.memoryzy.json.util.Json5Util;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,10 +28,7 @@ public class JavaBeanToJson5Action extends AnAction implements UpdateInBackgroun
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
         DataContext dataContext = event.getDataContext();
-        // 在此判断当前光标是在某个对象 或 对象实例 及 List、数组上，那就将该对象 或 对象实例解析为JSON
-        PsiClass psiClass = JavaUtil.getCurrentCursorPositionClass(project, dataContext);
-        // 执行操作
-        JavaBeanToJsonAction.convertAttributesToJsonAndNotify(project, psiClass, Json5Util::formatJson5WithDoubleQuote, true, LOG);
+        JavaBeanToJsonAction.convertAttributesToJsonAndNotify(project, dataContext, false, Json5Util::formatJson5WithDoubleQuote, true, LOG);
     }
 
     @Override

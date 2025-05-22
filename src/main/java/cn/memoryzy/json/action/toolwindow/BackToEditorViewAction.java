@@ -1,10 +1,10 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.ToolWindowUtil;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -38,7 +38,7 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
     public void actionPerformed(@NotNull AnActionEvent e) {
         Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
         Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent))
-                .ifPresent(panel -> panel.switchToCard(null, PluginConstant.JSON_EDITOR_CARD_NAME));
+                .ifPresent(panel -> panel.switchToCard(null, UIManager.JSON_EDITOR_CARD_NAME));
     }
 
     @Override

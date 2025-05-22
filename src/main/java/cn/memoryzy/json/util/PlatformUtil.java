@@ -20,10 +20,7 @@ import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.fileEditor.FileEditor;
@@ -35,6 +32,7 @@ import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -490,5 +488,20 @@ public class PlatformUtil {
         }
 
         return StrUtil.EMPTY;
+    }
+
+    public static String getSingleSelectText(Editor editor) {
+        if (null == editor) return null;
+        Document document = editor.getDocument();
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int startOffset = primaryCaret.getSelectionStart();
+        int endOffset = primaryCaret.getSelectionEnd();
+        return document.getText(new TextRange(startOffset, endOffset));
+    }
+
+    public static boolean hasJavaEnvironment(Project project) {
+        Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
+        Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
+        return project != null && languageClz != null && classClz != null;
     }
 }

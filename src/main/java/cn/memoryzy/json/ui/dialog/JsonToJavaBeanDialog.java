@@ -26,8 +26,8 @@ import cn.memoryzy.json.service.persistent.state.DeserializerState;
 import cn.memoryzy.json.ui.component.ActionGroupPopupButton;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
-import cn.memoryzy.json.util.*;
 import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -79,8 +79,8 @@ import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author Memory
@@ -134,11 +134,14 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
         JPanel optionPanel = new JPanel();
+        TitledSeparator titledSeparator = new TitledSeparator();
         optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.X_AXIS)); // 水平排列
         optionPanel.setBorder(JBUI.Borders.empty(5, 0, 0, 4));
-        optionPanel.add(new TitledSeparator());
+        optionPanel.add(titledSeparator);
         optionPanel.add(Box.createRigidArea(new Dimension(3, 0)));
         optionPanel.add(createOptionsButton());
+
+        new ClickTrigger().init(titledSeparator, el -> resetGuideFlag());
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(optionPanel);
 
@@ -909,6 +912,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return StrUtil.lowerFirst(originalKey);
     }
 
+
+    private void resetGuideFlag() {
+        propertiesComponent.unsetValue(DESERIALIZER_EXAMPLE_GUIDE_KEY);
+        Notifications.showNotification("", JsonAssistantBundle.messageOnSystem("notification.deserialize.reset.guide.content"), NotificationType.INFORMATION, project);
+    }
 
     /**
      * 类名验证

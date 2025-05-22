@@ -17,10 +17,7 @@ import cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import cn.memoryzy.json.ui.dialog.JsonStructureDialog;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.ToolWindowUtil;
+import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -127,7 +124,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
         }
 
         // 获取标签页的面板，切换卡片
-        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, PluginConstant.JSON_TREE_CARD_NAME));
+        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, UIManager.JSON_TREE_CARD_NAME));
 
         // 打开窗口
         toolWindow.show();

@@ -1,10 +1,10 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
@@ -67,7 +67,7 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
     public void actionPerformed(@NotNull AnActionEvent event) {
         Optional.ofNullable(simpleToolWindowPanel.getContent())
                 .ifPresent(el -> ((JsonAssistantToolWindowPanel) el)
-                        .switchToCard(null, PluginConstant.JSON_QUERY_CARD_NAME));
+                        .switchToCard(null, UIManager.JSON_QUERY_CARD_NAME));
     }
 
     @Override

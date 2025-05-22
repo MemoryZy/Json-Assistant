@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.panel;
 
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.ui.JBCardLayout;
 
 import java.awt.*;
@@ -38,15 +38,15 @@ public class CombineCardLayout extends JBCardLayout {
     }
 
     public boolean isEditorCardDisplayed() {
-        return PluginConstant.JSON_EDITOR_CARD_NAME.equals(currentCardName);
+        return UIManager.JSON_EDITOR_CARD_NAME.equals(currentCardName);
     }
 
     public boolean isTreeCardDisplayed() {
-        return PluginConstant.JSON_TREE_CARD_NAME.equals(currentCardName);
+        return UIManager.JSON_TREE_CARD_NAME.equals(currentCardName);
     }
 
     public boolean isQueryCardDisplayed() {
-        return PluginConstant.JSON_QUERY_CARD_NAME.equals(currentCardName);
+        return UIManager.JSON_QUERY_CARD_NAME.equals(currentCardName);
     }
 
 

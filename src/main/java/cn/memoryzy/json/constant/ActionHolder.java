@@ -30,6 +30,8 @@ public interface ActionHolder {
     String TO_JSON5_ACTION_ID = "JsonAssistant.Action.ToJson5Action";
     String TO_JSON_ACTION_ID = "JsonAssistant.Action.ToJsonAction";
 
+    String FILL_COMMENT_FROM_JAVA_ACTION_ID = "JsonAssistant.Action.FillCommentFromJavaAction";
+
     AnAction JSON_BEAUTIFY_ACTION = ActionManager.getInstance().getAction(JSON_BEAUTIFY_ACTION_ID);
     AnAction JSON_MINIFY_ACTION = ActionManager.getInstance().getAction(JSON_MINIFY_ACTION_ID);
     AnAction JSON_STRUCTURE_ACTION = ActionManager.getInstance().getAction(JSON_STRUCTURE_ACTION_ID);
@@ -48,5 +50,6 @@ public interface ActionHolder {
     AnAction TO_PROPERTIES_ACTION = ActionManager.getInstance().getAction(TO_PROPERTIES_ACTION_ID);
     AnAction TO_JSON5_ACTION = ActionManager.getInstance().getAction(TO_JSON5_ACTION_ID);
     AnAction TO_JSON_ACTION = ActionManager.getInstance().getAction(TO_JSON_ACTION_ID);
+    AnAction FILL_COMMENT_FROM_JAVA_ACTION = ActionManager.getInstance().getAction(FILL_COMMENT_FROM_JAVA_ACTION_ID);
 
 }

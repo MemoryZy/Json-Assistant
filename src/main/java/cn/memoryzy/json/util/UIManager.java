@@ -42,8 +42,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 
 /**
@@ -55,6 +55,26 @@ public class UIManager implements Disposable {
     public static UIManager getInstance() {
         return new UIManager();
     }
+
+    /**
+     * Json 编辑器卡片名称
+     */
+    public static final String JSON_EDITOR_CARD_NAME = "editor";
+
+    /**
+     * Json 树卡片名称
+     */
+    public static final String JSON_TREE_CARD_NAME = "tree";
+
+    /**
+     * JSONQuery 卡片名
+     */
+    public static final String JSON_QUERY_CARD_NAME = "query";
+
+    /**
+     * JSON表格 卡片名
+     */
+    public static final String JSON_GRID_CARD_NAME = "grid";
 
     @Override
     public void dispose() {

@@ -28,20 +28,7 @@ public interface PluginConstant {
      */
     String SOFT_WRAPS_SELECT_STATE = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SOFT_WRAPS_SELECT_STATE";
 
-    /**
-     * Json 编辑器卡片名称
-     */
-    String JSON_EDITOR_CARD_NAME = "editor";
 
-    /**
-     * Json 树卡片名称
-     */
-    String JSON_TREE_CARD_NAME = "tree";
-
-    /**
-     * JSONQuery 卡片名
-     */
-    String JSON_QUERY_CARD_NAME = "json_query";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
 

@@ -49,6 +49,10 @@ public class ConvertAllReadableTimeAction extends DumbAwareAction implements Upd
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(JsonValueHandler.containsSpecialType(e.getDataContext(), JsonValueHandleType.READABLE_TIME));
+        e.getPresentation().setEnabledAndVisible(containsSpecialType(e.getDataContext()));
+    }
+
+    public static boolean containsSpecialType(DataContext dataContext) {
+        return JsonValueHandler.containsSpecialType(dataContext, JsonValueHandleType.READABLE_TIME);
     }
 }

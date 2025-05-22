@@ -58,9 +58,12 @@ public class JavaUtil {
                                             PsiClass psiClass,
                                             Map<String, Object> jsonMap,
                                             Map<String, List<String>> ignoreMap,
+                                            List<String> ignoredFields,
                                             Map<String, String> commentMap,
                                             boolean resolveComment,
                                             AttributeSerializationState persistentState) {
+        // 类限定名
+        String qualifiedName = psiClass.getQualifiedName();
         // 获取该类所有字段
         PsiField[] allFields = JavaUtil.getNonStaticFields(psiClass);
         List<String> fieldNameList = new ArrayList<>();
@@ -84,6 +87,12 @@ public class JavaUtil {
                     || psiField.hasAnnotation(PluginConstant.KOTLIN_TRANSIENT)) {
 
                 fieldNameList.add(fieldName);
+                continue;
+            }
+
+            // 忽略字段
+            String qName = qualifiedName + "." + fieldName;
+            if (ignoredFields.stream().anyMatch(el -> Objects.equals(qName, el))) {
                 continue;
             }
 
@@ -130,7 +139,7 @@ public class JavaUtil {
                             nestedJsonMap = new LinkedHashMap<>();
                             Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, nestedCommentMap, resolveComment, persistentState);
+                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, persistentState);
                         }
                         // 添加至主Map
                         jsonMap.put(propertyName, nestedJsonMap);
@@ -150,7 +159,7 @@ public class JavaUtil {
                             Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
                             Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, nestedCommentMap, resolveComment, persistentState);
+                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, persistentState);
                             // 添加至list
                             list.add(nestedJsonMap);
                         }

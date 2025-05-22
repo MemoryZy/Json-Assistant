@@ -166,6 +166,9 @@
         </group>
 
 
+        <action id="ResetAction" class="cn.memoryzy.json.action.ResetAction" text="Reset">
+            <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl alt O"/>
+        </action>
     </actions>
 
 </idea-plugin>

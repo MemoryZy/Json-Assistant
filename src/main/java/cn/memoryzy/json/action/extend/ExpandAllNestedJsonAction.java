@@ -49,6 +49,10 @@ public class ExpandAllNestedJsonAction extends DumbAwareAction implements Update
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(JsonValueHandler.containsSpecialType(e.getDataContext(), JsonValueHandleType.NESTED_JSON));
+        e.getPresentation().setEnabledAndVisible(containsSpecialType(e.getDataContext()));
+    }
+
+    public static boolean containsSpecialType(DataContext dataContext) {
+        return JsonValueHandler.containsSpecialType(dataContext, JsonValueHandleType.NESTED_JSON);
     }
 }

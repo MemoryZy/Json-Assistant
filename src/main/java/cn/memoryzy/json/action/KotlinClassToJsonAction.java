@@ -6,7 +6,6 @@ import cn.memoryzy.json.util.KotlinUtil;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiClass;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,10 +32,7 @@ public class KotlinClassToJsonAction extends AnAction implements UpdateInBackgro
     @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        // 获取当前类
-        PsiClass currentPsiClass = KotlinUtil.getPsiClass(event.getDataContext());
-        // 执行操作
-        JavaBeanToJsonAction.convertAttributesToJsonAndNotify(project, currentPsiClass, JsonUtil::formatJson, false, LOG);
+        JavaBeanToJsonAction.convertAttributesToJsonAndNotify(project, event.getDataContext(), true, JsonUtil::formatJson, false, LOG);
     }
 
     @Override

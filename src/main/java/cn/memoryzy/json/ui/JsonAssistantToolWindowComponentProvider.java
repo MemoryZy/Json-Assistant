@@ -26,8 +26,8 @@ import cn.memoryzy.json.ui.dialog.ManuallySaveHistoryDialog;
 import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.*;
 import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.*;
 import com.google.common.collect.Lists;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationAction;
@@ -137,13 +137,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         resizeTreeFont(treeProvider);
 
         // 添加 Json 编辑器
-        cardPanel.add(editorComponent, PluginConstant.JSON_EDITOR_CARD_NAME);
+        cardPanel.add(editorComponent, UIManager.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树
-        cardPanel.add(treeComponent, PluginConstant.JSON_TREE_CARD_NAME);
+        cardPanel.add(treeComponent, UIManager.JSON_TREE_CARD_NAME);
         // 添加 JsonPath 界面
-        cardPanel.add(queryComponent, PluginConstant.JSON_QUERY_CARD_NAME);
+        cardPanel.add(queryComponent, UIManager.JSON_QUERY_CARD_NAME);
         // 默认显示编辑器
-        cardLayout.show(cardPanel, PluginConstant.JSON_EDITOR_CARD_NAME);
+        cardLayout.show(cardPanel, UIManager.JSON_EDITOR_CARD_NAME);
         // 添加到面板
         rootPanel.add(cardPanel, BorderLayout.CENTER);
 
