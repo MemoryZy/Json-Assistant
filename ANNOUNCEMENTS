@@ -1,1 +1,38 @@
-{}
+[
+  {
+    // 唯一标识（必填）
+    "id": "202308_update_v2",
+    "title": "重要更新通知",
+    // 标题（必填）
+    "content": "本次更新新增了XX功能...",
+    // 正文（必填）
+    "type": "warning",
+    // 公告类型（info/warning/error）
+    "priority": 1,
+    // 显示优先级（数值越大越优先）
+    "effectiveDate": "2023-08-25",
+    // 生效日期（ISO8601）
+    "expirationDate": "2023-09-30",
+    // 过期日期（自动隐藏）
+    "versionConstraints": ">=1.2.0",
+    // 版本约束（语义化版本范围）
+    "isDismissible": true,
+    // 是否允许用户关闭
+    "actions": [
+      // 关联操作按钮
+      {
+        "label": "查看详情",
+        "url": "https://example.com/docs"
+      },
+      {
+        "label": "立即升级",
+        "command": "updatePlugin"
+      }
+    ],
+    "metadata": {
+      // 扩展元数据
+      "author": "Dev Team",
+      "createdAt": "2023-08-20T14:30:00Z"
+    }
+  }
+]
