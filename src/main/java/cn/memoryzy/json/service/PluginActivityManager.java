@@ -47,6 +47,11 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         // TODO 通告
         //  1. 唯一标识 2.
 
+        // https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS
+
+        // https://gitee.com/MemoryZy/Json-Assistant/raw/main/ANNOUNCEMENTS
+
+
         /*
         [
   {
