@@ -14,6 +14,7 @@ public interface ActionHolder {
     String JSON_BEAUTIFY_ACTION_ID = "JsonAssistant.Action.JsonBeautifyAction";
     String JSON_MINIFY_ACTION_ID = "JsonAssistant.Action.JsonMinifyAction";
     String JSON_STRUCTURE_ACTION_ID = "JsonAssistant.Action.JsonStructureAction";
+    String JSON_GRID_ACTION_ID = "JsonAssistant.Action.JsonGridAction";
     String JSON_TEXT_DIFF_ACTION_ID = "JsonAssistant.Action.JsonTextDiffAction";
     String CONVERT_OTHER_FORMATS_GROUP_ID = "JsonAssistant.Group.ConvertOtherFormatsGroup";
     String SHORTCUT_ACTION_ID = "JsonAssistant.Action.ShortcutAction";
@@ -35,6 +36,7 @@ public interface ActionHolder {
     AnAction JSON_BEAUTIFY_ACTION = ActionManager.getInstance().getAction(JSON_BEAUTIFY_ACTION_ID);
     AnAction JSON_MINIFY_ACTION = ActionManager.getInstance().getAction(JSON_MINIFY_ACTION_ID);
     AnAction JSON_STRUCTURE_ACTION = ActionManager.getInstance().getAction(JSON_STRUCTURE_ACTION_ID);
+    AnAction JSON_GRID_ACTION = ActionManager.getInstance().getAction(JSON_GRID_ACTION_ID);
     AnAction JSON_TEXT_DIFF_ACTION = ActionManager.getInstance().getAction(JSON_TEXT_DIFF_ACTION_ID);
     AnAction CONVERT_OTHER_FORMATS_GROUP = ActionManager.getInstance().getAction(CONVERT_OTHER_FORMATS_GROUP_ID);
     AnAction SHORTCUT_ACTION = ActionManager.getInstance().getAction(SHORTCUT_ACTION_ID);

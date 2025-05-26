@@ -122,9 +122,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, StructureConfig.of(false, 3));
         JsonQueryComponentProvider queryProvider = new JsonQueryComponentProvider(project);
+        JsonGridComponentProvider gridProvider = new JsonGridComponentProvider(null);
         Disposer.register(this, queryProvider);
 
-        JsonAssistantToolWindowPanel rootPanel = createToolWindowPanel(treeProvider, queryProvider, cardLayout);
+        JsonAssistantToolWindowPanel rootPanel = createToolWindowPanel(treeProvider, queryProvider, gridProvider, cardLayout);
 
         // Json 编辑器
         JComponent editorComponent = editor.getComponent();
@@ -132,6 +133,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         JPanel treeComponent = treeProvider.getTreeComponent();
         // Json 查询界面
         JComponent queryComponent = queryProvider.createComponent();
+        // 表格组件
+        JPanel tableComponent = gridProvider.getTableComponent();
 
         // 在工具窗口中，可能字体需略微调大一点
         resizeTreeFont(treeProvider);
@@ -140,8 +143,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         cardPanel.add(editorComponent, UIManager.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树
         cardPanel.add(treeComponent, UIManager.JSON_TREE_CARD_NAME);
-        // 添加 JsonPath 界面
+        // 添加 Json 查询界面
         cardPanel.add(queryComponent, UIManager.JSON_QUERY_CARD_NAME);
+        // 添加 表格 界面
+        cardPanel.add(tableComponent, UIManager.JSON_GRID_CARD_NAME);
         // 默认显示编辑器
         cardLayout.show(cardPanel, UIManager.JSON_EDITOR_CARD_NAME);
         // 添加到面板
@@ -159,11 +164,15 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
     }
 
-    private JsonAssistantToolWindowPanel createToolWindowPanel(JsonStructureComponentProvider treeProvider, JsonQueryComponentProvider queryProvider, CombineCardLayout cardLayout) {
+    private JsonAssistantToolWindowPanel createToolWindowPanel(JsonStructureComponentProvider treeProvider,
+                                                               JsonQueryComponentProvider queryProvider,
+                                                               JsonGridComponentProvider gridProvider,
+                                                               CombineCardLayout cardLayout) {
         JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout());
         rootPanel.setEditor(this.editor);
         rootPanel.setTreeProvider(treeProvider);
         rootPanel.setQueryProvider(queryProvider);
+        rootPanel.setGridProvider(gridProvider);
         rootPanel.setCardLayout(cardLayout);
         return rootPanel;
     }
@@ -280,6 +289,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         actionGroup.add(Separator.create());
         actionGroup.add(new JsonStructureToolWindowAction(editor, simpleToolWindowPanel));
         actionGroup.add(new JsonQueryAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new JsonGridToolWindowAction(editor, simpleToolWindowPanel));
         actionGroup.add(Separator.create());
         actionGroup.add(new ToggleUseSoftWrapsAction(editor, simpleToolWindowPanel));
         actionGroup.add(new ScrollToTheEndAction(editor, simpleToolWindowPanel));

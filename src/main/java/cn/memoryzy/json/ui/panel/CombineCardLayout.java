@@ -49,5 +49,9 @@ public class CombineCardLayout extends JBCardLayout {
         return UIManager.JSON_QUERY_CARD_NAME.equals(currentCardName);
     }
 
+    public boolean isGridCardDisplayed() {
+        return UIManager.JSON_GRID_CARD_NAME.equals(currentCardName);
+    }
+
 
 }

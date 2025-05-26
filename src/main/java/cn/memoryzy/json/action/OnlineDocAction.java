@@ -1,15 +1,12 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.JsonGridComponentProvider;
-import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.openapi.ui.Messages;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,20 +33,7 @@ public class OnlineDocAction extends DumbAwareAction implements UpdateInBackgrou
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        // PlatformUtil.openOnlineDoc(event.getProject(), popupAction);
-
-        String json = Messages.showInputDialog("", "", Messages.getInformationIcon());
-
-        // String json = "[\n" +
-        //         "1,2,3,4,{\"a\": 90}\n" +
-        //         "]";
-
-        JsonGridComponentProvider provider = new JsonGridComponentProvider(JsonUtil.parse(json));
-
-        new DialogBuilder()
-                .centerPanel(provider.getTableComponent())
-                .show();
-
+        PlatformUtil.openOnlineDoc(event.getProject(), popupAction);
     }
 
 }

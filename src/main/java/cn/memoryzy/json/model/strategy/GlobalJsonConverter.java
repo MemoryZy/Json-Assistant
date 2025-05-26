@@ -36,9 +36,7 @@ public class GlobalJsonConverter {
     public static void parseAndProcessJson(DataContext dataContext, Editor editor, boolean needBeautify, String selectionMessage, String globalMessage) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
-        if (Objects.isNull(editorData)) {
-            return;
-        }
+        if (Objects.isNull(editorData)) return;
 
         JsonConversionProcessor[] processors = needBeautify
                 ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData)

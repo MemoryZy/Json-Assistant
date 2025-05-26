@@ -54,10 +54,19 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
         if (cardLayout != null) {
             boolean treeCardDisplayed = cardLayout.isTreeCardDisplayed();
             boolean queryCardDisplayed = cardLayout.isQueryCardDisplayed();
+            boolean gridCardDisplayed = cardLayout.isGridCardDisplayed();
 
-            if (treeCardDisplayed || queryCardDisplayed) {
+            if (treeCardDisplayed || queryCardDisplayed || gridCardDisplayed) {
                 enabled = true;
-                String text = treeCardDisplayed ? JsonAssistantBundle.messageOnSystem("action.close.tree.card.text") : JsonAssistantBundle.messageOnSystem("action.close.query.card.text");
+                String text;
+                if (treeCardDisplayed) {
+                    text = JsonAssistantBundle.messageOnSystem("action.close.tree.card.text");
+                } else if (queryCardDisplayed) {
+                    text = JsonAssistantBundle.messageOnSystem("action.close.query.card.text");
+                } else {
+                    text = JsonAssistantBundle.messageOnSystem("action.close.grid.card.text");
+                }
+
                 presentation.setText(text);
             }
         }

@@ -272,6 +272,21 @@ public class UIManager implements Disposable {
         return JBUI.Fonts.create("Consolas", size);
     }
 
+    public static JBFont consolasFont(int size, int style) {
+        JBFont font = consolasFont(size);
+
+        switch (style) {
+            case Font.BOLD:
+                font = font.asBold();
+                break;
+            case Font.ITALIC:
+                font = font.asItalic();
+                break;
+        }
+
+        return font;
+    }
+
     public static JBFont jetBrainsMonoFont(int size) {
         return JBUI.Fonts.create("JetBrains Mono", size);
     }

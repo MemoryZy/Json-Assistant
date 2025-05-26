@@ -1,20 +1,21 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
+import cn.memoryzy.json.ui.component.ModernTable;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.UIManager;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,53 +29,38 @@ import java.util.stream.Collectors;
  */
 public class JsonGridComponentProvider {
 
-    private JBTable table;
-    private DefaultTableModel model;
+    private ModernTable table;
     private JPanel tableComponent;
     private final boolean chineseLocale;
-    private final List<String> unset = new ArrayList<>();
+    private final List<ImmutablePair<Integer, Integer>> unset = new ArrayList<>();
 
     public JsonGridComponentProvider(JsonWrapper wrapper) {
         this.chineseLocale = PlatformUtil.isChineseLocale();
         init(wrapper);
     }
 
-
     private void init(JsonWrapper wrapper) {
-        // TODO 如果是单独的对象，无嵌套，那么 列 1 就是标题，列 2 就是值
-        // TODO 如果是list，那么就是多列，第一行作为标题
-
-        // TODO 如果数组中有多个对象，且对象不一致，则选择字段最多的对象展示，其余无此字段的，显示 <unset>
-
-        model = createTableModel(wrapper);
-        table = new JBTable(model);
-
-        for (String flag : unset) {
-            String[] split = flag.split(",");
-            String rowStr = split[0];
-            String columnStr = split[1];
-
-            int row = NumberUtil.parseInt(rowStr);
-            int column = NumberUtil.parseInt(columnStr);
-
-            TableCellEditor cellEditor = table.getCellEditor(row, column);
-
-
-        }
-
-
-
-
-        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(table);
+        table = new ModernTable(createTableModel(wrapper));
+        ToolbarDecorator decorator = ToolbarDecorator.createDecorator(table)
+                .setPanelBorder(JBUI.Borders.empty())
+                .setScrollPaneBorder(JBUI.Borders.empty());
         tableComponent = new BorderLayoutPanel().addToCenter(decorator.createPanel());
     }
 
     private DefaultTableModel createTableModel(JsonWrapper wrapper) {
+        if (null == wrapper) return new DefaultTableModel();
+
         return wrapper.isObject()
                 // 如果是单独的对象，那么 列 1 就是标题，列 2 就是值
                 ? createObjectTable((ObjectWrapper) wrapper)
                 // 如果是数组，那么就是多列，第一行作为标题
                 : createArrayTable((ArrayWrapper) wrapper);
+    }
+
+    public void rebuildTable(JsonWrapper wrapper) {
+        table.setModel(createTableModel(wrapper));
+        table.initWidth();
+        UIManager.repaintComponent(table);
     }
 
     private DefaultTableModel createObjectTable(ObjectWrapper wrapper) {
@@ -93,7 +79,7 @@ public class JsonGridComponentProvider {
             Object value = entry.getValue();
             String valueStr = String.valueOf(value);
 
-            if (value instanceof ObjectWrapper) {
+            if (value instanceof ObjectWrapper || value instanceof ArrayWrapper) {
                 valueStr = JsonUtil.compressJson(value);
             }
 
@@ -128,7 +114,7 @@ public class JsonGridComponentProvider {
                 Object obj = wrapper.get(i);
                 String objStr = String.valueOf(obj);
 
-                if (obj instanceof ObjectWrapper) {
+                if (obj instanceof ObjectWrapper || obj instanceof ArrayWrapper) {
                     objStr = JsonUtil.compressJson(obj);
                 }
 
@@ -154,12 +140,12 @@ public class JsonGridComponentProvider {
                     String key = columns[j];
                     if (!objectWrapper.containsKey(key)) {
                         // 行，列
-                        unset.add(StrUtil.format("{},{}", i, j));
+                        unset.add(ImmutablePair.of(i, j));
                     }
 
                     Object object = objectWrapper.get(key);
                     String objStr = String.valueOf(object);
-                    if (object instanceof ObjectWrapper) {
+                    if (object instanceof ObjectWrapper || object instanceof ArrayWrapper) {
                         objStr = JsonUtil.compressJson(obj);
                     }
 
@@ -184,10 +170,6 @@ public class JsonGridComponentProvider {
 
     public JBTable getTable() {
         return table;
-    }
-
-    public DefaultTableModel getModel() {
-        return model;
     }
 
     public JPanel getTableComponent() {

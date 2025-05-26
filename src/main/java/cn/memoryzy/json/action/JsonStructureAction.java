@@ -63,13 +63,11 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
-        if (null == editorData) {
-            return;
-        }
+        if (null == editorData) return;
 
         editorData.setParseComment(true);
         String json = GlobalJsonConverter.parseJson(context, editorData);
-        show(event.getDataContext(), json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, editorFlag);
+        show(dataContext, json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, editorFlag);
     }
 
 
@@ -92,7 +90,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
         } else if (treeDisplayMode == TreeDisplayMode.ORIGINAL_TOOLWINDOW) {
             // 在旧窗口展示
-            showInOriginalToolWindow(project, jsonWrapper, source);
+            showInOriginalToolWindow(project, jsonWrapper, source, UIManager.JSON_TREE_CARD_NAME);
 
         } else {
             // 在新辅助窗口展示
@@ -100,7 +98,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
         }
     }
 
-    public static void showInOriginalToolWindow(Project project, JsonWrapper jsonWrapper, StructureActionSource source) {
+    public static void showInOriginalToolWindow(Project project, JsonWrapper jsonWrapper, StructureActionSource source, String cardName) {
         // 原本的工具窗口窗口（Json Assistant）展示
         ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantToolWindow(project);
 
@@ -124,7 +122,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
         }
 
         // 获取标签页的面板，切换卡片
-        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, UIManager.JSON_TREE_CARD_NAME));
+        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, cardName));
 
         // 打开窗口
         toolWindow.show();
