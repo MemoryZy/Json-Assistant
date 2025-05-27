@@ -94,7 +94,7 @@ jobs:
           git add README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS
           
           if ! git diff --quiet --staged; then
-            git commit -m "Sync docs from source [skip ci]"
+            git commit -m "Sync docs from source"
             git push origin main
             echo "✅ 提交成功"
           else
