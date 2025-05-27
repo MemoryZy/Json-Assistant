@@ -62,43 +62,30 @@ jobs:
         env:
           TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
         run: |
-          # 克隆目标仓库（强制覆盖本地副本）
-          git clone --depth 1 --branch main https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant.git || true
+          # 强制删除旧目录（如果存在）
+          rm -rf Json-Assistant
           
-          # 添加调试信息
-          echo "==== 源仓库文件列表 ===="
-          ls -l README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS
+          # 克隆目标仓库（启用深度克隆加速）
+          git clone --depth 1 --branch main https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant.git
           
-          # 强制复制文件（包含递归复制目录）
-          cp -fv README.md README_zh.md CHANGELOG.md DESCRIPTION.md Json-Assistant/
-          cp -rfv ANNOUNCEMENTS Json-Assistant/
+          # 复制文件（显示详情）
+          echo "==== 开始复制文件 ===="
+          cp -v README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS Json-Assistant/
           
-          # 进入目标仓库目录
+          # 进入目录并提交
           cd Json-Assistant
-          
-          # 添加调试信息
-          echo "==== 目标仓库文件状态 ===="
-          git status
-          echo "==== 文件差异 ===="
-          git diff
-          
-          # 配置 Git 身份
           git config user.name "Sync Bot"
           git config user.email "actions@github.com"
           
-          # 精确添加指定文件
+          # 精确添加变更
           git add README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS
           
-          # 提交变更（强制处理空提交）
           if ! git diff --quiet --staged; then
             git commit -m "Sync docs from source [skip ci]"
             git push origin main
-            echo "✅ 变更已提交"
+            echo "✅ 提交成功"
           else
-            # 如果无变化但需要保持同步，创建空提交（可选）
-            git commit --allow-empty -m "Trigger sync"
-            git push origin main
-            echo "🟢 无内容变更但已同步"
+            echo "🟢 无变更需要提交"
           fi
 
       # 第三步：将那些文件同步到公共插件仓库
