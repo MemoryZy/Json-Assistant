@@ -70,12 +70,23 @@ jobs:
           
           # 复制文件（显示详情）
           echo "==== 开始复制文件 ===="
+          echo "当前目录"
           pwd
+          echo "当前目录文件"
           ls
           cp -v README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS Json-Assistant/
           
           # 进入目录并提交
           cd Json-Assistant
+          echo "当前目录"
+          pwd
+          echo "当前目录文件"
+          ls
+          
+          echo "查看README"
+          cat README.md
+
+          
           git config user.name "Sync Bot"
           git config user.email "actions@github.com"
           
