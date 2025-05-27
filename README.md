@@ -150,22 +150,26 @@ You can contribute and support the project in the following ways:
 
 Heartfelt thanks to every donor who supports us! Your generosity helps us improve and enhance the project. Thank you for your support!❤️
 
-| Name       | Website Link             | Accompanying Message                                                                         | Total Donation |
-|------------|--------------------------|----------------------------------------------------------------------------------------------|----------------|
-| ت          |                          | Json插件很好用，加油                                                                                 | 6.66 CNY       |
-| *瑞         |                          |                                                                                              | 5.00 CNY       |
-| JiaoJunWei |                          |                                                                                              | 5.00 CNY       |
-| 广柔散人       |                          | good                                                                                         | 6.66 CNY       |
-| One        |                          |                                                                                              | 6.66 CNY       |
-| Vinay      |                          |                                                                                              | 6.66 CNY       |
-| **权        |                          |                                                                                              | 1.00 CNY       |
-| **程        |                          |                                                                                              | 10.00 CNY      |
-| AC         |                          |                                                                                              | 8.88 CNY       |
-| ◎♪TEL      |                          |                                                                                              | 10.00 CNY      |
-| 听风逝夜       | https://coolrequest.dev/ | Plugin: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY       |
-| 秉心         |                          | 为开源技术人点赞                                                                                     | 6.66 CNY       |
-| Karl（大宇）   |                              |                                                                                          | 6.66 CNY  |
+<!-- DONORS_TABLE_EN_START -->
 
+| Name | Website | Message | Amount |
+| --- | --- | --- | --- |
+| **音 |  |  | 20.00 CNY |
+| **程 |  |  | 10.00 CNY |
+| ◎♪TEL |  |  | 10.00 CNY |
+| AC |  |  | 8.88 CNY |
+| ت |  | Json插件很好用，加油 | 6.66 CNY |
+| 广柔散人 |  | good | 6.66 CNY |
+| One |  |  | 6.66 CNY |
+| Vinay |  |  | 6.66 CNY |
+| 听风逝夜 | [https://coolrequest.dev/](https://coolrequest.dev/) | 插件: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY |
+| 秉心 |  | 为开源技术人点赞 | 6.66 CNY |
+| Karl（大宇） |  |  | 6.66 CNY |
+| *瑞 |  |  | 5.00 CNY |
+| JiaoJunWei |  |  | 5.00 CNY |
+| **权 |  |  | 1.00 CNY |
+
+<!-- DONORS_TABLE_EN_END -->
 
 [shields:hp]: https://img.shields.io/badge/Jetbrains%20Plugin-Json%20%20Assistant-4285F4.svg?style=Plastic&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNCIgaGVpZ2h0PSIxNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48ZyBmaWxsPSJub25lIj48cGF0aCBkPSJNMjQgMHYyNEgwVjB6TTEyLjU5MyAyMy4yNThsLS4wMTEuMDAybC0uMDcxLjAzNWwtLjAyLjAwNGwtLjAxNC0uMDA0bC0uMDcxLS4wMzVxLS4wMTYtLjAwNS0uMDI0LjAwNWwtLjAwNC4wMWwtLjAxNy40MjhsLjAwNS4wMmwuMDEuMDEzbC4xMDQuMDc0bC4wMTUuMDA0bC4wMTItLjAwNGwuMTA0LS4wNzRsLjAxMi0uMDE2bC4wMDQtLjAxN2wtLjAxNy0uNDI3cS0uMDA0LS4wMTYtLjAxNy0uMDE4bS4yNjUtLjExM2wtLjAxMy4wMDJsLS4xODUuMDkzbC0uMDEuMDFsLS4wMDMuMDExbC4wMTguNDNsLjAwNS4wMTJsLjAwOC4wMDdsLjIwMS4wOTNxLjAxOS4wMDUuMDI5LS4wMDhsLjAwNC0uMDE0bC0uMDM0LS42MTRxLS4wMDUtLjAxOS0uMDItLjAyMm0tLjcxNS4wMDJhLjAyLjAyIDAgMCAwLS4wMjcuMDA2bC0uMDA2LjAxNGwtLjAzNC42MTRxLjAwMS4wMTguMDE3LjAyNGwuMDE1LS4wMDJsLjIwMS0uMDkzbC4wMS0uMDA4bC4wMDQtLjAxMWwuMDE3LS40M2wtLjAwMy0uMDEybC0uMDEtLjAxeiIvPjxwYXRoIGZpbGw9IndoaXRlIiBkPSJNMiA5YTMgMyAwIDAgMSAzLTNoMi44NTNjLjI5NyAwIC40OC0uMzA5LjM2Ni0uNTgzQTIuNSAyLjUgMCAwIDEgOC4wODMgNWMtLjMzMS0xLjQ4Ny43OTItMyAyLjQxNy0zYzEuNjI2IDAgMi43NDggMS41MTMgMi40MTcgM2EyLjUgMi41IDAgMCAxLS4xMzYuNDE3Yy0uMTE1LjI3NC4wNjkuNTgzLjM2Ni41ODNIMTVhMyAzIDAgMCAxIDMgM3YxLjg1M2MwIC4yOTcuMzA4LjQ4LjU4My4zNjZjLjEzNS0uMDU2LjI3My0uMTA0LjQxNy0uMTM2YzEuNDg3LS4zMzEgMyAuNzkxIDMgMi40MTdzLTEuNTEzIDIuNzQ4LTMgMi40MTdhMi41IDIuNSAwIDAgMS0uNDE3LS4xMzZjLS4yNzQtLjExNS0uNTgzLjA2OS0uNTgzLjM2NlYxOWEzIDMgMCAwIDEtMyAzaC0xLjg5M2MtLjI4OCAwLS40NzMtLjI5MS0uMzktLjU2NnEuMDYzLS4yMS4wODUtLjQzNGEyLjMxIDIuMzEgMCAxIDAtNC42MDQgMHEuMDIxLjIyNC4wODYuNDM0Yy4wODIuMjc1LS4xMDMuNTY2LS4zOS41NjZINWEzIDMgMCAwIDEtMy0zdi0yLjg5M2MwLS4yODguMjkxLS40NzMuNTY2LS4zOXEuMjEuMDYzLjQzNC4wODVhMi4zMSAyLjMxIDAgMSAwIDAtNC42MDRxLS4yMjQuMDIxLS40MzQuMDg2Yy0uMjc1LjA4Mi0uNTY2LS4xMDMtLjU2Ni0uMzl6Ii8+PC9nPjwvc3ZnPg==
 [shields:build]: https://github.com/MemoryZy/Json-Assistant/workflows/Build/badge.svg

@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+- 支持选择部分字段进行序列化为JSON。
+
+- Support the selection of certain fields for serialization into JSON.
 
 ## [1.8.0] - 2025-04-16
 
