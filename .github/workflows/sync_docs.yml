@@ -18,7 +18,7 @@ jobs:
       - name: Checkout source repo
         uses: actions/checkout@v4
         with:
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 0  # 获取完整历史记录以便 diff-index 准确工作
 
       - name: Set up Python
@@ -30,21 +30,32 @@ jobs:
       - name: Update README tables
         run: |
           python .github/scripts/update_donors.py
-          echo "当前路径: "
 
       # 第二步：提交本仓库的 Readme 修改
+      # 需要去 Settings → Actions → General 在Workflow permissions中开启以下两项
+      #   Read and write permissions
+      #   Allow GitHub Actions to create and approve pull requests
       - name: Commit README changes
+        env:
+          # 使用内置的 GITHUB_TOKEN 权限
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动注入的令牌
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+          
+          # 添加目标文件
           git add README.md README_zh.md
           
-          if ! git diff-index --quiet HEAD --; then
+          # 检查是否有变更需要提交
+          if ! git diff --quiet --staged; then
             git commit -m "Update donor tables"
-            git push
-            echo "✅ Changes committed"
+          
+            # 显式使用 GH_TOKEN 进行推送
+            git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+            git push origin main
+            echo "✅ 提交成功"
           else
-            echo "🟢 No changes to commit"
+            echo "🟢 无变更需要提交"
           fi
 
       # 第三步：将那些文件同步到公共插件仓库
