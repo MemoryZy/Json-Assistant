@@ -1,0 +1,99 @@
+name: Multi-Repo Docs Sync
+
+on:
+  push:
+    paths:
+      - 'donors.json'       # 监控根目录的 donors.json
+      - 'README.md'         # 监控根目录的英文 README
+      - 'README_zh.md'      # 监控根目录的中文 README
+      - 'CHANGELOG.md'      # 监控变更日志
+      - 'DESCRIPTION.md'    # 监控项目描述文件
+      - 'ANNOUNCEMENTS'    # 公告文件
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0  # 获取完整历史记录以便 diff-index 准确工作
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # 第一步：修改本仓库的 Readme Donors Table
+      - name: Update README tables
+        run: |
+          python .github/scripts/update_donors.py
+          echo "当前路径: "
+
+      # 第二步：提交本仓库的 Readme 修改
+      - name: Commit README changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add README.md README_zh.md
+          
+          if ! git diff-index --quiet HEAD --; then
+            git commit -m "Update donor tables"
+            git push
+            echo "✅ Changes committed"
+          else
+            echo "🟢 No changes to commit"
+          fi
+
+      # 第三步：将那些文件同步到公共插件仓库
+      - name: Sync to Public Repo
+        env:
+          TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
+        run: |
+          git clone https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant.git
+          cp README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS Json-Assistant/
+          cd Json-Assistant
+          
+          git config user.name "Sync Bot"
+          git config user.email "actions@github.com"
+          git add .
+          if ! git diff --quiet; then
+            git commit -m "Sync docs from source [skip ci]"
+            git push origin main
+            echo "✅ Changes committed"
+          else
+            echo "🟢 No changes to commit"
+          fi
+
+      # 第四步：同步捐赠名单信息到文档仓库
+      - name: Sync to Writerside Repo
+        env:
+          TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
+          SOURCE_WORKSPACE: ${{ github.workspace }}  # 注入源仓库路径
+        run: |
+          # 克隆目标仓库
+          git clone https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant-Doc.git
+          # 复制脚本到目标仓库
+          cp -r "$SOURCE_WORKSPACE/.github/scripts" Json-Assistant-Doc/.github/
+          
+          # 进入目标仓库目录
+          cd Json-Assistant-Doc
+          
+          # 执行脚本（现在脚本在目标仓库内）
+          python .github/scripts/update_donors_writerside_zh.py \
+            --donors "$SOURCE_WORKSPACE/donors.json" \
+            --output "$PWD/Writerside/topics/Support.md"
+          
+          # 提交变更
+          git config user.name "Writerside Sync"
+          git config user.email "actions@github.com"
+          if ! git diff --quiet; then
+            git add Writerside/topics/Support.md
+            git commit -m "Update support docs"
+            git push origin main
+            echo "✅ Changes committed"
+          else
+            echo "🟢 No changes to commit"
+          fi
