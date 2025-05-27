@@ -72,6 +72,11 @@ public interface PluginConstant {
 
     String NEW_CLASS_TEMPLATE_NAME = "New Class.java";
 
+    String en_US = "en_US";
+
+    String zh_CN = "zh_CN";
+
+
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),
             Collection.class.getName(),

@@ -1,5 +1,6 @@
 package cn.memoryzy.json.service.persistent;
 
+import cn.memoryzy.json.model.AnnouncementStats;
 import cn.memoryzy.json.service.persistent.converter.*;
 import cn.memoryzy.json.service.persistent.state.*;
 import com.intellij.openapi.application.ApplicationManager;
@@ -9,6 +10,9 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Memory
@@ -69,6 +73,13 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
     @Attribute(converter = StructureStateConverter.class)
     public StructureState structureState = new StructureState();
 
+    /**
+     * 已读公告 (id -> 统计对象)
+     */
+    @Attribute(converter = AnnouncementStatsConverter.class)
+    public Map<String, AnnouncementStats> announcementStatsMap = new HashMap<>();
+
+
     @Override
     public @Nullable JsonAssistantPersistentState getState() {
         return this;
@@ -84,5 +95,6 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
         this.deserializerState = state.deserializerState;
         this.queryState = state.queryState;
         this.structureState = state.structureState;
+        this.announcementStatsMap = state.announcementStatsMap;
     }
 }

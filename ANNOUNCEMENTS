@@ -1,0 +1,36 @@
+[
+  {
+    "id": "202308_update_v2",
+    "locales": {
+      "en_US": {
+        "title": "Important Update",
+        "content": "Added new features..."
+      },
+      "zh_CN": {
+        "title": "重要更新",
+        "content": "新增了XX功能...，请大家擦亮眼睛，拒绝盗版"
+      }
+    },
+    "type": "warning",
+    "priority": 1,
+    "effectiveDate": "2025-05-27",
+    "expirationDate": "2023-09-30",
+    "versionConstraints": ">=1.2.0",
+    "isDismissible": true,
+    "display": 2,
+    "actions": [
+      {
+        "label": "查看详情",
+        "url": "https://xxxxxx"
+      },
+      {
+        "label": "立即升级",
+        "command": "updatePlugin"
+      }
+    ],
+    "metadata": {
+      "author": "Memory",
+      "createdAt": "2025-05-27"
+    }
+  }
+]
