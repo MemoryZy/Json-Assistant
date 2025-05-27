@@ -1,4 +1,3 @@
-# update_donors_writerside_zh.py
 import argparse
 from pathlib import Path
 import json
@@ -13,13 +12,14 @@ def update_support(output_path, start_marker, end_marker, content):
     """修改目标仓库的 Support.md"""
     target_file = Path(output_path)
     original = target_file.read_text(encoding='utf-8')
-    
+
+    # 修复正则表达式语法
     pattern = re.compile(
-        rf'({re.escape(start_marker)})(.*?)(re.escape(end_marker)})', 
+        rf'({re.escape(start_marker)})(.*?)({re.escape(end_marker)})',
         re.DOTALL
     )
     new_content = pattern.sub(f"{start_marker}\n{content}\n{end_marker}", original)
-    
+
     target_file.write_text(new_content, encoding='utf-8')
 
 if __name__ == "__main__":
@@ -29,8 +29,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     donors = sorted(
-        load_donors(args.donors), 
-        key=lambda x: x['total'], 
+        load_donors(args.donors),
+        key=lambda x: x['total'],
         reverse=True
     )
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
             f"{donor['total']:.2f} {donor.get('currency', 'CNY')}"
         ]
         table.append(f"| {' | '.join(row)} |")
-    
+
     # 写入目标文件
     update_support(
         args.output,
