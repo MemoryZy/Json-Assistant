@@ -152,21 +152,22 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 
 <!-- DONORS_TABLE_EN_START -->
 
-| Name       | Website Link             | Accompanying Message                                                                         | Total Donation |
-|------------|--------------------------|----------------------------------------------------------------------------------------------|----------------|
-| ت          |                          | Json插件很好用，加油                                                                                 | 6.66 CNY       |
-| *瑞         |                          |                                                                                              | 5.00 CNY       |
-| JiaoJunWei |                          |                                                                                              | 5.00 CNY       |
-| 广柔散人       |                          | good                                                                                         | 6.66 CNY       |
-| One        |                          |                                                                                              | 6.66 CNY       |
-| Vinay      |                          |                                                                                              | 6.66 CNY       |
-| **权        |                          |                                                                                              | 1.00 CNY       |
-| **程        |                          |                                                                                              | 10.00 CNY      |
-| AC         |                          |                                                                                              | 8.88 CNY       |
-| ◎♪TEL      |                          |                                                                                              | 10.00 CNY      |
-| 听风逝夜       | https://coolrequest.dev/ | Plugin: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY       |
-| 秉心         |                          | 为开源技术人点赞                                                                                     | 6.66 CNY       |
-| Karl（大宇）   |                              |                                                                                          | 6.66 CNY  |
+| Name | Website | Message | Amount |
+| --- | --- | --- | --- |
+| **音 |  |  | 20.00 CNY |
+| **程 |  |  | 10.00 CNY |
+| ◎♪TEL |  |  | 10.00 CNY |
+| AC |  |  | 8.88 CNY |
+| ت |  | Json插件很好用，加油 | 6.66 CNY |
+| 广柔散人 |  | good | 6.66 CNY |
+| One |  |  | 6.66 CNY |
+| Vinay |  |  | 6.66 CNY |
+| 听风逝夜 | [https://coolrequest.dev/](https://coolrequest.dev/) | 插件: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY |
+| 秉心 |  | 为开源技术人点赞 | 6.66 CNY |
+| Karl（大宇） |  |  | 6.66 CNY |
+| *瑞 |  |  | 5.00 CNY |
+| JiaoJunWei |  |  | 5.00 CNY |
+| **权 |  |  | 1.00 CNY |
 
 <!-- DONORS_TABLE_EN_END -->
 
