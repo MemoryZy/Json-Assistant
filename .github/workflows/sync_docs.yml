@@ -70,6 +70,8 @@ jobs:
           
           # 复制文件（显示详情）
           echo "==== 开始复制文件 ===="
+          pwd
+          ls
           cp -v README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS Json-Assistant/
           
           # 进入目录并提交
@@ -86,26 +88,6 @@ jobs:
             echo "✅ 提交成功"
           else
             echo "🟢 无变更需要提交"
-          fi
-
-      # 第三步：将那些文件同步到公共插件仓库
-      - name: Sync to Public Repo
-        env:
-          TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
-        run: |
-          git clone https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant.git
-          cp README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS Json-Assistant/
-          cd Json-Assistant
-          
-          git config user.name "Sync Bot"
-          git config user.email "actions@github.com"
-          git add .
-          if ! git diff --quiet; then
-            git commit -m "Sync docs from source [skip ci]"
-            git push origin main
-            echo "✅ Changes committed"
-          else
-            echo "🟢 No changes to commit"
           fi
 
       # 第四步：同步捐赠名单信息到文档仓库
