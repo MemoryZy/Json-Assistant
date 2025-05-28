@@ -2,18 +2,22 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.Announcement;
 import cn.memoryzy.json.model.AnnouncementStats;
+import cn.memoryzy.json.service.NotificationScheduler;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,42 +28,71 @@ import java.util.stream.Collectors;
  */
 public class AnnouncementManager {
 
-    public static void showAnnouncement() {
-        // 是否为中国区域
-        boolean isChineseLocale = PlatformUtil.isChineseLocale();
+    private static final Logger LOG = Logger.getInstance(AnnouncementManager.class);
 
-        // 拉取公告
-        List<Announcement> announcements = fetchAnnouncements(isChineseLocale);
+    public static void showAnnouncement(@NotNull Project project) {
+        try {
+            // 是否为中国区域
+            boolean isChineseLocale = PlatformUtil.isChineseLocale();
 
-        // 过滤
-        filterAnnouncements(announcements);
+            // 拉取公告
+            List<Announcement> announcements = fetchAnnouncements(isChineseLocale);
 
-        // 过滤
-        if (CollUtil.isEmpty(announcements)) return;
+            // 过滤
+            filterAnnouncements(announcements);
 
-        // 按优先级排序
-        announcements.sort(Comparator.comparing(Announcement::getPriority, Comparator.nullsLast(Comparator.reverseOrder())));
+            // 过滤
+            if (CollUtil.isEmpty(announcements)) return;
 
-        // 转换为通知
-        List<Notifications.FullContentNotification> notifications = announcements.stream()
-                .map(el -> convertNotification(el, isChineseLocale))
-                .collect(Collectors.toList());
+            // 按优先级排序
+            announcements.sort(Comparator.comparing(Announcement::getPriority, Comparator.nullsLast(Comparator.reverseOrder())));
 
+            // 转换为通知
+            List<Notifications.FullContentNotification> notifications = announcements.stream()
+                    .map(el -> convertNotification(el, isChineseLocale))
+                    .collect(Collectors.toList());
 
+            NotificationScheduler.getInstance().addNotifications(notifications, project);
+
+        } catch (Exception e) {
+            LOG.warn("The announcement shows an error.", e);
+        }
     }
 
     private static Notifications.FullContentNotification convertNotification(Announcement announcement, boolean isChineseLocale) {
-        // TODO 待完成
+        // 目前只做中英双语
+        Map<String, Announcement.LocalizedNotice> localeMap = announcement.getLocales();
+        Announcement.LocalizedNotice cnLocalizedNotice = localeMap.get(PluginConstant.zh_CN);
+        Announcement.LocalizedNotice usLocalizedNotice = localeMap.get(PluginConstant.en_US);
 
+        Announcement.LocalizedNotice localizedNotice = isChineseLocale ? cnLocalizedNotice : usLocalizedNotice;
+        String title = localizedNotice.getTitle();
+        String content = localizedNotice.getContent();
 
+        // 默认 info
+        NotificationType notificationType = NotificationType.INFORMATION;
+        switch (announcement.getType()) {
+            case WARNING:
+                notificationType = NotificationType.WARNING;
+                break;
+            case ERROR:
+                notificationType = NotificationType.ERROR;
+                break;
+        }
 
-        return new Notifications.FullContentNotification(
+        // TODO 还差 Action
+
+        Notifications.FullContentNotification notification = new Notifications.FullContentNotification(
                 Notifications.getBalloonLogNotificationGroup().getDisplayId(),
-                "",
-                "",
-                NotificationType.INFORMATION,
-                announcement.getId()
-        );
+                title,
+                content,
+                notificationType,
+                announcement.getId());
+
+        // 注册网址监听
+        notification.setListener(new Notifications.NotificationListenerImpl());
+
+        return notification;
     }
 
     private static void filterAnnouncements(List<Announcement> announcements) {
@@ -73,6 +106,8 @@ public class AnnouncementManager {
         // 过滤以下公告
         announcements.removeIf(el ->
                 Objects.isNull(el.getId())
+                        // 标题内容不存在
+                        || MapUtil.isEmpty(el.getLocales())
                         // 已展示过，并且展示次数超出设定值
                         || isExceedDisplayLimit(el, announcementStatsMap)
                         // 公告过期
@@ -166,7 +201,109 @@ public class AnnouncementManager {
 
         try {
             // 拉取公告
-            String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
+            // String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
+            String respJson = "[\n" +
+                    "  {\n" +
+                    "    \"id\": \"202308_update_v2\",\n" +
+                    "    \"locales\": {\n" +
+                    "      \"en_US\": {\n" +
+                    "        \"title\": \"Important Update\",\n" +
+                    "        \"content\": \"Added new features...\"\n" +
+                    "      },\n" +
+                    "      \"zh_CN\": {\n" +
+                    "        \"title\": \"重要更新\",\n" +
+                    "        \"content\": \"新增了XX功能...\"\n" +
+                    "      }\n" +
+                    "    },\n" +
+                    "    \"type\": \"info\",\n" +
+                    "    \"priority\": 1,\n" +
+                    "    \"effectiveDate\": \"2025-05-27\",\n" +
+                    "    \"expirationDate\": \"2025-06-30\",\n" +
+                    "    \"versionConstraints\": \">=1.8.0\",\n" +
+                    "    \"display\": 2,\n" +
+                    "    \"actions\": [\n" +
+                    "      {\n" +
+                    "        \"label\": \"查看详情\",\n" +
+                    "        \"url\": \"https://xxxxxx\"\n" +
+                    "      },\n" +
+                    "      {\n" +
+                    "        \"label\": \"立即升级\",\n" +
+                    "        \"command\": \"updatePlugin\"\n" +
+                    "      }\n" +
+                    "    ],\n" +
+                    "    \"metadata\": {\n" +
+                    "      \"author\": \"Memory\",\n" +
+                    "      \"createdAt\": \"2025-05-27\"\n" +
+                    "    }\n" +
+                    "  },\n" +
+                    "    {\n" +
+                    "    \"id\": \"202308_update_v3\",\n" +
+                    "    \"locales\": {\n" +
+                    "      \"en_US\": {\n" +
+                    "        \"title\": \"Important Update\",\n" +
+                    "        \"content\": \"Added new features...\"\n" +
+                    "      },\n" +
+                    "      \"zh_CN\": {\n" +
+                    "        \"title\": \"重要更新111\",\n" +
+                    "        \"content\": \"新增了XX功能2222...\"\n" +
+                    "      }\n" +
+                    "    },\n" +
+                    "    \"type\": \"info\",\n" +
+                    "    \"priority\": 1,\n" +
+                    "    \"effectiveDate\": \"2025-05-27\",\n" +
+                    "    \"expirationDate\": \"2025-06-30\",\n" +
+                    "    \"versionConstraints\": \">=1.8.0\",\n" +
+                    "    \"display\": 2,\n" +
+                    "    \"actions\": [\n" +
+                    "      {\n" +
+                    "        \"label\": \"查看详情\",\n" +
+                    "        \"url\": \"https://xxxxxx\"\n" +
+                    "      },\n" +
+                    "      {\n" +
+                    "        \"label\": \"立即升级\",\n" +
+                    "        \"command\": \"updatePlugin\"\n" +
+                    "      }\n" +
+                    "    ],\n" +
+                    "    \"metadata\": {\n" +
+                    "      \"author\": \"Memory\",\n" +
+                    "      \"createdAt\": \"2025-05-27\"\n" +
+                    "    }\n" +
+                    "  },\n" +
+                    "  {\n" +
+                    "    \"id\": \"202308_update_v4\",\n" +
+                    "    \"locales\": {\n" +
+                    "      \"en_US\": {\n" +
+                    "        \"title\": \"Important Update\",\n" +
+                    "        \"content\": \"Added new features...\"\n" +
+                    "      },\n" +
+                    "      \"zh_CN\": {\n" +
+                    "        \"title\": \"重要更新55555555\",\n" +
+                    "        \"content\": \"新增了XX功能55555555...\"\n" +
+                    "      }\n" +
+                    "    },\n" +
+                    "    \"type\": \"info\",\n" +
+                    "    \"priority\": 1,\n" +
+                    "    \"effectiveDate\": \"2025-05-27\",\n" +
+                    "    \"expirationDate\": \"2025-06-30\",\n" +
+                    "    \"versionConstraints\": \">=1.8.0\",\n" +
+                    "    \"display\": 2,\n" +
+                    "    \"actions\": [\n" +
+                    "      {\n" +
+                    "        \"label\": \"查看详情\",\n" +
+                    "        \"url\": \"https://xxxxxx\"\n" +
+                    "      },\n" +
+                    "      {\n" +
+                    "        \"label\": \"立即升级\",\n" +
+                    "        \"command\": \"updatePlugin\"\n" +
+                    "      }\n" +
+                    "    ],\n" +
+                    "    \"metadata\": {\n" +
+                    "      \"author\": \"Memory\",\n" +
+                    "      \"createdAt\": \"2025-05-27\"\n" +
+                    "    }\n" +
+                    "  }\n" +
+                    "]";
+
             // 解析
             return JsonUtil.MAPPER.readValue(respJson, new TypeReference<>() {
             });

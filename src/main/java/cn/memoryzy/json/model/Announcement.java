@@ -103,8 +103,58 @@ public class Announcement {
 
         private String label;
 
+        // TODO URL的话也分locale
         private String url;
 
+        /**
+         * 指令
+         * <pre>
+         *     1.update    - 提示用户应该更新插件
+         *     2.notPrompt - 直接关闭通知，并且显示次数直接到最高
+         * </pre>
+         */
+        private String command;
+
+
+        /*
+
+        [
+  {
+    "id": "tort_v1",
+    "locales": {
+      "en_US": {
+        "title": "Important Update",
+        "content": "Added new features..."
+      },
+      "zh_CN": {
+        "title": "Json Assistant",
+        "content": "关于 Json Assistant 被恶意剽窃及二次分发的说明"
+      }
+    },
+    "type": "info",
+    "priority": 1,
+    "effectiveDate": "2025-05-27",
+    "expirationDate": "2025-06-30",
+    "versionConstraints": ">=1.8.0",
+    "display": 2,
+    "actions": [
+      {
+        "label": "了解更多",
+        "url": "https://xxxxxx"
+      },
+      {
+        "label": "不再提示",
+        "command": "notPrompt"
+      }
+    ],
+    "metadata": {
+      "author": "Memory",
+      "createdAt": "2025-05-27"
+    }
+  }
+]
+
+         */
 
         // region Getter/Setter
         public String getLabel() {
@@ -122,6 +172,15 @@ public class Announcement {
         public void setUrl(String url) {
             this.url = url;
         }
+
+        public String getCommand() {
+            return command;
+        }
+
+        public void setCommand(String command) {
+            this.command = command;
+        }
+
         // endregion
     }
 

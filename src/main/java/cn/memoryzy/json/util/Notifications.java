@@ -15,7 +15,8 @@ import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.util.NlsContexts;
+import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.ui.BalloonImpl;
 import com.intellij.ui.BalloonLayoutData;
@@ -23,6 +24,7 @@ import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -304,6 +306,7 @@ public class Notifications {
     public static class FullContentNotification extends Notification implements NotificationFullContent {
 
         private final String announcementId;
+        private volatile Runnable closeRunnable;
 
         public FullContentNotification(@NotNull @NonNls String groupId,
                                        @NotNull String title,
@@ -325,9 +328,33 @@ public class Notifications {
         public String getAnnouncementId() {
             return announcementId;
         }
+
+        public void setCloseRunnable(Runnable closeRunnable) {
+            this.closeRunnable = closeRunnable;
+        }
+
+        @Override
+        public void notify(@Nullable Project project) {
+            super.notify(project);
+            Balloon balloon = getBalloon();
+            if (balloon != null) {
+                balloon.addListener(new JBPopupListener() {
+                    @Override
+                    public void onClosed(@NotNull LightweightWindowEvent event) {
+                        Runnable callback = closeRunnable;
+                        if (callback != null) callback.run();
+                    }
+                });
+            }
+        }
+
+        // 在 FullContentNotification 中添加销毁方法
+        public void dispose() {
+            this.closeRunnable = null;
+        }
     }
 
-    private static class NotificationListenerImpl extends NotificationListener.Adapter {
+    public static class NotificationListenerImpl extends NotificationListener.Adapter {
         @Override
         protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
             String url = e.getDescription();
