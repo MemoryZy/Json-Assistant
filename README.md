@@ -165,6 +165,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | 听风逝夜 | [https://coolrequest.dev/](https://coolrequest.dev/) | 插件: [Cool Request](https://plugins.jetbrains.com/plugin/23555-cool-request-rest-client-) | 6.66 CNY |
 | 秉心 |  | 为开源技术人点赞 | 6.66 CNY |
 | Karl（大宇） |  |  | 6.66 CNY |
+| *卿 |  |  | 6.66 CNY |
 | *瑞 |  |  | 5.00 CNY |
 | JiaoJunWei |  |  | 5.00 CNY |
 | **权 |  |  | 1.00 CNY |
