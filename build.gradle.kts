@@ -5,6 +5,16 @@ import org.jetbrains.intellij.tasks.RunPluginVerifierTask
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
+//buildscript {
+//    repositories {
+//        mavenCentral()
+//        google()
+//    }
+//    dependencies {
+//        classpath("com.guardsquare:proguard-gradle:7.7.0")
+//    }
+//}
+
 plugins {
     id("java") // Java support
     alias(libs.plugins.kotlin) // Kotlin support

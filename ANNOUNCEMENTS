@@ -16,7 +16,6 @@
     "effectiveDate": "2025-05-27",
     "expirationDate": "2023-09-30",
     "versionConstraints": ">=1.2.0",
-    "isDismissible": true,
     "display": 2,
     "actions": [
       {

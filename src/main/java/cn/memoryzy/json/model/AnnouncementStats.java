@@ -12,12 +12,12 @@ public class AnnouncementStats {
     /**
      * 展示次数
      */
-    private Integer displayCount;
+    private int displayCount = 0;
 
     /**
      * 最后展示时间戳
      */
-    private Long lastShownTime;
+    private long lastShownTime = 0L;
 
 
     public static AnnouncementStats fromMap(ObjectWrapper wrapper) {

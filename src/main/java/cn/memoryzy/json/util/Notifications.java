@@ -15,6 +15,7 @@ import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.ui.BalloonImpl;
 import com.intellij.ui.BalloonLayoutData;
@@ -301,8 +302,28 @@ public class Notifications {
     }
 
     public static class FullContentNotification extends Notification implements NotificationFullContent {
-        public FullContentNotification(@NotNull @NonNls String groupId, @NotNull String title, @NotNull String content, @NotNull NotificationType type) {
+
+        private final String announcementId;
+
+        public FullContentNotification(@NotNull @NonNls String groupId,
+                                       @NotNull String title,
+                                       @NotNull String content,
+                                       @NotNull NotificationType type) {
             super(groupId, title, content, type);
+            this.announcementId = null;
+        }
+
+        public FullContentNotification(@NotNull String groupId,
+                                       @NotNull String title,
+                                       @NotNull String content,
+                                       @NotNull NotificationType type,
+                                       String announcementId) {
+            super(groupId, title, content, type);
+            this.announcementId = announcementId;
+        }
+
+        public String getAnnouncementId() {
+            return announcementId;
         }
     }
 

@@ -51,10 +51,9 @@ public class Announcement {
     private String versionConstraints;
 
     /**
-     * 是否允许用户关闭
+     * 展示次数
      */
-    @JsonProperty("isDismissible")
-    private boolean dismissible = true;
+    private Integer display;
 
     /**
      * 关联操作按钮
@@ -217,12 +216,12 @@ public class Announcement {
         this.versionConstraints = versionConstraints;
     }
 
-    public boolean isDismissible() {
-        return dismissible;
+    public Integer getDisplay() {
+        return display;
     }
 
-    public void setDismissible(boolean dismissible) {
-        this.dismissible = dismissible;
+    public void setDisplay(Integer display) {
+        this.display = display;
     }
 
     public List<NoticeAction> getActions() {

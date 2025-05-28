@@ -2,10 +2,13 @@ package cn.memoryzy.json.service;
 
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.util.AnnouncementManager;
 import cn.memoryzy.json.util.Notifications;
+import cn.memoryzy.json.util.VersionComparator;
 import com.intellij.ide.plugins.DynamicPluginListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
@@ -36,15 +39,14 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
             propertiesComponent.setValue(JsonAssistantPlugin.PLUGIN_VERSION, currentVersion);
         } else {
             // 是否版本更高
-            if (JsonAssistantPlugin.isNewerVersion(lastVersion, currentVersion)) {
+            if (VersionComparator.isNewerVersion(lastVersion, currentVersion)) {
                 Notifications.showUpdateNotification(project);
                 propertiesComponent.setValue(JsonAssistantPlugin.PLUGIN_VERSION, currentVersion);
             }
         }
 
-        // TODO 用异步实现公告
-
-
+        // 实现公告
+        ApplicationManager.getApplication().executeOnPooledThread(AnnouncementManager::showAnnouncement);
     }
 
     /**
