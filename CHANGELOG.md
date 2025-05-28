@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 - 支持选择部分字段进行序列化为JSON。
+- 支持将 JSON 以表格视图展示。
 
 - Support the selection of certain fields for serialization into JSON.
+- Support displaying JSON in a table view.
 
 ## [1.8.0] - 2025-04-16
 
