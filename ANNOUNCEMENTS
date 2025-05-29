@@ -1,32 +1,42 @@
 [
   {
-    "id": "202308_update_v2",
+    "id": "tort_v1",
     "locales": {
       "en_US": {
-        "title": "Important Update",
-        "content": "Added new features..."
+        "title": "Json Assistant",
+        "content": "Statement on the Malicious Plagiarism and Unauthorized Redistribution of Json Assistant",
+        "actions": [
+          {
+            "label": "Learn More",
+            "url": "https://github.com/MemoryZy/Json-Assistant/discussions/89"
+          },
+          {
+            "label": "Don't Show Again",
+            "command": "notPrompt"
+          }
+        ]
       },
       "zh_CN": {
-        "title": "重要更新",
-        "content": "新增了XX功能..."
+        "title": "Json Assistant",
+        "content": "关于 Json Assistant 被恶意剽窃及二次分发的说明",
+        "actions": [
+          {
+            "label": "了解更多",
+            "url": "https://github.com/MemoryZy/Json-Assistant/discussions/87"
+          },
+          {
+            "label": "不再提示",
+            "command": "notPrompt"
+          }
+        ]
       }
     },
-    "type": "warning",
+    "type": "info",
     "priority": 1,
     "effectiveDate": "2025-05-27",
-    "expirationDate": "2023-09-30",
-    "versionConstraints": ">=1.2.0",
-    "display": 2,
-    "actions": [
-      {
-        "label": "查看详情",
-        "url": "https://xxxxxx"
-      },
-      {
-        "label": "立即升级",
-        "command": "updatePlugin"
-      }
-    ],
+    "expirationDate": null,
+    "versionConstraints": ">=1.8.0",
+    "display": 1,
     "metadata": {
       "author": "Memory",
       "createdAt": "2025-05-27"
