@@ -33,8 +33,9 @@ import org.jsoup.select.Elements;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -306,7 +307,7 @@ public class Notifications {
     public static class FullContentNotification extends Notification implements NotificationFullContent {
 
         private final String announcementId;
-        private volatile Runnable closeCallback;
+        private volatile Consumer<String> closedIdConsumer;
 
         public FullContentNotification(@NotNull @NonNls String groupId,
                                        @NotNull String title,
@@ -329,8 +330,8 @@ public class Notifications {
             return announcementId;
         }
 
-        public void setCloseCallback(Runnable closeCallback) {
-            this.closeCallback = closeCallback;
+        public void setClosedIdConsumer(Consumer<String> closedIdConsumer) {
+            this.closedIdConsumer = closedIdConsumer;
         }
 
         @Override
@@ -341,8 +342,8 @@ public class Notifications {
                 balloon.addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
-                        Runnable callback = closeCallback;
-                        if (callback != null) callback.run();
+                        Consumer<String> consumer = closedIdConsumer;
+                        if (consumer != null) consumer.accept(announcementId);
                     }
                 });
             }

@@ -8,7 +8,6 @@ import cn.memoryzy.json.util.VersionComparator;
 import com.intellij.ide.plugins.DynamicPluginListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +45,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         }
 
         // 实现公告
-        ApplicationManager.getApplication().executeOnPooledThread(() -> AnnouncementManager.showAnnouncement(project));
+        AnnouncementManager.scheduleDelayedAnnouncement(project);
     }
 
     /**

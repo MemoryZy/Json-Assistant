@@ -27,7 +27,7 @@ public class NotificationScheduler implements Disposable {
 
     private final Queue<Notification> notificationQueue = new ConcurrentLinkedQueue<>();
     private final AtomicBoolean isShowing = new AtomicBoolean(false);
-    private final AtomicInteger delayMillis = new AtomicInteger(4000);
+    private final AtomicInteger delayMillis = new AtomicInteger(60 * 1000);
     private final Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
 
     public void setDelay(int millis) {
@@ -62,10 +62,10 @@ public class NotificationScheduler implements Disposable {
         // 设置通知关闭回调
         if (next instanceof Notifications.FullContentNotification) {
             Notifications.FullContentNotification notification = (Notifications.FullContentNotification) next;
-            notification.setCloseCallback(() -> {
+            notification.setClosedIdConsumer(id -> {
                 scheduleNext(project, consumer);
                 if (null != consumer) {
-                    consumer.consume(notification.getAnnouncementId());
+                    consumer.consume(id);
                 }
             });
         }
