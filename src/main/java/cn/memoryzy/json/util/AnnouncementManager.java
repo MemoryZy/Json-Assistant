@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
@@ -28,6 +29,7 @@ import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -343,140 +345,7 @@ public class AnnouncementManager {
 
         try {
             // 拉取公告
-            // String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
-
-            String respJson = "[\n" +
-                    "  {\n" +
-                    "    \"id\": \"tort_v1\",\n" +
-                    "    \"locales\": {\n" +
-                    "      \"en_US\": {\n" +
-                    "        \"title\": \"Json Assistant\",\n" +
-                    "        \"content\": \"Statement on the Malicious Plagiarism and Unauthorized Redistribution of Json Assistant\",\n" +
-                    "        \"actions\": [\n" +
-                    "          {\n" +
-                    "            \"label\": \"Learn More\",\n" +
-                    "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/89\"\n" +
-                    "          },\n" +
-                    "          {\n" +
-                    "            \"label\": \"Don't Show Again\",\n" +
-                    "            \"command\": \"notPrompt\"\n" +
-                    "          }\n" +
-                    "        ]\n" +
-                    "      },\n" +
-                    "      \"zh_CN\": {\n" +
-                    "        \"title\": \"Json Assistant\",\n" +
-                    "        \"content\": \"关于 Json Assistant 被恶意剽窃及二次分发的说明\",\n" +
-                    "        \"actions\": [\n" +
-                    "          {\n" +
-                    "            \"label\": \"了解更多\",\n" +
-                    "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/87\"\n" +
-                    "          },\n" +
-                    "          {\n" +
-                    "            \"label\": \"不再提示\",\n" +
-                    "            \"command\": \"notPrompt\"\n" +
-                    "          }\n" +
-                    "        ]\n" +
-                    "      }\n" +
-                    "    },\n" +
-                    "    \"type\": \"info\",\n" +
-                    "    \"priority\": 1,\n" +
-                    "    \"effectiveDate\": \"2025-05-27\",\n" +
-                    "    \"expirationDate\": null,\n" +
-                    "    \"versionConstraints\": \">=1.8.0\",\n" +
-                    "    \"display\": 5,\n" +
-                    "    \"metadata\": {\n" +
-                    "      \"author\": \"Memory\",\n" +
-                    "      \"createdAt\": \"2025-05-27\"\n" +
-                    "    }\n" +
-                    "  },\n" +
-                    "    {\n" +
-                    "    \"id\": \"tort_v2\",\n" +
-                    "    \"locales\": {\n" +
-                    "      \"en_US\": {\n" +
-                    "        \"title\": \"Json Assistant\",\n" +
-                    "        \"content\": \"111 Statement on the Malicious Plagiarism and Unauthorized Redistribution of Json Assistant\",\n" +
-                    "        \"actions\": [\n" +
-                    "          {\n" +
-                    "            \"label\": \"Learn More\",\n" +
-                    "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/89\"\n" +
-                    "          },\n" +
-                    "          {\n" +
-                    "            \"label\": \"Don't Show Again\",\n" +
-                    "            \"command\": \"notPrompt\"\n" +
-                    "          }\n" +
-                    "        ]\n" +
-                    "      },\n" +
-                    "      \"zh_CN\": {\n" +
-                    "        \"title\": \"Json Assistant\",\n" +
-                    "        \"content\": \"111 关于 Json Assistant 被恶意剽窃及二次分发的说明\",\n" +
-                    "        \"actions\": [\n" +
-                    "          {\n" +
-                    "            \"label\": \"了解更多\",\n" +
-                    "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/87\"\n" +
-                    "          },\n" +
-                    "          {\n" +
-                    "            \"label\": \"不再提示\",\n" +
-                    "            \"command\": \"notPrompt\"\n" +
-                    "          }\n" +
-                    "        ]\n" +
-                    "      }\n" +
-                    "    },\n" +
-                    "    \"type\": \"info\",\n" +
-                    "    \"priority\": 3,\n" +
-                    "    \"effectiveDate\": \"2025-05-27\",\n" +
-                    "    \"expirationDate\": null,\n" +
-                    "    \"versionConstraints\": \">=1.8.0\",\n" +
-                    "    \"display\": 4,\n" +
-                    "    \"metadata\": {\n" +
-                    "      \"author\": \"Memory\",\n" +
-                    "      \"createdAt\": \"2025-05-27\"\n" +
-                    "    }\n" +
-                    "  },\n" +
-                    "  {\n" +
-                    "    \"id\": \"tort_v3\",\n" +
-                    "    \"locales\": {\n" +
-                    "      \"en_US\": {\n" +
-                    "        \"title\": \"Json Assistant\",\n" +
-                    "        \"content\": \"111 Statement on the Malicious Plagiarism and Unauthorized Redistribution of Json Assistant\",\n" +
-                    "        \"actions\": [\n" +
-                    "          {\n" +
-                    "            \"label\": \"Learn More\",\n" +
-                    "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/89\"\n" +
-                    "          },\n" +
-                    "          {\n" +
-                    "            \"label\": \"Don't Show Again\",\n" +
-                    "            \"command\": \"notPrompt\"\n" +
-                    "          }\n" +
-                    "        ]\n" +
-                    "      },\n" +
-                    "      \"zh_CN\": {\n" +
-                    "        \"title\": \"Json Assistant\",\n" +
-                    "        \"content\": \"222 关于 Json Assistant 被恶意剽窃及二次分发的说明\",\n" +
-                    "        \"actions\": [\n" +
-                    "          {\n" +
-                    "            \"label\": \"了解更多\",\n" +
-                    "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/87\"\n" +
-                    "          },\n" +
-                    "          {\n" +
-                    "            \"label\": \"不再提示\",\n" +
-                    "            \"command\": \"notPrompt\"\n" +
-                    "          }\n" +
-                    "        ]\n" +
-                    "      }\n" +
-                    "    },\n" +
-                    "    \"type\": \"info\",\n" +
-                    "    \"priority\": 5,\n" +
-                    "    \"effectiveDate\": \"2025-05-27\",\n" +
-                    "    \"expirationDate\": null,\n" +
-                    "    \"versionConstraints\": \">=1.8.0\",\n" +
-                    "    \"display\": 4,\n" +
-                    "    \"metadata\": {\n" +
-                    "      \"author\": \"Memory\",\n" +
-                    "      \"createdAt\": \"2025-05-27\"\n" +
-                    "    }\n" +
-                    "  }\n" +
-                    "]";
-
+            String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
             // 解析
             return JsonUtil.MAPPER.readValue(respJson, new TypeReference<>() {
             });
