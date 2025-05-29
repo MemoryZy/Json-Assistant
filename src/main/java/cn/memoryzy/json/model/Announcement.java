@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model;
 
+import com.fasterxml.jackson.annotation.JsonEnumDefaultValue;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 public class Announcement {
 
+
     /**
      * 唯一标识（必填）
      */
@@ -21,7 +23,7 @@ public class Announcement {
     /**
      * 国际化
      */
-    private Map<String, LocalizedNotice> locales;
+    private Map<String, LocaleContent> locales;
 
     /**
      * 公告类型（info/warning/error）
@@ -56,18 +58,13 @@ public class Announcement {
     private Integer display;
 
     /**
-     * 关联操作按钮
-     */
-    private List<NoticeAction> actions;
-
-    /**
      * 扩展元数据
      */
     @JsonProperty("metadata")
     private NoticeMetadata noticeMetadata;
 
 
-    public static class LocalizedNotice {
+    public static class LocaleContent {
 
         /**
          * 标题
@@ -78,6 +75,11 @@ public class Announcement {
          * 内容
          */
         private String content;
+
+        /**
+         * 关联操作按钮
+         */
+        private List<NoticeAction> actions;
 
 
         // region Getter/Setter
@@ -96,6 +98,14 @@ public class Announcement {
         public void setContent(String content) {
             this.content = content;
         }
+
+        public List<NoticeAction> getActions() {
+            return actions;
+        }
+
+        public void setActions(List<NoticeAction> actions) {
+            this.actions = actions;
+        }
         // endregion
     }
 
@@ -104,6 +114,11 @@ public class Announcement {
         private String label;
 
         private String url;
+
+        /**
+         * 指令，可为空，不可为空字符串
+         */
+        private CommandType command;
 
 
         // region Getter/Setter
@@ -121,6 +136,14 @@ public class Announcement {
 
         public void setUrl(String url) {
             this.url = url;
+        }
+
+        public CommandType getCommand() {
+            return command;
+        }
+
+        public void setCommand(CommandType command) {
+            this.command = command;
         }
         // endregion
     }
@@ -158,6 +181,24 @@ public class Announcement {
         @JsonProperty("error") ERROR;
     }
 
+    public enum CommandType {
+
+        /**
+         * 提示用户应该更新插件
+         */
+        @JsonProperty("update") UPDATE,
+
+        /**
+         * 直接关闭通知，并且不再显示
+         */
+        @JsonProperty("notPrompt") NOT_PROMPT,
+
+        /**
+         * 未定义命令
+         */
+        @JsonEnumDefaultValue UNKNOWN;
+
+    }
 
     // region Getter/Setter
     public String getId() {
@@ -168,11 +209,11 @@ public class Announcement {
         this.id = id;
     }
 
-    public Map<String, LocalizedNotice> getLocales() {
+    public Map<String, LocaleContent> getLocales() {
         return locales;
     }
 
-    public void setLocales(Map<String, LocalizedNotice> locales) {
+    public void setLocales(Map<String, LocaleContent> locales) {
         this.locales = locales;
     }
 
@@ -222,14 +263,6 @@ public class Announcement {
 
     public void setDisplay(Integer display) {
         this.display = display;
-    }
-
-    public List<NoticeAction> getActions() {
-        return actions;
-    }
-
-    public void setActions(List<NoticeAction> actions) {
-        this.actions = actions;
     }
 
     public NoticeMetadata getNoticeMetadata() {

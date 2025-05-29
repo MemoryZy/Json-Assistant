@@ -2,16 +2,28 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.Announcement;
 import cn.memoryzy.json.model.AnnouncementStats;
+import cn.memoryzy.json.service.NotificationScheduler;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.intellij.ide.BrowserUtil;
+import com.intellij.ide.actions.ShowSettingsUtilImpl;
+import com.intellij.ide.plugins.PluginManagerConfigurable;
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -24,42 +36,185 @@ import java.util.stream.Collectors;
  */
 public class AnnouncementManager {
 
-    public static void showAnnouncement() {
-        // 是否为中国区域
-        boolean isChineseLocale = PlatformUtil.isChineseLocale();
+    private static final Logger LOG = Logger.getInstance(AnnouncementManager.class);
 
-        // 拉取公告
-        List<Announcement> announcements = fetchAnnouncements(isChineseLocale);
+    public static void showAnnouncement(@NotNull Project project) {
+        try {
+            // 是否为中国区域
+            boolean isChineseLocale = PlatformUtil.isChineseLocale();
 
-        // 过滤
-        filterAnnouncements(announcements);
+            // 拉取公告
+            List<Announcement> announcements = fetchAnnouncements(isChineseLocale);
 
-        // 过滤
-        if (CollUtil.isEmpty(announcements)) return;
+            // 过滤
+            filterAnnouncements(announcements);
 
-        // 按优先级排序
-        announcements.sort(Comparator.comparing(Announcement::getPriority, Comparator.nullsLast(Comparator.reverseOrder())));
+            // 过滤
+            if (CollUtil.isEmpty(announcements)) return;
 
-        // 转换为通知
-        List<Notifications.FullContentNotification> notifications = announcements.stream()
-                .map(el -> convertNotification(el, isChineseLocale))
-                .collect(Collectors.toList());
+            // 按优先级排序
+            announcements.sort(Comparator.comparing(Announcement::getPriority, Comparator.nullsLast(Comparator.reverseOrder())));
 
+            // 转换为通知
+            List<Notification> notifications = announcements.stream()
+                    .map(el -> convertNotification(project, el, isChineseLocale))
+                    .collect(Collectors.toList());
 
+            // 计划显示通知
+            NotificationScheduler.getInstance().addNotifications(notifications, AnnouncementManager::addReadNoticeRecord, project);
+
+        } catch (Exception e) {
+            LOG.warn("The announcement shows an error.", e);
+        }
     }
 
-    private static Notifications.FullContentNotification convertNotification(Announcement announcement, boolean isChineseLocale) {
-        // TODO 待完成
+    private static Notification convertNotification(@NotNull Project project, Announcement announcement, boolean isChineseLocale) {
+        // 目前只做中英双语
+        Map<String, Announcement.LocaleContent> localeMap = announcement.getLocales();
 
+        Announcement.LocaleContent localeContent;
+        if (localeMap.size() == 1) {
+            localeContent = localeMap.values().iterator().next();
+        } else {
+            Announcement.LocaleContent cnLocalizedNotice = localeMap.get(PluginConstant.zh_CN);
+            Announcement.LocaleContent usLocalizedNotice = localeMap.get(PluginConstant.en_US);
+            localeContent = isChineseLocale ? cnLocalizedNotice : usLocalizedNotice;
+        }
 
+        return getFullContentNotification(project, announcement, localeContent);
+    }
 
-        return new Notifications.FullContentNotification(
+    @NotNull
+    @SuppressWarnings("deprecation")
+    private static Notification getFullContentNotification(@NotNull Project project, Announcement announcement, Announcement.LocaleContent localizedNotice) {
+        String title = localizedNotice.getTitle();
+        String content = localizedNotice.getContent();
+
+        // 默认 info
+        NotificationType notificationType = NotificationType.INFORMATION;
+        switch (announcement.getType()) {
+            case WARNING:
+                notificationType = NotificationType.WARNING;
+                break;
+            case ERROR:
+                notificationType = NotificationType.ERROR;
+                break;
+        }
+
+        // Action转换
+        List<AnAction> actions = collectActions(project, announcement, localizedNotice.getActions());
+
+        Notifications.FullContentNotification notification = new Notifications.FullContentNotification(
                 Notifications.getBalloonLogNotificationGroup().getDisplayId(),
-                "",
-                "",
-                NotificationType.INFORMATION,
-                announcement.getId()
-        );
+                title,
+                content,
+                notificationType,
+                announcement.getId());
+
+        actions.forEach(notification::addAction);
+
+        // 注册网址监听
+        notification.setListener(new Notifications.NotificationListenerImpl());
+
+        return notification;
+    }
+
+    private static List<AnAction> collectActions(@NotNull Project project, Announcement announcement, List<Announcement.NoticeAction> noticeActions) {
+        List<AnAction> actions = new ArrayList<>();
+        if (CollUtil.isNotEmpty(noticeActions)) {
+            for (Announcement.NoticeAction noticeAction : noticeActions) {
+                String label = noticeAction.getLabel();
+                String url = noticeAction.getUrl();
+                Announcement.CommandType command = noticeAction.getCommand();
+                if (StrUtil.isBlank(label)) continue;
+
+                AnAction action = null;
+                if (StrUtil.isNotBlank(url)) {
+                    action = createUrlAction(project, label, url, command, announcement);
+
+                } else if (Objects.nonNull(command) && Announcement.CommandType.UNKNOWN != command) {
+                    action = createCommandAction(project, label, command, announcement);
+                }
+
+                if (null != action) actions.add(action);
+            }
+        }
+
+        return actions;
+    }
+
+    /**
+     * 处理 URL 跳转
+     */
+    public static AnAction createUrlAction(@NotNull Project project, String label, String url, Announcement.CommandType command, Announcement announcement) {
+        Runnable call;
+        if (Objects.nonNull(command) && Announcement.CommandType.UNKNOWN != command) {
+            Runnable commandAction = createCommandAction(project, command, announcement);
+            if (null == commandAction) {
+                call = () -> BrowserUtil.browse(url);
+
+            } else {
+                call = () -> {
+                    commandAction.run();
+                    BrowserUtil.browse(url);
+                };
+            }
+
+        } else {
+            call = () -> BrowserUtil.browse(url);
+        }
+
+        return NotificationAction.createSimpleExpiring(label, call);
+    }
+
+    public static AnAction createCommandAction(@NotNull Project project, String label, Announcement.CommandType command, Announcement announcement) {
+        Runnable commandAction = createCommandAction(project, command, announcement);
+        if (null == commandAction) return null;
+        return NotificationAction.createSimpleExpiring(label, commandAction);
+    }
+
+    public static Runnable createCommandAction(@NotNull Project project, Announcement.CommandType command, Announcement announcement) {
+        switch (command) {
+            case UPDATE: {
+                // 打开插件页面，选中 Json Assistant 插件
+                return () -> ShowSettingsUtilImpl.showSettingsDialog(project, PluginManagerConfigurable.ID, JsonAssistantPlugin.PLUGIN_NAME);
+            }
+
+            case NOT_PROMPT: {
+                return () -> {
+                    // 此公告不再显示，加上标记
+                    String id = announcement.getId();
+                    Map<String, AnnouncementStats> announcementStatsMap = JsonAssistantPersistentState.getInstance().announcementStatsMap;
+
+                    // 获取此公告记录
+                    AnnouncementStats announcementStats = announcementStatsMap.computeIfAbsent(id, k -> new AnnouncementStats());
+                    // 若不存在此公告记录，则建立新的填充进去
+
+                    // 设置 [不再显示]
+                    announcementStats.setShouldShowAgain(false);
+                };
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 添加用户已读的公告记录
+     *
+     * @param announcementId 公告ID
+     */
+    private static void addReadNoticeRecord(String announcementId) {
+        // 添加已读记录
+        if (StrUtil.isBlank(announcementId)) return;
+
+        Map<String, AnnouncementStats> announcementStatsMap = JsonAssistantPersistentState.getInstance().announcementStatsMap;
+        AnnouncementStats announcementStats = announcementStatsMap.computeIfAbsent(announcementId, k -> new AnnouncementStats());
+
+        // 展示次数 +1
+        announcementStats
+                .setDisplayCount(announcementStats.getDisplayCount() + 1)
+                .setLastShownTime(System.currentTimeMillis());
     }
 
     private static void filterAnnouncements(List<Announcement> announcements) {
@@ -73,6 +228,8 @@ public class AnnouncementManager {
         // 过滤以下公告
         announcements.removeIf(el ->
                 Objects.isNull(el.getId())
+                        // 标题内容不存在
+                        || MapUtil.isEmpty(el.getLocales())
                         // 已展示过，并且展示次数超出设定值
                         || isExceedDisplayLimit(el, announcementStatsMap)
                         // 公告过期
@@ -98,6 +255,11 @@ public class AnnouncementManager {
         if (null == announcementStats) {
             // 不存在说明没展示过，不过滤
             return false;
+        }
+
+        // 如果不能再显示，则直接返回 true 以被过滤
+        if (!announcementStats.isShouldShowAgain()) {
+            return true;
         }
 
         // 展示次数若为空，则默认1次

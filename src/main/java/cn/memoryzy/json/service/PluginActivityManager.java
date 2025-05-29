@@ -46,7 +46,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         }
 
         // 实现公告
-        ApplicationManager.getApplication().executeOnPooledThread(AnnouncementManager::showAnnouncement);
+        ApplicationManager.getApplication().executeOnPooledThread(() -> AnnouncementManager.showAnnouncement(project));
     }
 
     /**

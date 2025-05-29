@@ -19,6 +19,13 @@ public class AnnouncementStats {
      */
     private long lastShownTime = 0L;
 
+    /**
+     * 是否能够再显示
+     */
+    private boolean shouldShowAgain = true;
+
+    public AnnouncementStats() {
+    }
 
     public static AnnouncementStats fromMap(ObjectWrapper wrapper) {
         return BeanUtil.toBean(wrapper, AnnouncementStats.class);
@@ -29,15 +36,26 @@ public class AnnouncementStats {
         return displayCount;
     }
 
-    public void setDisplayCount(int displayCount) {
+    public AnnouncementStats setDisplayCount(int displayCount) {
         this.displayCount = displayCount;
+        return this;
     }
 
     public long getLastShownTime() {
         return lastShownTime;
     }
 
-    public void setLastShownTime(long lastShownTime) {
+    public AnnouncementStats setLastShownTime(long lastShownTime) {
         this.lastShownTime = lastShownTime;
+        return this;
+    }
+
+    public boolean isShouldShowAgain() {
+        return shouldShowAgain;
+    }
+
+    public AnnouncementStats setShouldShowAgain(boolean shouldShowAgain) {
+        this.shouldShowAgain = shouldShowAgain;
+        return this;
     }
 }
