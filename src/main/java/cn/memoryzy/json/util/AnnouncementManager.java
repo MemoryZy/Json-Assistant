@@ -106,6 +106,13 @@ public class AnnouncementManager {
         String title = localizedNotice.getTitle();
         String content = localizedNotice.getContent();
         content = HtmlConstant.wrapBody(content);
+        Boolean autoHide = announcement.getAutoHide();
+
+        String displayId = Boolean.FALSE.equals(autoHide)
+                // 不自动消失
+                ? Notifications.getStickyLogNotificationGroup().getDisplayId()
+                // 自动消失（默认）
+                : Notifications.getBalloonLogNotificationGroup().getDisplayId();
 
         // 默认 info
         NotificationType notificationType = NotificationType.INFORMATION;
@@ -122,7 +129,7 @@ public class AnnouncementManager {
         List<AnAction> actions = collectActions(project, announcement, localizedNotice.getActions());
 
         Notifications.FullContentNotification notification = new Notifications.FullContentNotification(
-                Notifications.getBalloonLogNotificationGroup().getDisplayId(),
+                displayId,
                 title,
                 content,
                 notificationType,

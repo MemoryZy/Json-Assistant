@@ -58,6 +58,11 @@ public class Announcement {
     private Integer display;
 
     /**
+     * 是否能自动消失
+     */
+    private Boolean autoHide;
+
+    /**
      * 扩展元数据
      */
     @JsonProperty("metadata")
@@ -272,5 +277,14 @@ public class Announcement {
     public void setNoticeMetadata(NoticeMetadata noticeMetadata) {
         this.noticeMetadata = noticeMetadata;
     }
+
+    public Boolean getAutoHide() {
+        return autoHide;
+    }
+
+    public void setAutoHide(Boolean autoHide) {
+        this.autoHide = autoHide;
+    }
+
     // endregion
 }
