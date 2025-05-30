@@ -49,9 +49,7 @@ public class AnnouncementManager {
 
         alarm.addRequest(() -> {
             if (!project.isDisposed()) {
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    showAnnouncement(project);
-                });
+                ApplicationManager.getApplication().invokeLater(() -> showAnnouncement(project));
             }
         }, 5 * 60 * 1000);
     }
