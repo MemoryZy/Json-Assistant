@@ -321,7 +321,7 @@ public class Json5Util {
         } catch (Exception ignored) {
         }
 
-        return map;
+        return null;
     }
 
     public static Map<?, ?> getCommentsMap(ObjectWrapper jsonObject) {

@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.query;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.enums.JsonQuerySchema;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.QueryState;

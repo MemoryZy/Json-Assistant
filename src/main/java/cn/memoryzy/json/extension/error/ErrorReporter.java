@@ -1,8 +1,8 @@
 package cn.memoryzy.json.extension.error;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;

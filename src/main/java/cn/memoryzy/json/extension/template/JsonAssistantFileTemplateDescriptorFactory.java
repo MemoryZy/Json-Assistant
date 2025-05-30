@@ -1,6 +1,6 @@
 package cn.memoryzy.json.extension.template;
 
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateDescriptor;

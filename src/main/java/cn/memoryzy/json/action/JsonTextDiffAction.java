@@ -1,9 +1,9 @@
 package cn.memoryzy.json.action;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;

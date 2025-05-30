@@ -1,6 +1,6 @@
 package cn.memoryzy.json.extension.provider;
 
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.extension.editor.JsonTreeFileEditor;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.fileEditor.FileEditor;

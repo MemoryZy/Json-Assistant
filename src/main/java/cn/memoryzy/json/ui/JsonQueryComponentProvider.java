@@ -1,11 +1,11 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.query.ShowOriginalTextAction;
 import cn.memoryzy.json.action.query.SwitchAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.enums.JsonQuerySchema;
 import cn.memoryzy.json.model.jsonpath.EvaluateResult;
 import cn.memoryzy.json.model.jsonpath.IncorrectDocument;

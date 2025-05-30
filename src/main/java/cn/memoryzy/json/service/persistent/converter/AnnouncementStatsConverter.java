@@ -4,7 +4,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.AnnouncementStats;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.util.xmlb.Converter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ public class AnnouncementStatsConverter extends Converter<Map<String, Announceme
     public @Nullable Map<String, AnnouncementStats> fromString(@NotNull String value) {
         Map<String, AnnouncementStats> announcementStatsMap = new HashMap<>();
         value = StrUtil.str(Base64.decode(value), StandardCharsets.UTF_8);
-        ObjectWrapper jsonObject = Json5Util.parseObject(value);
+        ObjectWrapper jsonObject = JsonUtil.parseObject(value);
 
         for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
             ObjectWrapper entryValue = (ObjectWrapper) entry.getValue();
@@ -36,6 +36,6 @@ public class AnnouncementStatsConverter extends Converter<Map<String, Announceme
 
     @Override
     public @Nullable String toString(@NotNull Map<String, AnnouncementStats> value) {
-        return Base64.encode(Json5Util.compressJson5(value));
+        return Base64.encode(JsonUtil.compressJson(value));
     }
 }

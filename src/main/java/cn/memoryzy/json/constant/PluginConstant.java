@@ -1,5 +1,7 @@
 package cn.memoryzy.json.constant;
 
+import cn.memoryzy.json.JsonAssistantPlugin;
+
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDate;

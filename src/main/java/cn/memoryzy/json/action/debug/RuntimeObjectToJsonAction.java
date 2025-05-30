@@ -1,8 +1,8 @@
 package cn.memoryzy.json.action.debug;
 
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;

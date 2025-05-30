@@ -58,6 +58,8 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         List<AnAction> titleActions = List.of(
                 new BackToEditorViewAction(toolWindowEx),
                 Separator.create(),
+                new UpgradeHintAction(),
+                Separator.create(),
                 new JsonHistoryAction(toolWindowEx),
                 new OpenSettingsAction());
 

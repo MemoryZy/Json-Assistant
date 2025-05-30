@@ -1,10 +1,10 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DataTypeConstant;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.model.EditorInitData;

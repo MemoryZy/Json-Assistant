@@ -1,10 +1,10 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.notification.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.dialog.SupportDialog;

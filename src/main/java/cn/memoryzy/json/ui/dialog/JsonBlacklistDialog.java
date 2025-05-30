@@ -1,9 +1,9 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DataTypeConstant;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.BlacklistEntry;

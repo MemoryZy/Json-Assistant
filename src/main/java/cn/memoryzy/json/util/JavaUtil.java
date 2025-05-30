@@ -6,7 +6,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.*;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.JsonConversionTarget;
