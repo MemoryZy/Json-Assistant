@@ -38,6 +38,7 @@ public class Urls {
     public static final String ANNOUNCEMENTS_SOURCE_GITHUB_LINK = "https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS";
     public static final String ANNOUNCEMENTS_SOURCE_GITEE_LINK = "https://gitee.com/MemoryZy/Json-Assistant/raw/main/ANNOUNCEMENTS";
 
+    public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";
 
     public static final String FRONT_URL = "http://0.0.0.0";
 

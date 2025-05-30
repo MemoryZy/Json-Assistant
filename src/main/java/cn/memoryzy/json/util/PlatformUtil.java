@@ -1,10 +1,12 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.model.PluginDetail;
 import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
@@ -61,10 +63,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author Memory
@@ -503,5 +503,23 @@ public class PlatformUtil {
         Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
         Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
         return project != null && languageClz != null && classClz != null;
+    }
+
+
+    public static PluginDetail getPluginDetail() {
+        String xml = HttpUtil.get(Urls.PLUGIN_DETAILS_LINK, StandardCharsets.UTF_8);
+        PluginDetail pluginDetail = XmlUtil.parseXmlString(xml, PluginDetail.class);
+        sortPluginsByUpdatedDate(pluginDetail);
+        return pluginDetail;
+    }
+
+    private static void sortPluginsByUpdatedDate(PluginDetail detail) {
+        if (detail != null &&
+                detail.getCategory() != null &&
+                detail.getCategory().getIdeaPlugins() != null) {
+
+            List<PluginDetail.IdeaPlugin> plugins = detail.getCategory().getIdeaPlugins();
+            plugins.sort(Comparator.comparingLong(PluginDetail.IdeaPlugin::getUpdatedDate).reversed());
+        }
     }
 }
