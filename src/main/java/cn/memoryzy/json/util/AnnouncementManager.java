@@ -5,6 +5,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
+import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
@@ -106,6 +107,7 @@ public class AnnouncementManager {
     private static Notification getFullContentNotification(@NotNull Project project, Announcement announcement, Announcement.LocaleContent localizedNotice) {
         String title = localizedNotice.getTitle();
         String content = localizedNotice.getContent();
+        content = HtmlConstant.wrapBody(content);
 
         // 默认 info
         NotificationType notificationType = NotificationType.INFORMATION;
