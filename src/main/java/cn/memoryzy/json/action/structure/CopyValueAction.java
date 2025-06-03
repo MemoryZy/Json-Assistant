@@ -22,7 +22,7 @@ public class CopyValueAction extends DumbAwareAction implements UpdateInBackgrou
     private final Tree tree;
 
     public CopyValueAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.copy.value.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.copy.value.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.copy.value.description"),
                 null);
         this.tree = tree;

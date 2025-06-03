@@ -23,7 +23,7 @@ public class CopyNodeCommentAction extends DumbAwareAction implements UpdateInBa
     private final Tree tree;
 
     public CopyNodeCommentAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.copy.node.comment.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.copy.node.comment.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.copy.node.comment.description"),
                 null);
         this.tree = tree;

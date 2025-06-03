@@ -14,7 +14,7 @@ public class CollapseMultiAction extends DumbAwareAction implements UpdateInBack
     private final Tree tree;
 
     public CollapseMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.collapse.multi.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.collapse.multi.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.collapse.multi.description"),
                 null);
         this.tree = tree;

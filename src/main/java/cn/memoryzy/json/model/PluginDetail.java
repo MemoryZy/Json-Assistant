@@ -82,6 +82,10 @@ public class PluginDetail {
         @JsonProperty("change-notes")
         private String changeNotes;
 
+        private String chineseChangeNotes;
+
+        private String englishChangeNotes;
+
         @JsonProperty("idea-version")
         private IdeaVersion ideaVersion;
 
@@ -179,6 +183,22 @@ public class PluginDetail {
 
         public void setChangeNotes(String changeNotes) {
             this.changeNotes = changeNotes;
+        }
+
+        public String getChineseChangeNotes() {
+            return chineseChangeNotes;
+        }
+
+        public void setChineseChangeNotes(String chineseChangeNotes) {
+            this.chineseChangeNotes = chineseChangeNotes;
+        }
+
+        public String getEnglishChangeNotes() {
+            return englishChangeNotes;
+        }
+
+        public void setEnglishChangeNotes(String englishChangeNotes) {
+            this.englishChangeNotes = englishChangeNotes;
         }
 
         public IdeaVersion getIdeaVersion() {

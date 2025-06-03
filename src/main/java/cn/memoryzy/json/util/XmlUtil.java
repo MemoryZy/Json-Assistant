@@ -1,9 +1,13 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.ctc.wstx.stax.WstxInputFactory;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -120,5 +124,37 @@ public class XmlUtil {
         }
     }
 
+    /**
+     * 从XML中提取CDATA内容
+     *
+     * @param cdata XML字符串，必须由 CDATA 包裹
+     * @return CDATA内容，如果解析失败返回null
+     */
+    public static String extractCdataContent(String cdata) {
+        try {
+            cdata = StrUtil.format("<root><content>{}</content></root>", cdata);
+            XmlMapper xmlMapper = new XmlMapper();
+            XmlRoot root = xmlMapper.readValue(cdata, XmlRoot.class);
+            return root.getContent();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @JacksonXmlRootElement(localName = "root")
+    public static class XmlRoot {
+
+        @JacksonXmlCData
+        @JacksonXmlProperty(localName = "content")
+        private String content;
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
+        }
+    }
 
 }

@@ -14,6 +14,10 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DonateAction extends DumbAwareAction implements UpdateInBackground {
 
+    public DonateAction() {
+        super(JsonAssistantBundle.messageOnSystem("action.donate.coffee.text"), JsonAssistantBundle.messageOnSystem("action.donate.description"), JsonAssistantIcons.COFFEE);
+    }
+
     public DonateAction(String text) {
         super(text, JsonAssistantBundle.messageOnSystem("action.donate.description"), JsonAssistantIcons.DONATE);
     }

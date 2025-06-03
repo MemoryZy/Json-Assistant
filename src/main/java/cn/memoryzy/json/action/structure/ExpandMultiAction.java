@@ -19,7 +19,7 @@ public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackgr
     private final Tree tree;
 
     public ExpandMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.expand.multi.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.expand.multi.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.expand.multi.description"),
                 null);
         this.tree = tree;

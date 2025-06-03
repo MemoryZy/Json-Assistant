@@ -2,14 +2,22 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.util.PlatformUtil;
+import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
-public class UpgradeHintAction extends DumbAwareAction implements UpdateInBackground {
+import javax.swing.*;
+
+public class UpgradeHintAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     @SuppressWarnings("DialogTitleCapitalization")
     public UpgradeHintAction() {
@@ -22,15 +30,38 @@ public class UpgradeHintAction extends DumbAwareAction implements UpdateInBackgr
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        boolean enabled = false;
-        Presentation presentation = e.getPresentation();
-        if (JsonAssistantPlugin.hasUpdateAvailable()) {
-            enabled = true;
-            String latestVersion = JsonAssistantPlugin.getLatestVersion();
-            presentation.setText(JsonAssistantBundle.messageOnSystem("action.upgrade.text", latestVersion));
-        }
+    public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+        String latestVersion = JsonAssistantPlugin.getLatestVersion();
+        String description = PlatformUtil.isChineseLocale()
+                ? JsonAssistantPlugin.getLatestChineseChangeNotes()
+                : JsonAssistantPlugin.getLatestEnglishChangeNotes();
 
-        presentation.setEnabledAndVisible(enabled);
+        // TODO 这里还需再测试一下
+
+        ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
+            @Override
+            protected void updateToolTipText() {
+                HelpTooltip.dispose(this);
+                new HelpTooltip()
+                        .setTitle(JsonAssistantBundle.messageOnSystem("action.upgrade.text", latestVersion))
+                        .setDescription(description)
+                        .installOn(this);
+            }
+        };
+
+        button.setBorder(JBUI.Borders.empty(1, 2));
+        return button;
+    }
+
+    @Override
+    public void updateCustomComponent(@NotNull JComponent component, @NotNull Presentation presentation) {
+        // TODO 在此更新 Tooltip
+
+
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabledAndVisible(JsonAssistantPlugin.hasUpdateAvailable());
     }
 }

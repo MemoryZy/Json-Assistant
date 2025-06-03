@@ -26,7 +26,7 @@ public class OnlineDocAction extends DumbAwareAction implements UpdateInBackgrou
         this.popupAction = popupAction;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(popupAction ? JsonAssistantBundle.message("action.online.doc.override.text") : JsonAssistantBundle.message("action.online.doc.text"));
+        presentation.setText(popupAction ? JsonAssistantBundle.message("action.online.doc.override.text") : JsonAssistantBundle.messageOnSystem("action.online.doc.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.online.doc.description"));
         presentation.setIcon(popupAction ? AllIcons.Actions.Help : JsonAssistantIcons.BOOK_READER);
     }

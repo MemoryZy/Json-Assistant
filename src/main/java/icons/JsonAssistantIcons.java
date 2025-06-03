@@ -35,6 +35,7 @@ public class JsonAssistantIcons {
     public static final Icon OPEN = load("/icons/open.svg");
     public static final Icon SWITCH_DISPLAY = load("/icons/switch_display.svg");
     public static final Icon UPGRADE = load("/icons/upgrade.svg");
+    public static final Icon COFFEE = load("/icons/coffee.svg");
 
     public static class FileTypes {
         public static final Icon TOML = load("/icons/fileTypes/toml-file.svg");

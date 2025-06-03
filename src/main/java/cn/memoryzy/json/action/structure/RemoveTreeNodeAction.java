@@ -18,7 +18,7 @@ public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBac
     private final Tree tree;
 
     public RemoveTreeNodeAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.remove.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.remove.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.remove.description"),
                 null);
         this.tree = tree;

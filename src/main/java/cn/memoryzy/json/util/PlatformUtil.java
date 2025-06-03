@@ -52,6 +52,7 @@ import com.intellij.util.ResourceUtil;
 import com.intellij.util.ui.TextTransferable;
 import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -63,8 +64,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author Memory
@@ -511,6 +512,8 @@ public class PlatformUtil {
             String xml = HttpUtil.get(Urls.PLUGIN_DETAILS_LINK, StandardCharsets.UTF_8);
             PluginDetail pluginDetail = XmlUtil.parseXmlString(xml, PluginDetail.class);
             sortPluginsByUpdatedDate(pluginDetail);
+            // 更新日志区分为中英文
+            resolveMultiLocaleChangeNotes(pluginDetail);
             return pluginDetail;
         } catch (Exception e) {
             return null;
@@ -526,4 +529,26 @@ public class PlatformUtil {
             plugins.sort(Comparator.comparingLong(PluginDetail.IdeaPlugin::getUpdatedDate).reversed());
         }
     }
+
+    private static void resolveMultiLocaleChangeNotes(PluginDetail detail) {
+        if (detail != null &&
+                detail.getCategory() != null &&
+                detail.getCategory().getIdeaPlugins() != null) {
+
+            List<PluginDetail.IdeaPlugin> plugins = detail.getCategory().getIdeaPlugins();
+
+            for (PluginDetail.IdeaPlugin plugin : plugins) {
+                String changeNotes = StrUtil.trim(plugin.getChangeNotes());
+                // 被cdata包裹的文本，要去除此包裹
+                if (changeNotes.startsWith("<![CDATA[") && changeNotes.endsWith("]]>")) {
+                    changeNotes = XmlUtil.extractCdataContent(changeNotes);
+                }
+
+                ImmutablePair<String, String> pair = Notifications.distinguishChineseAndEnglishChangeNote(changeNotes);
+                plugin.setChineseChangeNotes(pair.left);
+                plugin.setEnglishChangeNotes(pair.right);
+            }
+        }
+    }
+
 }

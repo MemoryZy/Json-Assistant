@@ -26,7 +26,7 @@ public class CopyNodePathAction extends DumbAwareAction implements UpdateInBackg
     private final Tree tree;
 
     public CopyNodePathAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.copy.node.path.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.copy.node.path.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.copy.node.path.description"),
                 null);
         this.tree = tree;

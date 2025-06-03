@@ -47,6 +47,10 @@ public class JsonStructureComponentProvider {
     private Object hoverNode;
     private final StructureState structureState;
 
+    // TODO 尝试按需解析，初始只解析到第2层级，展开节点时动态加载子树（类似IDE的大文件处理）
+
+    // TODO 如果关联文件是 JsonFile，可以获取PsiElement，那就把修改后的element整体替换；如果是普通文本，那就整体替换吧
+
     /**
      * 构造器
      *
@@ -241,6 +245,8 @@ public class JsonStructureComponentProvider {
         group.add(new CopyNodePathAction(tree));
         group.addSeparator();
         group.add(new CopyNodeCommentAction(tree));
+        group.addSeparator();
+        group.add(new ModifyNodeValueAction(tree));
         group.addSeparator();
         group.add(new ExpandMultiAction(tree));
         group.addSeparator();

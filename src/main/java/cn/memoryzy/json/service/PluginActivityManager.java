@@ -98,7 +98,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
 
             // 判断市场的最新版本是否大于当前版本
             if (VersionComparator.isNewerVersion(currentVersion, latestVersion)) {
-                JsonAssistantPlugin.setUpdateAvailable(true, latestVersion);
+                JsonAssistantPlugin.setUpdateAvailable(true, latestVersion, pluginDetail);
             }
         });
     }
