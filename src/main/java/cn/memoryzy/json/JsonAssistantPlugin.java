@@ -1,7 +1,6 @@
 package cn.memoryzy.json;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.memoryzy.json.model.PluginDetail;
+import cn.memoryzy.json.model.PluginUpdateDetail;
 import com.intellij.diagnostic.PluginException;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
@@ -29,6 +28,7 @@ public class JsonAssistantPlugin {
     private static final AtomicReference<UpdateInfo> stateHolder =
             new AtomicReference<>(new UpdateInfo(false, null, null));
 
+
     public static IdeaPluginDescriptor getJsonAssistant() {
         if (descriptor == null) {
             throw new PluginException("Plugin does not exist!", PluginId.getId(PLUGIN_ID));
@@ -44,9 +44,13 @@ public class JsonAssistantPlugin {
 
     // -------------------------------------
 
-    public static void setUpdateAvailable(boolean hasUpdateAvailable, String latestVersion, PluginDetail pluginDetail) {
+    public static void setUpdateAvailable(boolean hasUpdateAvailable, String latestVersion, PluginUpdateDetail updateDetail) {
         // 创建新状态对象并原子更新
-        stateHolder.set(new UpdateInfo(hasUpdateAvailable, latestVersion, pluginDetail));
+        stateHolder.set(new UpdateInfo(hasUpdateAvailable, latestVersion, updateDetail));
+    }
+
+    public static long getLatestVersionId() {
+        return Optional.ofNullable(stateHolder.get().pluginUpdateDetail).map(PluginUpdateDetail::getId).orElse(0L);
     }
 
 
@@ -58,26 +62,13 @@ public class JsonAssistantPlugin {
         return stateHolder.get().latestVersion;
     }
 
+
     public static String getLatestChineseChangeNotes() {
-        PluginDetail pluginDetail = stateHolder.get().pluginDetail;
-        return Optional.ofNullable(pluginDetail)
-                .map(PluginDetail::getCategory)
-                .map(PluginDetail.Category::getIdeaPlugins)
-                .filter(CollUtil::isNotEmpty)
-                .map(list -> list.get(0))
-                .map(PluginDetail.IdeaPlugin::getChineseChangeNotes)
-                .orElse(null);
+        return Optional.ofNullable(stateHolder.get().pluginUpdateDetail).map(PluginUpdateDetail::getZhNotes).orElse("");
     }
 
     public static String getLatestEnglishChangeNotes() {
-        PluginDetail pluginDetail = stateHolder.get().pluginDetail;
-        return Optional.ofNullable(pluginDetail)
-                .map(PluginDetail::getCategory)
-                .map(PluginDetail.Category::getIdeaPlugins)
-                .filter(CollUtil::isNotEmpty)
-                .map(list -> list.get(0))
-                .map(PluginDetail.IdeaPlugin::getEnglishChangeNotes)
-                .orElse(null);
+        return Optional.ofNullable(stateHolder.get().pluginUpdateDetail).map(PluginUpdateDetail::getEnNotes).orElse("");
     }
 
 
@@ -88,12 +79,12 @@ public class JsonAssistantPlugin {
     private static class UpdateInfo {
         final boolean updateAvailable;
         final String latestVersion;
-        final PluginDetail pluginDetail;
+        final PluginUpdateDetail pluginUpdateDetail;
 
-        public UpdateInfo(boolean updateAvailable, String latestVersion, PluginDetail pluginDetail) {
+        public UpdateInfo(boolean updateAvailable, String latestVersion, PluginUpdateDetail pluginUpdateDetail) {
             this.updateAvailable = updateAvailable;
             this.latestVersion = latestVersion;
-            this.pluginDetail = pluginDetail;
+            this.pluginUpdateDetail = pluginUpdateDetail;
         }
     }
 

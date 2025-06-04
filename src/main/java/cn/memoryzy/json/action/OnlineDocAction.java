@@ -2,38 +2,31 @@ package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
 
 /**
  * @author Memory
  * @since 2024/8/6
  */
 public class OnlineDocAction extends DumbAwareAction implements UpdateInBackground {
-    private final boolean popupAction;
 
     public OnlineDocAction() {
-        this(false);
+        super(JsonAssistantBundle.messageOnSystem("action.online.doc.text"), JsonAssistantBundle.messageOnSystem("action.online.doc.description"), JsonAssistantIcons.BOOK_READER);
     }
 
-    public OnlineDocAction(boolean popupAction) {
-        super();
-        this.popupAction = popupAction;
-        setEnabledInModalContext(true);
-        Presentation presentation = getTemplatePresentation();
-        presentation.setText(popupAction ? JsonAssistantBundle.message("action.online.doc.override.text") : JsonAssistantBundle.messageOnSystem("action.online.doc.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.online.doc.description"));
-        presentation.setIcon(popupAction ? AllIcons.Actions.Help : JsonAssistantIcons.BOOK_READER);
+    public OnlineDocAction(String text, Icon icon) {
+        super(text, JsonAssistantBundle.messageOnSystem("action.online.doc.description"), icon);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        PlatformUtil.openOnlineDoc(event.getProject(), popupAction);
+        PlatformUtil.openOnlineDoc(event.getProject(), true);
     }
 
 }

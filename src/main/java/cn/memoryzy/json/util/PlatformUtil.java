@@ -7,6 +7,8 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
 import cn.memoryzy.json.model.PluginDetail;
+import cn.memoryzy.json.model.PluginUpdateDetail;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
@@ -551,4 +553,22 @@ public class PlatformUtil {
         }
     }
 
+    public static List<PluginUpdateDetail> getPluginUpdateDetail() {
+        try {
+            String json = HttpUtil.get(Urls.PLUGIN_UPDATE_DETAILS_LINK, StandardCharsets.UTF_8);
+            List<PluginUpdateDetail> pluginUpdateDetails = JsonUtil.MAPPER.readValue(json, new TypeReference<>() {});
+            pluginUpdateDetails.sort(Comparator.comparingLong(PluginUpdateDetail::getCdate).reversed());
+            pluginUpdateDetails.forEach(PlatformUtil::resolveMultiLocaleChangeNotes);
+            return pluginUpdateDetails;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+
+    private static void resolveMultiLocaleChangeNotes(PluginUpdateDetail detail) {
+        ImmutablePair<String, String> pair = Notifications.distinguishChineseAndEnglishChangeNote(detail.getNotes());
+        detail.setZhNotes(pair.left);
+        detail.setEnNotes(pair.right);
+    }
 }

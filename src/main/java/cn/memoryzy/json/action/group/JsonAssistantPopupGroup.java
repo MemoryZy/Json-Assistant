@@ -5,6 +5,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -80,7 +81,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         actions.add(Separator.create());
         actions.add(ActionHolder.SHORTCUT_ACTION);
         actions.add(Separator.create());
-        actions.add(new OnlineDocAction(true));
+        actions.add(new OnlineDocAction(JsonAssistantBundle.message("action.online.doc.override.text"), AllIcons.Actions.Help));
 
         return actions.toArray(new AnAction[0]);
     }

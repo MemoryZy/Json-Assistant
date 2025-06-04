@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.model.PluginDetail;
+import cn.memoryzy.json.model.PluginUpdateDetail;
 import cn.memoryzy.json.util.AnnouncementManager;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -17,7 +17,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
+import java.util.List;
 
 /**
  * @author Memory
@@ -80,26 +80,23 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     public void checkForUpdates() {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             // 获取插件市场的插件信息
-            PluginDetail pluginDetail = PlatformUtil.getPluginDetail();
+//            PluginDetail pluginDetail = PlatformUtil.getPluginDetail();
+            List<PluginUpdateDetail> pluginUpdateDetails = PlatformUtil.getPluginUpdateDetail();
+            if (CollUtil.isEmpty(pluginUpdateDetails)) return;
 
             // 筛选出最新的一个版本
-            String latestVersion = Optional.ofNullable(pluginDetail)
-                    .map(PluginDetail::getCategory)
-                    .map(PluginDetail.Category::getIdeaPlugins)
-                    .filter(CollUtil::isNotEmpty)
-                    .map(list -> list.get(0))
-                    .map(PluginDetail.IdeaPlugin::getVersion)
-                    .orElse(null);
-
+            PluginUpdateDetail pluginUpdateDetail = pluginUpdateDetails.get(0);
+            String latestVersion = pluginUpdateDetail.getVersion();
             if (StrUtil.isBlank(latestVersion)) return;
 
             // 当前版本
             String currentVersion = JsonAssistantPlugin.getVersion();
 
             // 判断市场的最新版本是否大于当前版本
-            if (VersionComparator.isNewerVersion(currentVersion, latestVersion)) {
-                JsonAssistantPlugin.setUpdateAvailable(true, latestVersion, pluginDetail);
-            }
+            JsonAssistantPlugin.setUpdateAvailable(
+                    VersionComparator.isNewerVersion(currentVersion, latestVersion),
+                    latestVersion,
+                    pluginUpdateDetail);
         });
     }
 }

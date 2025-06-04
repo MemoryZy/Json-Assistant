@@ -29,6 +29,8 @@ public class Urls {
     public static final String VIEW = "https://json.memoryzy.cn/view";
     public static final String MARKETPLACE_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant";
     public static final String MARKETPLACE_REVIEWS_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews";
+    public static final String MARKETPLACE_VERSION_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/versions";
+    public static final String MARKETPLACE_ASSIGN_VERSION_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/versions/stable/{}";
     public static final String EMAIL_LINK = "memoryzk@outlook.com";
 
     public static final String JSONPATH_EXPRESS_DESCRIPTION = "https://goessner.net/articles/JsonPath/";
@@ -39,6 +41,7 @@ public class Urls {
     public static final String ANNOUNCEMENTS_SOURCE_GITEE_LINK = "https://gitee.com/MemoryZy/Json-Assistant/raw/main/ANNOUNCEMENTS";
 
     public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";
+    public static final String PLUGIN_UPDATE_DETAILS_LINK = "https://plugins.jetbrains.com/api/plugins/24738/updates";
 
     public static final String FRONT_URL = "http://0.0.0.0";
 

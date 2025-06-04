@@ -1,6 +1,10 @@
 package cn.memoryzy.json.action;
 
+import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.Urls;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -18,6 +22,10 @@ public class LatestVersionAction extends DumbAwareAction implements UpdateInBack
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO 待实现
+        long latestVersionId = JsonAssistantPlugin.getLatestVersionId();
+        String url = latestVersionId > 0L
+                ? StrUtil.format(Urls.MARKETPLACE_ASSIGN_VERSION_LINK, latestVersionId)
+                : Urls.MARKETPLACE_VERSION_LINK;
+        BrowserUtil.browse(url);
     }
 }
