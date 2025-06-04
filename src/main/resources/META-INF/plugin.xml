@@ -163,7 +163,7 @@
             <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
         </group>
 
-        <group id="JsonAssistant.Group.JsonAssistantHelpPopupMenu" text="Json _Assistant" icon="JsonAssistantIcons.ToolWindow.LOGO" popup="true">
+        <group id="JsonAssistant.Group.JsonAssistantHelpPopupMenu" text="Json _Assistant" icon="JsonAssistantIcons.OPEN" popup="true">
             <action id="JsonAssistant.Action.LatestVersionAction" class="cn.memoryzy.json.action.LatestVersionAction"/>
             <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction"/>
             <separator/>
