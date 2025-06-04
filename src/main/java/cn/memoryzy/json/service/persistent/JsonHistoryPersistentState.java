@@ -44,4 +44,30 @@ public class JsonHistoryPersistentState implements PersistentStateComponent<Json
 
         return this.history;
     }
+
+
+
+    /* 配置加密
+
+    https://github.com/shuzijun/leetcode-editor/blob/653345c110f6867e5824cbb28f63328894e80142/src/main/java/com/shuzijun/leetcode/plugin/setting/PersistentConfig.java#L97
+
+        // 需要把 @Storage 的 roamingType 设置为 DISABLED，不共享、不导出配置
+
+        public void savePassword(String password, String username) {
+        if (username == null || password == null) {
+            return;
+        }
+        PasswordSafe.getInstance().set(new CredentialAttributes(PluginConstant.PLUGIN_ID, username, this.getClass()), new Credentials(username, password));
+    }
+
+    public String getPassword(String username) {
+        if (getConfig().getVersion() != null && username != null) {
+            return PasswordSafe.getInstance().getPassword(new CredentialAttributes(PluginConstant.PLUGIN_ID, username, this.getClass()));
+        }
+        return null;
+
+    }
+
+     */
+
 }
