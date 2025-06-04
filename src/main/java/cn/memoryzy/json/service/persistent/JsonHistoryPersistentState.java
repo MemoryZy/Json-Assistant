@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 @State(name = "Json Assistant History", storages = {@Storage(value = "JsonAssistantHistoryState.xml")})
 public class JsonHistoryPersistentState implements PersistentStateComponent<JsonHistoryPersistentState> {
-    public static final int LIMIT = 25;
+    public static final int LIMIT = 50;
 
     public static JsonHistoryPersistentState getInstance(Project project) {
         return project.getService(JsonHistoryPersistentState.class);
