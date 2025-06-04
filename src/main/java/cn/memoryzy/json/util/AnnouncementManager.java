@@ -22,7 +22,6 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -49,7 +48,7 @@ public class AnnouncementManager {
 
         alarm.addRequest(() -> {
             if (!project.isDisposed()) {
-                ApplicationManager.getApplication().invokeLater(() -> showAnnouncement(project));
+                showAnnouncement(project);
             }
         }, 5 * 60 * 1000);
     }

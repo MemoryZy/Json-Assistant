@@ -1,5 +1,6 @@
 package cn.memoryzy.json.action.toolwindow;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -26,17 +27,20 @@ public class UpgradeHintAction extends DumbAwareAction implements CustomComponen
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        // TODO 待实现
 
     }
 
     @Override
     public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+        boolean chineseLocale = PlatformUtil.isChineseLocale();
         String latestVersion = JsonAssistantPlugin.getLatestVersion();
-        String description = PlatformUtil.isChineseLocale()
+        String description = chineseLocale
                 ? JsonAssistantPlugin.getLatestChineseChangeNotes()
                 : JsonAssistantPlugin.getLatestEnglishChangeNotes();
 
-        // TODO 这里还需再测试一下
+        String pre = StrUtil.format("<br/><b>{}</b><br/>",
+                chineseLocale ? "更新内容如下：" : "The updated content is as follows::");
 
         ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
             @Override
@@ -44,20 +48,13 @@ public class UpgradeHintAction extends DumbAwareAction implements CustomComponen
                 HelpTooltip.dispose(this);
                 new HelpTooltip()
                         .setTitle(JsonAssistantBundle.messageOnSystem("action.upgrade.text", latestVersion))
-                        .setDescription(description)
+                        .setDescription(pre + description)
                         .installOn(this);
             }
         };
 
         button.setBorder(JBUI.Borders.empty(1, 2));
         return button;
-    }
-
-    @Override
-    public void updateCustomComponent(@NotNull JComponent component, @NotNull Presentation presentation) {
-        // TODO 在此更新 Tooltip
-
-
     }
 
     @Override

@@ -32,17 +32,17 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
      */
     @Override
     public void runActivity(@NotNull Project project) {
-        // 验证地址可达性
-        Urls.verifyReachable();
-
         // 展示欢迎或更新通知
         showWelcomeOrUpdateNotification(project);
-
         // 实现公告
         AnnouncementManager.scheduleDelayedAnnouncement(project);
 
-        // 检查有无更新
-        checkForUpdates();
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // 检查有无更新
+            checkForUpdates();
+            // 验证地址可达性
+            Urls.verifyReachable();
+        });
     }
 
     /**
@@ -78,25 +78,23 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     }
 
     public void checkForUpdates() {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // 获取插件市场的插件信息
+        // 获取插件市场的插件信息
 //            PluginDetail pluginDetail = PlatformUtil.getPluginDetail();
-            List<PluginUpdateDetail> pluginUpdateDetails = PlatformUtil.getPluginUpdateDetail();
-            if (CollUtil.isEmpty(pluginUpdateDetails)) return;
+        List<PluginUpdateDetail> pluginUpdateDetails = PlatformUtil.getPluginUpdateDetail();
+        if (CollUtil.isEmpty(pluginUpdateDetails)) return;
 
-            // 筛选出最新的一个版本
-            PluginUpdateDetail pluginUpdateDetail = pluginUpdateDetails.get(0);
-            String latestVersion = pluginUpdateDetail.getVersion();
-            if (StrUtil.isBlank(latestVersion)) return;
+        // 筛选出最新的一个版本
+        PluginUpdateDetail pluginUpdateDetail = pluginUpdateDetails.get(0);
+        String latestVersion = pluginUpdateDetail.getVersion();
+        if (StrUtil.isBlank(latestVersion)) return;
 
-            // 当前版本
-            String currentVersion = JsonAssistantPlugin.getVersion();
+        // 当前版本
+        String currentVersion = /*JsonAssistantPlugin.getVersion();*/"1.7.4";
 
-            // 判断市场的最新版本是否大于当前版本
-            JsonAssistantPlugin.setUpdateAvailable(
-                    VersionComparator.isNewerVersion(currentVersion, latestVersion),
-                    latestVersion,
-                    pluginUpdateDetail);
-        });
+        // 判断市场的最新版本是否大于当前版本
+        JsonAssistantPlugin.setUpdateAvailable(
+                VersionComparator.isNewerVersion(currentVersion, latestVersion),
+                latestVersion,
+                pluginUpdateDetail);
     }
 }

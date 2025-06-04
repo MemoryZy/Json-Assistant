@@ -1,7 +1,6 @@
 package cn.memoryzy.json;
 
 import cn.memoryzy.json.model.PluginUpdateDetail;
-import com.intellij.diagnostic.PluginException;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
@@ -20,8 +19,6 @@ public class JsonAssistantPlugin {
     public static final String PLUGIN_ID_NAME = PLUGIN_ID + ".Json-Assistant";
     public static final String PLUGIN_VERSION = PLUGIN_ID + ".version";
 
-    private static final IdeaPluginDescriptor descriptor = PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID));
-
     /**
      * 使用一个原子引用持有不可变的状态对象
      */
@@ -30,11 +27,7 @@ public class JsonAssistantPlugin {
 
 
     public static IdeaPluginDescriptor getJsonAssistant() {
-        if (descriptor == null) {
-            throw new PluginException("Plugin does not exist!", PluginId.getId(PLUGIN_ID));
-        }
-
-        return descriptor;
+        return PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID));
     }
 
     public static String getVersion() {

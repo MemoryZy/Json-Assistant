@@ -46,7 +46,7 @@ public class Urls {
     public static final String FRONT_URL = "http://0.0.0.0";
 
     public static void verifyReachable() {
-        new Thread(() -> reachableAtomic.getAndSet(isReachable(OVERVIEW))).start();
+        reachableAtomic.set(isReachable(OVERVIEW));
     }
 
     public static boolean isReachable() {
