@@ -50,7 +50,7 @@ public class AnnouncementManager {
             if (!project.isDisposed()) {
                 showAnnouncement(project);
             }
-        }, 5 * 60 * 1000);
+        }, /*5 * 60 * 1000*/ 100);
     }
 
     public static void showAnnouncement(@NotNull Project project) {
@@ -283,6 +283,15 @@ public class AnnouncementManager {
         // 如果不能再显示，则直接返回 true 以被过滤
         if (!announcementStats.isShouldShowAgain()) {
             return true;
+        }
+
+        // 若今天已经展示过，则不再展示
+        long lastShownTime = announcementStats.getLastShownTime();
+        if (JsonAssistantUtil.isValidTimestamp(lastShownTime + "")) {
+            LocalDate localDate = LocalDateTimeUtil.of(lastShownTime).toLocalDate();
+            if (LocalDate.now().equals(localDate)) {
+                return true;
+            }
         }
 
         // 展示次数若为空，则默认1次

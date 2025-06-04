@@ -79,7 +79,6 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
 
     public void checkForUpdates() {
         // 获取插件市场的插件信息
-//            PluginDetail pluginDetail = PlatformUtil.getPluginDetail();
         List<PluginUpdateDetail> pluginUpdateDetails = PlatformUtil.getPluginUpdateDetail();
         if (CollUtil.isEmpty(pluginUpdateDetails)) return;
 
@@ -89,7 +88,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         if (StrUtil.isBlank(latestVersion)) return;
 
         // 当前版本
-        String currentVersion = /*JsonAssistantPlugin.getVersion();*/"1.7.4";
+        String currentVersion = JsonAssistantPlugin.getVersion();
 
         // 判断市场的最新版本是否大于当前版本
         JsonAssistantPlugin.setUpdateAvailable(
