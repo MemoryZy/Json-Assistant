@@ -47,11 +47,22 @@ public class JsonStructureComponentProvider {
     private JPanel treeComponent;
     private Object hoverNode;
     private final StructureState structureState;
+
+    /**
+     * 上下文或上下文内的内容都可能是null
+     */
     private @Nullable EditorContext editorContext;
 
     // TODO 尝试按需解析，初始只解析到第2层级，展开节点时动态加载子树（类似IDE的大文件处理）
 
     // TODO 如果关联文件是 JsonFile，可以获取PsiElement，那就把修改后的element整体替换；如果是普通文本，那就整体替换吧
+
+    // TODO 把PsiElement与节点绑定，接着再进行修改、替换，会更方便（要用软引用）
+
+    // TODO 如果是文本类型，也可以用临时psifile进行绑定，例如：      // 创建临时JSON文件
+    //         PsiFile tempPsiFile = PsiFileFactory.getInstance(originalPsiFile.getProject())
+    //             .createFileFromText("temp.json", JsonFileType.INSTANCE, jsonText);
+    //
 
     /**
      * 构造器

@@ -26,7 +26,8 @@
         "scrollDown.svg": "icons/toolwindow/scrollDown.svg",
         "softWrap.svg": "icons/toolwindow/softWrap.svg",
         "switch.svg": "icons/toolwindow/switch.svg",
-        "text.svg": "icons/toolwindow/text.svg"
+        "text.svg": "icons/toolwindow/text.svg",
+        "grid.svg": "icons/toolwindow/grid.svg"
       },
       "structure": {
         "compare_structure.svg": "icons/structure/compare_structure.svg"

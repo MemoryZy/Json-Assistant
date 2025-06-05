@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui.component;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -27,10 +28,10 @@ public class ModernTable extends JBTable {
 
     private void init() {
         initStyle();
-        initWidth();
+        resizeColumns();
     }
 
-    public void initWidth() {
+    public void resizeColumns() {
         // 获取列模型
         TableColumnModel columnModel = getColumnModel();
         if (columnModel.getColumnCount() == 0) {
@@ -52,7 +53,7 @@ public class ModernTable extends JBTable {
 
     private void initStyle() {
         // 基础样式配置
-        setShowGrid(false);
+        setShowGrid(true);
         setRowHeight(35);
         setIntercellSpacing(new Dimension(0, 0));
         setSelectionBackground(new JBColor(new Color(220, 240, 255), new Color(70, 130, 180)));
@@ -61,13 +62,57 @@ public class ModernTable extends JBTable {
         // 自定义渲染器
         setDefaultRenderer(Object.class, new ModernTableCellRenderer());
 
+        // 4. 设置序号列（第一列）为小宽度+灰色
+        setupSequenceColumn();
+
         // 表头样式
         JTableHeader header = getTableHeader();
+        header.setReorderingAllowed(true);
+        header.setBorder(JBUI.Borders.empty(0,1,1,1));
         header.setFont(header.getFont().deriveFont(Font.BOLD));
-        header.setBackground(new JBColor(Gray._239, new Color(45, 45, 47)));
-        header.setForeground(new JBColor(Gray._80, new Color(188, 190, 196)));
-        header.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, new JBColor(Gray._220, new Color(45, 45, 47))));
+        header.setBackground(new JBColor(Gray._239, new Color(69, 72, 74)));
         header.setPreferredSize(new Dimension(header.getWidth(), 45));
+    }
+
+
+    private void setupSequenceColumn() {
+        if (getColumnCount() == 0) return;
+
+        // 应用渲染器到序号列
+        getColumnModel().getColumn(0).setCellRenderer(createSequenceRenderer());
+
+        // 3. 强制刷新组件
+        revalidate();
+        repaint();
+        if (getTableHeader() != null) {
+            getTableHeader().repaint();
+        }
+    }
+
+
+    private TableCellRenderer createSequenceRenderer() {
+        return new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus,
+                                                           int row, int column) {
+
+                // 调用父类方法创建默认组件
+                Component comp = super.getTableCellRendererComponent(
+                        table, value, isSelected, hasFocus, row, column);
+
+                // 仅针对序号列进行处理
+                if (column == 0) {
+                    // 强制居中
+                    ((JLabel) comp).setHorizontalAlignment(SwingConstants.CENTER);
+
+                    // 强制设置灰色 - 使用固定值确保生效
+                    comp.setForeground(JBColor.GRAY);
+                }
+
+                return comp;
+            }
+        };
     }
 
     static class ModernTableCellRenderer extends DefaultTableCellRenderer {

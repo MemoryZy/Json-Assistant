@@ -39,7 +39,7 @@ public class JsonGridToolWindowAction extends DumbAwareAction implements UpdateI
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.grid.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.grid.description"));
-        presentation.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE);
+        presentation.setIcon(JsonAssistantIcons.ToolWindow.GRID);
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt G"), simpleToolWindowPanel);
     }
 

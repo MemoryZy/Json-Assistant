@@ -59,12 +59,12 @@ public class JsonGridComponentProvider {
 
     public void rebuildTable(JsonWrapper wrapper) {
         table.setModel(createTableModel(wrapper));
-        table.initWidth();
+        table.resizeColumns();
         UIUtils.repaintComponent(table);
     }
 
     private DefaultTableModel createObjectTable(ObjectWrapper wrapper) {
-        String[] columns = {" ", chineseLocale ? "键" : "Key", chineseLocale ? "值" : "Value"};
+        String[] columns = {" ", "Key", "Value"};
         DefaultTableModel tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
