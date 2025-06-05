@@ -6,6 +6,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.PluginDetail;
 import cn.memoryzy.json.model.PluginUpdateDetail;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -92,6 +93,11 @@ public class PlatformUtil {
 
     public static PsiFile getPsiFile(Project project, Document document) {
         return PsiDocumentManager.getInstance(project).getPsiFile(document);
+    }
+
+    public static PsiFile getPsiFile(Project project, Editor editor) {
+        if (null == editor) return null;
+        return PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
     }
 
     public static PsiFile getPsiFile(DataContext dataContext, Document document) {
@@ -556,7 +562,8 @@ public class PlatformUtil {
     public static List<PluginUpdateDetail> getPluginUpdateDetail() {
         try {
             String json = HttpUtil.get(Urls.PLUGIN_UPDATE_DETAILS_LINK, StandardCharsets.UTF_8);
-            List<PluginUpdateDetail> pluginUpdateDetails = JsonUtil.MAPPER.readValue(json, new TypeReference<>() {});
+            List<PluginUpdateDetail> pluginUpdateDetails = JsonUtil.MAPPER.readValue(json, new TypeReference<>() {
+            });
             pluginUpdateDetails.sort(Comparator.comparingLong(PluginUpdateDetail::getCdate).reversed());
             pluginUpdateDetails.forEach(PlatformUtil::resolveMultiLocaleChangeNotes);
             return pluginUpdateDetails;
@@ -570,5 +577,25 @@ public class PlatformUtil {
         ImmutablePair<String, String> pair = Notifications.distinguishChineseAndEnglishChangeNote(detail.getNotes());
         detail.setZhNotes(pair.left);
         detail.setEnNotes(pair.right);
+    }
+
+
+    /**
+     * 获取编辑器及文件上下文信息
+     *
+     * @param project 项目
+     * @param editor  编辑器
+     * @return 上下文
+     */
+    public static EditorContext getEditorContext(Project project, Editor editor) {
+        EditorContext editorContext = new EditorContext();
+        if (null == project || null == editor) return editorContext;
+
+        editorContext.setEditor(editor);
+        PsiFile psiFile = getPsiFile(project, editor);
+        if (null == psiFile) return editorContext;
+
+        // 如果是内存文件，那 VirtualFile 为空
+        return editorContext.setPsiFile(psiFile).setFile(psiFile.getVirtualFile());
     }
 }

@@ -10,11 +10,11 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.model.EditorInitData;
 import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.model.JsonEntry;
-import cn.memoryzy.json.model.StructureConfig;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
@@ -27,7 +27,6 @@ import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.*;
-import cn.memoryzy.json.util.UIManager;
 import com.google.common.collect.Lists;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationAction;
@@ -120,7 +119,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         // 卡片面板
         JPanel cardPanel = new JPanel(cardLayout);
 
-        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, StructureConfig.of(false, 3));
+        StructureSetting setting = new StructureSetting().setNeedBorder(false).setNeedToolbar(true).setExpandLevel(3);
+        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, setting);
         JsonQueryComponentProvider queryProvider = new JsonQueryComponentProvider(project);
         JsonGridComponentProvider gridProvider = new JsonGridComponentProvider(null);
         Disposer.register(this, queryProvider);
@@ -140,15 +140,15 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         resizeTreeFont(treeProvider);
 
         // 添加 Json 编辑器
-        cardPanel.add(editorComponent, UIManager.JSON_EDITOR_CARD_NAME);
+        cardPanel.add(editorComponent, UIUtils.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树
-        cardPanel.add(treeComponent, UIManager.JSON_TREE_CARD_NAME);
+        cardPanel.add(treeComponent, UIUtils.JSON_TREE_CARD_NAME);
         // 添加 Json 查询界面
-        cardPanel.add(queryComponent, UIManager.JSON_QUERY_CARD_NAME);
+        cardPanel.add(queryComponent, UIUtils.JSON_QUERY_CARD_NAME);
         // 添加 表格 界面
-        cardPanel.add(tableComponent, UIManager.JSON_GRID_CARD_NAME);
+        cardPanel.add(tableComponent, UIUtils.JSON_GRID_CARD_NAME);
         // 默认显示编辑器
-        cardLayout.show(cardPanel, UIManager.JSON_EDITOR_CARD_NAME);
+        cardLayout.show(cardPanel, UIUtils.JSON_EDITOR_CARD_NAME);
         // 添加到面板
         rootPanel.add(cardPanel, BorderLayout.CENTER);
 
@@ -270,7 +270,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                 .registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl S"), editor.getComponent());
 
         JComponent component = editor.getComponent();
-        component.setFont(UIManager.consolasFont(15));
+        component.setFont(UIUtils.consolasFont(15));
         component.setBorder(JBUI.Borders.customLine(editor.getBackgroundColor(), 0, 4, 0, 0));
 
         // 切换软换行状态
@@ -527,7 +527,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> {
             settings.setLineNumbersShown(display);
             editor.reinitSettings();
-            UIManager.repaintEditor(editor);
+            UIUtils.repaintEditor(editor);
         });
     }
 
@@ -555,7 +555,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         editor.getComponent().setBorder(JBUI.Borders.customLine(editor.getBackgroundColor(), 0, 4, 0, 0));
 
-        UIManager.repaintEditor(editor);
+        UIUtils.repaintEditor(editor);
     }
 
 
@@ -571,7 +571,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> {
             settings.setFoldingOutlineShown(show);
             editor.reinitSettings();
-            UIManager.repaintEditor(editor);
+            UIUtils.repaintEditor(editor);
         });
     }
 
@@ -638,7 +638,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                 int newLineCount = document.getLineCount();
                 if (lastLineCount != newLineCount) {
                     lastLineCount = newLineCount;
-                    UIManager.repaintEditor(editor);
+                    UIUtils.repaintEditor(editor);
                 }
 
             } catch (Error error) {

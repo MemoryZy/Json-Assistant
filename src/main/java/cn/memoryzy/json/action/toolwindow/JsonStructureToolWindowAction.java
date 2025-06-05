@@ -8,7 +8,6 @@ import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -44,7 +43,13 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
 
         editorData.setParseComment(true);
         String json = GlobalJsonConverter.parseJson(context, editorData);
-        JsonStructureAction.show(event.getDataContext(), json, JsonUtil.canResolveToJson(json), StructureActionSource.TOOLWINDOW_TOOLBAR, false);
+        JsonStructureAction.show(
+                event.getDataContext(),
+                editor,
+                json,
+                GlobalJsonConverter.isValidJson(context.getProcessor()),
+                StructureActionSource.TOOLWINDOW_TOOLBAR,
+                false);
     }
 
     @Override

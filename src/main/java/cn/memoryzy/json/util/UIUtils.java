@@ -5,7 +5,6 @@ import cn.memoryzy.json.constant.PluginConstant;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.notification.impl.NotificationsManagerImpl;
-import com.intellij.openapi.Disposable;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
@@ -50,11 +49,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/7/30
  */
-public class UIManager implements Disposable {
-
-    public static UIManager getInstance() {
-        return new UIManager();
-    }
+public class UIUtils {
 
     /**
      * Json 编辑器卡片名称
@@ -76,9 +71,6 @@ public class UIManager implements Disposable {
      */
     public static final String JSON_GRID_CARD_NAME = "grid";
 
-    @Override
-    public void dispose() {
-    }
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -124,7 +116,7 @@ public class UIManager implements Disposable {
         // 展开二级节点
         for (Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-            UIManager.expandAll(tree, new TreePath(node.getPath()));
+            UIUtils.expandAll(tree, new TreePath(node.getPath()));
         }
     }
 
@@ -161,7 +153,7 @@ public class UIManager implements Disposable {
         // 折叠二级节点
         for (Enumeration<?> e = root.children(); e.hasMoreElements(); ) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) e.nextElement();
-            UIManager.collapseAll(tree, new TreePath(node.getPath()));
+            UIUtils.collapseAll(tree, new TreePath(node.getPath()));
         }
     }
 

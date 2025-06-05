@@ -6,7 +6,7 @@ import cn.memoryzy.json.enums.JsonQuerySchema;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.QueryState;
 import cn.memoryzy.json.ui.panel.SearchWrapper;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.find.FindBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
@@ -58,7 +58,7 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
                 .setResizable(false)
                 .setRequestFocus(true)
                 .setItemChosenCallback(item -> {
-                    UIManager.setText(searchTextField, item);
+                    UIUtils.setText(searchTextField, item);
                     IdeFocusManager.getGlobalInstance().requestFocus(searchTextField, false);
                 })
                 .createPopup()

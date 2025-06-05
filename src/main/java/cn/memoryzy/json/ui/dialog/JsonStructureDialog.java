@@ -2,7 +2,8 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.StructureConfig;
+import cn.memoryzy.json.model.EditorContext;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,10 +27,12 @@ public class JsonStructureDialog extends DialogWrapper {
 
     private Tree tree;
     private final JsonWrapper wrapper;
+    private final EditorContext editorContext;
 
-    public JsonStructureDialog(JsonWrapper wrapper) {
+    public JsonStructureDialog(JsonWrapper wrapper, EditorContext editorContext) {
         super((Project) null, true);
         this.wrapper = wrapper;
+        this.editorContext = editorContext;
 
         setModal(false);
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.structure.title"));
@@ -39,7 +42,7 @@ public class JsonStructureDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        JsonStructureComponentProvider componentProvider = new JsonStructureComponentProvider(wrapper, getRootPane(), StructureConfig.of(true, 2));
+        JsonStructureComponentProvider componentProvider = new JsonStructureComponentProvider(wrapper, getRootPane(), getStructureSetting());
         tree = componentProvider.getTree();
         JPanel rootPanel = componentProvider.getTreeComponent();
         rootPanel.setPreferredSize(new Dimension(400, 470));
@@ -67,6 +70,10 @@ public class JsonStructureDialog extends DialogWrapper {
     @Override
     public void show() {
         ApplicationManager.getApplication().invokeLater(super::show);
+    }
+
+    private StructureSetting getStructureSetting() {
+        return new StructureSetting().setNeedBorder(true).setNeedToolbar(true).setExpandLevel(2).setEditorContext(editorContext);
     }
 
 }

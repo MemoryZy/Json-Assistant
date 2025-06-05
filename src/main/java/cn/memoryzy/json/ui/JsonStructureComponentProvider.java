@@ -5,7 +5,8 @@ import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.model.StructureConfig;
+import cn.memoryzy.json.model.EditorContext;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
@@ -14,7 +15,7 @@ import cn.memoryzy.json.service.persistent.state.StructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
@@ -46,6 +47,7 @@ public class JsonStructureComponentProvider {
     private JPanel treeComponent;
     private Object hoverNode;
     private final StructureState structureState;
+    private @Nullable EditorContext editorContext;
 
     // TODO 尝试按需解析，初始只解析到第2层级，展开节点时动态加载子树（类似IDE的大文件处理）
 
@@ -56,11 +58,12 @@ public class JsonStructureComponentProvider {
      *
      * @param wrapper   JSON 结构
      * @param component 注册快捷键的组件
-     * @param config    配置
+     * @param setting   配置
      */
-    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
+    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
         this.structureState = JsonAssistantPersistentState.getInstance().structureState;
-        init(wrapper, component, config);
+        this.editorContext = setting.getEditorContext();
+        init(wrapper, component, setting);
     }
 
     /**
@@ -68,9 +71,9 @@ public class JsonStructureComponentProvider {
      *
      * @param wrapper   JSON 结构
      * @param component 注册快捷键的组件
-     * @param config    配置
+     * @param setting    配置
      */
-    private void init(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
+    private void init(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
         JsonTreeNode rootNode = new JsonTreeNode("root");
         // 允许在后面再进行树的构建
         if (wrapper != null) {
@@ -83,7 +86,7 @@ public class JsonStructureComponentProvider {
         tree = new Tree(new DefaultTreeModel(rootNode));
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
-        tree.setFont(UIManager.jetBrainsMonoFont(12));
+        tree.setFont(UIUtils.jetBrainsMonoFont(12));
         tree.setCellRenderer(new StyleTreeCellRenderer());
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
         tree.addMouseMotionListener(new MouseAdapter() {
@@ -99,9 +102,9 @@ public class JsonStructureComponentProvider {
         new TreeSpeedSearch(tree);
 
         ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree);
-        if (config.isNeedToolbar()) {
-            if (config.isNeedRefresh()) {
-                decorator.addExtraAction(AnActionButton.fromAction(new RefreshStructureAction(this, config.getFile())));
+        if (setting.isNeedToolbar()) {
+            if (setting.isNeedRefresh()) {
+                decorator.addExtraAction(AnActionButton.fromAction(new RefreshStructureAction(this, setting.getFile())));
             }
 
             decorator.addExtraAction(new ExpandAllAction(tree, component, true))
@@ -111,18 +114,19 @@ public class JsonStructureComponentProvider {
             decorator.setPanelBorder(JBUI.Borders.empty());
         }
 
-        if (!config.isNeedBorder()) {
+        if (!setting.isNeedBorder()) {
             // 去除边框
             decorator.setPanelBorder(JBUI.Borders.empty(0, 1))
                     .setScrollPaneBorder(JBUI.Borders.empty(0, 1));
         }
 
-        UIManager.expandSpecifiedLevelNode(tree, config.getExpandLevel());
+        UIUtils.expandSpecifiedLevelNode(tree, setting.getExpandLevel());
 
         this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
     }
 
-    public void rebuildTree(JsonWrapper wrapper, int expandLevel) {
+    public void rebuildTree(JsonWrapper wrapper, int expandLevel, EditorContext editorContext) {
+        this.editorContext = editorContext;
         JsonTreeNode rootNode = new JsonTreeNode("root");
         if (wrapper != null) {
             convertToTreeNode(wrapper, rootNode);
@@ -131,10 +135,10 @@ public class JsonStructureComponentProvider {
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         model.setRoot(rootNode);
 
-        UIManager.repaintComponent(tree);
+        UIUtils.repaintComponent(tree);
 
         // 默认展开前3级节点
-        UIManager.expandSpecifiedLevelNode(tree, expandLevel);
+        UIUtils.expandSpecifiedLevelNode(tree, expandLevel);
     }
 
     private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {

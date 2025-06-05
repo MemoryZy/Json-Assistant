@@ -7,7 +7,7 @@ import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.ui.component.ModernTable;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
@@ -60,7 +60,7 @@ public class JsonGridComponentProvider {
     public void rebuildTable(JsonWrapper wrapper) {
         table.setModel(createTableModel(wrapper));
         table.initWidth();
-        UIManager.repaintComponent(table);
+        UIUtils.repaintComponent(table);
     }
 
     private DefaultTableModel createObjectTable(ObjectWrapper wrapper) {

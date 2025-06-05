@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.decorator;
 
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
@@ -40,9 +40,9 @@ public class TextEditorErrorPopupDecorator {
 
     private void initTextFieldListener() {
         if (myTextField instanceof JTextField) {
-            UIManager.addRemoveErrorListener((JTextField) myTextField);
+            UIUtils.addRemoveErrorListener((JTextField) myTextField);
         } else if (myTextField instanceof EditorTextField) {
-            UIManager.addRemoveErrorListener((EditorTextField) myTextField);
+            UIUtils.addRemoveErrorListener((EditorTextField) myTextField);
         }
     }
 
@@ -120,7 +120,7 @@ public class TextEditorErrorPopupDecorator {
     }
 
     public void setErrorBorder() {
-        UIManager.addErrorBorder(myTextField);
+        UIUtils.addErrorBorder(myTextField);
     }
 
 }

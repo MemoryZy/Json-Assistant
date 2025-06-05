@@ -11,7 +11,7 @@ import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -101,7 +101,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
                     if (!Disposer.isDisposed(content)) {
                         if (StrUtil.isBlank(textField.getText())) {
                             // 将输入框边框红色，以示警告
-                            UIManager.addErrorBorder(textField);
+                            UIUtils.addErrorBorder(textField);
                             return;
                         }
 
@@ -115,7 +115,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
             }
         });
 
-        UIManager.addRemoveErrorListener(textField);
+        UIUtils.addRemoveErrorListener(textField);
         balloon.show(new RelativePoint(baseLabel, new Point(baseLabel.getWidth() / 2, baseLabel.getHeight())), Balloon.Position.above);
     }
 

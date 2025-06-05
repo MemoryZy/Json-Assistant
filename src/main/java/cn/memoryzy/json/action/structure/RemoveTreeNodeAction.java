@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -29,7 +29,7 @@ public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBac
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             // 记录树节点展开状态
-            Map<TreePath, Boolean> expandedStates = UIManager.recordExpandedStates(tree);
+            Map<TreePath, Boolean> expandedStates = UIUtils.recordExpandedStates(tree);
 
             for (TreePath path : paths) {
                 JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
@@ -42,7 +42,7 @@ public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBac
             ((DefaultTreeModel) tree.getModel()).reload();
 
             // 恢复树节点展开状态
-            UIManager.restoreExpandedStates(tree, expandedStates);
+            UIUtils.restoreExpandedStates(tree, expandedStates);
         }
     }
 

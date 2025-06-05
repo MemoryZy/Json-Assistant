@@ -12,7 +12,7 @@ import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -121,7 +121,7 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         // 如果是JSON5，即保留注释
         String value = isJson5 ? originalText : jsonString;
         this.showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, value, true);
-        this.showTextField.setFont(UIManager.consolasFont(13));
+        this.showTextField.setFont(UIUtils.consolasFont(13));
         this.showTextField.addNotify();
 
         if (isJson5) {

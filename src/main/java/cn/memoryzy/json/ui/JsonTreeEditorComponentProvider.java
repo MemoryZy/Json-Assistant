@@ -1,13 +1,14 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.StructureConfig;
+import cn.memoryzy.json.model.EditorContext;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
@@ -31,8 +32,13 @@ public class JsonTreeEditorComponentProvider {
         this.virtualFile = virtualFile;
         this.componentProvider = new JsonStructureComponentProvider(
                 null,
-                UIManager.getWindowComponent(project),
-                StructureConfig.of(false, 3, true, virtualFile));
+                UIUtils.getWindowComponent(project),
+                new StructureSetting()
+                        .setNeedBorder(false)
+                        .setNeedToolbar(true)
+                        .setExpandLevel(3)
+                        .setNeedRefresh(true)
+                        .setFile(virtualFile));
     }
 
     public JComponent getComponent() {
@@ -60,7 +66,8 @@ public class JsonTreeEditorComponentProvider {
     }
 
     public void compareAndRefresh(Project project, VirtualFile file) {
-        String text = Optional.ofNullable(PlatformUtil.getEditor(project, file))
+        EditorEx editor = PlatformUtil.getEditor(project, file);
+        String text = Optional.ofNullable(editor)
                 .map(EditorEx::getDocument)
                 .map(DocumentEx::getText)
                 .orElse(null);
@@ -73,6 +80,9 @@ public class JsonTreeEditorComponentProvider {
             return;
         }
 
+        // 获取编辑器及文件上下文
+        EditorContext editorContext = PlatformUtil.getEditorContext(project, editor);
+
         // 判断是否有子节点
         JsonWrapper newWrapper = getJsonWrapper(text);
         if (newWrapper == null) {
@@ -84,7 +94,7 @@ public class JsonTreeEditorComponentProvider {
         int childCount = rootNode.getChildCount();
         if (childCount == 0) {
             // 初次加载
-            componentProvider.rebuildTree(newWrapper, 3);
+            componentProvider.rebuildTree(newWrapper, 3, editorContext);
 
         } else {
             // 结构相同无需操作，不同则重建树
@@ -92,7 +102,7 @@ public class JsonTreeEditorComponentProvider {
 
             // 结构不同，重构树
             if (!Objects.equals(oldWrapper, newWrapper)) {
-                componentProvider.rebuildTree(newWrapper, 3);
+                componentProvider.rebuildTree(newWrapper, 3, editorContext);
             }
         }
     }

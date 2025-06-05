@@ -22,6 +22,9 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        // 1.获取树所关联的源文件的 PsiFile 、Editor、VirtualFile
+
+
 
     }
 }

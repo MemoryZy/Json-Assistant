@@ -14,7 +14,7 @@ import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
@@ -72,12 +72,12 @@ public class JsonHistoryListChooser extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
-        showTextField.setFont(UIManager.consolasFont(14));
+        showTextField.setFont(UIUtils.consolasFont(14));
         // 通知创建Editor
         showTextField.addNotify();
 
         showList = new JBList<>(fillHistoryListModel());
-        showList.setFont(UIManager.jetBrainsMonoFont(13));
+        showList.setFont(UIUtils.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new StyleListCellRenderer());
@@ -100,13 +100,13 @@ public class JsonHistoryListChooser extends DialogWrapper {
         // 默认选中第一条
         selectFirstItemInList();
 
-        UIManager.updateComponentColorsScheme(showList);
-        UIManager.updateComponentColorsScheme(showTextField);
+        UIUtils.updateComponentColorsScheme(showList);
+        UIUtils.updateComponentColorsScheme(showTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
-        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, JsonEntry::getShortText, true));
+        borderLayoutPanel.addToCenter(UIUtils.wrapListWithFilter(showList, JsonEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
-        UIManager.rebuildListWithFilter(showList);
+        UIUtils.rebuildListWithFilter(showList);
 
         JBSplitter splitter = new JBSplitter(true, 0.3f);
         splitter.setFirstComponent(borderLayoutPanel);
@@ -222,7 +222,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
                         new JsonHistoryTreeChooser.NameValidator(JsonHistoryPersistentState.getInstance(project).getHistory()));
                 if (StrUtil.isNotBlank(newName)) {
                     selectedValue.setName(newName);
-                    UIManager.repaintComponent(showList);
+                    UIUtils.repaintComponent(showList);
                 }
             }
         }
@@ -284,7 +284,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
                 }
             }
 
-            UIManager.rebuildListWithFilter(showList);
+            UIUtils.rebuildListWithFilter(showList);
         }
 
         @Override
@@ -319,7 +319,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
                 if (lastLineCount != newLineCount) {
                     lastLineCount = newLineCount;
                     Editor editor = showTextField.getEditor();
-                    UIManager.repaintEditor(Objects.requireNonNull(editor));
+                    UIUtils.repaintEditor(Objects.requireNonNull(editor));
                 }
             }
         }

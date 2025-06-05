@@ -7,7 +7,7 @@ import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -56,10 +56,10 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
-        showTextField.setFont(UIManager.consolasFont(14));
+        showTextField.setFont(UIUtils.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
-        showList.setFont(UIManager.jetBrainsMonoFont(13));
+        showList.setFont(UIUtils.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());
@@ -71,15 +71,15 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         // 默认选中第一条
         selectFirstItemInList();
 
-        UIManager.updateComponentColorsScheme(showList);
-        UIManager.updateComponentColorsScheme(showTextField);
+        UIUtils.updateComponentColorsScheme(showList);
+        UIUtils.updateComponentColorsScheme(showTextField);
 
         JBLabel label = new JBLabel();
         label.setFont(JBFont.label().deriveFont(13F));
         label.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint")));
         label.setBorder(JBUI.Borders.emptyBottom(10));
 
-        JComponent wrapComponent = UIManager.wrapListWithFilter(showList, YamlDocEntry::getShortText, true);
+        JComponent wrapComponent = UIUtils.wrapListWithFilter(showList, YamlDocEntry::getShortText, true);
         rebuildListWithFilter();
 
         JPanel firstPanel = new JPanel(new BorderLayout());

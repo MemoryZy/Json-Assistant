@@ -6,6 +6,7 @@ import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.enums.TreeDisplayMode;
+import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
@@ -49,12 +50,13 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void actionPerformed(@NotNull AnActionEvent event) {
         DataContext dataContext = event.getDataContext();
         Editor editor = PlatformUtil.getEditor(dataContext);
 
         // 如果是标记的编辑器，那么就用弹窗
-        boolean editorFlag = Boolean.TRUE.equals(editor.getUserData(JsonQueryComponentProvider.EDITOR_FLAG));
+        boolean queryEditorFlag = Boolean.TRUE.equals(editor.getUserData(JsonQueryComponentProvider.QUERY_EDITOR_FLAG));
         ToolWindow toolWindow = PlatformDataKeys.TOOL_WINDOW.getData(dataContext);
         StructureActionSource source =
                 Objects.nonNull(toolWindow) && PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID.equals(toolWindow.getId())
@@ -67,16 +69,34 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
         editorData.setParseComment(true);
         String json = GlobalJsonConverter.parseJson(context, editorData);
-        show(dataContext, json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, editorFlag);
+        show(dataContext, editor, json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, queryEditorFlag);
     }
 
 
-    public static void show(DataContext dataContext, String text, boolean isJson, StructureActionSource source, boolean editorFlag) {
+    /**
+     * 按设置展示树
+     *
+     * @param dataContext     数据上下文
+     * @param text            JSON文本
+     * @param isJson          是否为JSON格式、反之为JSON5
+     * @param source          事件触发来源
+     * @param queryEditorFlag 是否为查询界面的编辑器
+     */
+    public static void show(DataContext dataContext,
+                            Editor editor,
+                            String text,
+                            boolean isJson,
+                            StructureActionSource source,
+                            boolean queryEditorFlag) {
+
         Project project = dataContext.getData(CommonDataKeys.PROJECT);
+        // 获取编辑器及文件上下文
+        EditorContext editorContext = PlatformUtil.getEditorContext(project, editor);
+        // 解析 JSON
         JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parseWithComment(text);
 
         TreeDisplayMode treeDisplayMode;
-        if (editorFlag) {
+        if (queryEditorFlag) {
             treeDisplayMode = TreeDisplayMode.POPUP;
         } else {
             JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
@@ -86,19 +106,24 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
         if (treeDisplayMode == TreeDisplayMode.POPUP) {
             // 弹窗展示
-            new JsonStructureDialog(jsonWrapper).show();
+            new JsonStructureDialog(jsonWrapper, editorContext).show();
 
         } else if (treeDisplayMode == TreeDisplayMode.ORIGINAL_TOOLWINDOW) {
             // 在旧窗口展示
-            showInOriginalToolWindow(project, jsonWrapper, source, UIManager.JSON_TREE_CARD_NAME);
+            showInOriginalToolWindow(project, editorContext, jsonWrapper, source, UIUtils.JSON_TREE_CARD_NAME);
 
         } else {
             // 在新辅助窗口展示
-            showInAuxiliaryToolWindow(project, jsonWrapper);
+            showInAuxiliaryToolWindow(project, jsonWrapper, editorContext);
         }
     }
 
-    public static void showInOriginalToolWindow(Project project, JsonWrapper jsonWrapper, StructureActionSource source, String cardName) {
+    public static void showInOriginalToolWindow(Project project,
+                                                EditorContext editorContext,
+                                                JsonWrapper jsonWrapper,
+                                                StructureActionSource source,
+                                                String cardName) {
+
         // 原本的工具窗口窗口（Json Assistant）展示
         ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantToolWindow(project);
 
@@ -122,17 +147,17 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
         }
 
         // 获取标签页的面板，切换卡片
-        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, cardName));
+        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, editorContext, cardName));
 
         // 打开窗口
         toolWindow.show();
     }
 
-    public static void showInAuxiliaryToolWindow(Project project, JsonWrapper jsonWrapper) {
+    public static void showInAuxiliaryToolWindow(Project project, JsonWrapper jsonWrapper, EditorContext editorContext) {
         // 新开工具窗口展示
         AuxiliaryTreeToolWindowManager manager = AuxiliaryTreeToolWindowManager.getInstance(project);
         // 转换并展示
-        manager.convertAndShow(jsonWrapper);
+        manager.convertAndShow(jsonWrapper, editorContext);
     }
 
 }

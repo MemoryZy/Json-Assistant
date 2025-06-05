@@ -11,7 +11,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -51,6 +51,6 @@ public class JsonGridAction extends DumbAwareAction implements UpdateInBackgroun
         String json = GlobalJsonConverter.parseJson(context, editorData);
         boolean isJson = GlobalJsonConverter.isValidJson(context.getProcessor());
         JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(json)) : Json5Util.parseWithComment(json);
-        JsonStructureAction.showInOriginalToolWindow(getEventProject(e), jsonWrapper, source, UIManager.JSON_GRID_CARD_NAME);
+        JsonStructureAction.showInOriginalToolWindow(getEventProject(e), null, jsonWrapper, source, UIUtils.JSON_GRID_CARD_NAME);
     }
 }

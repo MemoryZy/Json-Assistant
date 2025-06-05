@@ -11,7 +11,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -52,7 +52,7 @@ public class JsonGridToolWindowAction extends DumbAwareAction implements UpdateI
         String json = GlobalJsonConverter.parseJson(context, editorData);
         boolean isJson = GlobalJsonConverter.isValidJson(context.getProcessor());
         JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(json)) : Json5Util.parseWithComment(json);
-        JsonStructureAction.showInOriginalToolWindow(getEventProject(e), jsonWrapper, StructureActionSource.TOOLWINDOW_TOOLBAR, UIManager.JSON_GRID_CARD_NAME);
+        JsonStructureAction.showInOriginalToolWindow(getEventProject(e), null, jsonWrapper, StructureActionSource.TOOLWINDOW_TOOLBAR, UIUtils.JSON_GRID_CARD_NAME);
     }
 
     @Override

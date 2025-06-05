@@ -27,7 +27,6 @@ import cn.memoryzy.json.ui.component.ActionGroupPopupButton;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.*;
-import cn.memoryzy.json.util.UIManager;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -146,7 +145,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(optionPanel);
 
         jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
-        jsonTextField.setFont(UIManager.consolasFont(15));
+        jsonTextField.setFont(UIUtils.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());

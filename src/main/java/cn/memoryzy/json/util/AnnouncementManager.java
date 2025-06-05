@@ -42,7 +42,7 @@ public class AnnouncementManager {
 
     private static final Logger LOG = Logger.getInstance(AnnouncementManager.class);
 
-
+    // TODO 需要注意的位置
     public static void scheduleDelayedAnnouncement(@NotNull Project project) {
         Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, Disposer.newDisposable());
 
@@ -50,7 +50,7 @@ public class AnnouncementManager {
             if (!project.isDisposed()) {
                 showAnnouncement(project);
             }
-        }, /*5 * 60 * 1000*/ 100);
+        }, 5 * 60 * 1000);
     }
 
     public static void showAnnouncement(@NotNull Project project) {
@@ -354,6 +354,7 @@ public class AnnouncementManager {
      * 拉取公告内容 (JSON)
      */
     public static List<Announcement> fetchAnnouncements(boolean isChineseLocale) {
+        // TODO 需要注意的位置
         String url = isChineseLocale
                 ? Urls.ANNOUNCEMENTS_SOURCE_GITEE_LINK
                 : Urls.ANNOUNCEMENTS_SOURCE_GITHUB_LINK;

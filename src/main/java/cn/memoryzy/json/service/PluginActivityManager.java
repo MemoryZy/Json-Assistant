@@ -78,6 +78,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     }
 
     public void checkForUpdates() {
+        // TODO 需要注意的位置
         // 获取插件市场的插件信息
         List<PluginUpdateDetail> pluginUpdateDetails = PlatformUtil.getPluginUpdateDetail();
         if (CollUtil.isEmpty(pluginUpdateDetails)) return;

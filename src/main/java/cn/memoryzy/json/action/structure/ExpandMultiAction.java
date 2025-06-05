@@ -4,7 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -30,7 +30,7 @@ public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackgr
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
-                UIManager.expandAll(tree, path);
+                UIUtils.expandAll(tree, path);
             }
         }
     }

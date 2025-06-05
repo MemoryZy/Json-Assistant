@@ -5,6 +5,7 @@ import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.action.toolwindow.RenameTabAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.AuxiliaryTreeToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
@@ -44,11 +45,11 @@ public class AuxiliaryTreeToolWindowManager {
         return project.getService(AuxiliaryTreeToolWindowManager.class);
     }
 
-    public void convertAndShow(JsonWrapper jsonWrapper) {
+    public void convertAndShow(JsonWrapper jsonWrapper, EditorContext editorContext) {
         // 为其分配一个标签页，用于展示
         AuxiliaryTreeToolWindowComponentProvider provider = new AuxiliaryTreeToolWindowComponentProvider(jsonWrapper);
         // 创建标签页
-        createToolWindowContent(provider.createComponent(toolWindow.getComponent()));
+        createToolWindowContent(provider.createComponent(toolWindow.getComponent(), editorContext));
         // 展示
         show();
     }

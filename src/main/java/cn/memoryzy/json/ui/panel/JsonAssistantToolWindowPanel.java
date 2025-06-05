@@ -1,10 +1,11 @@
 package cn.memoryzy.json.ui.panel;
 
+import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonGridComponentProvider;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import org.jetbrains.annotations.NotNull;
@@ -33,16 +34,16 @@ public class JsonAssistantToolWindowPanel extends JPanel {
     /**
      * 切换卡片
      */
-    public void switchToCard(JsonWrapper wrapper, String cardName) {
+    public void switchToCard(JsonWrapper wrapper, EditorContext editorContext, String cardName) {
         cardLayout.toggleCard(cardName);
-        if (Objects.equals(UIManager.JSON_TREE_CARD_NAME, cardName)) {
+        if (Objects.equals(UIUtils.JSON_TREE_CARD_NAME, cardName)) {
             // 重新生成根节点
-            treeProvider.rebuildTree(wrapper, 3);
+            treeProvider.rebuildTree(wrapper, 3, editorContext);
 
-        } else if (Objects.equals(UIManager.JSON_QUERY_CARD_NAME, cardName)) {
+        } else if (Objects.equals(UIUtils.JSON_QUERY_CARD_NAME, cardName)) {
             queryProvider.setDocumentText(editor.getDocument().getText());
 
-        } else if (Objects.equals(UIManager.JSON_GRID_CARD_NAME, cardName)) {
+        } else if (Objects.equals(UIUtils.JSON_GRID_CARD_NAME, cardName)) {
             gridProvider.rebuildTable(wrapper);
         }
     }

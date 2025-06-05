@@ -21,7 +21,7 @@ import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
@@ -82,7 +82,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
-        showTextField.setFont(UIManager.consolasFont(14));
+        showTextField.setFont(UIUtils.consolasFont(14));
         // 通知创建Editor
         showTextField.addNotify();
 
@@ -91,7 +91,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
         tree.setExpandableItemsEnabled(true);
         tree.setRootVisible(false);
         tree.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
-        tree.setFont(UIManager.jetBrainsMonoFont(13));
+        tree.setFont(UIUtils.jetBrainsMonoFont(13));
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.setCellRenderer(new StyleTreeCellRenderer());
         tree.addTreeSelectionListener(new UpdateEditorTreeSelectionListener());
@@ -117,7 +117,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
             }
         }.installOn(tree);
 
-        UIManager.updateComponentColorsScheme(showTextField);
+        UIUtils.updateComponentColorsScheme(showTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
         borderLayoutPanel.addToCenter(decorator.createPanel());
@@ -276,7 +276,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                             new NameValidator(JsonHistoryPersistentState.getInstance(project).getHistory()));
                     if (StrUtil.isNotBlank(newName)) {
                         entry.setName(newName);
-                        UIManager.repaintComponent(tree);
+                        UIUtils.repaintComponent(tree);
                     }
                 }
             }
@@ -319,7 +319,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
             // 刷新Tree
             TreePath selectionPath = tree.getSelectionPath();
             // 记录树节点展开状态
-            Map<TreePath, Boolean> expandedStates = UIManager.recordExpandedStates(tree);
+            Map<TreePath, Boolean> expandedStates = UIUtils.recordExpandedStates(tree);
 
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
             HistoryTreeNode oriRootNode = (HistoryTreeNode) model.getRoot();
@@ -527,7 +527,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                 if (lastLineCount != newLineCount) {
                     lastLineCount = newLineCount;
                     Editor editor = showTextField.getEditor();
-                    UIManager.repaintEditor(Objects.requireNonNull(editor));
+                    UIUtils.repaintEditor(Objects.requireNonNull(editor));
                 }
             }
         }

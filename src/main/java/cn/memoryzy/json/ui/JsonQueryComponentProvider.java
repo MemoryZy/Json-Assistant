@@ -54,7 +54,7 @@ import java.util.Objects;
 public class JsonQueryComponentProvider implements Disposable {
 
     public static final String SPLITTER_PROPORTION_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SplitterProportionKey";
-    public static final Key<Boolean> EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EditorFlag");
+    public static final Key<Boolean> QUERY_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".QueryEditorFlag");
 
     private final Project project;
     private final SearchWrapper searchWrapper;
@@ -212,7 +212,7 @@ public class JsonQueryComponentProvider implements Disposable {
         Editor editor = PlatformUtil.createEditor(project, fileName, FileTypeHolder.JSON5, isViewer, kind, "");
         editor.getSettings().setLineNumbersShown(false);
         // 标记编辑器
-        editor.putUserData(EDITOR_FLAG, true);
+        editor.putUserData(QUERY_EDITOR_FLAG, true);
         return editor;
     }
 

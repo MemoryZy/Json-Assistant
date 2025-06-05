@@ -9,7 +9,7 @@ import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.ui.icon.CircleIcon;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColorPicker;
 import com.intellij.ui.TitledSeparator;
@@ -107,7 +107,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private void configureGeneralComponents() {
         generalLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.general.text"));
         treeDisplayModeTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
-        UIManager.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
+        UIUtils.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
         for (TreeDisplayMode value : TreeDisplayMode.values()) {
             treeDisplayModeBox.addItem(value);
@@ -121,13 +121,13 @@ public class JsonAssistantMainConfigurableComponentProvider {
         attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
 
         includeRandomValuesCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
-        UIManager.setCommentLabel(includeRandomValuesDesc, includeRandomValuesCb, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
+        UIUtils.setCommentLabel(includeRandomValuesDesc, includeRandomValuesCb, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
 
         fastJsonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.text"));
-        UIManager.setCommentLabel(fastJsonDesc, fastJsonCb, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
+        UIUtils.setCommentLabel(fastJsonDesc, fastJsonCb, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
 
         jacksonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
-        UIManager.setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
+        UIUtils.setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
     }
 
     /**
@@ -137,7 +137,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         windowBehaviorLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
 
         recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
-        UIManager.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
+        UIUtils.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
 
         xmlFormatsCb.setText("XML");
         yamlFormatsCb.setText("YAML");
@@ -149,21 +149,21 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
         promptBeforeImportCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
-        UIManager.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
+        UIUtils.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
 
         recognizeOtherFormatsCb.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIManager.controlEnableCheckBox(xmlFormatsCb, true);
-                UIManager.controlEnableCheckBox(yamlFormatsCb, true);
-                UIManager.controlEnableCheckBox(tomlFormatsCb, true);
-                UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
-                UIManager.controlEnableCheckBox(promptBeforeImportCb, true);
+                UIUtils.controlEnableCheckBox(xmlFormatsCb, true);
+                UIUtils.controlEnableCheckBox(yamlFormatsCb, true);
+                UIUtils.controlEnableCheckBox(tomlFormatsCb, true);
+                UIUtils.controlEnableCheckBox(urlParamFormatsCb, true);
+                UIUtils.controlEnableCheckBox(promptBeforeImportCb, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIManager.controlEnableCheckBox(xmlFormatsCb, false);
-                UIManager.controlEnableCheckBox(yamlFormatsCb, false);
-                UIManager.controlEnableCheckBox(tomlFormatsCb, false);
-                UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
-                UIManager.controlEnableCheckBox(promptBeforeImportCb, false);
+                UIUtils.controlEnableCheckBox(xmlFormatsCb, false);
+                UIUtils.controlEnableCheckBox(yamlFormatsCb, false);
+                UIUtils.controlEnableCheckBox(tomlFormatsCb, false);
+                UIUtils.controlEnableCheckBox(urlParamFormatsCb, false);
+                UIUtils.controlEnableCheckBox(promptBeforeImportCb, false);
             }
         });
     }
@@ -186,7 +186,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 backgroundColorBox.addItem(value);
             }
 
-            UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
+            UIUtils.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
 
             // 当有焦点时，表示内部活动完毕，此时才允许用户选择颜色
             backgroundColorBox.addFocusListener(new FocusAdapter() {
@@ -218,7 +218,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                                 selectedLightColor = selectedColor;
                             }
 
-                            UIManager.repaintComponent(backgroundColorBox);
+                            UIUtils.repaintComponent(backgroundColorBox);
                         }
                     }
                 }
@@ -278,7 +278,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         autoStoreHistoryTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
         autoStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
         manualStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.manual.text"));
-        UIManager.setHelpLabel(autoStoreHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
+        UIUtils.setHelpLabel(autoStoreHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
 
         ButtonGroup group = new ButtonGroup();
         group.add(autoStoreRb);
@@ -286,14 +286,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         recordHistory.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIManager.controlEnableRadioButton(autoStoreRb, true);
-                UIManager.controlEnableRadioButton(manualStoreRb, true);
+                UIUtils.controlEnableRadioButton(autoStoreRb, true);
+                UIUtils.controlEnableRadioButton(manualStoreRb, true);
                 if (!historyStyleBox.isEnabled()) {
                     historyStyleBox.setEnabled(true);
                 }
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIManager.controlEnableRadioButton(autoStoreRb, false);
-                UIManager.controlEnableRadioButton(manualStoreRb, false);
+                UIUtils.controlEnableRadioButton(autoStoreRb, false);
+                UIUtils.controlEnableRadioButton(manualStoreRb, false);
                 if (historyStyleBox.isEnabled()) {
                     historyStyleBox.setEnabled(false);
                 }
@@ -357,35 +357,35 @@ public class JsonAssistantMainConfigurableComponentProvider {
         }
 
         if (switchHistory) {
-            UIManager.controlEnableRadioButton(autoStoreRb, true);
-            UIManager.controlEnableRadioButton(manualStoreRb, true);
+            UIUtils.controlEnableRadioButton(autoStoreRb, true);
+            UIUtils.controlEnableRadioButton(manualStoreRb, true);
             if (!historyStyleBox.isEnabled()) {
                 historyStyleBox.setEnabled(true);
             }
         } else {
-            UIManager.controlEnableRadioButton(autoStoreRb, false);
-            UIManager.controlEnableRadioButton(manualStoreRb, false);
+            UIUtils.controlEnableRadioButton(autoStoreRb, false);
+            UIUtils.controlEnableRadioButton(manualStoreRb, false);
             if (historyStyleBox.isEnabled()) {
                 historyStyleBox.setEnabled(false);
             }
         }
 
         if (recognizeOtherFormats) {
-            UIManager.controlEnableCheckBox(xmlFormatsCb, true);
-            UIManager.controlEnableCheckBox(yamlFormatsCb, true);
-            UIManager.controlEnableCheckBox(tomlFormatsCb, true);
-            UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
-            UIManager.controlEnableCheckBox(promptBeforeImportCb, true);
+            UIUtils.controlEnableCheckBox(xmlFormatsCb, true);
+            UIUtils.controlEnableCheckBox(yamlFormatsCb, true);
+            UIUtils.controlEnableCheckBox(tomlFormatsCb, true);
+            UIUtils.controlEnableCheckBox(urlParamFormatsCb, true);
+            UIUtils.controlEnableCheckBox(promptBeforeImportCb, true);
         } else {
-            UIManager.controlEnableCheckBox(xmlFormatsCb, false);
-            UIManager.controlEnableCheckBox(yamlFormatsCb, false);
-            UIManager.controlEnableCheckBox(tomlFormatsCb, false);
-            UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
-            UIManager.controlEnableCheckBox(promptBeforeImportCb, false);
+            UIUtils.controlEnableCheckBox(xmlFormatsCb, false);
+            UIUtils.controlEnableCheckBox(yamlFormatsCb, false);
+            UIUtils.controlEnableCheckBox(tomlFormatsCb, false);
+            UIUtils.controlEnableCheckBox(urlParamFormatsCb, false);
+            UIUtils.controlEnableCheckBox(promptBeforeImportCb, false);
         }
 
         if (isIdea) {
-            UIManager.repaintComponent(backgroundColorBox);
+            UIUtils.repaintComponent(backgroundColorBox);
         }
 
         // 常规

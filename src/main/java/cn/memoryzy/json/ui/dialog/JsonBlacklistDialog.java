@@ -11,7 +11,7 @@ import cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.ListRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
@@ -76,17 +76,17 @@ public class JsonBlacklistDialog extends DialogWrapper {
     protected @Nullable JComponent createCenterPanel() {
         // 原文编辑器
         oriTextField = new ViewerModeLanguageTextEditor(PlainTextLanguage.INSTANCE, project, "", true);
-        oriTextField.setFont(UIManager.consolasFont(13));
+        oriTextField.setFont(UIUtils.consolasFont(13));
         oriTextField.addNotify();
 
         // JSON 编辑器
         jsonTextField = new ViewerModeLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
-        jsonTextField.setFont(UIManager.consolasFont(13));
+        jsonTextField.setFont(UIUtils.consolasFont(13));
         jsonTextField.addNotify();
 
         // List
         showList = new JBList<>(fillBlacklistModel());
-        showList.setFont(UIManager.jetBrainsMonoFont(13));
+        showList.setFont(UIUtils.jetBrainsMonoFont(13));
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.blacklist.empty.text"));
         showList.setCellRenderer(new StyleListCellRenderer());
@@ -94,14 +94,14 @@ public class JsonBlacklistDialog extends DialogWrapper {
 
         selectFirstItemInList();
 
-        UIManager.updateComponentColorsScheme(showList);
-        UIManager.updateComponentColorsScheme(oriTextField);
-        UIManager.updateComponentColorsScheme(jsonTextField);
+        UIUtils.updateComponentColorsScheme(showList);
+        UIUtils.updateComponentColorsScheme(oriTextField);
+        UIUtils.updateComponentColorsScheme(jsonTextField);
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel();
-        borderLayoutPanel.addToCenter(UIManager.wrapListWithFilter(showList, BlacklistEntry::getShortText, true));
+        borderLayoutPanel.addToCenter(UIUtils.wrapListWithFilter(showList, BlacklistEntry::getShortText, true));
         borderLayoutPanel.setBorder(JBUI.Borders.empty(3));
-        UIManager.rebuildListWithFilter(showList);
+        UIUtils.rebuildListWithFilter(showList);
 
         cardPanel.add(oriTextField, ORI_CARD);
         cardPanel.add(jsonTextField, JSON_CARD);
@@ -202,7 +202,7 @@ public class JsonBlacklistDialog extends DialogWrapper {
                 }
             }
 
-            UIManager.rebuildListWithFilter(showList);
+            UIUtils.rebuildListWithFilter(showList);
         }
 
         @Override
@@ -262,14 +262,14 @@ public class JsonBlacklistDialog extends DialogWrapper {
                 int newLineCount = document.getLineCount();
                 if (lastLineCount != newLineCount) {
                     lastLineCount = newLineCount;
-                    UIManager.repaintEditor(Objects.requireNonNull(oriTextField.getEditor()));
+                    UIUtils.repaintEditor(Objects.requireNonNull(oriTextField.getEditor()));
                 }
 
                 Document jsonDocument = jsonTextField.getDocument();
                 int newJsonLineCount = jsonDocument.getLineCount();
                 if (lastJsonLineCount != newJsonLineCount) {
                     lastJsonLineCount = newJsonLineCount;
-                    UIManager.repaintEditor(Objects.requireNonNull(jsonTextField.getEditor()));
+                    UIUtils.repaintEditor(Objects.requireNonNull(jsonTextField.getEditor()));
                 }
             }
         }

@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 import cn.memoryzy.json.util.Json5Util;
@@ -37,12 +38,14 @@ public class RefreshStructureAction extends DumbAwareAction implements UpdateInB
     @Override
     @SuppressWarnings("DataFlowIssue")
     public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = getEventProject(e);
         // 获取 源文本，重新加载页面
-        EditorEx editor = PlatformUtil.getEditor(getEventProject(e), file);
+        EditorEx editor = PlatformUtil.getEditor(project, file);
+        EditorContext editorContext = PlatformUtil.getEditorContext(project, editor);
         String text = editor.getDocument().getText();
 
         JsonWrapper wrapper = JsonUtil.isJson(text) ? JsonUtil.parse(text) : Json5Util.parse(text);
-        provider.rebuildTree(wrapper, 3);
+        provider.rebuildTree(wrapper, 3, editorContext);
     }
 
     @Override
