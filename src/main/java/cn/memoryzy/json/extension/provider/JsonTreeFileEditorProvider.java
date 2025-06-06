@@ -23,7 +23,7 @@ public class JsonTreeFileEditorProvider implements FileEditorProvider {
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return PlatformUtil.isJsonFileType(file.getFileType());
+        return "json".equalsIgnoreCase(file.getExtension()) ||"json5".equalsIgnoreCase(file.getExtension());
     }
 
     @Override
