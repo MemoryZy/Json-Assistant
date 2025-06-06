@@ -64,6 +64,15 @@ public class StructureSetting {
         return this;
     }
 
+    public boolean isLazyLoad() {
+        return viewConfig.isLazyLoad();
+    }
+
+    public StructureSetting setLazyLoad(boolean lazyLoad) {
+        viewConfig.setLazyLoad(lazyLoad);
+        return this;
+    }
+
     // ------------------- EditorContext 属性代理 -------------------
 
     public Editor getEditor() {
