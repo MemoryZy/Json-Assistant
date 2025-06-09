@@ -43,10 +43,16 @@ import java.util.Objects;
  */
 public class JsonStructureComponentProvider {
 
-    private Tree tree;
-    private JPanel treeComponent;
+    private final Tree tree;
+    private final JPanel treeComponent;
     private Object hoverNode;
     private final StructureState structureState;
+    private final StructureSetting setting;
+
+    /**
+     * 是否已初始化完毕
+     */
+    private boolean initializationDone;
 
     /**
      * 上下文或上下文内的内容都可能是null
@@ -73,8 +79,15 @@ public class JsonStructureComponentProvider {
      */
     public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
         this.structureState = JsonAssistantPersistentState.getInstance().structureState;
+        this.setting = setting;
         this.editorContext = setting.getEditorContext();
-        init(wrapper, component, setting);
+        this.tree = new Tree(new DefaultTreeModel(new JsonTreeNode("root")));
+        this.treeComponent = new JPanel(new BorderLayout());
+
+        if (!setting.isLazyLoad()) {
+            component = null == component ? treeComponent : component;
+            init(wrapper, component, setting);
+        }
     }
 
     /**
@@ -82,19 +95,16 @@ public class JsonStructureComponentProvider {
      *
      * @param wrapper   JSON 结构
      * @param component 注册快捷键的组件
-     * @param setting    配置
+     * @param setting   配置
      */
     private void init(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
-        JsonTreeNode rootNode = new JsonTreeNode("root");
+        JsonTreeNode rootNode = (JsonTreeNode) tree.getModel().getRoot();
         // 允许在后面再进行树的构建
         if (wrapper != null) {
             convertToTreeNode(wrapper, rootNode);
         }
 
         // 构建树
-        this.treeComponent = new JPanel(new BorderLayout());
-
-        tree = new Tree(new DefaultTreeModel(rootNode));
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
         tree.setFont(UIUtils.jetBrainsMonoFont(12));
@@ -134,22 +144,32 @@ public class JsonStructureComponentProvider {
         UIUtils.expandSpecifiedLevelNode(tree, setting.getExpandLevel());
 
         this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
+
+        // 设置初始化完毕
+        initializationDone = true;
     }
 
     public void rebuildTree(JsonWrapper wrapper, int expandLevel, EditorContext editorContext) {
         this.editorContext = editorContext;
-        JsonTreeNode rootNode = new JsonTreeNode("root");
-        if (wrapper != null) {
-            convertToTreeNode(wrapper, rootNode);
+        this.setting.setExpandLevel(expandLevel);
+
+        // 之前因为懒加载没有执行样式加载，这里进行
+        if (!initializationDone && setting.isLazyLoad()) {
+            init(wrapper, treeComponent, setting);
+        } else {
+            JsonTreeNode rootNode = new JsonTreeNode("root");
+            if (wrapper != null) {
+                convertToTreeNode(wrapper, rootNode);
+            }
+
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            model.setRoot(rootNode);
+
+            UIUtils.repaintComponent(tree);
+
+            // 默认展开前3级节点
+            UIUtils.expandSpecifiedLevelNode(tree, expandLevel);
         }
-
-        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-        model.setRoot(rootNode);
-
-        UIUtils.repaintComponent(tree);
-
-        // 默认展开前3级节点
-        UIUtils.expandSpecifiedLevelNode(tree, expandLevel);
     }
 
     private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {
@@ -262,6 +282,8 @@ public class JsonStructureComponentProvider {
         group.add(new CopyNodeCommentAction(tree));
         group.addSeparator();
         group.add(new ModifyNodeValueAction(tree));
+        group.addSeparator();
+        group.add(new ShowAsTableAction(tree));
         group.addSeparator();
         group.add(new ExpandMultiAction(tree));
         group.addSeparator();

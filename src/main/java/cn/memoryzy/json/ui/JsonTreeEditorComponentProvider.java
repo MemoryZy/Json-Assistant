@@ -8,7 +8,6 @@ import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
@@ -28,16 +27,17 @@ public class JsonTreeEditorComponentProvider {
     private final VirtualFile virtualFile;
     private final JsonStructureComponentProvider componentProvider;
 
-    public JsonTreeEditorComponentProvider(Project project, VirtualFile virtualFile) {
+    public JsonTreeEditorComponentProvider(VirtualFile virtualFile) {
         this.virtualFile = virtualFile;
         this.componentProvider = new JsonStructureComponentProvider(
                 null,
-                UIUtils.getWindowComponent(project),
+                null,
                 new StructureSetting()
                         .setNeedBorder(false)
                         .setNeedToolbar(true)
                         .setExpandLevel(3)
                         .setNeedRefresh(true)
+                        .setLazyLoad(true)
                         .setFile(virtualFile));
     }
 

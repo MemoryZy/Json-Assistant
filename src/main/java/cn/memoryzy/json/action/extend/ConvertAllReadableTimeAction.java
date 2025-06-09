@@ -41,6 +41,7 @@ public class ConvertAllReadableTimeAction extends DumbAwareAction implements Upd
         PsiFile psiFile = PlatformUtil.getPsiFile(dataContext, editor.getDocument());
 
         if (psiFile instanceof JsonFile) {
+            // TODO Psi 操作太慢
             JsonValueHandler.handleAllElement(project, psiFile, editorData, JsonValueHandleType.READABLE_TIME);
         } else {
             JsonValueHandler.handleAllWrapper(project, dataContext, editorData, JsonValueHandleType.READABLE_TIME);

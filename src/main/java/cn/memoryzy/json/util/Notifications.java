@@ -34,8 +34,10 @@ import org.jsoup.select.Elements;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -225,29 +227,60 @@ public class Notifications {
 
 
     public static RelativePoint getUpperRightRelativePoint(JComponent component, BalloonImpl balloon) {
-        // 在其他平台上，气球提示显示在标题栏的右侧边缘
-        JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
+        // // 在其他平台上，气球提示显示在标题栏的右侧边缘
+        // JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
+        //
+        // // 查找标题栏组件
+        // Component titleBar = Arrays.stream(layeredPane.getComponents())
+        //         .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
+        //         .findFirst()
+        //         .orElse(null);
+        //
+        // // 计算垂直偏移量
+        // int insetTop = balloon.getShadowBorderInsets().top;
+        // int contentHalfHeight = (int) (balloon.getContent().getPreferredSize().getHeight() / 2);
+        // int titleBarHeight = titleBar != null ? titleBar.getHeight() : 40;
+        // int offsetY = titleBarHeight + insetTop + contentHalfHeight;
+        //
+        // // 设置气球提示的显示位置
+        // Component relativeComponent = titleBar != null ? titleBar : component;
+        //
+        // int insetRight = balloon.getShadowBorderInsets().right;
+        // int contentHalfWidth = (int) (balloon.getContent().getPreferredSize().getWidth() / 2);
+        // int offsetX = relativeComponent.getWidth() - (25 + insetRight + contentHalfWidth);
+        //
+        // return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
 
-        // 查找标题栏组件
-        Component titleBar = Arrays.stream(layeredPane.getComponents())
-                .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
-                .findFirst()
-                .orElse(null);
+        Dimension componentSize = component.getSize();
+        Dimension balloonSize = balloon.getPreferredSize();
 
-        // 计算垂直偏移量
-        int insetTop = balloon.getShadowBorderInsets().top;
-        int contentHalfHeight = (int) (balloon.getContent().getPreferredSize().getHeight() / 2);
-        int titleBarHeight = titleBar != null ? titleBar.getHeight() : 40;
-        int offsetY = titleBarHeight + insetTop + contentHalfHeight;
+        int width = Math.min(balloonSize.width, componentSize.width);
+        int height = Math.min(balloonSize.height, componentSize.height);
 
-        // 设置气球提示的显示位置
-        Component relativeComponent = titleBar != null ? titleBar : component;
+        // top-right corner, 20px to the edges
+        return new RelativePoint(component, new Point(componentSize.width - 20 - width / 2, 20 + height / 2));
+    }
 
-        int insetRight = balloon.getShadowBorderInsets().right;
-        int contentHalfWidth = (int) (balloon.getContent().getPreferredSize().getWidth() / 2);
-        int offsetX = relativeComponent.getWidth() - (25 + insetRight + contentHalfWidth);
+    /**
+     * 计算组件右下角的相对位置（适合放置气球控件的中心点）
+     *
+     * @param component 目标组件
+     * @param balloon   气球控件
+     * @return 位于组件右下角区域的相对坐标点
+     */
+    public static RelativePoint getLowerRightRelativePoint(JComponent component, BalloonImpl balloon) {
+        Dimension componentSize = component.getSize();
+        Dimension balloonSize = balloon.getPreferredSize();
 
-        return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
+        // 使用组件和气球的最小尺寸确保不超出边界
+        int width = Math.min(balloonSize.width, componentSize.width);
+        int height = Math.min(balloonSize.height, componentSize.height);
+
+        // 计算右下角位置：距右边缘20px，距底边缘20px
+        int x = componentSize.width - 20 - width / 2; // 中心点水平位置
+        int y = componentSize.height - 20 - height / 2; // 中心点垂直位置
+
+        return new RelativePoint(component, new Point(x, y));
     }
 
     /**
@@ -367,4 +400,33 @@ public class Notifications {
             }
         }
     }
+
+
+
+    /*
+        // bottom-right corner
+    balloon.show(new PositionTracker<Balloon>(jFrame.getRootPane()) {
+      @Override
+      public RelativePoint recalculateLocation(@NotNull Balloon balloon) {
+        Dimension jFrameSize = jFrame.getSize();
+        Dimension balloonSize = balloon.getPreferredSize();
+        return new RelativePoint(jFrame, new Point(jFrameSize.width - balloonSize.width / 2, jFrameSize.height - balloonSize.height / 2));
+      }
+    }, Balloon.Position.above);
+
+    -----------------------
+
+        Dimension componentSize = component.getSize();
+    Dimension balloonSize = balloon.getPreferredSize();
+
+    int width = Math.min(balloonSize.width, componentSize.width);
+    int height = Math.min(balloonSize.height, componentSize.height);
+
+    // top-right corner, 20px to the edges
+    RelativePoint point = new RelativePoint(component, new Point(componentSize.width - 20 - width / 2, 20 + height / 2));
+    balloon.show(point, Balloon.Position.above);
+
+
+     */
+
 }

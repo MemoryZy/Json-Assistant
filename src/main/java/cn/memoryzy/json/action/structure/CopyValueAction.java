@@ -39,10 +39,11 @@ public class CopyValueAction extends DumbAwareAction implements UpdateInBackgrou
                 // 获取value值，多个的话用其他处理方式
                 Object value = node.getValue();
                 JsonTreeNodeType nodeType = node.getNodeType();
+
                 // JSONArrayElement及JSONObjectProperty都是普通类型
-                if (Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType)
-                        || Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeType)) {
+                if (JsonTreeNodeType.isLeafNode(nodeType)) {
                     valueList.add(Objects.nonNull(value) ? value.toString() : "null");
+
                 } else {
                     JsonWrapper json = (JsonWrapper) value;
 

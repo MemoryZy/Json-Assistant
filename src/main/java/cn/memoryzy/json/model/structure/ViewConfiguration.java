@@ -26,6 +26,11 @@ class ViewConfiguration {
      */
     private boolean needRefresh;
 
+    /**
+     * 懒加载组件
+     */
+    private boolean lazyLoad;
+
 
     public boolean isNeedBorder() {
         return needBorder;
@@ -57,5 +62,13 @@ class ViewConfiguration {
 
     public void setNeedRefresh(boolean needRefresh) {
         this.needRefresh = needRefresh;
+    }
+
+    public boolean isLazyLoad() {
+        return lazyLoad;
+    }
+
+    public void setLazyLoad(boolean lazyLoad) {
+        this.lazyLoad = lazyLoad;
     }
 }
