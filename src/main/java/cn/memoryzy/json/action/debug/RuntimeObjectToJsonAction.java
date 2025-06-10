@@ -4,6 +4,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.model.ProgressContext;
 import cn.memoryzy.json.model.RecursionContext;
 import cn.memoryzy.json.model.RecursiveResult;
 import cn.memoryzy.json.util.*;
@@ -29,7 +30,7 @@ import java.util.function.Function;
  */
 public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackground {
 
-    private static final int MAX_DEPTH = 8;
+    private static final int MAX_DEPTH = 7;
     private static final Logger LOG = Logger.getInstance(RuntimeObjectToJsonAction.class);
     public static final Key<Boolean> RESOLVE_COMMENT_KEY = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".RESOLVE_COMMENT");
 
@@ -67,7 +68,7 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
         new Task.Backgroundable(project, JsonAssistantBundle.messageOnSystem("progress.convert.to.json.title"), true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(false);
+                indicator.setIndeterminate(true);
                 indicator.setText(JsonAssistantBundle.messageOnSystem("progress.convert.to.json.text"));
                 indicator.setFraction(0);
 
@@ -75,24 +76,23 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                 try {
                     // 保存【是否解析注释】
                     if (resolveComment) project.putUserData(RESOLVE_COMMENT_KEY, true);
-                    // 调整进度
-                    indicator.setFraction(0.1);
                     // 解析树节点值
                     Value value = JavaDebugUtil.parseTreeNode(dataContext);
                     if (null == value) return;
-                    indicator.setFraction(0.3);
+                    indicator.setFraction(0.1);
 
                     RecursionContext context = new RecursionContext(MAX_DEPTH);
 
+                    // 创建进度上下文
+                    // 估算节点总数 - 初始为1000，实际会调整
+                    ProgressContext progressContext = new ProgressContext(indicator, 0.1, 0.9, 10000);
+
                     // 调用READ线程执行
                     Object jsonValue = application.runReadAction(
-                            (Computable<Object>) () -> JavaDebugUtil.getValue(project, value, context));
+                            (Computable<Object>) () -> JavaDebugUtil.getValue(project, value, context, progressContext));
 
                     // 包装结果
                     result = new RecursiveResult(jsonValue, context);
-
-                    // 调整进度
-                    indicator.setFraction(0.9);
                     Object resultValue = result.getValue();
 
                     // 写入窗口
@@ -104,6 +104,10 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
 
                         application.invokeLater(() -> ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, jsonConverter.apply(resultValue), FileTypeHolder.JSON5));
                     }
+
+                    indicator.setFraction(1.0);
+                    indicator.setText(JsonAssistantBundle.messageOnSystem("progress.convert.to.json.finished.text"));
+
                 } catch (StackOverflowError ex) {
                     LOG.error(ex);
                     Notifications.showNotification(JsonAssistantBundle.messageOnSystem("error.runtime.serialize.recursion"), NotificationType.ERROR, project);
@@ -111,21 +115,12 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                     // 置空
                     project.putUserData(RESOLVE_COMMENT_KEY, null);
                 }
-
-                indicator.setFraction(1.0);
-                indicator.setText(JsonAssistantBundle.messageOnSystem("progress.convert.to.json.finished.text"));
             }
         }.queue();
     }
 
     private static void handleRecursionWarning(Project project, RecursiveResult result) {
-        // String message = String.format(
-        //         JsonAssistantBundle.messageOnSystem("warning.runtime.serialize.max_depth"),
-        //         result.getCurrentDepth(),
-        //         result.getMaxDepth()
-        // );
-        //
-        // Notifications.showNotification(message, NotificationType.WARNING, project);
+        Notifications.showFullNotification("", JsonAssistantBundle.messageOnSystem("notification.runtime.serialize.depth.content"), NotificationType.WARNING, project);
     }
 
 }
