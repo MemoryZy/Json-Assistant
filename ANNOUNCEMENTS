@@ -4,7 +4,7 @@
     "locales": {
       "en_US": {
         "title": "Json Assistant",
-        "content": "It has recently come to light that the source code of my original plugin <b><a href=\"https://github.com/MemoryZy/Json-Assistant\">Json Assistant</a></b> was maliciously modified and redistributed by developer <b><a href=\"https://plugins.jetbrains.com/vendor/katter\">Infinitron</a></b><i> (JetBrains Plugin Marketplace username)</i> as the infringing plugin <b><a href=\"https://plugins.jetbrains.com/plugin/26977-json-viewer\">Json Viewer</a></b>: It directly copied core code, illegally added paywall restrictions across all features for profit, and removed original author information along with open-source licenses. Despite attempted camouflage through updates (e.g., modifying icons), its core code logic and functionality remain substantially identical, and the essential nature of the infringement persists. We urge all users to exercise caution and avoid downloading or using <b>this infringing plugin</b>!<br/>",
+        "content": "It has recently come to light that the source code of my original plugin <b><a href=\"https://github.com/MemoryZy/Json-Assistant\">Json Assistant</a></b> was maliciously modified and redistributed by developer <b><a href=\"https://plugins.jetbrains.com/vendor/katter\">Infinitron</a></b>(JetBrains Plugin Marketplace username) as the infringing plugin <b><a href=\"https://plugins.jetbrains.com/plugin/26977-json-viewer\">Json Viewer</a></b>: It directly copied core code, illegally added paywall restrictions across all features for profit, and removed original author information along with open-source licenses. Despite attempted camouflage through updates (e.g., modifying icons), its core code logic and functionality remain substantially identical, and the essential nature of the infringement persists. We urge all users to exercise caution and avoid downloading or using <b>this infringing plugin</b>!<br/>",
         "actions": [
           {
             "label": "Learn More",
@@ -14,7 +14,7 @@
       },
       "zh_CN": {
         "title": "Json Assistant",
-        "content": "近期发现，本人原创插件 <b><a href=\"https://github.com/MemoryZy/Json-Assistant\">Json Assistant</a></b> 的源码被开发者 <b><a href=\"https://plugins.jetbrains.com/vendor/katter\">Infinitron</a></b><i>（JetBrains 插件市场用户名）</i>恶意篡改并二次分发为侵权插件 <b><a href=\"https://plugins.jetbrains.com/plugin/26977-json-viewer\">Json Viewer</a></b>：其直接复制核心代码，非法添加全功能付费限制牟利，且删除原作者信息及开源协议。虽经更新伪装（如修改图标），但其核心代码逻辑与功能仍高度一致，侵权本质未变。请广大用户注意辨别，避免下载和使用此类侵权插件！<br/>",
+        "content": "近期发现，本人原创插件 <b><a href=\"https://github.com/MemoryZy/Json-Assistant\">Json Assistant</a></b> 的源码被开发者 <b><a href=\"https://plugins.jetbrains.com/vendor/katter\">Infinitron</a></b>（JetBrains 插件市场用户名）恶意篡改并二次分发为侵权插件 <b><a href=\"https://plugins.jetbrains.com/plugin/26977-json-viewer\">Json Viewer</a></b>：其直接复制核心代码，非法添加全功能付费限制牟利，且删除原作者信息及开源协议。虽经更新伪装（如修改图标），但其核心代码逻辑与功能仍高度一致，侵权本质未变。请广大用户注意辨别，避免下载和使用此类侵权插件！<br/>",
         "actions": [
           {
             "label": "了解更多",
