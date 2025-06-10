@@ -49,14 +49,14 @@ public class JsonValueHandler {
             return false;
         }
 
-        PsiFile psiFile = CommonDataKeys.PSI_FILE.getData(dataContext);
-        if (psiFile instanceof JsonFile) {
-            return containsSpecialTypeInElement(psiFile, handleType);
-
-        } else {
+        // PsiFile psiFile = CommonDataKeys.PSI_FILE.getData(dataContext);
+        // if (psiFile instanceof JsonFile) {
+        //     return containsSpecialTypeInElement(psiFile, handleType);
+        //
+        // } else {
             // 文本判断
             return containsSpecialTypeInJson(dataContext, handleType);
-        }
+        // }
     }
 
 

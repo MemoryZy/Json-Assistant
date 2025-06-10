@@ -59,6 +59,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         actions.add(ActionHolder.JSON_BEAUTIFY_ACTION);
         actions.add(ActionHolder.JSON_MINIFY_ACTION);
         actions.add(ActionHolder.JSON_STRUCTURE_ACTION);
+        actions.add(Separator.create());
         actions.add(ActionHolder.JSON_GRID_ACTION);
         actions.add(Separator.create());
         actions.add(ActionHolder.JSON_ESCAPE_ACTION);

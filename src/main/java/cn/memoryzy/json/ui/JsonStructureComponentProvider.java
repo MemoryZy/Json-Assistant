@@ -280,8 +280,8 @@ public class JsonStructureComponentProvider {
         group.add(new CopyNodePathAction(tree));
         group.addSeparator();
         group.add(new CopyNodeCommentAction(tree));
-        group.addSeparator();
-        group.add(new ModifyNodeValueAction(tree));
+        // group.addSeparator();
+        // group.add(new ModifyNodeValueAction(tree));
         group.addSeparator();
         group.add(new ShowAsTableAction(tree));
         group.addSeparator();

@@ -16,8 +16,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.sun.jdi.Value;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +30,10 @@ import java.util.function.Function;
  */
 public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackground {
 
-    private static final int MAX_DEPTH = 7;
+    /**
+     * 将此设置为无限，不限制递归
+     */
+    private static final int MAX_DEPTH = 9999;
     private static final Logger LOG = Logger.getInstance(RuntimeObjectToJsonAction.class);
     public static final Key<Boolean> RESOLVE_COMMENT_KEY = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".RESOLVE_COMMENT");
 
@@ -81,6 +84,7 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                     if (null == value) return;
                     indicator.setFraction(0.1);
 
+                    // 不需要关注递归的深度，只要出现了异常，直接报告用户即可
                     RecursionContext context = new RecursionContext(MAX_DEPTH);
 
                     // 创建进度上下文
@@ -89,7 +93,7 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
 
                     // 调用READ线程执行
                     Object jsonValue = application.runReadAction(
-                            (Computable<Object>) () -> JavaDebugUtil.getValue(project, value, context, progressContext));
+                            (ThrowableComputable<Object, RuntimeException>) () -> JavaDebugUtil.getValue(project, value, context, progressContext));
 
                     // 包装结果
                     result = new RecursiveResult(jsonValue, context);
@@ -115,6 +119,11 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                     // 置空
                     project.putUserData(RESOLVE_COMMENT_KEY, null);
                 }
+            }
+
+            @Override
+            public void onCancel() {
+                Notifications.showFullNotification("", JsonAssistantBundle.messageOnSystem("notification.task.cancel.content"), NotificationType.WARNING, project);
             }
         }.queue();
     }
