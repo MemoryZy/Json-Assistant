@@ -3,9 +3,12 @@
 ## [Unreleased]
 - 支持选择部分字段进行序列化为JSON。
 - 支持将 JSON 以表格视图展示。
-
+- 大幅提升扩展功能（如时间戳转换等）的执行速度。
+- 解决运行时的大型对象转 JSON 时的窗口UI冻结问题。
 - Support the selection of certain fields for serialization into JSON.
 - Support displaying JSON in a table view.
+- Significantly enhance the execution speed of extended functions such as timestamp conversion, etc.
+- Solve the problem of window UI freezing when converting large objects to JSON at runtime.
 
 ## [1.8.0] - 2025-04-16
 

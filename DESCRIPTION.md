@@ -17,6 +17,7 @@
   - Beautify
   - Minify
   - Tree View
+  - GridView
   - Compare
   - Escape
 - Serialization
