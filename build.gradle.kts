@@ -143,10 +143,6 @@ tasks {
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
-    listProductsReleases {
-        sinceVersion = properties("productsReleasesSinceBuild")
-    }
-
     runPluginVerifier {
         // 验证问题类型
         failureLevel.set(listOf(
