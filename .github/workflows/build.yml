@@ -353,7 +353,7 @@ jobs:
       # Create a new release draft which is not publicly visible and requires manual acceptance
       - name: Create Release Draft (Target Repo)
         env:
-          TARGET_OWNER_REPO: Intellij-plugin-verify
+          TARGET_OWNER_REPO: "${{ github.repository_owner }}/Intellij-plugin-verify"
           GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
         run: |
           gh release create "v${{ needs.build.outputs.version }}" \
