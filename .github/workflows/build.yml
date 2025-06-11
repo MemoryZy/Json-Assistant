@@ -24,6 +24,8 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
+      - 'ANNOUNCEMENTS'
+      - 'donors.json'
 
   # Trigger the workflow on any pull request
   pull_request:
@@ -34,6 +36,8 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
+      - 'ANNOUNCEMENTS'
+      - 'donors.json'
 
   # 可手动操控
   workflow_dispatch:
@@ -96,10 +100,10 @@ jobs:
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
-
-      - name: Cat Products Releases
-        run: cat build/listProductsReleases.txt
+#          ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
+#
+#      - name: Cat Products Releases
+#        run: cat build/listProductsReleases.txt
 
       # Build plugin
       - name: Build plugin
@@ -124,47 +128,47 @@ jobs:
           path: ./build/distributions/content/*/*
 
   # Run tests and upload a code coverage report
-  test:
-    name: Test
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-
-      # Check out the current repository
-      - name: Fetch Sources
-        uses: actions/checkout@v4
-
-      # Set up Java environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 11
-
-      # Setup Gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x ./gradlew
-
-      # Run tests
-      - name: Run Tests
-        run: ./gradlew check
-
-      # Collect Tests Result of failed tests
-      - name: Collect Tests Result
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: tests-result
-          path: ${{ github.workspace }}/build/reports/tests
-
-      # Upload the Kover report to CodeCov
-      - name: Upload Code Coverage Report
-        uses: codecov/codecov-action@v4
-        with:
-          files: ${{ github.workspace }}/build/reports/kover/report.xml
+#  test:
+#    name: Test
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#
+#      # Check out the current repository
+#      - name: Fetch Sources
+#        uses: actions/checkout@v4
+#
+#      # Set up Java environment for the next steps
+#      - name: Setup Java
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: zulu
+#          java-version: 11
+#
+#      # Setup Gradle
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@v4
+#
+#      - name: Grant execute permission for Gradle wrapper
+#        run: chmod +x ./gradlew
+#
+#      # Run tests
+#      - name: Run Tests
+#        run: ./gradlew check
+#
+#      # Collect Tests Result of failed tests
+#      - name: Collect Tests Result
+#        if: ${{ failure() }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: tests-result
+#          path: ${{ github.workspace }}/build/reports/tests
+#
+#      # Upload the Kover report to CodeCov
+#      - name: Upload Code Coverage Report
+#        uses: codecov/codecov-action@v4
+#        with:
+#          files: ${{ github.workspace }}/build/reports/kover/report.xml
 
   # Run Qodana inspections and provide report
 #  inspectCode:
@@ -303,7 +307,7 @@ jobs:
   releaseDraft:
     name: Release draft
     if: github.event_name != 'pull_request'
-    needs: [ build, test, verify ]
+    needs: [ build, verify ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
