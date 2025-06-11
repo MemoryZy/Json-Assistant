@@ -148,7 +148,7 @@ tasks {
     }
 
     runPluginVerifier {
-        // ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
+        // 验证问题类型
         failureLevel.set(listOf(
             RunPluginVerifierTask.FailureLevel.COMPATIBILITY_PROBLEMS,
             RunPluginVerifierTask.FailureLevel.INTERNAL_API_USAGES,
@@ -157,7 +157,15 @@ tasks {
             RunPluginVerifierTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
         ))
 
+        // 验证平台列表
         ideVersions.set(properties("pluginVerifierVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) })
+
+        // 验证结果输出格式 -> https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#tasks-runpluginverifier
+        verificationReportsFormats.set(listOf(
+            RunPluginVerifierTask.VerificationReportsFormats.PLAIN,
+            RunPluginVerifierTask.VerificationReportsFormats.HTML,
+            RunPluginVerifierTask.VerificationReportsFormats.MARKDOWN,
+        ))
     }
 
     signPlugin {
