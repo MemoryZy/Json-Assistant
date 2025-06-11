@@ -5,15 +5,21 @@ import org.jetbrains.intellij.tasks.RunPluginVerifierTask
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
-//buildscript {
-//    repositories {
-//        mavenCentral()
-//        google()
-//    }
-//    dependencies {
-//        classpath("com.guardsquare:proguard-gradle:7.7.0")
-//    }
-//}
+buildscript {
+    repositories {
+        maven {
+            setUrl("https://maven.aliyun.com/repository/public/")
+            setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
+            setUrl("https://plugins.gradle.org/m2/")
+            setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath("com.guardsquare:proguard-gradle:7.7.0")
+    }
+}
 
 plugins {
     id("java") // Java support
@@ -29,7 +35,12 @@ version = properties("pluginVersion").get()
 
 // Configure project's dependencies
 repositories {
+    maven {
+        setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
+        setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
+    }
     mavenCentral()
+    gradlePluginPortal()
 }
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
@@ -134,7 +145,6 @@ tasks {
 
     listProductsReleases {
         sinceVersion = properties("productsReleasesSinceBuild")
-
     }
 
     runPluginVerifier {
@@ -146,6 +156,8 @@ tasks {
             RunPluginVerifierTask.FailureLevel.MISSING_DEPENDENCIES,
             RunPluginVerifierTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
         ))
+
+        ideVersions.set(properties("pluginVerifierVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) })
     }
 
     signPlugin {
