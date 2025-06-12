@@ -1,7 +1,6 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.tasks.RunPluginVerifierTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -18,7 +17,7 @@ buildscript {
         gradlePluginPortal()
     }
     dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.7.0")
+        classpath("com.guardsquare:proguard-gradle:7.3.2")
     }
 }
 
@@ -160,10 +159,10 @@ tasks {
         dontwarn()
 
         // 生成混淆前后类名/方法名的映射文件（用于调试）
-        printmapping("build/obfuscated/output/${properties("pluginName").get()}-${properties("pluginVersion").get()}-ProGuard-ChangeLog.txt")
+        printmapping("build/obfuscated/output/${properties("pluginName").get()}-${properties("pluginVersion").get()}-ProGuard-Mapping.txt")
 
         // 指定目标插件版本（使用插件版本避免字节码版本问题）
-        target(properties("javaVersion").get())
+        target(properties("pluginVersion").get())
 
         // 混淆资源文件名（与类名同步修改，这里可能会混淆图标）
         adaptresourcefilenames()
@@ -171,6 +170,8 @@ tasks {
         optimizationpasses(9)
         // 允许修改访问修饰符（增强混淆效果）
         allowaccessmodification()
+
+        renamesourcefileattribute("SourceFile")
 
         // 保留指定的重要类属性（如注解、行号表等调试/反射必需信息）
         keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
@@ -181,13 +182,6 @@ tasks {
              """.trimIndent()
         )
 
-        // TODO 目前还是存在图标丢失的问题
-
-        keepdirectories("icons")
-        keepdirectories("icons/**")
-
-        keep("class cn.memoryzy.json.service.persistent.state.** { *; }")
-
         // 保留类的静态实例成员（单例模式保护）
         keepclassmembers("""
             class * {public static ** INSTANCE;}
@@ -196,6 +190,12 @@ tasks {
 
         // 保留整个工具类（com.intellij.util包下所有类）
         keep("class com.intellij.util.* {*;}")
+
+        keepdirectories()
+
+
+        // TODO Inspection 和 Intention 不能混淆
+
     }
 
     // 配置准备沙箱任务（打包插件前的步骤）
