@@ -1,6 +1,7 @@
 import org.jetbrains.changelog.Changelog
 import org.jetbrains.changelog.markdownToHTML
 import org.jetbrains.intellij.tasks.RunPluginVerifierTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
@@ -77,6 +78,7 @@ intellij {
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     groups.empty()
+    version.set(properties("pluginVersion"))
     repositoryUrl = properties("pluginRepositoryUrl")
 }
 
@@ -107,10 +109,104 @@ tasks {
     }
 
     // Set the JVM compatibility versions
-    withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
-        options.encoding = "UTF-8"
+    properties("javaVersion").let {
+        withType<JavaCompile> {
+            sourceCompatibility = it.get()
+            targetCompatibility = it.get()
+            options.encoding = "UTF-8"
+        }
+    }
+
+    // 注册一个名为 "proguard" 的 Gradle 任务
+    register<proguard.gradle.ProGuardTask>("proguard") {
+        // 声明此任务依赖 instrumentedJar 任务，确保先构建原始 JAR
+        dependsOn(instrumentedJar)
+        // 启用详细日志输出
+        verbose()
+
+        // 获取当前 Java 安装路径
+        val javaHome = System.getProperty("java.home")
+        // 将 Java 标准库的所有 jmods 文件添加为库引用（防止混淆系统类）
+        File("$javaHome/jmods/").listFiles()!!.forEach { libraryjars(it.absolutePath)}
+
+        // Use the jar task output as a input jar. This will automatically add the necessary task dependency.
+        // 指定输入 JAR 文件路径（instrumentedJar 任务的输出）
+        injars("build/libs/instrumented-${properties("pluginName").get()}-${properties("pluginVersion").get()}.jar")
+        // 指定混淆后的输出 JAR 路径
+        outjars("build/obfuscated/output/instrumented-${properties("pluginName").get()}-${properties("pluginVersion").get()}.jar")
+
+        // 添加编译类路径的所有依赖库（防止混淆第三方库）
+        libraryjars(configurations.compileClasspath.get())
+
+        // 禁用代码缩减（不删除未使用的类/方法）
+        dontshrink()
+        // 禁用代码优化（保持字节码结构不变）
+        dontoptimize()
+
+        // 自动调整字符串常量（如 XML 文件中的类名引用）
+        adaptclassstrings("**.xml")
+        // 自动调整资源文件内容（如 XML 中的类名）
+        adaptresourcefilecontents("**.xml")
+
+        // Allow methods with the same signature, except for the return type,
+        // to get the same obfuscation name.
+        // 对返回类型不同的重载方法使用相同混淆名（增强混淆强度）
+        overloadaggressively()
+
+        // Put all obfuscated classes into the nameless root package.
+        // 将所有混淆后的类移至根包（即默认包，增加反编译难度）
+        repackageclasses("")
+        // 禁止显示所有警告（避免因警告中断构建）
+        dontwarn()
+
+        // 生成混淆前后类名/方法名的映射文件（用于调试）
+        printmapping("build/obfuscated/output/${properties("pluginName").get()}-${properties("pluginVersion").get()}-ProGuard-ChangeLog.txt")
+
+        // 指定目标插件版本（使用插件版本避免字节码版本问题）
+        target(properties("javaVersion").get())
+
+        // 混淆资源文件名（与类名同步修改，这里可能会混淆图标）
+        adaptresourcefilenames()
+        // 设置优化次数为9次（虽然禁用优化，但保留此配置以防启用）
+        optimizationpasses(9)
+        // 允许修改访问修饰符（增强混淆效果）
+        allowaccessmodification()
+
+        // 保留指定的重要类属性（如注解、行号表等调试/反射必需信息）
+        keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
+
+        // 保留实现特定接口的类（确保插件持久化状态组件不被混淆）
+        keep("""
+            class * implements com.intellij.openapi.components.PersistentStateComponent {*;}
+             """.trimIndent()
+        )
+
+        // TODO 目前还是存在图标丢失的问题
+
+        keepdirectories("icons")
+        keepdirectories("icons/**")
+
+        keep("class cn.memoryzy.json.service.persistent.state.** { *; }")
+
+        // 保留类的静态实例成员（单例模式保护）
+        keepclassmembers("""
+            class * {public static ** INSTANCE;}
+             """.trimIndent()
+        )
+
+        // 保留整个工具类（com.intellij.util包下所有类）
+        keep("class com.intellij.util.* {*;}")
+    }
+
+    // 配置准备沙箱任务（打包插件前的步骤）
+    prepareSandbox {
+        // 检查是否启用了混淆（通过 enableProGuard 属性控制）
+        if (properties("enableProGuard").map(String::toBoolean).getOrElse(false)) {
+            // 使沙箱任务依赖 proguard 任务
+            dependsOn("proguard")
+            // 使用混淆后的 JAR 作为插件主文件
+            pluginJar.set(File("build/obfuscated/output/instrumented-${properties("pluginName").get()}-${properties("pluginVersion").get()}.jar"))
+        }
     }
 
     patchPluginXml {
