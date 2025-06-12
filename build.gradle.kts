@@ -162,6 +162,8 @@ tasks {
             RunPluginVerifierTask.VerificationReportsFormats.HTML,
             RunPluginVerifierTask.VerificationReportsFormats.MARKDOWN,
         ))
+
+        teamCityOutputFormat.set(true)
     }
 
     signPlugin {
