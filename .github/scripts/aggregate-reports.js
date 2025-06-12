@@ -101,7 +101,25 @@ function findReportFiles(dir) {
                     // 检查文件是否存在
                     if (fs.existsSync(filePath)) {
                         // 读取文件内容
-                        const content = fs.readFileSync(filePath, 'utf8');
+                        let content = fs.readFileSync(filePath, 'utf8');
+
+                        // 特别处理 deprecated-usages.txt 和 experimental-api-usages.txt
+                        if (fileName === 'deprecated-usages.txt' || fileName === 'experimental-api-usages.txt') {
+                            // 确保内容有换行符
+                            if (content.trim() !== '') {
+                                // 如果内容没有换行符，添加一个
+                                if (content.indexOf('\n') === -1) {
+                                    content += '\n';
+                                }
+                                // 确保每行都有换行符
+                                else {
+                                    content = content.split('\n').map(line => {
+                                        return line.endsWith('\n') ? line : line + '\n\n';
+                                    }).join('');
+                                }
+                            }
+                        }
+
                         reportData.files[fileName] = {
                             content,
                             description
@@ -129,6 +147,34 @@ function findReportFiles(dir) {
 }
 
 /**
+ * 获取本地化的北京时间
+ * 格式：yyyy年MM月dd日 HH时mm分ss秒
+ *
+ * @returns {string} 格式化后的时间字符串
+ */
+function getLocalizedTime() {
+    // 创建一个Date对象
+    const now = new Date();
+
+    // 手动计算北京时间（UTC+8）
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const beijingTime = new Date(utcTime + (3600000 * 8));
+
+    // 格式化为中文时间字符串
+    return `${beijingTime.getFullYear()}年${
+        (beijingTime.getMonth() + 1).toString().padStart(2, '0')
+    }月${
+        beijingTime.getDate().toString().padStart(2, '0')
+    }日 ${
+        beijingTime.getHours().toString().padStart(2, '0')
+    }时${
+        beijingTime.getMinutes().toString().padStart(2, '0')
+    }分${
+        beijingTime.getSeconds().toString().padStart(2, '0')
+    }秒`;
+}
+
+/**
  * 生成HTML报告
  *
  * @param {Array} reports - 报告数据数组
@@ -138,6 +184,9 @@ function generateHTML(reports) {
     // 使用第一个报告的插件信息作为标题（如果存在）
     const mainPluginName = reports.length > 0 ? reports[0].pluginName : 'unknown';
     const mainPluginVersion = reports.length > 0 ? reports[0].pluginVersion : 'unknown';
+
+    // 获取北京时间
+    const formattedTime = getLocalizedTime();
 
     /**
      * HTML模板
@@ -155,7 +204,7 @@ function generateHTML(reports) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDEA 插件验证报告聚合</title>
+    <title>插件验证报告</title>
 
     <!-- 引入Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -311,6 +360,7 @@ function generateHTML(reports) {
             box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 阴影 */
             margin-bottom: 1.5rem;             /* 底部间距 */
             border-left: 4px solid var(--primary-color); /* 左侧边框 */
+            margin-top: 2.5rem; /* 增加了上边距 */
         }
 
         /* 统计数字 */
@@ -436,6 +486,21 @@ function generateHTML(reports) {
                 width: 100%;                   /* 全宽 */
             }
         }
+        
+                    /* 新增时间戳样式 */
+            .timestamp {
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.85);
+                text-align: right;
+                margin-top: -15px;
+                margin-bottom: 10px;
+            }
+            
+                    /* 新增总问题数徽章样式 */
+        .total-problems-badge {
+            background-color: #3b82f6; /* 蓝色背景 */
+            color: white;              /* 白色文字 */
+        }
     </style>
 
 </head>
@@ -446,8 +511,9 @@ function generateHTML(reports) {
         <div class="container">
             <div class="plugin-header">
                 <div>
-                    <h1 class="mb-3">IDEA 插件验证报告聚合</h1>
-
+                    <h1 class="mb-3">插件验证报告</h1>
+                    <!-- 添加时间戳 -->
+                    <div class="timestamp">报告生成时间: ${formattedTime}</div>
                 </div>
 
                 <div class="plugin-info">
@@ -513,24 +579,24 @@ function generateHTML(reports) {
         <!-- 报告卡片列表 -->
         <div class="accordion" id="reportsAccordion">
             ${reports.map((report, index) => {
-                // 获取验证结果
-                const verdict = report.files['verification-verdict.txt']?.content || '未知';
-                // 判断兼容状态
-                const isCompatible = verdict.includes('Compatible');
-                const isIncompatible = verdict.includes('Incompatible') || verdict.includes('Invalid');
+        // 获取验证结果
+        const verdict = report.files['verification-verdict.txt']?.content || '未知';
+        // 判断兼容状态
+        const isCompatible = verdict.includes('Compatible');
+        const isIncompatible = verdict.includes('Incompatible') || verdict.includes('Invalid');
 
-                // 计算问题总数并分组
-                const problemCounts = Object.entries(report.problemCounts)
-                    .filter(([_, count]) => count > 0)
-                    .map(([type, count]) => {
-                        const fileName = type;
-                        // 查找对应的描述文本
-                        const description = reportFileTypes.find(item => item[0] === fileName)?.[1] || fileName;
-                        return {description, count};
-                    });
+        // 计算问题总数并分组
+        const problemCounts = Object.entries(report.problemCounts)
+            .filter(([_, count]) => count > 0)
+            .map(([type, count]) => {
+                const fileName = type;
+                // 查找对应的描述文本
+                const description = reportFileTypes.find(item => item[0] === fileName)?.[1] || fileName;
+                return {description, count};
+            });
 
-                // 生成报告卡片
-                return `
+        // 生成报告卡片
+        return `
                 <div class="plugin-card" data-verdict="${isCompatible ? 'compatible' : isIncompatible ? 'incompatible' : 'unknown'}" data-problems="${report.totalProblems > 0}">
                     <!-- 卡片头部 -->
                     <div class="accordion-header" id="heading${index}">
@@ -556,7 +622,7 @@ function generateHTML(reports) {
                                     `).join('')}
                                 </div>
                                 <div>
-                                    <span class="badge status-badge">
+                                    <span class="badge status-badge total-problems-badge">
                                         <i class="bi bi-exclamation-circle me-1"></i>总问题数: ${report.totalProblems}
                                     </span>
                                 </div>
@@ -572,22 +638,23 @@ function generateHTML(reports) {
 
                             <!-- 各类报告文件内容 -->
                             ${reportFileTypes.map(([fileName, description]) => {
-                                // 跳过不存在的文件和验证结果
-                                if (!report.files[fileName]) return '';
-                                if (fileName === 'verification-verdict.txt') return '';
+            // 跳过不存在的文件和验证结果
+            if (!report.files[fileName]) return '';
+            if (fileName === 'verification-verdict.txt') return '';
 
-                                const fileData = report.files[fileName];
-                                // 获取问题数量
-                                const problemCount = report.problemCounts[fileName] || 0;
-                                // 生成唯一ID用于折叠控制
-                                const uniqueId = `file-${index}-${fileName.replace('.', '-')}`;
+            const fileData = report.files[fileName];
+            // 获取问题数量
+            const problemCount = report.problemCounts[fileName] || 0;
+            // 生成唯一ID用于折叠控制
+            const uniqueId = `file-${index}-${fileName.replace('.', '-')}`;
 
-                                // 确定默认折叠状态
-                                const isDependency = fileName === 'dependencies.txt';
-                                const isDeprecated = fileName === 'deprecated-usages.txt';
-                                const shouldCollapse = isDependency || isDeprecated;
+            // 确定默认折叠状态
+            const isDependency = fileName === 'dependencies.txt';
+            const isDeprecated = fileName === 'deprecated-usages.txt';
+            const isExperimental = fileName === 'experimental-api-usages.txt';
+            const shouldCollapse = isDependency || isDeprecated || isExperimental;
 
-                                return `
+            return `
                                 <div class="file-content">
                                     <div class="file-header">
                                         <div>${description}</div>
@@ -616,12 +683,12 @@ function generateHTML(reports) {
                                 </div>
 
                                 `;
-                            }).join('')}
+        }).join('')}
                         </div>
                     </div>
                 </div>
                 `;
-            }).join('')}
+    }).join('')}
         </div>
 
     </div>
