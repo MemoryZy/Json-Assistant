@@ -1,7 +1,7 @@
 package cn.memoryzy.json.service.persistent;
 
-import cn.memoryzy.json.model.BlacklistEntry;
 import cn.memoryzy.json.service.persistent.converter.BlacklistConverter;
+import cn.memoryzy.json.service.persistent.state.BlacklistEntry;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;

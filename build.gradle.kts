@@ -108,16 +108,17 @@ tasks {
     }
 
     // Set the JVM compatibility versions
-    properties("javaVersion").let {
-        withType<JavaCompile> {
-            sourceCompatibility = it.get()
-            targetCompatibility = it.get()
-            options.encoding = "UTF-8"
-        }
+    withType<JavaCompile> {
+        sourceCompatibility = properties("javaVersion").get()
+        targetCompatibility = properties("javaVersion").get()
+        options.encoding = "UTF-8"
     }
 
     // 注册一个名为 "proguard" 的 Gradle 任务
     register<proguard.gradle.ProGuardTask>("proguard") {
+        // 告知 Gradle 每次都应该重新执行 (不加这个的话，每次启动时，Gradle 总是判断 ProGuard 无需变更，于是复用上一次的配置)
+        outputs.upToDateWhen { false }
+
         // 声明此任务依赖 instrumentedJar 任务，确保先构建原始 JAR
         dependsOn(instrumentedJar)
         // 启用详细日志输出
@@ -141,6 +142,8 @@ tasks {
         dontshrink()
         // 禁用代码优化（保持字节码结构不变）
         dontoptimize()
+
+        // ProGuard 在混淆处理 XML 时，会用GBK编码，这里需要在 gradle.properties 中的 org.gradle.jvmargs 指定 -Dfile.encoding=UTF-8
 
         // 自动调整字符串常量（如 XML 文件中的类名引用）
         adaptclassstrings("**.xml")
@@ -171,7 +174,10 @@ tasks {
         // 允许修改访问修饰符（增强混淆效果）
         allowaccessmodification()
 
+        // 开启这个之后，在堆栈中不会显示具体的原类名 [at cU.a(JsonAssistantToolWindowComponentProvider:300)]，只会显示 [at cU.a(SourceFile:300)]
         renamesourcefileattribute("SourceFile")
+
+        // ------------------------------------------- 规则
 
         // 保留指定的重要类属性（如注解、行号表等调试/反射必需信息）
         keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
@@ -191,21 +197,44 @@ tasks {
         // 保留整个工具类（com.intellij.util包下所有类）
         keep("class com.intellij.util.* {*;}")
 
+        // 因为在默认打包的时候，java/icons 和 resources/icons 两个目录会被打到一起，
+        // 所以需要过滤包及包下的类名不被混淆，但是方法、字段等可以被混淆
+        keep("class icons.*")
+
+        // Inspection 和 Intention 不能混淆，因为要关联 resources 目录下的描述
+        keep("class * extends com.intellij.codeInspection.LocalInspectionTool")
+        keep("class * implements com.intellij.codeInsight.intention.IntentionAction")
+
+        // State 存储对象的字段不能被混淆，不然它们在xml中的key就会变成 a b c 这样的，并且每次都不同
+        keep("class cn.memoryzy.json.service.persistent.state.** {public <fields>;}")
+
+        // 不混淆枚举类，因为 JSON 反序列化时会根据枚举常量名来进行，如果混淆了这个，就会出现找不到的问题
+        keepclassmembers("enum * {*;}")
+
+        // 不开启这个的话，fileTemplates 文件模板无法找到
         keepdirectories()
 
+        // 反射调用相关的方法、字段，也不能被混淆 (例如 BlacklistEntry.toJson()，序列化时，JSON5处理器默认会调用此方法)
 
-        // TODO Inspection 和 Intention 不能混淆
+
 
     }
 
     // 配置准备沙箱任务（打包插件前的步骤）
     prepareSandbox {
-        // 检查是否启用了混淆（通过 enableProGuard 属性控制）
-        if (properties("enableProGuard").map(String::toBoolean).getOrElse(false)) {
+        // 当前环境是否为 ci 环境，在此环境下，无需混淆 (优先级大于本地 enableProGuard 属性)
+        val isCiMode = environment("CI_MODE").map(String::toBoolean).getOrElse(false)
+        // 检查本地是否启用了混淆（通过 enableProGuard 属性控制）
+        val useProGuard = properties("enableProGuard").map(String::toBoolean).getOrElse(false)
+
+        // 只有不处于 ci 环境中，且启用了混淆才开始执行
+        if (!isCiMode && useProGuard) {
             // 使沙箱任务依赖 proguard 任务
             dependsOn("proguard")
             // 使用混淆后的 JAR 作为插件主文件
             pluginJar.set(File("build/obfuscated/output/instrumented-${properties("pluginName").get()}-${properties("pluginVersion").get()}.jar"))
+        } else {
+            logger.lifecycle("Obfuscation has been mandatorily disabled in CI mode.")
         }
     }
 

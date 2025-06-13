@@ -107,6 +107,8 @@ jobs:
 
       # Build plugin
       - name: Build plugin
+        env:
+          CI_MODE: "true" # 设置 CI 标识
         run: ./gradlew buildPlugin
 
       # Prepare plugin archive content for creating artifact
@@ -246,6 +248,8 @@ jobs:
 
       # Run Verify Plugin task and IntelliJ Plugin Verifier tool
       - name: Run Plugin Verification tasks
+        env:
+          CI_MODE: "true" # 设置 CI 标识
         continue-on-error: true
         run: ./gradlew runPluginVerifier -Dplugin.verifier.home.dir=${{ needs.build.outputs.pluginVerifierHomeDir }}
 

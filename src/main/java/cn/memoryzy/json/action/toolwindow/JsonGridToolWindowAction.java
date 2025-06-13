@@ -50,8 +50,7 @@ public class JsonGridToolWindowAction extends DumbAwareAction implements UpdateI
         if (null == editorData) return;
 
         String json = GlobalJsonConverter.parseJson(context, editorData);
-        boolean isJson = GlobalJsonConverter.isValidJson(context.getProcessor());
-        JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(json)) : Json5Util.parseWithComment(json);
+        JsonWrapper jsonWrapper = JsonUtil.isJson(json) ? JsonUtil.parse(JsonUtil.ensureJson(json)) : Json5Util.parseWithComment(json);
         JsonStructureAction.showInOriginalToolWindow(getEventProject(e), null, jsonWrapper, StructureActionSource.TOOLWINDOW_TOOLBAR, UIUtils.JSON_GRID_CARD_NAME);
     }
 

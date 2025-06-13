@@ -47,7 +47,6 @@ public class JsonStructureToolWindowAction extends DumbAwareAction implements Up
                 event.getDataContext(),
                 editor,
                 json,
-                GlobalJsonConverter.isValidJson(context.getProcessor()),
                 StructureActionSource.TOOLWINDOW_TOOLBAR,
                 false);
     }

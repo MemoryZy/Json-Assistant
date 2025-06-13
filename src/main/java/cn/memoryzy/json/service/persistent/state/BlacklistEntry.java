@@ -1,10 +1,9 @@
-package cn.memoryzy.json.model;
+package cn.memoryzy.json.service.persistent.state;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.memoryzy.json.constant.DataTypeConstant;
-import cn.memoryzy.json.model.serializer.LocalDateTimeTypeHandler;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
@@ -27,37 +26,37 @@ public class BlacklistEntry {
     /**
      * 记录Id
      */
-    private Integer id;
+    public Integer id;
 
     /**
      * 名称
      */
-    private String name;
+    public String name;
 
     /**
      * 记录短文本（展示）
      */
-    private String shortText;
+    public String shortText;
 
     /**
      * 记录原文
      */
-    private String originalText;
+    public String originalText;
 
     /**
      * 原文类型
      */
-    private String originalDataType;
+    public String originalDataType;
 
     /**
      * 记录解析后的 JSON 对象
      */
-    private JsonWrapper jsonWrapper;
+    public JsonWrapper jsonWrapper;
 
     /**
      * 历史记录插入时间
      */
-    private LocalDateTime insertTime;
+    public LocalDateTime insertTime;
 
     public BlacklistEntry() {
     }
@@ -125,16 +124,6 @@ public class BlacklistEntry {
 
     public void setInsertTime(LocalDateTime insertTime) {
         this.insertTime = insertTime;
-    }
-
-    /**
-     * 转为 Json5（供 JsonSerializer 的 addObj 方法调用）
-     *
-     * @return Json5
-     */
-    public String toJson() {
-        Map<String, Object> map = BeanUtil.beanToMap(this);
-        return Json5Util.toJson5Str(map, Json5Util.COMPACT_JSON5.handleType(new LocalDateTimeTypeHandler()));
     }
 
     public static BlacklistEntry fromMap(Map<String, Object> map) {

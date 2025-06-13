@@ -5,6 +5,7 @@ import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.util.DataConverter;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.icons.AllIcons;
@@ -35,7 +36,7 @@ public class ToPropertiesAction extends DumbAwareAction implements UpdateInBackg
         DataContext dataContext = event.getDataContext();
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
-        String propertiesStr = DataConverter.jsonToProperties(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+        String propertiesStr = DataConverter.jsonToProperties(json, JsonUtil.isJson(json));
         TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), propertiesStr, FileTypeHolder.PROPERTIES);
     }
 

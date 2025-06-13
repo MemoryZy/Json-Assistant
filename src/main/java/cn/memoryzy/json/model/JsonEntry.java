@@ -3,9 +3,7 @@ package cn.memoryzy.json.model;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.LocalDateTimeUtil;
-import cn.memoryzy.json.model.serializer.LocalDateTimeTypeHandler;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 
@@ -118,16 +116,6 @@ public class JsonEntry {
         return insertTime;
     }
     // endregion
-
-    /**
-     * 转为 Json5（供 JsonSerializer 的 addObj 方法调用）
-     *
-     * @return Json5
-     */
-    public String toJson() {
-        Map<String, Object> map = BeanUtil.beanToMap(this);
-        return Json5Util.toJson5Str(map, Json5Util.COMPACT_JSON5.handleType(new LocalDateTimeTypeHandler()));
-    }
 
     public static JsonEntry fromMap(Map<String, Object> map) {
         // 替换时间类型（加快转换速度）

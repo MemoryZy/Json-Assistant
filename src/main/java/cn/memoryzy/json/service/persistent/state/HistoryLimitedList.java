@@ -1,5 +1,6 @@
-package cn.memoryzy.json.model;
+package cn.memoryzy.json.service.persistent.state;
 
+import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import com.intellij.openapi.project.Project;

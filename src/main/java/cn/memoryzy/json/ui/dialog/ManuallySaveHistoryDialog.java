@@ -2,7 +2,7 @@ package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.model.HistoryLimitedList;
+import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;

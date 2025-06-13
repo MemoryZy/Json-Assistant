@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import cn.memoryzy.json.util.XmlUtil;
@@ -45,7 +46,7 @@ public class ToXmlAction extends DumbAwareAction implements UpdateInBackground {
             GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
             String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
             // 处理不同的 Json 类型
-            xmlStr = XmlUtil.toXml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+            xmlStr = XmlUtil.toXml(json, JsonUtil.isJson(json));
             xmlStr = xmlStr.replaceAll("\r\n", "\n");
         } catch (Exception ex) {
             LOG.error("xml conversion failure", ex);

@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import cn.memoryzy.json.util.YamlUtil;
@@ -45,7 +46,7 @@ public class ToYamlAction extends DumbAwareAction implements UpdateInBackground 
             GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
             String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
             // 处理不同的 Json 类型
-            yamlStr = YamlUtil.toYaml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+            yamlStr = YamlUtil.toYaml(json, JsonUtil.isJson(json));
         } catch (Exception ex) {
             LOG.error("Yaml conversion failure", ex);
             return;

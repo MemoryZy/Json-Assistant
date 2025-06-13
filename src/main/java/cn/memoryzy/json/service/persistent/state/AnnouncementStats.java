@@ -1,11 +1,7 @@
-package cn.memoryzy.json.model;
+package cn.memoryzy.json.service.persistent.state;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.memoryzy.json.model.serializer.LocalDateTimeTypeHandler;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.util.Json5Util;
-
-import java.util.Map;
 
 /**
  * @author Memory
@@ -16,29 +12,19 @@ public class AnnouncementStats {
     /**
      * 展示次数
      */
-    private int displayCount = 0;
+    public int displayCount = 0;
 
     /**
      * 最后展示时间戳
      */
-    private long lastShownTime = 0L;
+    public long lastShownTime = 0L;
 
     /**
      * 是否能够再显示
      */
-    private boolean shouldShowAgain = true;
+    public boolean shouldShowAgain = true;
 
     public AnnouncementStats() {
-    }
-
-    /**
-     * 转为 Json5（供 JsonSerializer 的 addObj 方法调用）
-     *
-     * @return Json5
-     */
-    public String toJson() {
-        Map<String, Object> map = BeanUtil.beanToMap(this);
-        return Json5Util.toJson5Str(map, Json5Util.COMPACT_JSON5.handleType(new LocalDateTimeTypeHandler()));
     }
 
     public static AnnouncementStats fromMap(ObjectWrapper wrapper) {

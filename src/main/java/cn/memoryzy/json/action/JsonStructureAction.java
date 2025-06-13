@@ -69,7 +69,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
         editorData.setParseComment(true);
         String json = GlobalJsonConverter.parseJson(context, editorData);
-        show(dataContext, editor, json, GlobalJsonConverter.isValidJson(context.getProcessor()), source, queryEditorFlag);
+        show(dataContext, editor, json, source, queryEditorFlag);
     }
 
 
@@ -78,14 +78,12 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
      *
      * @param dataContext     数据上下文
      * @param text            JSON文本
-     * @param isJson          是否为JSON格式、反之为JSON5
      * @param source          事件触发来源
      * @param queryEditorFlag 是否为查询界面的编辑器
      */
     public static void show(DataContext dataContext,
                             Editor editor,
                             String text,
-                            boolean isJson,
                             StructureActionSource source,
                             boolean queryEditorFlag) {
 
@@ -93,7 +91,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
         // 获取编辑器及文件上下文
         EditorContext editorContext = PlatformUtil.getEditorContext(project, editor);
         // 解析 JSON
-        JsonWrapper jsonWrapper = isJson ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parseWithComment(text);
+        JsonWrapper jsonWrapper = JsonUtil.isJson(text) ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parseWithComment(text);
 
         TreeDisplayMode treeDisplayMode;
         if (queryEditorFlag) {

@@ -1,7 +1,7 @@
 package cn.memoryzy.json.service.persistent;
 
-import cn.memoryzy.json.model.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter;
+import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;

@@ -2,8 +2,8 @@ package cn.memoryzy.json.service.persistent.converter;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.AnnouncementStats;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
+import cn.memoryzy.json.service.persistent.state.AnnouncementStats;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.util.xmlb.Converter;
 import org.jetbrains.annotations.NotNull;

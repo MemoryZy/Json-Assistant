@@ -10,6 +10,10 @@ import java.util.Map;
  */
 public class ArrayWrapper extends ArrayList<Object> implements JsonWrapper {
 
+    public ArrayWrapper() {
+        super();
+    }
+
     @SuppressWarnings("unchecked")
     public ArrayWrapper(Object source) {
         super();
