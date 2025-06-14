@@ -1,0 +1,58 @@
+name: Test Properties
+on:
+  # 可手动操控
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Properties
+    runs-on: ubuntu-latest
+    steps:
+
+      # Check out the current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+
+      # Set up Java environment for the next steps
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: 11
+
+      # Setup Gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-home-cache-cleanup: true
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+
+
+
+      # Set environment variables
+      - name: Export Properties
+        id: properties
+        shell: bash
+        run: |
+          PROPERTIES="$(./gradlew properties --console=plain -q)"
+          VERSION="$(echo "$PROPERTIES" | grep "^version:" | cut -f2- -d ' ')"
+          NAME="$(echo "$PROPERTIES" | grep "^name:" | cut -f2- -d ' ')"
+          COMING_NAME="$(echo "$NAME" | sed 's/ /\-/g')"
+          
+          ORIGIN_NAME="$(echo "$PROPERTIES" | grep "^pluginName:" | cut -f2- -d ' ' || echo "$NAME")"
+          
+          # 转义空格
+          NAME="$(echo "$NAME" | sed 's/ /\\ /g')"
+          
+          echo "name: $NAME"
+          echo "coming_name: $COMING_NAME"
+          echo "version: $VERSION"
+          echo "releaseTagName: ${{ github.event.release.tag_name }}"
+          echo ""
+          echo "origin name: ORIGIN_NAME"
+
