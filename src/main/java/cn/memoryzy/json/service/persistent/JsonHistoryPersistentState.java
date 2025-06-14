@@ -3,6 +3,7 @@ package cn.memoryzy.json.service.persistent;
 import cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
@@ -16,7 +17,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/11/25
  */
-@State(name = "Json Assistant History", storages = {@Storage(value = "JsonAssistantHistoryState.xml")})
+@State(name = "Json Assistant History", storages = {@Storage(value = "JsonAssistantHistoryState.xml", roamingType = RoamingType.DISABLED)})
 public class JsonHistoryPersistentState implements PersistentStateComponent<JsonHistoryPersistentState> {
     public static final int LIMIT = 50;
 
