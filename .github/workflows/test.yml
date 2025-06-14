@@ -53,6 +53,10 @@ jobs:
           echo "coming_name: $COMING_NAME"
           echo "version: $VERSION"
           echo "releaseTagName: ${{ github.event.release.tag_name }}"
-          echo ""
+          echo "\n"
           echo "origin name: $ORIGIN_NAME"
+          
+          echo "\n"
+          
+          echo "$ORIGIN_NAME-$VERSION-ProGuard-Mapping.txt"
 
