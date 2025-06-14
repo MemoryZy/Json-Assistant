@@ -46,6 +46,8 @@ jobs:
           
           ORIGIN_NAME="$(echo "$PROPERTIES" | grep "^pluginName:" | cut -f2- -d ' ' || echo "$NAME")"
           
+          PROGUARD_MAPPING_FILE_NAME="$ORIGIN_NAME-$VERSION-ProGuard-Mapping.txt"
+          
           # 转义空格
           NAME="$(echo "$NAME" | sed 's/ /\\ /g')"
           
@@ -53,10 +55,9 @@ jobs:
           echo "coming_name: $COMING_NAME"
           echo "version: $VERSION"
           echo "releaseTagName: ${{ github.event.release.tag_name }}"
-          echo "\n"
+
           echo "origin name: $ORIGIN_NAME"
+
           
-          echo "\n"
-          
-          echo "$ORIGIN_NAME-$VERSION-ProGuard-Mapping.txt"
+          echo "Mapping: $PROGUARD_MAPPING_FILE_NAME"
 
