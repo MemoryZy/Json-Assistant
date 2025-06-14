@@ -58,6 +58,9 @@ jobs:
           # 原插件名
           ORIGIN_NAME="$(echo "$PROPERTIES" | grep "^pluginName:" | cut -f2- -d ' ' || echo "$NAME")"
           
+          # 混淆映射表
+          PROGUARD_MAPPING_FILE_NAME="$ORIGIN_NAME-$VERSION-ProGuard-Mapping.txt"
+          
           # 转义空格
           NAME="$(echo "$NAME" | sed 's/ /\\ /g')"
           
@@ -66,6 +69,7 @@ jobs:
           echo "coming_name: $COMING_NAME"
           echo "version: $VERSION"
           echo "releaseTagName: ${{ github.event.release.tag_name }}"
+          echo "proguardMappingFileName: $PROGUARD_MAPPING_FILE_NAME"
           echo "changelog:"
           echo "$CHANGELOG"
           
@@ -74,6 +78,7 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "pluginName=$NAME-$VERSION.zip" >> $GITHUB_OUTPUT
           echo "pluginSignedName=$NAME-$VERSION-signed.zip" >> $GITHUB_OUTPUT
+          echo "proguardMappingFileName=$PROGUARD_MAPPING_FILE_NAME" >> $GITHUB_OUTPUT
           
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
@@ -100,6 +105,13 @@ jobs:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
         run: ./gradlew publishPlugin
+
+      # 上传保存混淆映射文件（重要，因为每次混淆的类名都可能不一样）
+      - name: Upload Obfuscation Mapping
+        uses: actions/upload-artifact@v4
+        with:
+          name: Obfuscation-Mapping
+          path: ./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}
 
       - name: Move zip
         run: |
