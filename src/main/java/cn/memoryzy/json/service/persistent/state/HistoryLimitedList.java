@@ -1,6 +1,5 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import com.intellij.openapi.project.Project;
@@ -14,6 +13,7 @@ import java.util.Objects;
  * @since 2024/11/25
  */
 public class HistoryLimitedList extends LinkedList<JsonEntry> {
+
     private final int limit;
 
     public HistoryLimitedList(int limit) {
@@ -111,7 +111,7 @@ public class HistoryLimitedList extends LinkedList<JsonEntry> {
     }
 
     public static int calculateId(Project project) {
-        HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).getHistory();
+        HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).history;
         Integer id = history.stream().map(JsonEntry::getId).max(Integer::compareTo).orElse(-1);
         return id + 1;
     }

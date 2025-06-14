@@ -10,9 +10,9 @@ import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
+import cn.memoryzy.json.service.persistent.state.JsonEntry;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.node.HistoryTreeNode;
@@ -174,7 +174,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     }
 
     private TreeModel buildTreeModel() {
-        return new DefaultTreeModel(buildRootNode(JsonHistoryPersistentState.getInstance(project).getHistory()));
+        return new DefaultTreeModel(buildRootNode(JsonHistoryPersistentState.getInstance(project).history));
     }
 
     private TreeNode buildRootNode(HistoryLimitedList historyList) {
@@ -273,7 +273,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
                             JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"),
                             null,
                             name,
-                            new NameValidator(JsonHistoryPersistentState.getInstance(project).getHistory()));
+                            new NameValidator(JsonHistoryPersistentState.getInstance(project).history));
                     if (StrUtil.isNotBlank(newName)) {
                         entry.setName(newName);
                         UIUtils.repaintComponent(tree);
@@ -339,7 +339,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
             }
 
             // 获取历史记录列表
-            HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(Objects.requireNonNull(project)).getHistory();
+            HistoryLimitedList historyList = JsonHistoryPersistentState.getInstance(Objects.requireNonNull(project)).history;
             // 删除真实数据
             historyList.removeById(deletionList.toArray(new Integer[0]));
 

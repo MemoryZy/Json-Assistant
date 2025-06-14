@@ -11,14 +11,16 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 /**
  * @author Memory
  * @since 2024/11/25
  */
 @State(name = "Json Assistant History", storages = {@Storage(value = "JsonAssistantHistoryState.xml", roamingType = RoamingType.DISABLED)})
 public class JsonHistoryPersistentState implements PersistentStateComponent<JsonHistoryPersistentState> {
+
+    /**
+     * 历史记录数量限制
+     */
     public static final int LIMIT = 50;
 
     public static JsonHistoryPersistentState getInstance(Project project) {
@@ -26,7 +28,7 @@ public class JsonHistoryPersistentState implements PersistentStateComponent<Json
     }
 
     @Attribute(converter = HistoryLimitedListConverter.class)
-    public HistoryLimitedList history;
+    public HistoryLimitedList history = new HistoryLimitedList(LIMIT);
 
     @Override
     public @Nullable JsonHistoryPersistentState getState() {
@@ -36,14 +38,6 @@ public class JsonHistoryPersistentState implements PersistentStateComponent<Json
     @Override
     public void loadState(@NotNull JsonHistoryPersistentState state) {
         this.history = state.history;
-    }
-
-    public HistoryLimitedList getHistory() {
-        if (Objects.isNull(this.history)) {
-            this.history = new HistoryLimitedList(LIMIT);
-        }
-
-        return this.history;
     }
 
 

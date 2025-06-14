@@ -4,9 +4,9 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
+import cn.memoryzy.json.service.persistent.state.JsonEntry;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
 import cn.memoryzy.json.ui.listener.ListRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
@@ -161,7 +161,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
     }
 
     private DefaultListModel<JsonEntry> fillHistoryListModel() {
-        HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).getHistory();
+        HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).history;
         return JBList.createDefaultListModel(history);
     }
 
@@ -219,7 +219,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
                         JsonAssistantBundle.messageOnSystem("dialog.assign.history.name.title"),
                         null,
                         name,
-                        new JsonHistoryTreeChooser.NameValidator(JsonHistoryPersistentState.getInstance(project).getHistory()));
+                        new JsonHistoryTreeChooser.NameValidator(JsonHistoryPersistentState.getInstance(project).history));
                 if (StrUtil.isNotBlank(newName)) {
                     selectedValue.setName(newName);
                     UIUtils.repaintComponent(showList);
@@ -262,7 +262,7 @@ public class JsonHistoryListChooser extends DialogWrapper {
             JsonEntry selectedValue = showList.getSelectedValue();
 
             // 删除真实数据
-            HistoryLimitedList history = JsonHistoryPersistentState.getInstance(Objects.requireNonNull(project)).getHistory();
+            HistoryLimitedList history = JsonHistoryPersistentState.getInstance(Objects.requireNonNull(project)).history;
             history.removeById(selectedValue.getId());
 
             // 替换List数据为最新的

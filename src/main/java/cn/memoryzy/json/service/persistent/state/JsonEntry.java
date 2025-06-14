@@ -1,4 +1,4 @@
-package cn.memoryzy.json.model;
+package cn.memoryzy.json.service.persistent.state;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;

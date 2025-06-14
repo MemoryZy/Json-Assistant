@@ -147,7 +147,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
 
                 // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
                 List<JsonWrapper> oldHistory = new ArrayList<>();
-                HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).getHistory();
+                HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).history;
                 for (Object data : array) {
                     JsonWrapper wrapper = null;
                     String dataStr = (String) data;

@@ -8,7 +8,6 @@ import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.model.EditorInitData;
-import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
@@ -17,10 +16,7 @@ import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
-import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
-import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
-import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.dialog.ManuallySaveHistoryDialog;
 import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
@@ -415,7 +411,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
 
     private void performAction(boolean auto) {
-        HistoryLimitedList historyList = historyState.getHistory();
+        HistoryLimitedList historyList = historyState.history;
 
         boolean isJson5 = false;
         String text = StrUtil.trim(editor.getDocument().getText());

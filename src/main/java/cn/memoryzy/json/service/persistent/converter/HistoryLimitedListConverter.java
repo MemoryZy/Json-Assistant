@@ -2,11 +2,11 @@ package cn.memoryzy.json.service.persistent.converter;
 
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.model.JsonEntry;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
+import cn.memoryzy.json.service.persistent.state.JsonEntry;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.diagnostic.Logger;

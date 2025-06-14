@@ -2,7 +2,7 @@ package cn.memoryzy.json.ui.node;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
-import cn.memoryzy.json.model.JsonEntry;
+import cn.memoryzy.json.service.persistent.state.JsonEntry;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Objects;
