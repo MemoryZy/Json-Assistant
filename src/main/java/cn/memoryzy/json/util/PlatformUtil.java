@@ -416,6 +416,21 @@ public class PlatformUtil {
         return conversionContext.getProjectRootManagerSettings();
     }
 
+    /**
+     * 为指定配置文件创建数据管理
+     *
+     * @param project  项目
+     * @param fileName 文件名
+     * @return 数据管理器
+     */
+    public static ComponentManagerSettings createProjectSettings(Project project, String fileName) {
+        IProjectStore store = ProjectKt.getStateStore(project);
+        Path projectBasePath = store.getProjectBasePath();
+
+        ConversionContextImpl conversionContext = new ConversionContextImpl(projectBasePath);
+        return conversionContext.createProjectSettings(fileName);
+    }
+
     public static String getFileContent(VirtualFile file) {
         String content = null;
         try {
