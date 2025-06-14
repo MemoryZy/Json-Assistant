@@ -54,5 +54,5 @@ jobs:
           echo "version: $VERSION"
           echo "releaseTagName: ${{ github.event.release.tag_name }}"
           echo ""
-          echo "origin name: ORIGIN_NAME"
+          echo "origin name: $ORIGIN_NAME"
 
