@@ -206,7 +206,7 @@ tasks {
         keep("class * implements com.intellij.codeInsight.intention.IntentionAction")
 
         // State 存储对象的字段不能被混淆，不然它们在xml中的key就会变成 a b c 这样的，并且每次都不同
-        keep("class cn.memoryzy.json.service.persistent.state.** { <fields>; }")
+        keep("class cn.memoryzy.json.service.persistent.state.** {*;}")
 
         // 不混淆枚举类，因为 JSON 反序列化时会根据枚举常量名来进行，如果混淆了这个，就会出现找不到的问题
         keepclassmembers("enum * {*;}")

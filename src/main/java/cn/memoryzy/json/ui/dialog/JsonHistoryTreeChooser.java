@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.structure.CollapseAllAction;
 import cn.memoryzy.json.action.structure.ExpandAllAction;
@@ -180,7 +180,7 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     private TreeNode buildRootNode(HistoryLimitedList historyList) {
         HistoryTreeNode rootNode = new HistoryTreeNode();
         Map<String, List<JsonEntry>> historyGroup = historyList.stream().collect(Collectors.groupingBy(el -> {
-            String formatted = LocalDateTimeUtil.format(el.getInsertTime(), DatePattern.NORM_DATE_FORMATTER);
+            String formatted = DateUtil.format(el.getInsertTime(), DatePattern.NORM_DATE_FORMATTER);
             return formatted != null ? formatted : PluginConstant.UNKNOWN;
         }));
 

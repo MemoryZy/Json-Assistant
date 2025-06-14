@@ -2,7 +2,7 @@ package cn.memoryzy.json.service.persistent.state;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.util.Json5Util;
@@ -11,7 +11,7 @@ import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.editor.actions.ContentChooser;
 import com.intellij.openapi.util.text.StringUtil;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -56,7 +56,7 @@ public class BlacklistEntry {
     /**
      * 历史记录插入时间
      */
-    public LocalDateTime insertTime;
+    public Date insertTime;
 
     public BlacklistEntry() {
     }
@@ -67,7 +67,7 @@ public class BlacklistEntry {
         this.originalDataType = originalDataType;
         this.shortText = getShortText(originalText, originalDataType, jsonWrapper);
         this.jsonWrapper = jsonWrapper;
-        this.insertTime = LocalDateTime.now();
+        this.insertTime = new Date();
     }
 
     public Integer getId() {
@@ -118,18 +118,18 @@ public class BlacklistEntry {
         this.jsonWrapper = jsonWrapper;
     }
 
-    public LocalDateTime getInsertTime() {
+    public Date getInsertTime() {
         return insertTime;
     }
 
-    public void setInsertTime(LocalDateTime insertTime) {
+    public void setInsertTime(Date insertTime) {
         this.insertTime = insertTime;
     }
 
     public static BlacklistEntry fromMap(Map<String, Object> map) {
         // 替换时间类型（加快转换速度）
         String insertTime = (String) map.get(insertTimeConstant);
-        map.put(insertTimeConstant, LocalDateTimeUtil.parse(insertTime, DatePattern.NORM_DATETIME_PATTERN));
+        map.put(insertTimeConstant, DateUtil.parse(insertTime, DatePattern.NORM_DATETIME_PATTERN));
         return BeanUtil.toBean(map, BlacklistEntry.class);
     }
 

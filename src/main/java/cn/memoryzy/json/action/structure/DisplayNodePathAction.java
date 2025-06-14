@@ -5,6 +5,7 @@ import cn.memoryzy.json.service.persistent.state.StructureState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CheckedActionGroup;
 import com.intellij.openapi.actionSystem.ToggleAction;
+import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAware;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/4/7
  */
-public class DisplayNodePathAction extends ToggleAction implements CheckedActionGroup, DumbAware {
+public class DisplayNodePathAction extends ToggleAction implements CheckedActionGroup, UpdateInBackground, DumbAware {
 
     private final StructureState structureState;
 

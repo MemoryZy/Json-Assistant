@@ -2,12 +2,12 @@ package cn.memoryzy.json.service.persistent.state;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
-import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -49,7 +49,7 @@ public class JsonEntry {
     /**
      * 历史记录插入时间
      */
-    private LocalDateTime insertTime;
+    private Date insertTime;
 
 
     // region 构造方法及Getter、Setter方法
@@ -65,7 +65,7 @@ public class JsonEntry {
         this.shortText = getShortText(jsonWrapper);
         this.jsonString = jsonString;
         this.jsonWrapper = jsonWrapper;
-        this.insertTime = LocalDateTime.now();
+        this.insertTime = new Date();
     }
 
     public void setId(Integer id) {
@@ -88,7 +88,7 @@ public class JsonEntry {
         this.jsonWrapper = jsonWrapper;
     }
 
-    public void setInsertTime(LocalDateTime insertTime) {
+    public void setInsertTime(Date insertTime) {
         this.insertTime = insertTime;
     }
 
@@ -112,15 +112,16 @@ public class JsonEntry {
         return jsonWrapper;
     }
 
-    public LocalDateTime getInsertTime() {
+    public Date getInsertTime() {
         return insertTime;
     }
+
     // endregion
 
     public static JsonEntry fromMap(Map<String, Object> map) {
         // 替换时间类型（加快转换速度）
         String insertTime = (String) map.get(insertTimeConstant);
-        map.put(insertTimeConstant, LocalDateTimeUtil.parse(insertTime, DatePattern.NORM_DATETIME_PATTERN));
+        map.put(insertTimeConstant, DateUtil.parse(insertTime, DatePattern.NORM_DATETIME_PATTERN));
         return BeanUtil.toBean(map, JsonEntry.class);
     }
 
