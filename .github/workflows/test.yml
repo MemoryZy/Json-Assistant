@@ -12,8 +12,7 @@ jobs:
       # Check out the current repository
       - name: Fetch Sources
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.release.tag_name }}
+       
 
 
       # Set up Java environment for the next steps
