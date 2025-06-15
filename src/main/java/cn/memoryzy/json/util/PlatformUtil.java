@@ -58,6 +58,7 @@ import com.intellij.util.ui.TextTransferable;
 import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -442,6 +443,17 @@ public class PlatformUtil {
     public static String getApplicationConfigPath() {
         return PathManager.getOptionsPath();
     }
+
+    /**
+     * 获取指定配置文件（XML格式）
+     *
+     * @param configFileName 配置文件名
+     * @return 配置文件
+     */
+    public static File getOptionsConfigFile(@NotNull String configFileName) {
+        return PathManager.getOptionsFile(configFileName);
+    }
+
 
     public static String getFileContent(VirtualFile file) {
         String content = null;
