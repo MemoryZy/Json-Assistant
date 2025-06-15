@@ -11,6 +11,7 @@ import cn.memoryzy.json.model.PluginDetail;
 import cn.memoryzy.json.model.PluginUpdateDetail;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.conversion.ComponentManagerSettings;
+import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
@@ -22,6 +23,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationNamesInfo;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
@@ -412,7 +414,7 @@ public class PlatformUtil {
         IProjectStore store = ProjectKt.getStateStore(project);
         Path projectBasePath = store.getProjectBasePath();
 
-        ConversionContextImpl conversionContext = new ConversionContextImpl(projectBasePath);
+        ConversionContext conversionContext = new ConversionContextImpl(projectBasePath);
         return conversionContext.getProjectRootManagerSettings();
     }
 
@@ -427,8 +429,18 @@ public class PlatformUtil {
         IProjectStore store = ProjectKt.getStateStore(project);
         Path projectBasePath = store.getProjectBasePath();
 
-        ConversionContextImpl conversionContext = new ConversionContextImpl(projectBasePath);
+        ConversionContext conversionContext = new ConversionContextImpl(projectBasePath);
         return conversionContext.createProjectSettings(fileName);
+    }
+
+
+    /**
+     * 获取IDE的全局配置路径
+     *
+     * @return 全局配置路径
+     */
+    public static String getApplicationConfigPath() {
+        return PathManager.getOptionsPath();
     }
 
     public static String getFileContent(VirtualFile file) {

@@ -231,5 +231,29 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
             LOG.error(e);
         }
     }
+
+
+
+    /*
+
+    TODO 操作Dom
+
+com.intellij.conversion.impl.ConversionContextImpl.findGlobalLibraryElement
+
+      private static @Nullable Element findGlobalLibraryElement(String name) throws CannotConvertException {
+    final File file = PathManager.getOptionsFile("applicationLibraries");
+    if (file.exists()) {
+      final Element root = JDomConvertingUtil.load(file.toPath());
+      final Element libraryTable = JDomSerializationUtil.findComponent(root, "libraryTable");
+      if (libraryTable != null) {
+        return findLibraryInTable(libraryTable, name);
+      }
+    }
+    return null;
+  }
+
+     */
+
+
 }
 

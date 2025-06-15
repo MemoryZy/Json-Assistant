@@ -103,21 +103,16 @@ function findReportFiles(dir) {
                         // 读取文件内容
                         let content = fs.readFileSync(filePath, 'utf8');
 
-                        // 特别处理 deprecated-usages.txt 和 experimental-api-usages.txt
-                        if (fileName === 'deprecated-usages.txt' || fileName === 'experimental-api-usages.txt') {
-                            // 确保内容有换行符
-                            if (content.trim() !== '') {
-                                // 如果内容没有换行符，添加一个
-                                if (content.indexOf('\n') === -1) {
-                                    content += '\n';
-                                }
-                                // 确保每行都有换行符
-                                else {
-                                    content = content.split('\n').map(line => {
-                                        return line.endsWith('\n') ? line : line + '\n\n';
-                                    }).join('');
-                                }
-                            }
+                        // 统一处理：确保每行之间都有换行符
+                        content = content
+                            .split('\n')               // 按行分割
+                            .filter(line => line.trim() !== '')  // 过滤空行
+                            .map(line => line + '\n')  // 每行添加换行符
+                            .join('');                 // 重新组合
+
+                        // 特别处理：对于问题文件，确保问题之间有空行
+                        if (fileName !== 'verification-verdict.txt' && fileName !== 'dependencies.txt') {
+                            content = content.replace(/\n+/g, '\n\n');
                         }
 
                         reportData.files[fileName] = {
@@ -581,9 +576,32 @@ function generateHTML(reports) {
             ${reports.map((report, index) => {
         // 获取验证结果
         const verdict = report.files['verification-verdict.txt']?.content || '未知';
-        // 判断兼容状态
-        const isCompatible = verdict.includes('Compatible');
-        const isIncompatible = verdict.includes('Incompatible') || verdict.includes('Invalid');
+
+        // 定义需要触发错误级别的关键文件
+        const criticalFiles = [
+            'compatibility-problems.txt',
+            'internal-api-usages.txt',
+            'invalid-plugin.txt',
+            'override-only-usages.txt',
+            'non-extendable-api-usages.txt'
+        ];
+
+        // 检查是否存在关键问题文件
+        const hasCriticalFile = criticalFiles.some(file =>
+            report.files[file] && report.files[file].content.trim() !== ''
+        );
+
+        // 优先根据关键文件判断状态
+        let status;
+        if (hasCriticalFile) {
+            status = 'incompatible';  // 存在关键文件，标记为不兼容
+        } else if (verdict.includes('Compatible')) {
+            status = 'compatible';    // 兼容状态
+        } else if (verdict.includes('Incompatible') || verdict.includes('Invalid')) {
+            status = 'incompatible';  // 不兼容状态
+        } else {
+            status = 'warning';       // 默认警告状态
+        }
 
         // 计算问题总数并分组
         const problemCounts = Object.entries(report.problemCounts)
@@ -597,16 +615,16 @@ function generateHTML(reports) {
 
         // 生成报告卡片
         return `
-                <div class="plugin-card" data-verdict="${isCompatible ? 'compatible' : isIncompatible ? 'incompatible' : 'unknown'}" data-problems="${report.totalProblems > 0}">
+                <div class="plugin-card" data-verdict="${status}" data-problems="${report.totalProblems > 0}">
                     <!-- 卡片头部 -->
                     <div class="accordion-header" id="heading${index}">
                         <button class="accordion-button d-flex justify-content-between align-items-center flex-wrap" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${index}" aria-expanded="${index === 0 ? 'true' : 'false'}" aria-controls="collapse${index}">
                             <div class="d-flex flex-column">
                                 <div>
                                     <span>${report.productVersion}</span>
-                                    <!-- 状态徽章 -->
-                                    <span class="badge ${isCompatible ? 'compatible-badge' : isIncompatible ? 'incompatible-badge' : 'warning-badge'} status-badge">
-                                        ${isCompatible ? '兼容' : isIncompatible ? '不兼容' : '警告'}
+                                    <!-- 状态徽章 - 使用新判断逻辑 -->
+                                    <span class="badge ${status === 'compatible' ? 'compatible-badge' : status === 'incompatible' ? 'incompatible-badge' : 'warning-badge'} status-badge">
+                                        ${status === 'compatible' ? '兼容' : status === 'incompatible' ? '不兼容' : '警告'}
                                     </span>
                                 </div>
                                 <small class="version-id">插件: ${report.pluginName}:${report.pluginVersion}</small>
