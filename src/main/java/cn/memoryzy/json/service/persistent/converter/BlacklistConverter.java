@@ -1,11 +1,15 @@
 package cn.memoryzy.json.service.persistent.converter;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.state.BlacklistEntry;
 import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.util.xmlb.Converter;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +34,24 @@ public class BlacklistConverter extends Converter<LinkedList<BlacklistEntry>> {
 
         for (Object data : jsonArray) {
             ObjectWrapper element = (ObjectWrapper) data;
-            BlacklistEntry entry = BlacklistEntry.fromMap(element);
+            // BlacklistEntry entry = BlacklistEntry.fromMap(element);
+
+            Long insertTime = null;
+            String time = element.get("insertTime") + "";
+            if (!JsonAssistantUtil.isValidTimestamp(time)) {
+                DateTime dateTime = null;
+                try {
+                    dateTime = DateUtil.parse(time);
+                } catch (Exception ignored) {
+                }
+
+                if (null != dateTime) {
+                    insertTime = dateTime.getTime();
+                }
+            }
+
+            BlacklistEntry entry = BeanUtil.toBean(element, BlacklistEntry.class);
+            if (null != insertTime) entry.setInsertTime(insertTime);
             jsonEntries.add(entry);
         }
 

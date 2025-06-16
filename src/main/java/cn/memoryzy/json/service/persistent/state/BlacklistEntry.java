@@ -11,7 +11,6 @@ import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.editor.actions.ContentChooser;
 import com.intellij.openapi.util.text.StringUtil;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -56,7 +55,7 @@ public class BlacklistEntry {
     /**
      * 历史记录插入时间
      */
-    public Date insertTime;
+    public Long insertTime;
 
     public BlacklistEntry() {
     }
@@ -67,7 +66,7 @@ public class BlacklistEntry {
         this.originalDataType = originalDataType;
         this.shortText = getShortText(originalText, originalDataType, jsonWrapper);
         this.jsonWrapper = jsonWrapper;
-        this.insertTime = new Date();
+        this.insertTime = System.currentTimeMillis();
     }
 
     public Integer getId() {
@@ -118,11 +117,11 @@ public class BlacklistEntry {
         this.jsonWrapper = jsonWrapper;
     }
 
-    public Date getInsertTime() {
+    public Long getInsertTime() {
         return insertTime;
     }
 
-    public void setInsertTime(Date insertTime) {
+    public void setInsertTime(Long insertTime) {
         this.insertTime = insertTime;
     }
 

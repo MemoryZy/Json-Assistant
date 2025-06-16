@@ -180,7 +180,8 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     private TreeNode buildRootNode(HistoryLimitedList historyList) {
         HistoryTreeNode rootNode = new HistoryTreeNode();
         Map<String, List<JsonEntry>> historyGroup = historyList.stream().collect(Collectors.groupingBy(el -> {
-            String formatted = DateUtil.format(el.getInsertTime(), DatePattern.NORM_DATE_FORMATTER);
+            Date createTime = new Date(el.getInsertTime());
+            String formatted = DateUtil.format(createTime, DatePattern.NORM_DATE_FORMATTER);
             return formatted != null ? formatted : PluginConstant.UNKNOWN;
         }));
 

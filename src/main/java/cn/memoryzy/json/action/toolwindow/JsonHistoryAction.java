@@ -252,6 +252,31 @@ com.intellij.conversion.impl.ConversionContextImpl.findGlobalLibraryElement
     return null;
   }
 
+
+
+java.lang.ClassCastException: class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')
+	at cn.memoryzy.json.model.JsonEntry.fromMap(JsonEntry.java:134)
+	at cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter.fromString(HistoryLimitedListConverter.java:41)
+	at cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter.fromString(HistoryLimitedListConverter.java:22)
+	at com.intellij.util.xmlb.AttributeBinding.set(AttributeBinding.java:57)
+	at com.intellij.util.xmlb.BeanBinding.deserializeInto(BeanBinding.java:211)
+	at com.intellij.util.xmlb.BeanBinding.deserializeInto(BeanBinding.java:199)
+	at com.intellij.util.xmlb.BeanBinding.deserialize(BeanBinding.java:142)
+	at com.intellij.configurationStore.JdomSerializerImpl.deserialize(xmlSerializer.kt:93)
+	at com.intellij.configurationStore.DefaultStateSerializerKt.deserializeState(DefaultStateSerializer.kt:29)
+	at com.intellij.configurationStore.StateStorageBase.deserializeState(StateStorageBase.kt:32)
+	at com.intellij.configurationStore.StateGetterImpl.getState(StorageBaseEx.kt:56)
+	at com.intellij.configurationStore.ComponentStoreImpl.doInitComponent(ComponentStoreImpl.kt:470)
+	at com.intellij.configurationStore.ComponentStoreImpl.initComponent(ComponentStoreImpl.kt:415)
+	at com.intellij.configurationStore.ComponentStoreImpl.reloadState(ComponentStoreImpl.kt:633)
+	at com.intellij.configurationStore.ComponentStoreImpl.reinitComponents(ComponentStoreImpl.kt:676)
+	at com.intellij.configurationStore.ComponentStoreImpl.reload(ComponentStoreImpl.kt:663)
+	at com.intellij.configurationScript.providers.MyProjectStore.reload(ConfigurationScriptProjectStoreFactory.kt:86)
+	at com.intellij.configurationStore.StoreReloadManagerImplKt.reloadStore(StoreReloadManagerImpl.kt:266)
+	at com.intellij.configurationStore.StoreReloadManagerImpl.applyProjectChanges(StoreReloadManagerImpl.kt:131)
+	at com.intellij.configurationStore.StoreReloadManagerImpl.access$applyProjectChanges(StoreReloadManagerImpl.kt:41)
+	at com.intellij.configurationStore.StoreReloadManagerImpl$doReload$2.invokeSuspend(StoreReloadManagerImpl.kt:79)
+
      */
 
 
