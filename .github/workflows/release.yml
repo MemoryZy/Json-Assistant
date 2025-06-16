@@ -113,6 +113,15 @@ jobs:
           name: Obfuscation-Mapping
           path: ./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}
 
+      - name: Upload WebDAV
+        uses: bxb100/action-upload-webdav@v0.0.6
+        with:
+          webdav_address: ${{ secrets.WEBDAV_ADDRESS }}
+          webdav_username: ${{ secrets.WEBDAV_USERNAME }}
+          webdav_password: ${{ secrets.WEBDAV_PASSWORD }}
+          webdav_upload_path: "/Plugins/Json-Assistant"
+          files: "./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}"
+
       - name: Move zip
         run: |
           echo "${{ steps.properties.outputs.pluginName }}"
