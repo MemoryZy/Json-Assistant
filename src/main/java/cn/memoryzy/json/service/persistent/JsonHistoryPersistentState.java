@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 @State(name = "Json Assistant History", storages = {@Storage(value = "JsonAssistantHistoryState.xml", roamingType = RoamingType.DISABLED)})
 public class JsonHistoryPersistentState implements PersistentStateComponent<JsonHistoryPersistentState> {
 
+    // 下版本改为 "Json-Assistant/history.xml"
+
     /**
      * 历史记录数量限制
      */

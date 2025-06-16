@@ -19,6 +19,8 @@ import java.util.LinkedList;
 @State(name = "Json Assistant Clipboard Data Blacklist", storages = {@Storage(value = "ClipboardDataBlacklistPersistentState.xml")})
 public class ClipboardDataBlacklistPersistentState implements PersistentStateComponent<ClipboardDataBlacklistPersistentState>  {
 
+    // 下版本汇总到主配置中，名称改为 blacklist
+
     public static ClipboardDataBlacklistPersistentState getInstance() {
         return ApplicationManager.getApplication().getService(ClipboardDataBlacklistPersistentState.class);
     }

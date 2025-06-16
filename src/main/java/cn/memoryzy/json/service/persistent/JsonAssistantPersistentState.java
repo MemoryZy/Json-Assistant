@@ -20,6 +20,8 @@ import java.util.Map;
 @State(name = "Json Assistant Settings", storages = {@Storage(value = "JsonAssistantPersistentState.xml")})
 public class JsonAssistantPersistentState implements PersistentStateComponent<JsonAssistantPersistentState> {
 
+    // 下版本改为 "Json-Assistant.xml"
+
     public static JsonAssistantPersistentState getInstance() {
         return ApplicationManager.getApplication().getService(JsonAssistantPersistentState.class);
     }
