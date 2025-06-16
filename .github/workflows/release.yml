@@ -119,7 +119,7 @@ jobs:
           webdav_address: ${{ secrets.WEBDAV_ADDRESS }}
           webdav_username: ${{ secrets.WEBDAV_USERNAME }}
           webdav_password: ${{ secrets.WEBDAV_PASSWORD }}
-          webdav_upload_path: "/Plugins/Json-Assistant"
+          webdav_upload_path: "/Plugins/Json-Assistant/ProGuard"
           files: "./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}"
 
       - name: Move zip
