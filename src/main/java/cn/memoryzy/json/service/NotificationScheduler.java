@@ -17,6 +17,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * @author Memory
+ * @since 2025/6/1
+ */
 public class NotificationScheduler implements Disposable {
 
     private static final Logger LOG = Logger.getInstance(NotificationScheduler.class);
