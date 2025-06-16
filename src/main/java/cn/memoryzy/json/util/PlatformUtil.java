@@ -637,4 +637,5 @@ public class PlatformUtil {
         // 如果是内存文件，那 VirtualFile 为空
         return editorContext.setPsiFile(psiFile).setFile(psiFile.getVirtualFile());
     }
+
 }
