@@ -1,6 +1,9 @@
 # Json Assistant Plugin Changelog
 
 ## [Unreleased]
+
+## [1.8.2] - 2025-06-16
+
 - 支持选择部分字段进行序列化为JSON。
 - 支持将 JSON 以表格视图展示。
 - 大幅提升扩展功能（如时间戳转换等）的执行速度。
@@ -333,7 +336,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.2...HEAD
+[1.8.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.0...v1.8.2
 [1.8.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.8...v1.8.0
 [1.7.8]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7...v1.7.8
 [1.7.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7-beta...v1.7.7
