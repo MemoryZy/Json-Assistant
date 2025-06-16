@@ -151,6 +151,35 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.coming_name }}
 
+      # 同步发布目标仓库的草稿Release
+      - name: Publish Draft in Target Repository
+        env:
+          GH_TOKEN: ${{ secrets.TARGET_TOKEN }}  # 目标仓库PAT
+          TARGET_REPO: "${{ github.repository_owner }}/Json-Assistant"
+          RELEASE_TAG: "${{ github.event.release.tag_name }}"
+        run: |
+          gh release edit "$RELEASE_TAG" \
+          --draft=false \
+          --repo "$TARGET_REPO"
+
+      # 上传到目标仓库的Release
+      - name: Upload to Target Repository Release
+        env:
+          GH_TOKEN: ${{ secrets.TARGET_TOKEN }}  # 目标仓库PAT
+          TARGET_REPO: "${{ github.repository_owner }}/Json-Assistant"
+          RELEASE_TAG: "${{ github.event.release.tag_name }}"
+          FILE_PATH: ./build/distributions/${{ steps.properties.outputs.coming_name }}
+        run: |
+          echo "⬆️ Uploading to target repository: $TARGET_REPO"
+
+          gh release upload $RELEASE_TAG \
+            $FILE_PATH \
+            -R $TARGET_REPO \
+            --clobber  # 覆盖已存在文件
+
+          echo "✅ Assets uploaded to target repository"
+
+      # 删除新标签分支
       - name: Check If Branch Exists
         run: |
           VERSION="${{ github.event.release.tag_name }}"
