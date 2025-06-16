@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.PluginUpdateDetail;
-import cn.memoryzy.json.util.AnnouncementManager;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.VersionComparator;
@@ -35,7 +34,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         // 展示欢迎或更新通知
         showWelcomeOrUpdateNotification(project);
         // 实现公告
-        AnnouncementManager.scheduleDelayedAnnouncement(project);
+        AnnouncementManager.getInstance().scheduleDelayedAnnouncement(project);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             // 检查有无更新

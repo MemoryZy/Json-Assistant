@@ -1,4 +1,4 @@
-package cn.memoryzy.json.util;
+package cn.memoryzy.json.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
@@ -10,9 +10,9 @@ import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.Announcement;
-import cn.memoryzy.json.service.NotificationScheduler;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.AnnouncementStats;
+import cn.memoryzy.json.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.ide.BrowserUtil;
@@ -21,10 +21,11 @@ import com.intellij.ide.plugins.PluginManagerConfigurable;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Disposer;
 import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import org.jetbrains.annotations.NotNull;
@@ -38,14 +39,18 @@ import java.util.stream.Collectors;
  * @author Memory
  * @since 2025/5/27
  */
-public class AnnouncementManager {
+public class AnnouncementManager implements Disposable {
 
     private static final Logger LOG = Logger.getInstance(AnnouncementManager.class);
 
-    // TODO 需要注意的位置
-    public static void scheduleDelayedAnnouncement(@NotNull Project project) {
-        Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, Disposer.newDisposable());
+    public static AnnouncementManager getInstance() {
+        return ApplicationManager.getApplication().getService(AnnouncementManager.class);
+    }
 
+    private final Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
+
+    // TODO 需要注意的位置
+    public void scheduleDelayedAnnouncement(@NotNull Project project) {
         alarm.addRequest(() -> {
             if (!project.isDisposed()) {
                 showAnnouncement(project);
@@ -370,4 +375,8 @@ public class AnnouncementManager {
         }
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }

@@ -7,6 +7,7 @@ import cn.memoryzy.json.action.notification.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.service.NotificationScheduler;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
@@ -182,7 +183,7 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    Disposer.newDisposable());
+                    NotificationScheduler.getInstance());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
@@ -218,7 +219,7 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    Disposer.newDisposable());
+                    NotificationScheduler.getInstance());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
