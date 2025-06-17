@@ -4,6 +4,7 @@ import cn.memoryzy.json.util.Notifications;
 import com.intellij.notification.Notification;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Alarm;
@@ -21,7 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Memory
  * @since 2025/6/1
  */
-public class NotificationScheduler implements Disposable {
+@Service(Service.Level.APP)
+public final class NotificationScheduler implements Disposable {
 
     private static final Logger LOG = Logger.getInstance(NotificationScheduler.class);
 

@@ -24,6 +24,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.Alarm;
@@ -39,7 +40,8 @@ import java.util.stream.Collectors;
  * @author Memory
  * @since 2025/5/27
  */
-public class AnnouncementManager implements Disposable {
+@Service(Service.Level.APP)
+public final class AnnouncementManager implements Disposable {
 
     private static final Logger LOG = Logger.getInstance(AnnouncementManager.class);
 

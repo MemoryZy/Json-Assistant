@@ -11,6 +11,7 @@ import cn.memoryzy.json.ui.AuxiliaryTreeToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
@@ -31,7 +32,8 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/12/12
  */
-public class AuxiliaryTreeToolWindowManager {
+@Service(Service.Level.PROJECT)
+public final class AuxiliaryTreeToolWindowManager {
 
     private final Project project;
     private final ToolWindow toolWindow;

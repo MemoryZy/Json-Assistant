@@ -1,5 +1,6 @@
 package cn.memoryzy.json.enums;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
@@ -93,6 +94,17 @@ public enum ColorScheme {
     @Override
     public String toString() {
         return JsonAssistantBundle.messageOnSystem(key);
+    }
+
+
+    public static ColorScheme of(String name) {
+        for (ColorScheme value : values()) {
+            if (StrUtil.equalsIgnoreCase(value.name(), name)){
+                return value;
+            }
+        }
+
+        return null;
     }
 
 }

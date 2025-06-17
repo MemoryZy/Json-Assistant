@@ -51,10 +51,6 @@
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
 
-        <applicationService serviceImplementation="cn.memoryzy.json.service.NotificationScheduler"/>
-        <applicationService serviceImplementation="cn.memoryzy.json.service.AnnouncementManager"/>
-        <projectService serviceImplementation="cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager"/>
-
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
