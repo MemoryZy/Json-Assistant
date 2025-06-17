@@ -18,6 +18,8 @@ import java.util.Objects;
  */
 public enum ColorScheme {
 
+    // TODO 需要去除自定义选项
+
     /**
      * 跟随全局背景色
      */

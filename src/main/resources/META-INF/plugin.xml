@@ -51,6 +51,12 @@
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
 
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.EditorAppearanceSettings"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.EditorBehaviorSettings"/>
+
+
+
+
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
@@ -168,6 +174,10 @@
             <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction"/>
             <separator/>
             <action id="JsonAssistant.Action.DonateAction" class="cn.memoryzy.json.action.notification.DonateAction"/>
+
+<!--        TODO 待删除    -->
+            <separator/>
+            <action id="JsonAssistant.Action.TestConfigAction" class="cn.memoryzy.json.action.TestConfigAction"/>
         </group>
 
         <group id="JsonAssistant.Group.JsonAssistantHelpMenu">
