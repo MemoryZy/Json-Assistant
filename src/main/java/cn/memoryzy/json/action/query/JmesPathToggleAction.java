@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.query;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonQuerySchema;
+import cn.memoryzy.json.enums.JsonQueryLanguage;
 import cn.memoryzy.json.service.persistent.state.QueryState;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -31,13 +31,13 @@ public class JmesPathToggleAction extends DumbAwareToggleAction implements Updat
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return queryState.querySchema == JsonQuerySchema.JMESPath;
+        return queryState.querySchema == JsonQueryLanguage.JMESPath;
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
         // 限制单选
-        queryState.querySchema = state ? JsonQuerySchema.JMESPath : JsonQuerySchema.JSONPath;
+        queryState.querySchema = state ? JsonQueryLanguage.JMESPath : JsonQueryLanguage.JSONPath;
         queryComponentProvider.clearSearchAndResultText();
     }
 }

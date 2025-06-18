@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.HistoryViewType;
+import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
@@ -93,7 +93,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
         }
 
         HistoryState historyState = persistenceState.historyState;
-        if (historyState.historyViewType == HistoryViewType.TREE) {
+        if (historyState.historyViewType == HistoryDisplayMode.TREE) {
             new JsonHistoryTreeChooser(project, toolWindow).show();
         } else {
             new JsonHistoryListChooser(project, toolWindow).show();

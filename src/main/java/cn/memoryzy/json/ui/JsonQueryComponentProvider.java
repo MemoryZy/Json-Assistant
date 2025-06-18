@@ -6,7 +6,7 @@ import cn.memoryzy.json.action.query.ShowOriginalTextAction;
 import cn.memoryzy.json.action.query.SwitchAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.enums.JsonQuerySchema;
+import cn.memoryzy.json.enums.JsonQueryLanguage;
 import cn.memoryzy.json.model.jsonpath.EvaluateResult;
 import cn.memoryzy.json.model.jsonpath.IncorrectDocument;
 import cn.memoryzy.json.model.jsonpath.IncorrectExpression;
@@ -156,7 +156,7 @@ public class JsonQueryComponentProvider implements Disposable {
             docText = Json5Util.convertJson5ToJson(docText);
         }
 
-        EvaluateResult result = JsonQuerySchema.JSONPath == queryState.querySchema
+        EvaluateResult result = JsonQueryLanguage.JSONPath == queryState.querySchema
                 ? JsonPathEvaluator.evaluate(path, docText)
                 : JmesPathEvaluator.evaluate(path, docText);
 

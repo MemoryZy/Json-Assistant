@@ -19,7 +19,9 @@ public class JsonAssistantPlugin {
     public static final String PLUGIN_ID_NAME = PLUGIN_ID + ".Json-Assistant";
     public static final String PLUGIN_VERSION = PLUGIN_ID + ".version";
 
-    public static final String STORAGE_FILE_NAME = "Json-Assistant.xml";
+    public static final String STORAGE_MAIN_FILE = "json_assistant_settings.xml";
+    public static final String STORAGE_BLACKLIST_FILE = "json_assistant_blacklist.xml";
+    public static final String STORAGE_HISTORY_FILE = "Json-Assistant/history.xml";
 
     /**
      * 使用一个原子引用持有不可变的状态对象

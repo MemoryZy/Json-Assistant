@@ -1,13 +1,14 @@
-package cn.memoryzy.json.service.persistent.state;
+package cn.memoryzy.json.service.persistent.state.v2;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
+import com.intellij.util.xmlb.annotations.Tag;
 
 /**
  * @author Memory
  * @since 2025/5/27
  */
-@Deprecated
+@Tag("stats")
 public class AnnouncementStats {
 
     /**

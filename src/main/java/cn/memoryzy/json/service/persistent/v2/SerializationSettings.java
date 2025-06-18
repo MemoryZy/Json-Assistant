@@ -2,19 +2,20 @@ package cn.memoryzy.json.service.persistent.v2;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
-import cn.memoryzy.json.service.persistent.state.v2.SerializationStateV2;
+import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Property;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
  * @since 2025/6/17
  */
-@State(name = "Serialization/Deserialization", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_FILE_NAME)})
+@State(name = "Serialization/Deserialization", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
 public class SerializationSettings implements PersistentStateComponent<SerializationSettings> {
 
     // public static SerializationSettings getInstance() {
@@ -25,9 +26,15 @@ public class SerializationSettings implements PersistentStateComponent<Serializa
         return project.getService(SerializationSettings.class);
     }
 
-    private SerializationStateV2 serializationState;
+    /**
+     * 序列化相关配置项
+     */
+    private SerializationState serializationState = new SerializationState();
 
-    private DeserializationState deserializationState;
+    /**
+     * 反序列化相关配置项
+     */
+    private DeserializationState deserializationState = new DeserializationState();
 
 
     @Override
@@ -40,7 +47,8 @@ public class SerializationSettings implements PersistentStateComponent<Serializa
         XmlSerializerUtil.copyBean(state, this);
     }
 
-    public void setSerializationState(SerializationStateV2 serializationState) {
+
+    public void setSerializationState(SerializationState serializationState) {
         this.serializationState = serializationState;
     }
 
@@ -48,10 +56,12 @@ public class SerializationSettings implements PersistentStateComponent<Serializa
         this.deserializationState = deserializationState;
     }
 
-    public SerializationStateV2 getSerializationState() {
+    @Property(surroundWithTag = false)
+    public SerializationState getSerializationState() {
         return serializationState;
     }
 
+    @Property(surroundWithTag = false)
     public DeserializationState getDeserializationState() {
         return deserializationState;
     }

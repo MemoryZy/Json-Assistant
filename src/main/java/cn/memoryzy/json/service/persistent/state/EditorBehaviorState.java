@@ -6,6 +6,7 @@ package cn.memoryzy.json.service.persistent.state;
  * @author Memory
  * @since 2024/11/18
  */
+@Deprecated
 public class EditorBehaviorState {
 
     /**

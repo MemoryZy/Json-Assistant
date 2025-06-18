@@ -2,8 +2,8 @@ package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.enums.HistoryViewType;
-import cn.memoryzy.json.enums.TreeDisplayMode;
+import cn.memoryzy.json.enums.HistoryDisplayMode;
+import cn.memoryzy.json.enums.TreeViewMode;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
@@ -12,6 +12,7 @@ import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColorPicker;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
@@ -21,6 +22,7 @@ import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -65,11 +67,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private TitledSeparator historyLabel;
     private JBLabel historyStyleTitle;
     private JBCheckBox recordHistory;
-    private ComboBox<HistoryViewType> historyStyleBox;
+    private ComboBox<HistoryDisplayMode> historyStyleBox;
     private TitledSeparator generalLabel;
     private JBLabel treeDisplayModeTitle;
     private JBLabel treeDisplayModeDesc;
-    private ComboBox<TreeDisplayMode> treeDisplayModeBox;
+    private ComboBox<TreeViewMode> treeDisplayModeBox;
     private JBCheckBox promptBeforeImportCb;
     private JBLabel promptBeforeImportDesc;
     private JBLabel autoStoreHistoryTitle;
@@ -109,9 +111,16 @@ public class JsonAssistantMainConfigurableComponentProvider {
         treeDisplayModeTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
         UIUtils.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
-        for (TreeDisplayMode value : TreeDisplayMode.values()) {
+        for (TreeViewMode value : TreeViewMode.values()) {
             treeDisplayModeBox.addItem(value);
         }
+
+        treeDisplayModeBox.setRenderer(new SimpleListCellRenderer<>() {
+            @Override
+            public void customize(@NotNull JList<? extends TreeViewMode> list, TreeViewMode value, int index, boolean selected, boolean hasFocus) {
+                setText(value != null ? JsonAssistantBundle.messageOnSystem(value.getKey()) : "");
+            }
+        });
     }
 
     /**
@@ -229,7 +238,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                     // 调用父类方法
                     super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    Color color = getColor((ColorScheme) value);
+                    ColorScheme scheme = (ColorScheme) value;
+                    setText(null != scheme ? JsonAssistantBundle.messageOnSystem(scheme.getKey()) : "");
+
+                    Color color = getColor(scheme);
 
                     setIcon(Objects.isNull(color)
                             // 创建一个空白图标
@@ -271,9 +283,16 @@ public class JsonAssistantMainConfigurableComponentProvider {
         historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
         recordHistory.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
         historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
-        for (HistoryViewType value : HistoryViewType.values()) {
+        for (HistoryDisplayMode value : HistoryDisplayMode.values()) {
             historyStyleBox.addItem(value);
         }
+
+        historyStyleBox.setRenderer(new SimpleListCellRenderer<>() {
+            @Override
+            public void customize(@NotNull JList<? extends HistoryDisplayMode> list, HistoryDisplayMode value, int index, boolean selected, boolean hasFocus) {
+                setText(null != value ? JsonAssistantBundle.messageOnSystem(value.getKey()) : "");
+            }
+        });
 
         autoStoreHistoryTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
         autoStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
@@ -432,11 +451,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
         HistoryState historyState = persistentState.historyState;
         boolean oldSwitchHistory = historyState.switchHistory;
         boolean oldAutoStore = historyState.autoStore;
-        HistoryViewType oldHistoryViewType = historyState.historyViewType;
+        HistoryDisplayMode oldHistoryViewType = historyState.historyViewType;
 
         // 常规
         GeneralState generalState = persistentState.generalState;
-        TreeDisplayMode oldTreeDisplayMode = generalState.treeDisplayMode;
+        TreeViewMode oldTreeDisplayMode = generalState.treeDisplayMode;
 
         // ----------------------------------------------------------------------
 
@@ -461,10 +480,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
         // 历史记录
         boolean newSwitchHistory = recordHistory.isSelected();
         boolean newAutoStore = autoStoreRb.isSelected();
-        HistoryViewType newHistoryViewType = historyStyleBox.getItem();
+        HistoryDisplayMode newHistoryViewType = historyStyleBox.getItem();
 
         // 常规
-        TreeDisplayMode newTreeDisplayMode = treeDisplayModeBox.getItem();
+        TreeViewMode newTreeDisplayMode = treeDisplayModeBox.getItem();
 
         // 比较是否更改
         return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)

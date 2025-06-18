@@ -1,12 +1,10 @@
 package cn.memoryzy.json.enums;
 
-import cn.memoryzy.json.bundle.JsonAssistantBundle;
-
 /**
  * @author Memory
  * @since 2024/11/29
  */
-public enum HistoryViewType {
+public enum HistoryDisplayMode {
 
     /**
      * 树形视图
@@ -20,12 +18,11 @@ public enum HistoryViewType {
 
     private final String key;
 
-    HistoryViewType(String key) {
+    HistoryDisplayMode(String key) {
         this.key = key;
     }
 
-    @Override
-    public String toString() {
-        return JsonAssistantBundle.messageOnSystem(key);
+    public String getKey() {
+        return key;
     }
 }

@@ -1,6 +1,6 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.enums.TreeDisplayMode;
+import cn.memoryzy.json.enums.TreeViewMode;
 
 /**
  * 常规设置项
@@ -8,11 +8,12 @@ import cn.memoryzy.json.enums.TreeDisplayMode;
  * @author Memory
  * @since 2024/12/11
  */
+@Deprecated
 public class GeneralState {
 
     /**
      * JSON 树结构展示形式
      */
-    public TreeDisplayMode treeDisplayMode = TreeDisplayMode.POPUP;
+    public TreeViewMode treeDisplayMode = TreeViewMode.POPUP;
 
 }

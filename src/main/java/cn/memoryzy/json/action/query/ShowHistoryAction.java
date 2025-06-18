@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.query;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.enums.JsonQuerySchema;
+import cn.memoryzy.json.enums.JsonQueryLanguage;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.state.QueryState;
 import cn.memoryzy.json.ui.panel.SearchWrapper;
@@ -66,13 +66,13 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
     }
 
     public static List<String> getHistory(QueryState queryState, Project project) {
-        String historyPropertyName = queryState.querySchema == JsonQuerySchema.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
+        String historyPropertyName = queryState.querySchema == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
         String history = PropertiesComponent.getInstance(project).getValue(historyPropertyName);
         return StrUtil.isNotBlank(history) ? StrUtil.split(history, '\n') : List.of();
     }
 
     public static void setHistory(QueryState queryState, Project project, Collection<String> history) {
-        String historyPropertyName = queryState.querySchema == JsonQuerySchema.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
+        String historyPropertyName = queryState.querySchema == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
         PropertiesComponent.getInstance(project).setValue(historyPropertyName, StrUtil.join("\n", history));
     }
 

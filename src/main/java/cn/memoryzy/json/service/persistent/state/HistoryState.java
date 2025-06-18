@@ -1,11 +1,12 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.enums.HistoryViewType;
+import cn.memoryzy.json.enums.HistoryDisplayMode;
 
 /**
  * @author Memory
  * @since 2024/11/29
  */
+@Deprecated
 public class HistoryState {
 
     /**
@@ -16,7 +17,7 @@ public class HistoryState {
     /**
      * 历史记录显示类型
      */
-    public HistoryViewType historyViewType = HistoryViewType.TREE;
+    public HistoryDisplayMode historyViewType = HistoryDisplayMode.TREE;
 
     /**
      * 是否自动记录

@@ -5,7 +5,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.StructureActionSource;
-import cn.memoryzy.json.enums.TreeDisplayMode;
+import cn.memoryzy.json.enums.TreeViewMode;
 import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.GlobalTextConverter;
@@ -93,20 +93,20 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
         // 解析 JSON
         JsonWrapper jsonWrapper = JsonUtil.isJson(text) ? JsonUtil.parse(JsonUtil.ensureJson(text)) : Json5Util.parseWithComment(text);
 
-        TreeDisplayMode treeDisplayMode;
+        TreeViewMode treeDisplayMode;
         if (queryEditorFlag) {
-            treeDisplayMode = TreeDisplayMode.POPUP;
+            treeDisplayMode = TreeViewMode.POPUP;
         } else {
             JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
             GeneralState generalState = persistentState.generalState;
             treeDisplayMode = generalState.treeDisplayMode;
         }
 
-        if (treeDisplayMode == TreeDisplayMode.POPUP) {
+        if (treeDisplayMode == TreeViewMode.POPUP) {
             // 弹窗展示
             new JsonStructureDialog(jsonWrapper, editorContext).show();
 
-        } else if (treeDisplayMode == TreeDisplayMode.ORIGINAL_TOOLWINDOW) {
+        } else if (treeDisplayMode == TreeViewMode.ORIGINAL_TOOLWINDOW) {
             // 在旧窗口展示
             showInOriginalToolWindow(project, editorContext, jsonWrapper, source, UIUtils.JSON_TREE_CARD_NAME);
 

@@ -1,12 +1,10 @@
 package cn.memoryzy.json.enums;
 
-import cn.memoryzy.json.bundle.JsonAssistantBundle;
-
 /**
  * @author Memory
  * @since 2024/12/11
  */
-public enum TreeDisplayMode {
+public enum TreeViewMode {
 
     /**
      * 弹出窗口
@@ -26,12 +24,12 @@ public enum TreeDisplayMode {
 
     private final String key;
 
-    TreeDisplayMode(String key) {
+    TreeViewMode(String key) {
         this.key = key;
     }
 
-    @Override
-    public String toString() {
-        return JsonAssistantBundle.messageOnSystem(key);
+    public String getKey() {
+        return key;
     }
+
 }

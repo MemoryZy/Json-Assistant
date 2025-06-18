@@ -51,8 +51,12 @@
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.EditorAppearanceSettings"/>
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.EditorBehaviorSettings"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.GeneralSettings"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.HistorySettings"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.SerializationSettings"/>
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.ToolWindowSettings"/>
+
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.BlacklistManager"/>
 
 
 
@@ -177,7 +181,9 @@
 
 <!--        TODO 待删除    -->
             <separator/>
-            <action id="JsonAssistant.Action.TestConfigAction" class="cn.memoryzy.json.action.TestConfigAction"/>
+            <action id="JsonAssistant.Action.TestAddConfigAction" class="cn.memoryzy.json.action.test.TestAddConfigAction"/>
+            <separator/>
+            <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatConfigAction"/>
         </group>
 
         <group id="JsonAssistant.Group.JsonAssistantHelpMenu">

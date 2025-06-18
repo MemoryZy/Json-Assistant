@@ -4,6 +4,7 @@ package cn.memoryzy.json.service.persistent.state;
  * @author Memory
  * @since 2025/4/7
  */
+@Deprecated
 public class StructureState {
 
     /**

@@ -1,17 +1,18 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.enums.JsonQuerySchema;
+import cn.memoryzy.json.enums.JsonQueryLanguage;
 
 /**
  * @author Memory
  * @since 2024/12/27
  */
+@Deprecated
 public class QueryState {
 
     /**
      * 当前查询语言
      */
-    public JsonQuerySchema querySchema = JsonQuerySchema.JSONPath;
+    public JsonQueryLanguage querySchema = JsonQueryLanguage.JSONPath;
 
     /**
      * 显示原始文本

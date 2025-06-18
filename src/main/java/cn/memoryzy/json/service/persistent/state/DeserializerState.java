@@ -6,6 +6,7 @@ package cn.memoryzy.json.service.persistent.state;
  * @author Memory
  * @since 2024/12/23
  */
+@Deprecated
 public class DeserializerState {
 
     /**
