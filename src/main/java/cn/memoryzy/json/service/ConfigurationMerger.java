@@ -22,6 +22,8 @@ public final class ConfigurationMerger {
 
     // private final Element rootElement = getPluginSettingsElement();
 
+    // TODO 初次导入完成后，在原来的xml中添加一个标记，表示已经同步，但是最好是直接删掉xml
+
     public static ConfigurationMerger getInstance() {
         return ApplicationManager.getApplication().getService(ConfigurationMerger.class);
     }
