@@ -3,10 +3,10 @@ package cn.memoryzy.json.service.persistent.v2;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
 import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Property;
 import org.jetbrains.annotations.NotNull;
@@ -18,13 +18,9 @@ import org.jetbrains.annotations.NotNull;
 @State(name = "Serialization/Deserialization", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
 public class SerializationSettings implements PersistentStateComponent<SerializationSettings> {
 
-    // public static SerializationSettings getInstance() {
-    //     return ApplicationManager.getApplication().getService(SerializationSettings.class);
-    // }
-
-    public static SerializationSettings getInstance(Project project) {
-        return project.getService(SerializationSettings.class);
-    }
+     public static SerializationSettings getInstance() {
+         return ApplicationManager.getApplication().getService(SerializationSettings.class);
+     }
 
     /**
      * 序列化相关配置项

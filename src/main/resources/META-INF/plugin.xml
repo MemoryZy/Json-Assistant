@@ -51,12 +51,10 @@
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.GeneralSettings"/>
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.HistorySettings"/>
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.SerializationSettings"/>
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.ToolWindowSettings"/>
-
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.BlacklistManager"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.GeneralSettings"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.SerializationSettings"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.ToolWindowSettings"/>
+        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.BlacklistManager"/>
 
 
 
@@ -181,7 +179,7 @@
 
 <!--        TODO 待删除    -->
             <separator/>
-            <action id="JsonAssistant.Action.TestAddConfigAction" class="cn.memoryzy.json.action.test.TestAddConfigAction"/>
+<!--            <action id="JsonAssistant.Action.TestAddConfigAction" class="cn.memoryzy.json.action.test.TestAddConfigAction"/>-->
             <separator/>
             <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatConfigAction"/>
         </group>

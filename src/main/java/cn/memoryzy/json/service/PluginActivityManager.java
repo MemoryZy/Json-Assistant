@@ -41,7 +41,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
             checkForUpdates();
             // 验证地址可达性
             Urls.verifyReachable();
-
+            // 合并旧配置
             mergeLegacySettings();
         });
     }
@@ -100,11 +100,9 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     }
 
     private void mergeLegacySettings() {
-        // TODO 待实现
+//         ConfigurationMerger merger = ConfigurationMerger.getInstance();
 
-        // ConfigurationMerger merger = ConfigurationMerger.getInstance();
-
-        // merger.mergeGeneralLegacySettings();
+//         merger.mergeGeneralLegacySettings();
 
     }
 }

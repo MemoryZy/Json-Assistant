@@ -1,5 +1,7 @@
 package cn.memoryzy.json.enums;
 
+import cn.hutool.core.util.StrUtil;
+
 /**
  * @author Memory
  * @since 2024/12/11
@@ -30,6 +32,16 @@ public enum TreeViewMode {
 
     public String getKey() {
         return key;
+    }
+
+    public static TreeViewMode of(String name) {
+        for (TreeViewMode value : values()) {
+            if (StrUtil.equalsIgnoreCase(value.name(), name)) {
+                return value;
+            }
+        }
+
+        return null;
     }
 
 }
