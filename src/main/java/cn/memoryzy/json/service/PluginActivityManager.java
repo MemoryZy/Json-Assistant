@@ -37,12 +37,12 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         AnnouncementManager.getInstance().scheduleDelayedAnnouncement(project);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // 合并旧配置
+            ConfigurationMerger.getInstance().mergeLegacySettings();
             // 检查有无更新
             checkForUpdates();
             // 验证地址可达性
             Urls.verifyReachable();
-
-            mergeLegacySettings();
         });
     }
 
@@ -97,14 +97,5 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
                 VersionComparator.isNewerVersion(currentVersion, latestVersion),
                 latestVersion,
                 pluginUpdateDetail);
-    }
-
-    private void mergeLegacySettings() {
-        // TODO 待实现
-
-        // ConfigurationMerger merger = ConfigurationMerger.getInstance();
-
-        // merger.mergeGeneralLegacySettings();
-
     }
 }

@@ -1,7 +1,5 @@
 package cn.memoryzy.json.service.persistent.state.v2;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import com.intellij.util.xmlb.annotations.Tag;
 
 /**
@@ -28,11 +26,6 @@ public class AnnouncementStats {
 
     public AnnouncementStats() {
     }
-
-    public static AnnouncementStats fromMap(ObjectWrapper wrapper) {
-        return BeanUtil.toBean(wrapper, AnnouncementStats.class);
-    }
-
 
     public int getDisplayCount() {
         return displayCount;

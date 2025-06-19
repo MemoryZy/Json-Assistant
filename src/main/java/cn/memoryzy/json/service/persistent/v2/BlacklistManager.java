@@ -2,10 +2,10 @@ package cn.memoryzy.json.service.persistent.v2;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
-import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.XCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,13 +26,9 @@ public class BlacklistManager implements PersistentStateComponent<BlacklistManag
      */
     private static final int MAX_BLACKLIST_SIZE = 50;
 
-    // public static BlacklistSettings getInstance() {
-    //     return ApplicationManager.getApplication().getService(BlacklistSettings.class);
-    // }
-
-    public static BlacklistManager getInstance(Project project) {
-        return project.getService(BlacklistManager.class);
-    }
+     public static BlacklistManager getInstance() {
+         return ApplicationManager.getApplication().getService(BlacklistManager.class);
+     }
 
     /**
      * 黑名单列表
