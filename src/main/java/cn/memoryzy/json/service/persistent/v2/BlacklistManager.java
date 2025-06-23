@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
+import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.XCollection;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,9 +27,14 @@ public class BlacklistManager implements PersistentStateComponent<BlacklistManag
      */
     private static final int MAX_BLACKLIST_SIZE = 50;
 
-     public static BlacklistManager getInstance() {
-         return ApplicationManager.getApplication().getService(BlacklistManager.class);
-     }
+    public static BlacklistManager getInstance() {
+        return ApplicationManager.getApplication().getService(BlacklistManager.class);
+    }
+
+    /**
+     * 配置版本
+     */
+    private Integer version = JsonAssistantPlugin.CONFIG_VERSION;
 
     /**
      * 黑名单列表
@@ -43,24 +49,6 @@ public class BlacklistManager implements PersistentStateComponent<BlacklistManag
     @Override
     public void loadState(@NotNull BlacklistManager state) {
         this.blacklist = state.blacklist;
-
-        // TODO 可在 loadState方法中加载旧配置
-        // migrateFromLegacy()
-
-        /*
-
-            StartupManager.getInstance(myProject).runAfterOpened(() -> {
-      ApplicationManager.getApplication().invokeLater(() -> {
-        List<Bookmark> newList = myPendingState.getAndSet(null);
-        if (newList != null) {
-          applyNewState(newList, true);
-        }
-      }, ModalityState.NON_MODAL, myProject.getDisposed());
-    });
-
-         */
-
-        // 加载状态后自动裁剪
         trimBlacklist();
     }
 
@@ -78,6 +66,7 @@ public class BlacklistManager implements PersistentStateComponent<BlacklistManag
 
     /**
      * 添加新记录到黑名单并进行裁剪
+     *
      * @param record 要添加的JSON记录
      */
     public synchronized void add(JsonRecord record) {
@@ -93,5 +82,14 @@ public class BlacklistManager implements PersistentStateComponent<BlacklistManag
         while (blacklist.size() > MAX_BLACKLIST_SIZE) {
             blacklist.remove(0);
         }
+    }
+
+    @Attribute
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 }

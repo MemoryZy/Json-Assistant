@@ -45,7 +45,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
             // 处理不同的 Json 类型
             tomlStr = TomlUtil.toToml(json, JsonUtil.isJson(json));
         } catch (Exception ex) {
-            LOG.error("Toml conversion failure", ex);
+            LOG.error("[Json Assistant] Toml conversion failure", ex);
             return;
         }
 

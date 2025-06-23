@@ -460,7 +460,7 @@ public class PlatformUtil {
         try {
             content = StrUtil.str(file.contentsToByteArray(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            LOG.error("Failed to get text", e);
+            LOG.error("[Json Assistant] Failed to get text", e);
         }
 
         return content;
@@ -479,7 +479,7 @@ public class PlatformUtil {
 
             return text;
         } catch (Exception e) {
-            LOG.error("Failed to get text", e);
+            LOG.error("[Json Assistant] Failed to get text", e);
         }
 
         return null;
@@ -532,7 +532,7 @@ public class PlatformUtil {
         try (InputStream stream = ResourceUtil.getResourceAsStream(JsonAssistantIcons.class.getClassLoader(), basePath, fileName)) {
             return ResourceUtil.loadText(stream);
         } catch (Exception e) {
-            LOG.error("Failed to load text", e);
+            LOG.error("[Json Assistant] Failed to load text", e);
         }
 
         return StrUtil.EMPTY;

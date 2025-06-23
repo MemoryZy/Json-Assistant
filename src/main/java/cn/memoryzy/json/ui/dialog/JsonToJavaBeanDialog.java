@@ -112,7 +112,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.deserializerState = persistentState.deserializerState;
 
         if (this.deserializerState == null) {
-            LOG.error("Deserialized configuration object is empty!");
+            LOG.error("[Json Assistant] Deserialized configuration object is empty!");
             throw new IllegalArgumentException("Deserialized configuration object is empty!");
         }
 

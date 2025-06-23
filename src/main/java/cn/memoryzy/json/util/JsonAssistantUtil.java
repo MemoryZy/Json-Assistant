@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -347,6 +348,17 @@ public class JsonAssistantUtil {
             return new BigDecimal(value);
         } catch (Exception e) {
             return new BigDecimal("0");
+        }
+    }
+
+    public static String calculateSHA256(String content) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(content.getBytes());
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (Exception e) {
+            // 退回到hashCode
+            return String.valueOf(content.hashCode());
         }
     }
 

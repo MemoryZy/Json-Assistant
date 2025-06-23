@@ -48,7 +48,7 @@ public class ToYamlAction extends DumbAwareAction implements UpdateInBackground 
             // 处理不同的 Json 类型
             yamlStr = YamlUtil.toYaml(json, JsonUtil.isJson(json));
         } catch (Exception ex) {
-            LOG.error("Yaml conversion failure", ex);
+            LOG.error("[Json Assistant] Yaml conversion failure", ex);
             return;
         }
 

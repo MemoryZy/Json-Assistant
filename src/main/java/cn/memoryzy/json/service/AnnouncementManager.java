@@ -86,7 +86,7 @@ public final class AnnouncementManager implements Disposable {
             NotificationScheduler.getInstance().addNotifications(notifications, AnnouncementManager::addReadNoticeRecord, project);
 
         } catch (Exception e) {
-            LOG.warn("The announcement shows an error.", e);
+            LOG.warn("[Json Assistant] The announcement shows an error.", e);
         }
     }
 

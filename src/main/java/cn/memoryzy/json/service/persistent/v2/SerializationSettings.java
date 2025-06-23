@@ -8,6 +8,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Property;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,9 +19,14 @@ import org.jetbrains.annotations.NotNull;
 @State(name = "Serialization/Deserialization", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
 public class SerializationSettings implements PersistentStateComponent<SerializationSettings> {
 
-     public static SerializationSettings getInstance() {
-         return ApplicationManager.getApplication().getService(SerializationSettings.class);
-     }
+    public static SerializationSettings getInstance() {
+        return ApplicationManager.getApplication().getService(SerializationSettings.class);
+    }
+
+    /**
+     * 配置版本
+     */
+    private Integer version = JsonAssistantPlugin.CONFIG_VERSION;
 
     /**
      * 序列化相关配置项
@@ -60,5 +66,14 @@ public class SerializationSettings implements PersistentStateComponent<Serializa
     @Property(surroundWithTag = false)
     public DeserializationState getDeserializationState() {
         return deserializationState;
+    }
+
+    @Attribute
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
     }
 }

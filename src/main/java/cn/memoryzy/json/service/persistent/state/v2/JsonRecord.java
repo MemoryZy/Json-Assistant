@@ -1,6 +1,9 @@
 package cn.memoryzy.json.service.persistent.state.v2;
 
+import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.converter.JsonBase64Converter;
 import cn.memoryzy.json.service.persistent.converter.JsonWrapperConverter;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Tag;
@@ -10,6 +13,7 @@ import com.intellij.util.xmlb.annotations.Tag;
  * @since 2025/6/15
  */
 @Tag("record")
+@SuppressWarnings("UnusedReturnValue")
 public class JsonRecord {
 
     /**
@@ -35,7 +39,7 @@ public class JsonRecord {
     /**
      * 原文类型
      */
-    private String sourceType;
+    private DataFormatType sourceType;
 
     /**
      * 记录解析后的 JSON 对象
@@ -55,43 +59,58 @@ public class JsonRecord {
     /**
      * 原始数据长度 (字节数)
      */
-    private Integer dataSize;
+    private Integer dataSize = 0;
 
 
-    public void setId(Integer id) {
+    public JsonRecord() {
+    }
+
+
+
+    public JsonRecord setId(Integer id) {
         this.id = id;
+        return this;
     }
 
-    public void setName(String name) {
+    public JsonRecord setName(String name) {
         this.name = name;
+        return this;
     }
 
-    public void setDisplayText(String displayText) {
+    public JsonRecord setDisplayText(String displayText) {
         this.displayText = displayText;
+        return this;
     }
 
-    public void setRawText(String rawText) {
+    public JsonRecord setRawText(String rawText) {
         this.rawText = rawText;
+        this.dataSize = StrUtil.isBlank(rawText) ? 0 : rawText.length();
+        return this;
     }
 
-    public void setSourceType(String sourceType) {
+    public JsonRecord setSourceType(DataFormatType sourceType) {
         this.sourceType = sourceType;
+        return this;
     }
 
-    public void setWrapper(JsonWrapper wrapper) {
+    public JsonRecord setWrapper(JsonWrapper wrapper) {
         this.wrapper = wrapper;
+        return this;
     }
 
-    public void setCreateTime(Long createTime) {
+    public JsonRecord setCreateTime(Long createTime) {
         this.createTime = createTime;
+        return this;
     }
 
-    public void setUpdateTime(Long updateTime) {
+    public JsonRecord setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
+        return this;
     }
 
-    public void setDataSize(Integer dataSize) {
+    public JsonRecord setDataSize(Integer dataSize) {
         this.dataSize = dataSize;
+        return this;
     }
 
 
@@ -103,15 +122,17 @@ public class JsonRecord {
         return name;
     }
 
+    @OptionTag(converter = JsonBase64Converter.class)
     public String getDisplayText() {
         return displayText;
     }
 
+    @OptionTag(converter = JsonBase64Converter.class)
     public String getRawText() {
         return rawText;
     }
 
-    public String getSourceType() {
+    public DataFormatType getSourceType() {
         return sourceType;
     }
 

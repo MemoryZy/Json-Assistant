@@ -78,7 +78,7 @@ public class ExpandNestedJsonInspection extends LocalInspectionTool {
             String value = ((JsonStringLiteral) startElement).getValue();
             String formatted = JsonUtil.isJson(value) ? JsonUtil.formatJson(value) : Json5Util.formatJson5(value);
             if (StrUtil.isBlank(formatted)) {
-                ExpandNestedJsonInspection.LOG.error("Formatting failure, original: " + value);
+                ExpandNestedJsonInspection.LOG.error("[Json Assistant] Formatting failure, original: " + value);
                 return;
             }
 

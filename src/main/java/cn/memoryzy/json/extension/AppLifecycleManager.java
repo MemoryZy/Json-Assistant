@@ -1,5 +1,6 @@
 package cn.memoryzy.json.extension;
 
+import cn.memoryzy.json.service.ConfigurationMerger;
 import com.intellij.ide.AppLifecycleListener;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +14,8 @@ public class AppLifecycleManager implements AppLifecycleListener {
 
     @Override
     public void appFrameCreated(@NotNull List<String> commandLineArgs) {
-
+        // 合并旧配置
+        ConfigurationMerger.getInstance().mergeGlobalLegacySettings();
     }
 
 }

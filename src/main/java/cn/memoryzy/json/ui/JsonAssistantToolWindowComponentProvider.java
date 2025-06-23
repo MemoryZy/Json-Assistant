@@ -49,6 +49,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleManager;
@@ -76,6 +77,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
     public static final String MANUAL_HISTORY_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".MANUAL_HISTORY_GUIDE_KEY";
+    public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
 
     private final Project project;
     private final FileType editorFileType;
@@ -229,6 +231,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             Notifications.showFullStickyNotification("Json Assistant", JsonAssistantBundle.messageOnSystem("notification.manual.history.content"), NotificationType.INFORMATION, notificationActions, project);
             propertiesComponent.setValue(MANUAL_HISTORY_GUIDE_KEY, "1");
         }
+
+        editor.putUserData(PLUGIN_EDITOR_FLAG, "Memory");
 
         return editor;
     }
@@ -502,7 +506,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         executor.shutdownNow();
         try {
             if (!executor.awaitTermination(500, TimeUnit.MILLISECONDS)) {
-                LOG.error("The Executor does not shut down properly");
+                LOG.error("[Json Assistant] The Executor does not shut down properly");
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -638,7 +642,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                 }
 
             } catch (Error error) {
-                LOG.warn(error);
+                LOG.warn("[Json Assistant] " + error);
             }
         }
     }

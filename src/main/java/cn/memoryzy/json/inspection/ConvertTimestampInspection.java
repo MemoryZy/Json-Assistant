@@ -93,7 +93,7 @@ public class ConvertTimestampInspection extends LocalInspectionTool {
             }
 
             if (!JsonAssistantUtil.isValidTimestamp(timestamp + "")) {
-                ConvertTimestampInspection.LOG.error("The timestamp format is incorrect: " + timestamp);
+                ConvertTimestampInspection.LOG.error("[Json Assistant] The timestamp format is incorrect: " + timestamp);
                 return;
             }
 

@@ -21,7 +21,9 @@ public class JsonAssistantPlugin {
 
     public static final String STORAGE_MAIN_FILE = "json_assistant_settings.xml";
     public static final String STORAGE_BLACKLIST_FILE = "json_assistant_blacklist.xml";
-    public static final String STORAGE_HISTORY_FILE = "Json-Assistant/history.xml";
+    public static final String STORAGE_HISTORY_FILE = "json_assistant_history.xml";
+
+    public static final Integer CONFIG_VERSION = 1;
 
     /**
      * 使用一个原子引用持有不可变的状态对象

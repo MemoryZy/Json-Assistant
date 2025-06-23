@@ -137,7 +137,7 @@ public class JsonUtil {
         try {
             return formatJson(MAPPER.readValue(jsonStr, Object.class));
         } catch (Exception e) {
-            LOG.error("Formatting failure", e);
+            LOG.error("[Json Assistant] Formatting failure", e);
             return null;
         }
     }
@@ -163,7 +163,7 @@ public class JsonUtil {
                     .create()
                     .toJson(data);
         } catch (Exception e) {
-            LOG.error("Formatting failure", e);
+            LOG.error("[Json Assistant] Formatting failure", e);
             return null;
         }
     }
@@ -179,7 +179,7 @@ public class JsonUtil {
         try {
             return compressJson(MAPPER.readTree(jsonStr));
         } catch (Exception e) {
-            LOG.error("Compression failure", e);
+            LOG.error("[Json Assistant] Compression failure", e);
             return null;
         }
     }
@@ -195,7 +195,7 @@ public class JsonUtil {
         try {
             return MAPPER.writeValueAsString(data);
         } catch (Exception e) {
-            LOG.error("Compression failure", e);
+            LOG.error("[Json Assistant] Compression failure", e);
             return null;
         }
     }

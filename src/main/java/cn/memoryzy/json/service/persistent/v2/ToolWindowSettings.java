@@ -10,6 +10,7 @@ import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Property;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,6 +25,11 @@ public class ToolWindowSettings implements PersistentStateComponent<ToolWindowSe
     public static ToolWindowSettings getInstance() {
         return ApplicationManager.getApplication().getService(ToolWindowSettings.class);
     }
+
+    /**
+     * 配置版本
+     */
+    private Integer version = JsonAssistantPlugin.CONFIG_VERSION;
 
     /**
      * 窗口编辑器外观状态类
@@ -73,6 +79,10 @@ public class ToolWindowSettings implements PersistentStateComponent<ToolWindowSe
         this.historyState = historyState;
     }
 
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
     @Property(surroundWithTag = false)
     public EditorVisualState getVisualState() {
         return visualState;
@@ -91,5 +101,10 @@ public class ToolWindowSettings implements PersistentStateComponent<ToolWindowSe
     @Property(surroundWithTag = false)
     public HistoryState getHistoryState() {
         return historyState;
+    }
+
+    @Attribute
+    public Integer getVersion() {
+        return version;
     }
 }

@@ -55,16 +55,16 @@
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.SerializationSettings"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.ToolWindowSettings"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.v2.BlacklistManager"/>
-
-
-
+        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.v2.HistoryManager"/>
 
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
 
-        <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonTreeFileEditorProvider"/>
+        <fileEditorProvider implementation="cn.memoryzy.json.extension.editor.JsonTreeFileEditorProvider"/>
 
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
+        
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"
                          bundle="messages.JsonAssistantBundle"
@@ -94,7 +94,7 @@
     <applicationListeners>
         <listener class="cn.memoryzy.json.service.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
 <!--        <listener class="cn.memoryzy.json.extension.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>-->
-<!--        <listener class="cn.memoryzy.json.extension.AppLifecycleManager" topic="com.intellij.ide.AppLifecycleListener"/>-->
+        <listener class="cn.memoryzy.json.extension.AppLifecycleManager" topic="com.intellij.ide.AppLifecycleListener"/>
     </applicationListeners>
 
     <actions>
@@ -181,7 +181,7 @@
             <separator/>
 <!--            <action id="JsonAssistant.Action.TestAddConfigAction" class="cn.memoryzy.json.action.test.TestAddConfigAction"/>-->
             <separator/>
-<!--            <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatConfigAction"/>-->
+            <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatNewConfigAction"/>
         </group>
 
         <group id="JsonAssistant.Group.JsonAssistantHelpMenu">
@@ -190,6 +190,10 @@
             <separator/>
 
             <add-to-group group-id="HelpMenu" relative-to-action="WhatsNewAction" anchor="before"/>
+        </group>
+
+        <group id="JsonAssistant.Group.EditorFloatGroup">
+            <action id="JsonAssistant.Action.PasteDataAction" class="cn.memoryzy.json.action.toolwindow.PasteDataAction"/>
         </group>
     </actions>
 

@@ -1,5 +1,7 @@
 package cn.memoryzy.json.enums;
 
+import cn.hutool.core.util.StrUtil;
+
 /**
  * @author Memory
  * @since 2024/11/29
@@ -24,5 +26,15 @@ public enum HistoryDisplayMode {
 
     public String getKey() {
         return key;
+    }
+
+    public static HistoryDisplayMode of(String name) {
+        for (HistoryDisplayMode value : values()) {
+            if (StrUtil.equalsIgnoreCase(value.name(), name)) {
+                return value;
+            }
+        }
+
+        return null;
     }
 }

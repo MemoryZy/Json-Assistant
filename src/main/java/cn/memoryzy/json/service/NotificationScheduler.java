@@ -114,7 +114,7 @@ public final class NotificationScheduler implements Disposable {
     private void handleNotificationError(@NotNull Project project, Exception e) {
         isShowing.set(false);
         if (!project.isDisposed()) {
-            LOG.warn("通知处理失败", e);
+            LOG.warn("[Json Assistant] Notification processing failed", e);
         }
     }
 

@@ -49,7 +49,7 @@ public class ToXmlAction extends DumbAwareAction implements UpdateInBackground {
             xmlStr = XmlUtil.toXml(json, JsonUtil.isJson(json));
             xmlStr = xmlStr.replaceAll("\r\n", "\n");
         } catch (Exception ex) {
-            LOG.error("xml conversion failure", ex);
+            LOG.error("[Json Assistant] xml conversion failure", ex);
             return;
         }
 

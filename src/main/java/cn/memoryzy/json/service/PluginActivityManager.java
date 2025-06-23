@@ -38,7 +38,7 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             // 合并旧配置
-            ConfigurationMerger.getInstance().mergeLegacySettings();
+            ConfigurationMerger.getInstance().mergeProjectLegacySettings(project);
             // 检查有无更新
             checkForUpdates();
             // 验证地址可达性

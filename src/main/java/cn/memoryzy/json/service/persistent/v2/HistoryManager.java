@@ -7,6 +7,7 @@ import com.intellij.openapi.components.RoamingType;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,12 +23,16 @@ public class HistoryManager implements PersistentStateComponent<HistoryManager> 
     /**
      * 最大保留记录数
      */
-    private static final int MAX_HISTORY_ITEMS = 50;
+    private static final int MAX_HISTORY_ITEMS = 30;
 
     public static HistoryManager getInstance(Project project) {
         return project.getService(HistoryManager.class);
     }
 
+    /**
+     * 配置版本
+     */
+    private Integer version = JsonAssistantPlugin.CONFIG_VERSION;
 
     /**
      * 历史记录列表（双向队列）
@@ -101,4 +106,20 @@ public class HistoryManager implements PersistentStateComponent<HistoryManager> 
         }
     }
 
+    @Attribute
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public Deque<JsonRecord> getHistories() {
+        return histories;
+    }
+
+    public void setHistories(Deque<JsonRecord> histories) {
+        this.histories = histories;
+    }
 }

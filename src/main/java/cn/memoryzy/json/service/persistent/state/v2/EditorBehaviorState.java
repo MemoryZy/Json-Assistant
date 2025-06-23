@@ -23,7 +23,7 @@ public class EditorBehaviorState {
     /**
      * 启用自动识别的数据格式列表（空列表表示禁用所有自动识别）
      */
-    private List<DataFormatType> enabledFormats = List.of(DataFormatType.values());
+    private List<DataFormatType> enabledFormats = List.of(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
 
     /**
      * 从剪贴板自动导入数据时是否显示确认对话框
