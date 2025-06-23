@@ -132,6 +132,15 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         component.scheduleShow();
     }
 
+    /**
+     * 兼容203版本
+     */
+    public void register(@NotNull FloatingToolbarComponent component, @NotNull Disposable disposable) {
+        // TODO 将register方法实现抽取为公共方法，再进行实现（想办法获取DataContext对象）
+
+
+    }
+
     private void registerOnChangeHandlers() {
         // 更新工具栏组件状态
         projectConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, this::updateToolbarState);
