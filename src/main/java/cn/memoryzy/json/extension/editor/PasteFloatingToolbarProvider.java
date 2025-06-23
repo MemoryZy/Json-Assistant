@@ -138,6 +138,11 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     public void register(@NotNull FloatingToolbarComponent component, @NotNull Disposable disposable) {
         // TODO 将register方法实现抽取为公共方法，再进行实现（想办法获取DataContext对象）
 
+        // DataManager manager = DataManager.getInstance();
+// manager.getDataContextFromFocusAsync()
+
+        // TODO 更稳妥的方式是用 FloatingToolbarComponent的实现类来获取，若获取不到，则取 实现类的 parentComponent、contextComponent 等
+
 
     }
 
