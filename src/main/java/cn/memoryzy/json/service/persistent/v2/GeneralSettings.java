@@ -29,7 +29,7 @@ public final class GeneralSettings implements PersistentStateComponent<GeneralSt
 
 
     @Override
-    public GeneralState getState() {
+    public @NotNull GeneralState getState() {
         return this.state;
     }
 

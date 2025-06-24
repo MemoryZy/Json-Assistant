@@ -13,7 +13,7 @@ public class HistoryState {
     /**
      * 是否启用历史记录功能
      */
-    private boolean historyEnabled = true;
+    private boolean enableHistory = true;
 
     /**
      * 历史记录显示类型
@@ -26,8 +26,8 @@ public class HistoryState {
     private boolean autoRecordHistory = false;
 
 
-    public void setHistoryEnabled(boolean historyEnabled) {
-        this.historyEnabled = historyEnabled;
+    public void setEnableHistory(boolean enableHistory) {
+        this.enableHistory = enableHistory;
     }
 
     public void setHistoryDisplayMode(HistoryDisplayMode historyDisplayMode) {
@@ -39,8 +39,8 @@ public class HistoryState {
     }
 
 
-    public boolean isHistoryEnabled() {
-        return historyEnabled;
+    public boolean isEnableHistory() {
+        return enableHistory;
     }
 
     public HistoryDisplayMode getHistoryDisplayMode() {

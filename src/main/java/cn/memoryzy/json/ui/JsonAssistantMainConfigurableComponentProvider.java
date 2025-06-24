@@ -2,16 +2,18 @@ package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
+import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.TreeViewMode;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.*;
+import cn.memoryzy.json.service.persistent.state.v2.*;
+import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
+import cn.memoryzy.json.service.persistent.v2.SerializationSettings;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.ui.icon.CircleIcon;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.ColorPicker;
 import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.ActionLink;
@@ -23,73 +25,70 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Memory
  * @since 2024/10/31
  */
 public class JsonAssistantMainConfigurableComponentProvider {
+
     // region 组件
     private JPanel rootPanel;
-    private TitledSeparator attributeSerializationLabel;
-    private JBCheckBox includeRandomValuesCb;
-    private JBLabel includeRandomValuesDesc;
-    private JBCheckBox fastJsonCb;
-    private JBLabel fastJsonDesc;
-    private JBCheckBox jacksonCb;
-    private JBLabel jacksonDesc;
-    private TitledSeparator windowBehaviorLabel;
-    private JBCheckBox displayLineNumbersCb;
-    private JBCheckBox foldingOutlineCb;
+    private TitledSeparator serializationTitle;
+    private JBCheckBox serializeRandomValuesCheckBox;
+    private JBLabel serializeRandomValuesDesc;
+    private JBCheckBox detectFastJsonAnnotationsCheckBox;
+    private JBLabel detectFastJsonAnnotationsDesc;
+    private JBCheckBox detectJacksonAnnotationsCheckBox;
+    private JBLabel detectJacksonAnnotationsDesc;
+
+    private TitledSeparator editorBehaviorTitle;
+    private JBCheckBox showLineNumbersCheckBox;
+    private JBCheckBox showFoldingOutlineCheckBox;
+    private JBCheckBox autoRecognizeFormatsCheckBox;
+    private JBLabel autoRecognizeFormatsDesc;
+    private JBCheckBox enableXmlFormatsCheckBox;
+    private JBCheckBox enableYamlFormatsCheckBox;
+    private JBCheckBox enableTomlFormatsCheckBox;
+    private JBCheckBox enableUrlParamFormatsCheckBox;
+    private JPanel formatsCheckBoxPanel;
+
+    private TitledSeparator editorVisualTitle;
+    private JBLabel backgroundLabel;
+    private ComboBox<ColorScheme> backgroundComboBox;
+    private JPanel backgroundPanel;
+    private JBLabel backgroundDesc;
+
+    private TitledSeparator historyTitle;
+    private JBCheckBox enableHistoryCheckBox;
+    private JBLabel historyStyleLabel;
+    private ComboBox<HistoryDisplayMode> historyStyleComboBox;
+
+    private TitledSeparator generalTitle;
+    private JBLabel treeViewModeLabel;
+    private JBLabel treeViewModeDesc;
+    private ComboBox<TreeViewMode> treeViewModeComboBox;
+    private JBCheckBox shouldPromptBeforeImportCheckBox;
+    private JBLabel shouldPromptBeforeImportDesc;
+    private JBLabel autoRecordHistoryLabel;
+    private JBRadioButton autoRecordHistoryRadioBtn;
+    private JBRadioButton manualRecordHistoryRadioBtn;
+    private JBLabel autoRecordHistoryDesc;
+
     private ActionLink donateLink;
-    private JBCheckBox recognizeOtherFormatsCb;
-    private JBLabel recognizeOtherFormatsDesc;
-    private JBCheckBox xmlFormatsCb;
-    private JBCheckBox yamlFormatsCb;
-    private JBCheckBox tomlFormatsCb;
-    private JBCheckBox urlParamFormatsCb;
-    private JPanel formatCbPanel;
-    private JBLabel backgroundColorTitle;
-    private ComboBox<ColorScheme> backgroundColorBox;
-    private TitledSeparator windowAppearanceLabel;
-    private JPanel backgroundColorPanel;
-    private JBLabel backgroundColorDesc;
-    private TitledSeparator historyLabel;
-    private JBLabel historyStyleTitle;
-    private JBCheckBox recordHistory;
-    private ComboBox<HistoryDisplayMode> historyStyleBox;
-    private TitledSeparator generalLabel;
-    private JBLabel treeDisplayModeTitle;
-    private JBLabel treeDisplayModeDesc;
-    private ComboBox<TreeViewMode> treeDisplayModeBox;
-    private JBCheckBox promptBeforeImportCb;
-    private JBLabel promptBeforeImportDesc;
-    private JBLabel autoStoreHistoryTitle;
-    private JBRadioButton autoStoreRb;
-    private JBRadioButton manualStoreRb;
-    private JBLabel autoStoreHistoryDesc;
     // endregion
 
-    // 区分亮暗，防止配置界面还存在时，主题被切换
-    private Color selectedLightColor;
-    private Color selectedDarkColor;
 
-    /**
-     * 标志变量，用于标识是否处于初始加载状态
-     */
-    private boolean isLoading = false;
-    private final JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
     private final boolean isIdea = PlatformUtil.isIdea();
+
 
     public JPanel createComponent() {
         configureGeneralComponents();
@@ -107,15 +106,15 @@ public class JsonAssistantMainConfigurableComponentProvider {
      * 常规
      */
     private void configureGeneralComponents() {
-        generalLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.general.text"));
-        treeDisplayModeTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
-        UIUtils.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
+        generalTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.general.text"));
+        treeViewModeLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
+        UIUtils.setHelpLabel(treeViewModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
         for (TreeViewMode value : TreeViewMode.values()) {
-            treeDisplayModeBox.addItem(value);
+            treeViewModeComboBox.addItem(value);
         }
 
-        treeDisplayModeBox.setRenderer(new SimpleListCellRenderer<>() {
+        treeViewModeComboBox.setRenderer(new SimpleListCellRenderer<>() {
             @Override
             public void customize(@NotNull JList<? extends TreeViewMode> list, TreeViewMode value, int index, boolean selected, boolean hasFocus) {
                 setText(value != null ? JsonAssistantBundle.messageOnSystem(value.getKey()) : "");
@@ -127,52 +126,52 @@ public class JsonAssistantMainConfigurableComponentProvider {
      * 属性序列化
      */
     private void configureAttributeSerializationComponents() {
-        attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
+        serializationTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
 
-        includeRandomValuesCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
-        UIUtils.setCommentLabel(includeRandomValuesDesc, includeRandomValuesCb, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
+        serializeRandomValuesCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
+        UIUtils.setCommentLabel(serializeRandomValuesDesc, serializeRandomValuesCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
 
-        fastJsonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.text"));
-        UIUtils.setCommentLabel(fastJsonDesc, fastJsonCb, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
+        detectFastJsonAnnotationsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.text"));
+        UIUtils.setCommentLabel(detectFastJsonAnnotationsDesc, detectFastJsonAnnotationsCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
 
-        jacksonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
-        UIUtils.setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
+        detectJacksonAnnotationsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
+        UIUtils.setCommentLabel(detectJacksonAnnotationsDesc, detectJacksonAnnotationsCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
     }
 
     /**
      * 窗口行为
      */
     private void configureToolWindowBehaviorComponents() {
-        windowBehaviorLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
+        editorBehaviorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
 
-        recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
-        UIUtils.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
+        autoRecognizeFormatsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
+        UIUtils.setHelpLabel(autoRecognizeFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
 
-        xmlFormatsCb.setText("XML");
-        yamlFormatsCb.setText("YAML");
-        tomlFormatsCb.setText("TOML");
-        urlParamFormatsCb.setText("URL Param");
+        enableXmlFormatsCheckBox.setText("XML");
+        enableYamlFormatsCheckBox.setText("YAML");
+        enableTomlFormatsCheckBox.setText("TOML");
+        enableUrlParamFormatsCheckBox.setText("URL Param");
 
-        int left = UIUtil.getCheckBoxTextHorizontalOffset(recognizeOtherFormatsCb);
-        formatCbPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
+        int left = UIUtil.getCheckBoxTextHorizontalOffset(autoRecognizeFormatsCheckBox);
+        formatsCheckBoxPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
 
         // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
-        promptBeforeImportCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
-        UIUtils.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
+        shouldPromptBeforeImportCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
+        UIUtils.setCommentLabel(shouldPromptBeforeImportDesc, shouldPromptBeforeImportCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
 
-        recognizeOtherFormatsCb.addItemListener(e -> {
+        autoRecognizeFormatsCheckBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIUtils.controlEnableCheckBox(xmlFormatsCb, true);
-                UIUtils.controlEnableCheckBox(yamlFormatsCb, true);
-                UIUtils.controlEnableCheckBox(tomlFormatsCb, true);
-                UIUtils.controlEnableCheckBox(urlParamFormatsCb, true);
-                UIUtils.controlEnableCheckBox(promptBeforeImportCb, true);
+                UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIUtils.controlEnableCheckBox(xmlFormatsCb, false);
-                UIUtils.controlEnableCheckBox(yamlFormatsCb, false);
-                UIUtils.controlEnableCheckBox(tomlFormatsCb, false);
-                UIUtils.controlEnableCheckBox(urlParamFormatsCb, false);
-                UIUtils.controlEnableCheckBox(promptBeforeImportCb, false);
+                UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, false);
             }
         });
     }
@@ -181,140 +180,76 @@ public class JsonAssistantMainConfigurableComponentProvider {
      * 窗口外观
      */
     private void configureToolWindowAppearanceComponents() {
-        windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
-        displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
-        foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
-        // 单独设定背景色
-        configureBackGroundColorComponents();
-    }
+        editorVisualTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
+        showLineNumbersCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
+        showFoldingOutlineCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
 
-    private void configureBackGroundColorComponents() {
         if (isIdea) {
-            backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
+            backgroundLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
             for (ColorScheme value : ColorScheme.values()) {
-                backgroundColorBox.addItem(value);
+                backgroundComboBox.addItem(value);
             }
 
-            UIUtils.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
+            UIUtils.setHelpLabel(backgroundDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
 
-            // 当有焦点时，表示内部活动完毕，此时才允许用户选择颜色
-            backgroundColorBox.addFocusListener(new FocusAdapter() {
+            backgroundComboBox.setRenderer(new SimpleListCellRenderer<ColorScheme>() {
                 @Override
-                public void focusGained(FocusEvent e) {
-                    isLoading = false;
-                }
-            });
-
-            backgroundColorBox.addActionListener(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ColorScheme item = backgroundColorBox.getItem();
-                    if (ColorScheme.Custom.equals(item) && !isLoading) {
-                        backgroundColorBox.hidePopup();
-                        boolean darkTheme = UIUtil.isUnderDarcula();
-                        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-                        Color preselectedColor = darkTheme ? editorAppearanceState.customDarkcolor : editorAppearanceState.customLightColor;
-                        String title = darkTheme ? JsonAssistantBundle.messageOnSystem("dialog.choose.dark.color.title") : JsonAssistantBundle.messageOnSystem("dialog.choose.light.color.title");
-
-                        Color selectedColor = ColorPicker.showDialog(
-                                backgroundColorBox, title,
-                                preselectedColor, true, null, true);
-
-                        if (null != selectedColor) {
-                            if (darkTheme) {
-                                selectedDarkColor = selectedColor;
-                            } else {
-                                selectedLightColor = selectedColor;
-                            }
-
-                            UIUtils.repaintComponent(backgroundColorBox);
-                        }
-                    }
-                }
-            });
-
-            backgroundColorBox.setRenderer(new DefaultListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    // 调用父类方法
-                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    ColorScheme scheme = (ColorScheme) value;
-                    setText(null != scheme ? JsonAssistantBundle.messageOnSystem(scheme.getKey()) : "");
-
-                    Color color = getColor(scheme);
+                public void customize(@NotNull JList<? extends ColorScheme> list, ColorScheme value, int index, boolean selected, boolean hasFocus) {
+                    setText(JsonAssistantBundle.messageOnSystem(value.getKey()));
+                    Color color = value.getColor();
 
                     setIcon(Objects.isNull(color)
                             // 创建一个空白图标
                             ? new ImageIcon(new BufferedImage(14, 14, BufferedImage.TYPE_INT_ARGB))
                             // 创建圆形图标
                             : new CircleIcon(14, color));
-
-                    return this;
-                }
-
-                @Nullable
-                private Color getColor(ColorScheme colorScheme) {
-                    Color color = colorScheme.getColor();
-                    boolean darkTheme = UIUtil.isUnderDarcula();
-                    Color selectColor = darkTheme ? selectedDarkColor : selectedLightColor;
-
-                    // 实现自定义中，颜色选择后，颜色图标跟随变化
-                    // 选择的颜色默认是null，当选择后才会被赋值
-                    // 只要与持久化中的颜色不同，那么表示选中了新颜色，即切换颜色图标
-                    if (ColorScheme.Custom.equals(colorScheme)
-                            && Objects.nonNull(selectColor)
-                            && Objects.nonNull(color)
-                            && !Objects.equals(selectColor, color)) {
-                        color = selectColor;
-                    }
-
-                    return color;
                 }
             });
         } else {
-            backgroundColorPanel.setVisible(false);
+            backgroundPanel.setVisible(false);
         }
     }
+
 
     /**
      * 历史记录
      */
     private void configureHistoryComponents() {
-        historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
-        recordHistory.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
-        historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
+        historyTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
+        enableHistoryCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
+        historyStyleLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
         for (HistoryDisplayMode value : HistoryDisplayMode.values()) {
-            historyStyleBox.addItem(value);
+            historyStyleComboBox.addItem(value);
         }
 
-        historyStyleBox.setRenderer(new SimpleListCellRenderer<>() {
+        historyStyleComboBox.setRenderer(new SimpleListCellRenderer<>() {
             @Override
             public void customize(@NotNull JList<? extends HistoryDisplayMode> list, HistoryDisplayMode value, int index, boolean selected, boolean hasFocus) {
                 setText(null != value ? JsonAssistantBundle.messageOnSystem(value.getKey()) : "");
             }
         });
 
-        autoStoreHistoryTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
-        autoStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
-        manualStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.manual.text"));
-        UIUtils.setHelpLabel(autoStoreHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
+        autoRecordHistoryLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
+        autoRecordHistoryRadioBtn.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
+        manualRecordHistoryRadioBtn.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.manual.text"));
+        UIUtils.setHelpLabel(autoRecordHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
 
         ButtonGroup group = new ButtonGroup();
-        group.add(autoStoreRb);
-        group.add(manualStoreRb);
+        group.add(autoRecordHistoryRadioBtn);
+        group.add(manualRecordHistoryRadioBtn);
 
-        recordHistory.addItemListener(e -> {
+        enableHistoryCheckBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIUtils.controlEnableRadioButton(autoStoreRb, true);
-                UIUtils.controlEnableRadioButton(manualStoreRb, true);
-                if (!historyStyleBox.isEnabled()) {
-                    historyStyleBox.setEnabled(true);
+                UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, true);
+                UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, true);
+                if (!historyStyleComboBox.isEnabled()) {
+                    historyStyleComboBox.setEnabled(true);
                 }
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIUtils.controlEnableRadioButton(autoStoreRb, false);
-                UIUtils.controlEnableRadioButton(manualStoreRb, false);
-                if (historyStyleBox.isEnabled()) {
-                    historyStyleBox.setEnabled(false);
+                UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, false);
+                UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, false);
+                if (historyStyleComboBox.isEnabled()) {
+                    historyStyleComboBox.setEnabled(false);
                 }
             }
         });
@@ -338,226 +273,208 @@ public class JsonAssistantMainConfigurableComponentProvider {
     // ----------------------------------------------------------------------------------- //
 
     public void reset() {
-        // 属性序列化
-        AttributeSerializationState attributeSerializationState = persistentState.attributeSerializationState;
-        includeRandomValuesCb.setSelected(attributeSerializationState.includeRandomValues);
-        fastJsonCb.setSelected(attributeSerializationState.recognitionFastJsonAnnotation);
-        jacksonCb.setSelected(attributeSerializationState.recognitionJacksonAnnotation);
+        // ----------------------------------- 属性序列化
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+        serializeRandomValuesCheckBox.setSelected(serializationState.isSerializeRandomValues());
+        detectFastJsonAnnotationsCheckBox.setSelected(serializationState.isDetectFastJsonAnnotations());
+        detectJacksonAnnotationsCheckBox.setSelected(serializationState.isDetectJacksonAnnotations());
 
-        // 行为
-        EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        // 控制全部CheckBox
-        boolean recognizeOtherFormats = editorBehaviorState.recognizeOtherFormats;
-        recognizeOtherFormatsCb.setSelected(recognizeOtherFormats);
-        xmlFormatsCb.setSelected(editorBehaviorState.recognizeXmlFormat);
-        yamlFormatsCb.setSelected(editorBehaviorState.recognizeYamlFormat);
-        tomlFormatsCb.setSelected(editorBehaviorState.recognizeTomlFormat);
-        urlParamFormatsCb.setSelected(editorBehaviorState.recognizeUrlParamFormat);
-        promptBeforeImportCb.setSelected(editorBehaviorState.promptBeforeImport);
+        // ----------------------------------- 行为
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
 
-        // 外观
-        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        if (isIdea) {
-            resetBackgroundColorItem(editorAppearanceState);
-        }
+        boolean autoRecognizeFormats = editorBehaviorState.isAutoRecognizeFormats();
+        autoRecognizeFormatsCheckBox.setSelected(autoRecognizeFormats);
+        shouldPromptBeforeImportCheckBox.setSelected(editorBehaviorState.isShouldPromptBeforeImport());
 
-        displayLineNumbersCb.setSelected(editorAppearanceState.displayLineNumbers);
-        foldingOutlineCb.setSelected(editorAppearanceState.foldingOutline);
+        Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
+        enableXmlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.XML));
+        enableYamlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.YAML));
+        enableTomlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TOML));
+        enableUrlParamFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.URL_PARAM));
 
-        // 历史记录
-        HistoryState historyState = persistentState.historyState;
-        boolean switchHistory = historyState.switchHistory;
-        recordHistory.setSelected(switchHistory);
-        historyStyleBox.setItem(historyState.historyViewType);
-        if (historyState.autoStore) {
-            autoStoreRb.setSelected(true);
+        // ----------------------------------- 外观
+        EditorVisualState visualState = toolWindowSettings.getVisualState();
+        showLineNumbersCheckBox.setSelected(visualState.isShowLineNumbers());
+        showFoldingOutlineCheckBox.setSelected(visualState.isShowFoldingOutline());
+        backgroundComboBox.setItem(visualState.getColorScheme());
+
+        // ----------------------------------- 历史记录
+        HistoryState historyState = toolWindowSettings.getHistoryState();
+        boolean enableHistory = historyState.isEnableHistory();
+
+        enableHistoryCheckBox.setSelected(enableHistory);
+        historyStyleComboBox.setItem(historyState.getHistoryDisplayMode());
+        if (historyState.isAutoRecordHistory()) {
+            autoRecordHistoryRadioBtn.setSelected(true);
         } else {
-            manualStoreRb.setSelected(true);
+            manualRecordHistoryRadioBtn.setSelected(true);
         }
 
-        if (switchHistory) {
-            UIUtils.controlEnableRadioButton(autoStoreRb, true);
-            UIUtils.controlEnableRadioButton(manualStoreRb, true);
-            if (!historyStyleBox.isEnabled()) {
-                historyStyleBox.setEnabled(true);
+
+        // ----------------------------------- 样式处理
+
+        // ---------------------------- 历史记录
+        if (enableHistory) {
+            UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, true);
+            UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, true);
+            if (!historyStyleComboBox.isEnabled()) {
+                historyStyleComboBox.setEnabled(true);
             }
         } else {
-            UIUtils.controlEnableRadioButton(autoStoreRb, false);
-            UIUtils.controlEnableRadioButton(manualStoreRb, false);
-            if (historyStyleBox.isEnabled()) {
-                historyStyleBox.setEnabled(false);
+            UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, false);
+            UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, false);
+            if (historyStyleComboBox.isEnabled()) {
+                historyStyleComboBox.setEnabled(false);
             }
         }
 
-        if (recognizeOtherFormats) {
-            UIUtils.controlEnableCheckBox(xmlFormatsCb, true);
-            UIUtils.controlEnableCheckBox(yamlFormatsCb, true);
-            UIUtils.controlEnableCheckBox(tomlFormatsCb, true);
-            UIUtils.controlEnableCheckBox(urlParamFormatsCb, true);
-            UIUtils.controlEnableCheckBox(promptBeforeImportCb, true);
+        // ---------------------------- 解析格式
+        if (autoRecognizeFormats) {
+            UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, true);
         } else {
-            UIUtils.controlEnableCheckBox(xmlFormatsCb, false);
-            UIUtils.controlEnableCheckBox(yamlFormatsCb, false);
-            UIUtils.controlEnableCheckBox(tomlFormatsCb, false);
-            UIUtils.controlEnableCheckBox(urlParamFormatsCb, false);
-            UIUtils.controlEnableCheckBox(promptBeforeImportCb, false);
-        }
-
-        if (isIdea) {
-            UIUtils.repaintComponent(backgroundColorBox);
+            UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, false);
         }
 
         // 常规
-        GeneralState generalState = persistentState.generalState;
-        treeDisplayModeBox.setItem(generalState.treeDisplayMode);
+        TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        treeViewModeComboBox.setItem(treeStructureState.getTreeViewMode());
     }
-
-    private void resetBackgroundColorItem(EditorAppearanceState editorAppearanceState) {
-        // 在初始化组件、Reset时，不需要弹出颜色选择窗
-        isLoading = true;
-        backgroundColorBox.setItem(editorAppearanceState.colorScheme);
-        selectedLightColor = editorAppearanceState.customLightColor;
-        selectedDarkColor = editorAppearanceState.customDarkcolor;
-        isLoading = false;
-    }
-
 
     public boolean isModified() {
-        // 属性序列化
-        AttributeSerializationState attributeSerializationState = persistentState.attributeSerializationState;
-        boolean oldIncludeRandomValues = attributeSerializationState.includeRandomValues;
-        boolean oldRecognitionFastJsonAnnotation = attributeSerializationState.recognitionFastJsonAnnotation;
-        boolean oldRecognitionJacksonAnnotation = attributeSerializationState.recognitionJacksonAnnotation;
+        // ----------------------------------- 序列化
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+        boolean oldSerializeRandomValues = serializationState.isSerializeRandomValues();
+        boolean oldDetectFastJsonAnnotations = serializationState.isDetectFastJsonAnnotations();
+        boolean oldDetectJacksonAnnotations = serializationState.isDetectJacksonAnnotations();
 
-        // 行为
-        EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        boolean oldRecognizeOtherFormats = editorBehaviorState.recognizeOtherFormats;
-        boolean oldRecognizeXmlFormat = editorBehaviorState.recognizeXmlFormat;
-        boolean oldRecognizeYamlFormat = editorBehaviorState.recognizeYamlFormat;
-        boolean oldRecognizeTomlFormat = editorBehaviorState.recognizeTomlFormat;
-        boolean oldRecognizeUrlParamFormat = editorBehaviorState.recognizeUrlParamFormat;
-        boolean oldPromptBeforeImport = editorBehaviorState.promptBeforeImport;
+        // ----------------------------------- 行为
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
+        boolean oldAutoRecognizeFormats = editorBehaviorState.isAutoRecognizeFormats();
+        boolean oldShouldPromptBeforeImport = editorBehaviorState.isShouldPromptBeforeImport();
 
-        // 外观
-        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        boolean oldDisplayLineNumbers = editorAppearanceState.displayLineNumbers;
-        boolean oldFoldingOutline = editorAppearanceState.foldingOutline;
-        ColorScheme oldColorScheme = editorAppearanceState.colorScheme;
-        // 比较自定义颜色是否存在变更
-        Color oldDarkcolor = editorAppearanceState.customDarkcolor;
-        Color oldLightColor = editorAppearanceState.customLightColor;
+        Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
+        boolean oldEnableXmlFormat = enabledFormats.contains(DataFormatType.XML);
+        boolean oldEnableYamlFormat = enabledFormats.contains(DataFormatType.YAML);
+        boolean oldEnableTomlFormat = enabledFormats.contains(DataFormatType.TOML);
+        boolean oldEnableUrlParamFormat = enabledFormats.contains(DataFormatType.URL_PARAM);
 
-        // 历史记录
-        HistoryState historyState = persistentState.historyState;
-        boolean oldSwitchHistory = historyState.switchHistory;
-        boolean oldAutoStore = historyState.autoStore;
-        HistoryDisplayMode oldHistoryViewType = historyState.historyViewType;
+        // ----------------------------------- 外观
+        EditorVisualState visualState = toolWindowSettings.getVisualState();
+        boolean oldShowLineNumbers = visualState.isShowLineNumbers();
+        boolean oldShowFoldingOutline = visualState.isShowFoldingOutline();
+        ColorScheme oldColorScheme = visualState.getColorScheme();
 
-        // 常规
-        GeneralState generalState = persistentState.generalState;
-        TreeViewMode oldTreeDisplayMode = generalState.treeDisplayMode;
+        // ----------------------------------- 历史记录
+        HistoryState historyState = toolWindowSettings.getHistoryState();
+        boolean oldEnableHistory = historyState.isEnableHistory();
+        boolean oldAutoRecordHistory = historyState.isAutoRecordHistory();
+        HistoryDisplayMode oldHistoryDisplayMode = historyState.getHistoryDisplayMode();
+
+        // ----------------------------------- 常规
+        TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        TreeViewMode oldTreeViewMode = treeStructureState.getTreeViewMode();
+
 
         // ----------------------------------------------------------------------
 
-        // 属性序列化
-        boolean newIncludeRandomValues = includeRandomValuesCb.isSelected();
-        boolean newRecognitionFastJsonAnnotation = fastJsonCb.isSelected();
-        boolean newRecognitionJacksonAnnotation = jacksonCb.isSelected();
+        // ----------------------------------- 属性序列化
+        boolean newSerializeRandomValues = serializeRandomValuesCheckBox.isSelected();
+        boolean newDetectFastJsonAnnotations = detectFastJsonAnnotationsCheckBox.isSelected();
+        boolean newDetectJacksonAnnotations = detectJacksonAnnotationsCheckBox.isSelected();
 
-        // 外观
-        ColorScheme newColorScheme = backgroundColorBox.getItem();
-        boolean newDisplayLineNumbers = displayLineNumbersCb.isSelected();
-        boolean newFoldingOutline = foldingOutlineCb.isSelected();
+        // ----------------------------------- 外观
+        boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
+        boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
+        ColorScheme newColorScheme = backgroundComboBox.getItem();
 
-        // 解析
-        boolean newRecognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
-        boolean newRecognizeXmlFormat = xmlFormatsCb.isSelected();
-        boolean newRecognizeYamlFormat = yamlFormatsCb.isSelected();
-        boolean newRecognizeTomlFormat = tomlFormatsCb.isSelected();
-        boolean newRecognizeUrlParamFormat = urlParamFormatsCb.isSelected();
-        boolean newPromptBeforeImport = promptBeforeImportCb.isSelected();
+        // ----------------------------------- 行为
+        boolean newAutoRecognizeFormats = autoRecognizeFormatsCheckBox.isSelected();
+        boolean newShouldPromptBeforeImport = shouldPromptBeforeImportCheckBox.isSelected();
+        boolean newEnableXmlFormat = enableXmlFormatsCheckBox.isSelected();
+        boolean newEnableYamlFormat = enableYamlFormatsCheckBox.isSelected();
+        boolean newEnableTomlFormat = enableTomlFormatsCheckBox.isSelected();
+        boolean newEnableUrlParamFormat = enableUrlParamFormatsCheckBox.isSelected();
 
-        // 历史记录
-        boolean newSwitchHistory = recordHistory.isSelected();
-        boolean newAutoStore = autoStoreRb.isSelected();
-        HistoryDisplayMode newHistoryViewType = historyStyleBox.getItem();
+        // ----------------------------------- 历史记录
+        boolean newEnableHistory = enableHistoryCheckBox.isSelected();
+        boolean newAutoRecordHistory = autoRecordHistoryRadioBtn.isSelected();
+        HistoryDisplayMode newHistoryDisplayMode = historyStyleComboBox.getItem();
 
-        // 常规
-        TreeViewMode newTreeDisplayMode = treeDisplayModeBox.getItem();
+        // ----------------------------------- 常规
+        TreeViewMode newTreeViewMode = treeViewModeComboBox.getItem();
 
-        // 比较是否更改
-        return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
-                || !Objects.equals(oldRecognitionFastJsonAnnotation, newRecognitionFastJsonAnnotation)
-                || !Objects.equals(oldRecognitionJacksonAnnotation, newRecognitionJacksonAnnotation)
+        // ------------------------------------------- 对比
+
+        return !Objects.equals(oldSerializeRandomValues, newSerializeRandomValues)
+                || !Objects.equals(oldDetectFastJsonAnnotations, newDetectFastJsonAnnotations)
+                || !Objects.equals(oldDetectJacksonAnnotations, newDetectJacksonAnnotations)
 
                 || (isIdea && !Objects.equals(oldColorScheme, newColorScheme))
-                || (isIdea && (ColorScheme.Custom.equals(newColorScheme)
-                // 自定义颜色比较
-                && !Objects.equals(oldLightColor, selectedLightColor) || !Objects.equals(oldDarkcolor, selectedDarkColor)))
 
-                || !Objects.equals(oldDisplayLineNumbers, newDisplayLineNumbers)
-                || !Objects.equals(oldFoldingOutline, newFoldingOutline)
+                || !Objects.equals(oldShowLineNumbers, newShowLineNumbers)
+                || !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline)
 
-                || !Objects.equals(oldRecognizeOtherFormats, newRecognizeOtherFormats)
-                || !Objects.equals(oldRecognizeXmlFormat, newRecognizeXmlFormat)
-                || !Objects.equals(oldRecognizeYamlFormat, newRecognizeYamlFormat)
-                || !Objects.equals(oldRecognizeTomlFormat, newRecognizeTomlFormat)
-                || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
-                || !Objects.equals(oldPromptBeforeImport, newPromptBeforeImport)
-                || !Objects.equals(oldSwitchHistory, newSwitchHistory)
-                || !Objects.equals(oldAutoStore, newAutoStore)
-                || !Objects.equals(oldHistoryViewType, newHistoryViewType)
-                || !Objects.equals(oldTreeDisplayMode, newTreeDisplayMode)
+                || !Objects.equals(oldAutoRecognizeFormats, newAutoRecognizeFormats)
+                || !Objects.equals(oldEnableXmlFormat, newEnableXmlFormat)
+                || !Objects.equals(oldEnableYamlFormat, newEnableYamlFormat)
+                || !Objects.equals(oldEnableTomlFormat, newEnableTomlFormat)
+                || !Objects.equals(oldEnableUrlParamFormat, newEnableUrlParamFormat)
+                || !Objects.equals(oldShouldPromptBeforeImport, newShouldPromptBeforeImport)
+                || !Objects.equals(oldEnableHistory, newEnableHistory)
+                || !Objects.equals(oldAutoRecordHistory, newAutoRecordHistory)
+                || !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode)
+                || !Objects.equals(oldTreeViewMode, newTreeViewMode)
 
                 ;
     }
 
     public void apply() {
-        // 属性序列化
-        AttributeSerializationState attributeSerializationState = persistentState.attributeSerializationState;
-        attributeSerializationState.includeRandomValues = includeRandomValuesCb.isSelected();
-        attributeSerializationState.recognitionFastJsonAnnotation = fastJsonCb.isSelected();
-        attributeSerializationState.recognitionJacksonAnnotation = jacksonCb.isSelected();
+        // ----------------------------------- 序列化
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+        serializationState.setSerializeRandomValues(serializeRandomValuesCheckBox.isSelected());
+        serializationState.setDetectFastJsonAnnotations(detectFastJsonAnnotationsCheckBox.isSelected());
+        serializationState.setDetectJacksonAnnotations(detectJacksonAnnotationsCheckBox.isSelected());
 
-        // 行为
-        EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        editorBehaviorState.recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
-        editorBehaviorState.recognizeXmlFormat = xmlFormatsCb.isSelected();
-        editorBehaviorState.recognizeYamlFormat = yamlFormatsCb.isSelected();
-        editorBehaviorState.recognizeTomlFormat = tomlFormatsCb.isSelected();
-        editorBehaviorState.recognizeUrlParamFormat = urlParamFormatsCb.isSelected();
-        editorBehaviorState.promptBeforeImport = promptBeforeImportCb.isSelected();
+        // ----------------------------------- 行为
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
+        editorBehaviorState.setAutoRecognizeFormats(autoRecognizeFormatsCheckBox.isSelected());
+        editorBehaviorState.setShouldPromptBeforeImport(shouldPromptBeforeImportCheckBox.isSelected());
+        Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
+        if (enableXmlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.XML);
+        if (enableYamlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.YAML);
+        if (enableTomlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TOML);
+        if (enableUrlParamFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.URL_PARAM);
 
-        // 历史记录
-        HistoryState historyState = persistentState.historyState;
-        historyState.switchHistory = recordHistory.isSelected();
-        historyState.autoStore = autoStoreRb.isSelected();
-        historyState.historyViewType = historyStyleBox.getItem();
+        // ----------------------------------- 历史记录
+        HistoryState historyState = toolWindowSettings.getHistoryState();
+        historyState.setEnableHistory(enableHistoryCheckBox.isSelected());
+        historyState.setAutoRecordHistory(autoRecordHistoryRadioBtn.isSelected());
+        historyState.setHistoryDisplayMode(historyStyleComboBox.getItem());
 
-        // 外观
-        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        editorAppearanceState.displayLineNumbers = displayLineNumbersCb.isSelected();
-        editorAppearanceState.foldingOutline = foldingOutlineCb.isSelected();
+        // ----------------------------------- 外观
+        EditorVisualState visualState = toolWindowSettings.getVisualState();
+        visualState.setShowLineNumbers(showLineNumbersCheckBox.isSelected());
+        visualState.setShowFoldingOutline(showFoldingOutlineCheckBox.isSelected());
 
         if (isIdea) {
-            ColorScheme selectedScheme = backgroundColorBox.getItem();
-            editorAppearanceState.colorScheme = selectedScheme;
-
-            // 如果选择的是Custom，那么将选择的颜色赋值给customColor，这个color可以暂时缓存起来
-            if (ColorScheme.Custom.equals(selectedScheme)) {
-                if (Objects.nonNull(selectedDarkColor)) {
-                    editorAppearanceState.customDarkcolor = selectedDarkColor;
-                }
-
-                if (Objects.nonNull(selectedLightColor)) {
-                    editorAppearanceState.customLightColor = selectedLightColor;
-                }
-            }
+            ColorScheme selectedScheme = backgroundComboBox.getItem();
+            visualState.setColorScheme(selectedScheme);
         }
 
         // 常规
-        GeneralState generalState = persistentState.generalState;
-        generalState.treeDisplayMode = treeDisplayModeBox.getItem();
+        TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        treeStructureState.setTreeViewMode(treeViewModeComboBox.getItem());
     }
 
 }

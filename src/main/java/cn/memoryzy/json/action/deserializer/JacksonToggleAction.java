@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action.deserializer;
 
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -12,21 +12,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class JacksonToggleAction extends ToggleAction implements UpdateInBackground {
 
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
 
-    public JacksonToggleAction(DeserializerState deserializerState) {
+    public JacksonToggleAction(DeserializationState deserializationState) {
         super("@JsonProperty (Jackson)", null, null);
-        this.deserializerState = deserializerState;
+        this.deserializationState = deserializationState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializerState.jacksonAnnotation;
+        return deserializationState.isEnableJacksonAnnotation();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializerState.jacksonAnnotation = state;
+        deserializationState.setEnableJacksonAnnotation(state);
     }
 
 }

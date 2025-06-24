@@ -14,9 +14,12 @@ import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversion
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.service.persistent.state.*;
+import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
+import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
+import cn.memoryzy.json.service.persistent.state.JsonEntry;
+import cn.memoryzy.json.service.persistent.state.v2.*;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.dialog.ManuallySaveHistoryDialog;
 import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
@@ -83,8 +86,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private final FileType editorFileType;
     private final boolean initTab;
     private final JsonHistoryPersistentState historyState;
-    private final EditorBehaviorState editorBehaviorState;
-    private final EditorAppearanceState editorAppearanceState;
+    private final EditorBehaviorState behaviorState;
+    private final EditorVisualState visualState;
     private final HistoryState historyOptionState;
     private final PropertiesComponent propertiesComponent;
     private EditorEx editor;
@@ -98,11 +101,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         this.project = project;
         this.editorFileType = editorFileType;
         this.initTab = initTab;
+        // TODO 待修改
         this.historyState = JsonHistoryPersistentState.getInstance(project);
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-        this.editorBehaviorState = persistentState.editorBehaviorState;
-        this.editorAppearanceState = persistentState.editorAppearanceState;
-        this.historyOptionState = persistentState.historyState;
+
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        this.behaviorState = toolWindowSettings.getBehaviorState();
+        this.visualState = toolWindowSettings.getVisualState();
+        this.historyOptionState = toolWindowSettings.getHistoryState();
         this.propertiesComponent = PropertiesComponent.getInstance();
     }
 
@@ -182,7 +187,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         String jsonString = initData.getJsonString();
         String parseType = initData.getParseType();
         String originalText = initData.getOriginalText();
-        boolean needPrompt = hasText && editorBehaviorState.promptBeforeImport;
+        boolean needPrompt = hasText && behaviorState.isShouldPromptBeforeImport();
 
         // 若是json5，则粘贴原文
         boolean isJson5 = DataTypeConstant.JSON5.equals(parseType);
@@ -240,11 +245,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private void changeEditorAppearance(EditorEx editor, boolean hasText) {
         EditorSettings settings = editor.getSettings();
         // 行号显示
-        settings.setLineNumbersShown(editorAppearanceState.displayLineNumbers);
+        settings.setLineNumbersShown(visualState.isShowLineNumbers());
         // 设置显示的缩进导轨
         settings.setIndentGuidesShown(true);
         // 折叠块显示
-        settings.setFoldingOutlineShown(editorAppearanceState.foldingOutline);
+        settings.setFoldingOutlineShown(visualState.isShowFoldingOutline());
         // 折叠块、行号所展示的区域
         settings.setLineMarkerAreaShown(false);
         // 显示设置插入符行（光标选中行会变黄）
@@ -258,7 +263,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         gutterComponentEx.setPaintBackground(false);
 
         // 指定配色方案
-        toggleColorSchema(editor, editor.getColorsScheme(), editorAppearanceState);
+        toggleColorSchema(editor, editor.getColorsScheme(), visualState);
 
         editor.setBorder(JBUI.Borders.empty());
 
@@ -313,7 +318,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         String originalText = null;
 
         if (initTab) {
-            if (editorBehaviorState.recognizeOtherFormats) {
+            if (behaviorState.isAutoRecognizeFormats()) {
                 String clipboard = PlatformUtil.getClipboard();
                 if (StrUtil.isNotBlank(clipboard)) {
                     // 尝试不同格式数据策略
@@ -348,7 +353,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
 
     private void pasteJsonToEditor() {
-        if (initTab && editorBehaviorState.recognizeOtherFormats) {
+        if (initTab && behaviorState.isAutoRecognizeFormats()) {
             String text = editor.getDocument().getText();
             if (StrUtil.isBlank(text)) {
                 String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
@@ -375,7 +380,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                         }
 
                         String type = strategy.type();
-                        if (editorBehaviorState.promptBeforeImport) {
+                        if (behaviorState.isShouldPromptBeforeImport()) {
                             new PreviewClipboardDataDialog(project, editor, type, formattedStr, clipboard).show();
                         } else {
                             WriteCommandAction.runWriteCommandAction(project, () -> {
@@ -531,8 +536,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         });
     }
 
-    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, EditorAppearanceState appearanceState) {
-        ColorScheme colorScheme = appearanceState.colorScheme;
+    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, EditorVisualState appearanceState) {
+        ColorScheme colorScheme = appearanceState.getColorScheme();
         if (ColorScheme.Default.equals(colorScheme)) {
             // 默认的话，按照默认颜色
             Color oriColor = editor.getBackgroundColor();
@@ -591,11 +596,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             // 获取剪贴板的 JSON 并设置到编辑器内
             pasteJsonToEditor();
             // 行号显示
-            toggleLineNumbers(editor, editorAppearanceState.displayLineNumbers);
+            toggleLineNumbers(editor, visualState.isShowLineNumbers());
             // 配色切换
-            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), editorAppearanceState);
+            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), visualState);
             // 切换展示折叠区域
-            toggleFoldingOutline(editor, editorAppearanceState.foldingOutline);
+            toggleFoldingOutline(editor, visualState.isShowFoldingOutline());
 
 
 
@@ -607,7 +612,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         public void focusLost(@NotNull Editor editor) {
             // --------------------------- 失去焦点时
             // 添加当前编辑器的 JSON 至历史记录
-            if (historyOptionState.switchHistory && historyOptionState.autoStore) {
+            if (historyOptionState.isEnableHistory() && historyOptionState.isAutoRecordHistory()) {
                 scheduleDebouncedAction();
             }
         }
@@ -655,7 +660,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private class ManuallySaveHistoryAction implements Consumer<AnActionEvent> {
         @Override
         public void consume(AnActionEvent event) {
-            if (historyOptionState.switchHistory && !historyOptionState.autoStore) {
+            if (historyOptionState.isEnableHistory() && !historyOptionState.isAutoRecordHistory()) {
                 performAction(false);
             }
         }

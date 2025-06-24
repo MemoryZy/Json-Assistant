@@ -1,10 +1,11 @@
 package cn.memoryzy.json.service.persistent.state.v2;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.memoryzy.json.enums.DataFormatType;
 import com.intellij.util.xmlb.annotations.Tag;
 import com.intellij.util.xmlb.annotations.XCollection;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 编辑器行为设置项
@@ -16,14 +17,14 @@ import java.util.List;
 public class EditorBehaviorState {
 
     /**
-     * 是否自动识别并转换剪贴板中的非标准格式数据（如HTML、富文本等）（总开关）
+     * 是否自动识别并转换剪贴板中的非标准格式数据（如XML、YAML等）（总开关）
      */
     private boolean autoRecognizeFormats = true;
 
     /**
      * 启用自动识别的数据格式列表（空列表表示禁用所有自动识别）
      */
-    private List<DataFormatType> enabledFormats = List.of(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
+    private Set<DataFormatType> enabledFormats = CollUtil.newHashSet(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
 
     /**
      * 从剪贴板自动导入数据时是否显示确认对话框
@@ -35,7 +36,7 @@ public class EditorBehaviorState {
         this.autoRecognizeFormats = autoRecognizeFormats;
     }
 
-    public void setEnabledFormats(List<DataFormatType> enabledFormats) {
+    public void setEnabledFormats(Set<DataFormatType> enabledFormats) {
         this.enabledFormats = enabledFormats;
     }
 
@@ -49,7 +50,7 @@ public class EditorBehaviorState {
     }
 
     @XCollection(propertyElementName = "formats", elementName = "item", style = XCollection.Style.v2)
-    public List<DataFormatType> getEnabledFormats() {
+    public Set<DataFormatType> getEnabledFormats() {
         return enabledFormats;
     }
 

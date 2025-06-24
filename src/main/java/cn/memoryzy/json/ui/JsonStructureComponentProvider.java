@@ -10,8 +10,8 @@ import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.StructureState;
+import cn.memoryzy.json.service.persistent.state.v2.TreeStructureState;
+import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
@@ -46,7 +46,7 @@ public class JsonStructureComponentProvider {
     private final Tree tree;
     private final JPanel treeComponent;
     private Object hoverNode;
-    private final StructureState structureState;
+    private final TreeStructureState structureState;
     private final StructureSetting setting;
 
     /**
@@ -78,7 +78,7 @@ public class JsonStructureComponentProvider {
      * @param setting   配置
      */
     public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
-        this.structureState = JsonAssistantPersistentState.getInstance().structureState;
+        this.structureState = GeneralSettings.getInstance().getState().getTreeStructureState();
         this.setting = setting;
         this.editorContext = setting.getEditorContext();
         this.tree = new Tree(new DefaultTreeModel(new JsonTreeNode("root")));
@@ -488,7 +488,7 @@ public class JsonStructureComponentProvider {
                 append("  " + comment, SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES, false);
             }
 
-            if (structureState.displayNodePath && jsonTreeNode.equals(hoverNode)) {
+            if (structureState.isDisplayNodePath() && jsonTreeNode.equals(hoverNode)) {
                 TreeNode[] pathElements = jsonTreeNode.getPath();
                 // 不显示根节点与第二层的节点路径
                 if (pathElements.length > 2) {

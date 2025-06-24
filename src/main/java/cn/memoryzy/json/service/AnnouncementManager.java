@@ -10,8 +10,8 @@ import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.Announcement;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.AnnouncementStats;
+import cn.memoryzy.json.service.persistent.state.v2.AnnouncementStats;
+import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
 import cn.memoryzy.json.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -214,12 +214,10 @@ public final class AnnouncementManager implements Disposable {
                 return () -> {
                     // 此公告不再显示，加上标记
                     String id = announcement.getId();
-                    Map<String, AnnouncementStats> announcementStatsMap = JsonAssistantPersistentState.getInstance().announcementStatsMap;
-
                     // 获取此公告记录
-                    AnnouncementStats announcementStats = announcementStatsMap.computeIfAbsent(id, k -> new AnnouncementStats());
+                    Map<String, AnnouncementStats> readAnnouncements = GeneralSettings.getInstance().getState().getReadAnnouncements();
                     // 若不存在此公告记录，则建立新的填充进去
-
+                    AnnouncementStats announcementStats = readAnnouncements.computeIfAbsent(id, k -> new AnnouncementStats());
                     // 设置 [不再显示]
                     announcementStats.setShouldShowAgain(false);
                 };
@@ -238,8 +236,8 @@ public final class AnnouncementManager implements Disposable {
         // 添加已读记录
         if (StrUtil.isBlank(announcementId)) return;
 
-        Map<String, AnnouncementStats> announcementStatsMap = JsonAssistantPersistentState.getInstance().announcementStatsMap;
-        AnnouncementStats announcementStats = announcementStatsMap.computeIfAbsent(announcementId, k -> new AnnouncementStats());
+        Map<String, AnnouncementStats> readAnnouncements = GeneralSettings.getInstance().getState().getReadAnnouncements();
+        AnnouncementStats announcementStats = readAnnouncements.computeIfAbsent(announcementId, k -> new AnnouncementStats());
 
         // 展示次数 +1
         announcementStats
@@ -251,7 +249,7 @@ public final class AnnouncementManager implements Disposable {
         // 当前时间
         LocalDate now = LocalDate.now();
         // 已读公告
-        Map<String, AnnouncementStats> announcementStatsMap = JsonAssistantPersistentState.getInstance().announcementStatsMap;
+        Map<String, AnnouncementStats> readAnnouncements = GeneralSettings.getInstance().getState().getReadAnnouncements();
         // 当前插件版本
         String version = JsonAssistantPlugin.getVersion();
 
@@ -261,7 +259,7 @@ public final class AnnouncementManager implements Disposable {
                         // 标题内容不存在
                         || MapUtil.isEmpty(el.getLocales())
                         // 已展示过，并且展示次数超出设定值
-                        || isExceedDisplayLimit(el, announcementStatsMap)
+                        || isExceedDisplayLimit(el, readAnnouncements)
                         // 公告过期
                         || isNoticeExpired(el, now)
                         // 版本约束

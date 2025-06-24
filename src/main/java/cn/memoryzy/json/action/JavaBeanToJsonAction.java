@@ -5,7 +5,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonConversionTarget;
 import cn.memoryzy.json.model.TypeNamePair;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
+import cn.memoryzy.json.service.persistent.v2.SerializationSettings;
 import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
@@ -91,14 +92,14 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         Map<String, String> commentMap = new HashMap<>();
 
         // 相关配置
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
 
         // 获取忽略字段，只有当前类才进行字段筛选
         List<String> ignoredFields = getIgnoredFields(dataContext, psiClass, target);
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, ignoredFields, commentMap, resolveComment, persistentState.attributeSerializationState);
+            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, ignoredFields, commentMap, resolveComment, serializationState);
         } catch (Error e) {
             log.error(e);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("error.serialize.recursion"), NotificationType.ERROR, project);

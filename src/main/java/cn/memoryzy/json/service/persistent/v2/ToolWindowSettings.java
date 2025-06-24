@@ -14,7 +14,6 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.Property;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Memory
@@ -51,11 +50,11 @@ public final class ToolWindowSettings implements PersistentStateComponent<ToolWi
     /**
      * 历史记录设置项
      */
-    public HistoryState historyState = new HistoryState();
+    private HistoryState historyState = new HistoryState();
 
 
     @Override
-    public @Nullable ToolWindowSettings getState() {
+    public @NotNull ToolWindowSettings getState() {
         return this;
     }
 

@@ -10,9 +10,6 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * @author Memory
  * @since 2024/11/18
@@ -56,29 +53,7 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
     @Attribute(converter = GeneralStateConverter.class)
     public GeneralState generalState = new GeneralState();
 
-    /**
-     * 持久化设置项
-     */
-    @Attribute(converter = DeserializerStateConverter.class)
-    public DeserializerState deserializerState = new DeserializerState();
 
-    /**
-     * 查询设置项
-     */
-    @Attribute(converter = QueryStateConverter.class)
-    public QueryState queryState = new QueryState();
-
-    /**
-     * 结构设置项
-     */
-    @Attribute(converter = StructureStateConverter.class)
-    public StructureState structureState = new StructureState();
-
-    /**
-     * 已读公告 (id -> 统计对象)
-     */
-    @Attribute(converter = AnnouncementStatsConverter.class)
-    public Map<String, AnnouncementStats> announcementStatsMap = new HashMap<>();
 
 
     @Override
@@ -88,14 +63,7 @@ public class JsonAssistantPersistentState implements PersistentStateComponent<Js
 
     @Override
     public void loadState(@NotNull JsonAssistantPersistentState state) {
-        this.attributeSerializationState = state.attributeSerializationState;
-        this.editorAppearanceState = state.editorAppearanceState;
-        this.editorBehaviorState = state.editorBehaviorState;
-        this.historyState = state.historyState;
-        this.generalState = state.generalState;
-        this.deserializerState = state.deserializerState;
-        this.queryState = state.queryState;
-        this.structureState = state.structureState;
-        this.announcementStatsMap = state.announcementStatsMap;
+
+
     }
 }

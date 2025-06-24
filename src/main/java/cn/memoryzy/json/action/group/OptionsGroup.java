@@ -9,7 +9,7 @@ import cn.memoryzy.json.action.deserializer.comment.SwaggerV3ToggleAction;
 import cn.memoryzy.json.action.deserializer.lombok.LombokGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
 import cn.memoryzy.json.util.JavaUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
@@ -32,12 +32,12 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
     private static final Logger LOG = Logger.getInstance(OptionsGroup.class);
 
     private final Module module;
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
 
-    public OptionsGroup(Module module, DeserializerState deserializerState) {
+    public OptionsGroup(Module module, DeserializationState deserializationState) {
         super(JsonAssistantBundle.messageOnSystem("dialog.deserialize.options.text"), true);
         this.module = module;
-        this.deserializerState = deserializerState;
+        this.deserializationState = deserializationState;
         Presentation presentation = getTemplatePresentation();
         presentation.setIcon(AllIcons.General.Settings);
 
@@ -59,7 +59,7 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
         Separator json5Separator = Separator.create("JSON5");
 
         if (JavaUtil.hasLibrary(module, DependencyConstant.LOMBOK_LIB)) {
-            actions.add(new LombokGroup(deserializerState));
+            actions.add(new LombokGroup(deserializationState));
         }
 
         actions.add(Separator.create());
@@ -67,21 +67,21 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
             if (!actions.contains(attributeSeparator)) {
                 actions.add(attributeSeparator);
             }
-            actions.add(new JacksonToggleAction(deserializerState));
+            actions.add(new JacksonToggleAction(deserializationState));
         }
 
         if (JavaUtil.hasFastJsonLib(module)) {
             if (!actions.contains(attributeSeparator)) {
                 actions.add(attributeSeparator);
             }
-            actions.add(new FastJsonToggleAction(deserializerState));
+            actions.add(new FastJsonToggleAction(deserializationState));
         }
 
         if (JavaUtil.hasFastJson2Lib(module)) {
             if (!actions.contains(attributeSeparator)) {
                 actions.add(attributeSeparator);
             }
-            actions.add(new FastJson2ToggleAction(deserializerState));
+            actions.add(new FastJson2ToggleAction(deserializationState));
         }
 
         // ------------------------------------------
@@ -91,18 +91,18 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
             if (!actions.contains(json5Separator)) {
                 actions.add(json5Separator);
             }
-            actions.add(new SwaggerV3ToggleAction(deserializerState));
+            actions.add(new SwaggerV3ToggleAction(deserializationState));
         }
 
         if (JavaUtil.hasSwaggerLib(module)) {
             if (!actions.contains(json5Separator)) {
                 actions.add(json5Separator);
             }
-            actions.add(new SwaggerToggleAction(deserializerState));
+            actions.add(new SwaggerToggleAction(deserializationState));
         }
 
         actions.add(Separator.create());
-        actions.add(new KeepCamelToggleAction(deserializerState));
+        actions.add(new KeepCamelToggleAction(deserializationState));
         return actions.toArray(new AnAction[0]);
     }
 

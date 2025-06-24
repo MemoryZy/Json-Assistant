@@ -143,7 +143,7 @@ public final class ConfigurationMerger {
             String colorSchemeStr = (String) wrapper.get("colorScheme");
             ColorScheme colorScheme = ColorScheme.of(colorSchemeStr);
 
-            if (null != displayLineNumbers) visualState.setDisplayLineNumbers(displayLineNumbers);
+            if (null != displayLineNumbers) visualState.setShowLineNumbers(displayLineNumbers);
             if (null != foldingOutline) visualState.setShowFoldingOutline(foldingOutline);
             if (null != colorScheme) visualState.setColorScheme(colorScheme);
         }
@@ -195,7 +195,7 @@ public final class ConfigurationMerger {
             HistoryDisplayMode historyViewType = HistoryDisplayMode.of(historyViewTypeStr);
             Boolean autoStore = (Boolean) wrapper.get("autoStore");
 
-            if (null != switchHistory) historyState.setHistoryEnabled(switchHistory);
+            if (null != switchHistory) historyState.setEnableHistory(switchHistory);
             if (null != historyViewType) historyState.setHistoryDisplayMode(historyViewType);
             if (null != autoStore) historyState.setAutoRecordHistory(autoStore);
         }

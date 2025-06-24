@@ -12,7 +12,7 @@ import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.JsonConversionTarget;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.SwaggerAnnotations;
-import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
+import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -52,7 +52,7 @@ public class JavaUtil {
      * @param ignoreMap       忽略元素列表
      * @param commentMap      最外层的注释Map
      * @param resolveComment  是否解析注释
-     * @param persistentState 持久化配置
+     * @param serializationState 持久化配置
      */
     public static void recursionAddProperty(Project project,
                                             PsiClass psiClass,
@@ -61,7 +61,7 @@ public class JavaUtil {
                                             List<String> ignoredFields,
                                             Map<String, String> commentMap,
                                             boolean resolveComment,
-                                            AttributeSerializationState persistentState) {
+                                            SerializationState serializationState) {
         // 类限定名
         String qualifiedName = psiClass.getQualifiedName();
         // 获取该类所有字段
@@ -79,7 +79,7 @@ public class JavaUtil {
 
             // -------------------------- 注解支持
             // 获取Json键名
-            String jsonKeyName = getAnnotationJsonKeyName(psiField, persistentState);
+            String jsonKeyName = getAnnotationJsonKeyName(psiField, serializationState);
 
             // 如果加了忽略，则忽略该属性；或属性为临时属性，也忽略
             if (Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, jsonKeyName)
@@ -139,7 +139,7 @@ public class JavaUtil {
                             nestedJsonMap = new LinkedHashMap<>();
                             Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, persistentState);
+                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, serializationState);
                         }
                         // 添加至主Map
                         jsonMap.put(propertyName, nestedJsonMap);
@@ -159,12 +159,12 @@ public class JavaUtil {
                             Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
                             Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, persistentState);
+                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, serializationState);
                             // 添加至list
                             list.add(nestedJsonMap);
                         }
                     } else {
-                        Object defaultValue = getDefaultValue(psiField, classType, persistentState.includeRandomValues);
+                        Object defaultValue = getDefaultValue(psiField, classType, serializationState.isSerializeRandomValues());
                         if (Objects.nonNull(defaultValue)) {
                             list.add(defaultValue);
                         }
@@ -174,7 +174,7 @@ public class JavaUtil {
                 jsonMap.put(propertyName, list);
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
-                jsonMap.put(propertyName, getDefaultValueWithAnnotation(psiField, psiType, persistentState));
+                jsonMap.put(propertyName, getDefaultValueWithAnnotation(psiField, psiType, serializationState));
             }
         }
     }
@@ -204,10 +204,10 @@ public class JavaUtil {
         return comment;
     }
 
-    private static Object getDefaultValueWithAnnotation(PsiField psiField, PsiType psiType, AttributeSerializationState persistentState) {
+    private static Object getDefaultValueWithAnnotation(PsiField psiField, PsiType psiType, SerializationState serializationState) {
         // 如果是加了时间序列化注解，但是类型不属于时间相关类型，那注解不生效
-        boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;
-        boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
+        boolean recognitionJacksonAnnotation = serializationState.isDetectJacksonAnnotations();
+        boolean recognitionFastJsonAnnotation = serializationState.isDetectFastJsonAnnotations();
 
         // 因为 @JsonFormat 是独立注解，如果存在，则直接返回时间类型
         if (recognitionJacksonAnnotation) {
@@ -260,7 +260,7 @@ public class JavaUtil {
             }
         }
 
-        return getDefaultValue(psiField, psiType, persistentState.includeRandomValues);
+        return getDefaultValue(psiField, psiType, serializationState.isSerializeRandomValues());
     }
 
 
@@ -310,13 +310,13 @@ public class JavaUtil {
      * 获取Json注解中的键名称
      *
      * @param psiField        字段属性
-     * @param persistentState 持久化配置
+     * @param serializationState 持久化配置
      * @return 键名（如果是{@link JsonAssistantPlugin#PLUGIN_ID_NAME}）则表示忽略该字段
      */
-    private static String getAnnotationJsonKeyName(PsiField psiField, AttributeSerializationState persistentState) {
+    private static String getAnnotationJsonKeyName(PsiField psiField, SerializationState serializationState) {
         // ---------------------------------- 获取注解判断是否忽略序列化
-        boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
-        boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;
+        boolean recognitionFastJsonAnnotation = serializationState.isDetectFastJsonAnnotations();
+        boolean recognitionJacksonAnnotation = serializationState.isDetectJacksonAnnotations();
 
         // jackson 通过 @JsonIgnore 注解标记是否忽略序列化字段
         if (recognitionJacksonAnnotation) {

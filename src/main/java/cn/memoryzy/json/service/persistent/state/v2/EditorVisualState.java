@@ -16,7 +16,7 @@ public class EditorVisualState {
     /**
      * 是否在编辑器中显示行号
      */
-    private boolean displayLineNumbers = false;
+    private boolean showLineNumbers = false;
 
     /**
      * 是否显示代码块的折叠控制符号
@@ -29,8 +29,8 @@ public class EditorVisualState {
     private ColorScheme colorScheme = ColorScheme.Default;
 
 
-    public void setDisplayLineNumbers(boolean displayLineNumbers) {
-        this.displayLineNumbers = displayLineNumbers;
+    public void setShowLineNumbers(boolean showLineNumbers) {
+        this.showLineNumbers = showLineNumbers;
     }
 
     public void setShowFoldingOutline(boolean showFoldingOutline) {
@@ -42,8 +42,8 @@ public class EditorVisualState {
     }
 
 
-    public boolean isDisplayLineNumbers() {
-        return displayLineNumbers;
+    public boolean isShowLineNumbers() {
+        return showLineNumbers;
     }
 
     public boolean isShowFoldingOutline() {
