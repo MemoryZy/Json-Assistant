@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- 切换识别剪贴板数据的方式。
+- 优化插件性能。
+- Switch the way of recognizing clipboard data.
+- Optimize the performance of the plugin.
+
 ## [1.8.2] - 2025-06-16
 
 - 支持选择部分字段进行序列化为JSON。
