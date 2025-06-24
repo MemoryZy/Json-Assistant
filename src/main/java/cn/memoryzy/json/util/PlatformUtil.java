@@ -341,10 +341,8 @@ public class PlatformUtil {
                     .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.timeout.message"))
                     .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.timeout.action", url));
 
-            if (Urls.isReachable()) {
-                HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("open.html.quick.start.title"), url, timeoutContent);
-                return;
-            }
+            HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("open.html.quick.start.title"), url, timeoutContent);
+            return;
         }
 
         BrowserUtil.browse(url);

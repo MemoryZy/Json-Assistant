@@ -1,30 +1,19 @@
 package cn.memoryzy.json.action.toolwindow;
 
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
-import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.dialog.JsonHistoryListChooser;
 import cn.memoryzy.json.ui.dialog.JsonHistoryTreeChooser;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.Notifications;
-import cn.memoryzy.json.util.PlatformUtil;
-import com.google.common.collect.Lists;
-import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.ide.HelpTooltip;
-import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.keymap.MacKeymapUtil;
@@ -41,9 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -116,82 +103,82 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
      *
      * @param project 项目
      */
-    public static void compatibilityHistory(Project project) {
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-        if (persistentState.historyState.switchHistory) {
-            // 历史记录检测
-            ApplicationManager.getApplication().invokeLater(() -> {
-                ComponentManagerSettings projectDataManagerSettings = PlatformUtil.getProjectDataManagerSettings(project);
-                // 项目数据（.idea/misc.xml）
-                Path path = projectDataManagerSettings.getPath();
-                // 根节点
-                Element rootElement = projectDataManagerSettings.getRootElement();
-
-                // 获取之前版本历史记录的 State Key
-                Element historyElement = projectDataManagerSettings.getComponentElement("JsonAssistantJsonHistory");
-                // 获取属性值
-                String oriHistory = (historyElement == null) ? null : historyElement.getAttributeValue("historyList");
-
-                // 没有数据的话，退出
-                if (StrUtil.isBlank(oriHistory) && !JsonUtil.isJsonArray(oriHistory)) {
-                    return;
-                }
-
-                ArrayWrapper array = JsonUtil.parseArray(oriHistory);
-                if (array.isEmpty()) {
-                    return;
-                }
-
-                // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
-                List<JsonWrapper> oldHistory = new ArrayList<>();
-                HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).history;
-                for (Object data : array) {
-                    JsonWrapper wrapper = null;
-                    String dataStr = (String) data;
-                    if (JsonUtil.isJson(dataStr)) {
-                        if (JsonUtil.isJsonObject(dataStr)) {
-                            wrapper = JsonUtil.parseObject(dataStr);
-                        } else {
-                            wrapper = JsonUtil.parseArray(dataStr);
-                        }
-                    } else if (Json5Util.isJson5(dataStr)) {
-                        if (Json5Util.isJson5Object(dataStr)) {
-                            wrapper = Json5Util.parseObject(dataStr);
-                        } else {
-                            wrapper = Json5Util.parseArray(dataStr);
-                        }
-                    }
-
-                    // 此Json是否存在
-                    if (Objects.isNull(wrapper) || newHistory.exists(wrapper)) {
-                        continue;
-                    }
-
-                    oldHistory.add(wrapper);
-                }
-
-                // 都存在于现在的历史记录的话，就结束
-                if (oldHistory.isEmpty()) {
-                    return;
-                }
-
-                NotificationAction importAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
-                        () -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
-
-                NotificationAction ignoreAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
-                        () -> ignoreRecords(path, rootElement, historyElement));
-
-                ArrayList<NotificationAction> notificationActions = Lists.newArrayList(importAction, ignoreAction);
-
-                Notifications.showFullStickyNotification(
-                        "Json Assistant",
-                        JsonAssistantBundle.messageOnSystem("notification.recover.content", oldHistory.size()),
-                        NotificationType.INFORMATION,
-                        notificationActions,
-                        project);
-            });
-        }
-    }
+    // public static void compatibilityHistory(Project project) {
+    //     HistoryState historyState = ToolWindowSettings.getInstance().getHistoryState();
+    //     if (historyState.isEnableHistory()) {
+    //         // 历史记录检测
+    //         ApplicationManager.getApplication().invokeLater(() -> {
+    //             ComponentManagerSettings projectDataManagerSettings = PlatformUtil.getProjectDataManagerSettings(project);
+    //             // 项目数据（.idea/misc.xml）
+    //             Path path = projectDataManagerSettings.getPath();
+    //             // 根节点
+    //             Element rootElement = projectDataManagerSettings.getRootElement();
+    //
+    //             // 获取之前版本历史记录的 State Key
+    //             Element historyElement = projectDataManagerSettings.getComponentElement("JsonAssistantJsonHistory");
+    //             // 获取属性值
+    //             String oriHistory = (historyElement == null) ? null : historyElement.getAttributeValue("historyList");
+    //
+    //             // 没有数据的话，退出
+    //             if (StrUtil.isBlank(oriHistory) && !JsonUtil.isJsonArray(oriHistory)) {
+    //                 return;
+    //             }
+    //
+    //             ArrayWrapper array = JsonUtil.parseArray(oriHistory);
+    //             if (array.isEmpty()) {
+    //                 return;
+    //             }
+    //
+    //             // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
+    //             List<JsonWrapper> oldHistory = new ArrayList<>();
+    //             HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).history;
+    //             for (Object data : array) {
+    //                 JsonWrapper wrapper = null;
+    //                 String dataStr = (String) data;
+    //                 if (JsonUtil.isJson(dataStr)) {
+    //                     if (JsonUtil.isJsonObject(dataStr)) {
+    //                         wrapper = JsonUtil.parseObject(dataStr);
+    //                     } else {
+    //                         wrapper = JsonUtil.parseArray(dataStr);
+    //                     }
+    //                 } else if (Json5Util.isJson5(dataStr)) {
+    //                     if (Json5Util.isJson5Object(dataStr)) {
+    //                         wrapper = Json5Util.parseObject(dataStr);
+    //                     } else {
+    //                         wrapper = Json5Util.parseArray(dataStr);
+    //                     }
+    //                 }
+    //
+    //                 // 此Json是否存在
+    //                 if (Objects.isNull(wrapper) || newHistory.exists(wrapper)) {
+    //                     continue;
+    //                 }
+    //
+    //                 oldHistory.add(wrapper);
+    //             }
+    //
+    //             // 都存在于现在的历史记录的话，就结束
+    //             if (oldHistory.isEmpty()) {
+    //                 return;
+    //             }
+    //
+    //             NotificationAction importAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
+    //                     () -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
+    //
+    //             NotificationAction ignoreAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
+    //                     () -> ignoreRecords(path, rootElement, historyElement));
+    //
+    //             ArrayList<NotificationAction> notificationActions = Lists.newArrayList(importAction, ignoreAction);
+    //
+    //             Notifications.showFullStickyNotification(
+    //                     "Json Assistant",
+    //                     JsonAssistantBundle.messageOnSystem("notification.recover.content", oldHistory.size()),
+    //                     NotificationType.INFORMATION,
+    //                     notificationActions,
+    //                     project);
+    //         });
+    //     }
+    // }
 
     private static void importRecords(Project project, List<JsonWrapper> oldHistory, HistoryLimitedList newHistory,
                                       Path path, Element rootElement, Element historyElement) {

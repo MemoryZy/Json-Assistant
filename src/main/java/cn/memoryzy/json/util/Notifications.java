@@ -390,11 +390,8 @@ public class Notifications {
             String url = e.getDescription();
 
             if (Objects.equals(UrlType.DONATE.getId(), url)) {
-                if (Urls.isReachable()) {
-                    BrowserUtil.browse(UrlType.DONATE.getUrl());
-                } else {
-                    new SupportDialog().show();
-                }
+                // BrowserUtil.browse(UrlType.DONATE.getUrl());
+                new SupportDialog().show();
             } else {
                 BrowserUtil.browse(url);
             }

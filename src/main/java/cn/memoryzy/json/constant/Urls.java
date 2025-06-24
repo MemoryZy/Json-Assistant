@@ -1,19 +1,10 @@
 package cn.memoryzy.json.constant;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * @author Memory
  * @since 2024/7/25
  */
 public class Urls {
-
-    public static final AtomicBoolean reachableAtomic = new AtomicBoolean(false);
 
     public static final String GITHUB_LINK = "https://github.com/MemoryZy/Json-Assistant";
     public static final String GITHUB_ISSUE_LINK = "https://github.com/MemoryZy/Json-Assistant/issues/new";
@@ -45,44 +36,4 @@ public class Urls {
 
     public static final String FRONT_URL = "http://0.0.0.0";
 
-    public static void verifyReachable() {
-        reachableAtomic.set(isReachable(OVERVIEW));
-    }
-
-    public static boolean isReachable() {
-        return reachableAtomic.get();
-    }
-
-    /**
-     * 验证地址是否可达
-     *
-     * @param url 网络地址
-     * @return 可达，true；否则为 false
-     */
-    public static boolean isReachable(String url) {
-        return isReachable(url, 5000);
-    }
-
-    /**
-     * 验证地址是否可达
-     *
-     * @param url 网络地址
-     * @return 可达，true；否则为 false
-     */
-    public static boolean isReachable(String url, int timeout) {
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-            RequestConfig requestConfig = RequestConfig.custom()
-                    // 设置连接超时时间
-                    .setConnectTimeout(timeout)
-                    // 设置读取超时时间
-                    .setSocketTimeout(timeout)
-                    .build();
-            HttpGet request = new HttpGet(url);
-            request.setConfig(requestConfig);
-            httpClient.execute(request);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

@@ -47,7 +47,6 @@
                 bundle="messages.JsonAssistantBundle"
                 key="setting.display.name"/>
 
-        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.JsonAssistantPersistentState"/>
         <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
         <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
 

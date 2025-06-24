@@ -5,12 +5,12 @@ import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -88,17 +88,12 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         content.setDisposer(window);
         contentManager.addContent(content, 0);
 
-
-        // 检查位置
-        if (ToolWindowAnchor.RIGHT.equals(toolWindow.getAnchor()) && !toolWindow.isSplitMode()) {
-            ToolWindowUtil.moveWindowToRightBottom(toolWindow);
-        }
-
-        // 验证地址可达性
-        Urls.verifyReachable();
-
-        // 兼容旧版本历史记录数据
-        JsonHistoryAction.compatibilityHistory(project);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // 检查位置
+            if (ToolWindowAnchor.RIGHT.equals(toolWindow.getAnchor()) && !toolWindow.isSplitMode()) {
+                ToolWindowUtil.moveWindowToRightBottom(toolWindow);
+            }
+        });
     }
 
 }

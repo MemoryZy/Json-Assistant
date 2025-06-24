@@ -3,7 +3,6 @@ package cn.memoryzy.json.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.PluginUpdateDetail;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -41,8 +40,6 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
             ConfigurationMerger.getInstance().mergeProjectLegacySettings(project);
             // 检查有无更新
             checkForUpdates();
-            // 验证地址可达性
-            Urls.verifyReachable();
         });
     }
 
