@@ -15,7 +15,6 @@ import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.project.DumbAware;
@@ -132,11 +131,6 @@ public class JsonBlacklistDialog extends DialogWrapper {
     @Override
     protected @NonNls @Nullable String getHelpId() {
         return UrlType.RECOGNIZE.getId();
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override

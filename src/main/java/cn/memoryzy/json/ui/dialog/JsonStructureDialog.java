@@ -6,7 +6,6 @@ import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.treeStructure.Tree;
@@ -65,11 +64,6 @@ public class JsonStructureDialog extends DialogWrapper {
     @Override
     protected @NonNls @Nullable String getHelpId() {
         return UrlType.SITE_TREE.getId();
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     private StructureSetting getStructureSetting() {

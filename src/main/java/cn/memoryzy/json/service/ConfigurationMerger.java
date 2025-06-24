@@ -29,10 +29,10 @@ import org.jetbrains.jps.model.serialization.JDomSerializationUtil;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * 配置合并
@@ -162,7 +162,7 @@ public final class ConfigurationMerger {
 
             if (null != recognizeOtherFormats) behaviorState.setAutoRecognizeFormats(recognizeOtherFormats);
 
-            List<DataFormatType> enabledFormats = new ArrayList<>();
+            Set<DataFormatType> enabledFormats = new HashSet<>();
             if (null != recognizeXmlFormat && recognizeXmlFormat) enabledFormats.add(DataFormatType.XML);
             if (null != recognizeYamlFormat && recognizeYamlFormat) enabledFormats.add(DataFormatType.YAML);
             if (null != recognizeTomlFormat && recognizeTomlFormat) enabledFormats.add(DataFormatType.TOML);

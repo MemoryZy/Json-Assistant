@@ -15,10 +15,11 @@ import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversion
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.state.JsonEntry;
-import cn.memoryzy.json.service.persistent.state.v2.*;
+import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.state.v2.EditorVisualState;
+import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.dialog.ManuallySaveHistoryDialog;

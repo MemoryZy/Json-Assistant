@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
@@ -57,11 +56,6 @@ public class DiffNameDialog extends DialogWrapper {
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
         return leftSideTextField;
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override

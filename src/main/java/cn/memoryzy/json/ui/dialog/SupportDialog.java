@@ -6,7 +6,6 @@ import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import cn.memoryzy.json.ui.panel.HyperLinkJBLabel;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -121,8 +120,4 @@ public class SupportDialog extends DialogWrapper {
         return actions.toArray(new Action[0]);
     }
 
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
-    }
 }

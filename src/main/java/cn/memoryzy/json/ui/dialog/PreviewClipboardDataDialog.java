@@ -13,7 +13,6 @@ import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.Project;
@@ -130,11 +129,6 @@ public class PreviewClipboardDataDialog extends DialogWrapper {
         }
 
         super.init();
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override

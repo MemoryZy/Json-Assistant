@@ -8,7 +8,8 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
 import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
 import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
-import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.dialog.JsonHistoryListChooser;
 import cn.memoryzy.json.ui.dialog.JsonHistoryTreeChooser;
 import cn.memoryzy.json.util.Json5Util;
@@ -53,11 +54,12 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
     private static final Logger LOG = Logger.getInstance(JsonHistoryAction.class);
 
     private final ToolWindowEx toolWindow;
-    private final JsonAssistantPersistentState persistenceState = JsonAssistantPersistentState.getInstance();
+    private final HistoryState historyState;
 
     public JsonHistoryAction(ToolWindowEx toolWindow) {
         super();
         this.toolWindow = toolWindow;
+        this.historyState = ToolWindowSettings.getInstance().getHistoryState();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.history.text"));
@@ -88,12 +90,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        if (project == null) {
-            return;
-        }
-
-        HistoryState historyState = persistenceState.historyState;
-        if (historyState.historyViewType == HistoryDisplayMode.TREE) {
+        if (historyState.getHistoryDisplayMode() == HistoryDisplayMode.TREE) {
             new JsonHistoryTreeChooser(project, toolWindow).show();
         } else {
             new JsonHistoryListChooser(project, toolWindow).show();
@@ -102,7 +99,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(persistenceState.historyState.switchHistory);
+        e.getPresentation().setEnabledAndVisible(null != getEventProject(e) && historyState.isEnableHistory());
     }
 
     private String getShortcut() {

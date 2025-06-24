@@ -24,7 +24,6 @@ import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
@@ -139,11 +138,6 @@ public class JsonHistoryTreeChooser extends DialogWrapper {
     @Override
     protected @NonNls @Nullable String getHelpId() {
         return UrlType.DEFAULT.getId();
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override
