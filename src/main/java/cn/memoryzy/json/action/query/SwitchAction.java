@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.query;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.service.persistent.state.QueryState;
+import cn.memoryzy.json.service.persistent.state.v2.QueryState;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;

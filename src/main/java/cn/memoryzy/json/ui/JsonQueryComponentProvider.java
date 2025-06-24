@@ -12,8 +12,8 @@ import cn.memoryzy.json.model.jsonpath.IncorrectDocument;
 import cn.memoryzy.json.model.jsonpath.IncorrectExpression;
 import cn.memoryzy.json.model.jsonpath.ResultNotFound;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.QueryState;
+import cn.memoryzy.json.service.persistent.state.v2.QueryState;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.panel.SearchWrapper;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
@@ -85,10 +85,8 @@ public class JsonQueryComponentProvider implements Disposable {
         this.docEditor = createJsonEditor("original.json5", false, EditorKind.MAIN_EDITOR);
         this.docPanel = new BorderLayoutPanel().addToTop(docLabel).addToCenter(docEditor.getComponent());
 
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-        this.queryState = persistentState.queryState;
-
-        this.docPanel.setVisible(queryState.showOriginalText);
+        this.queryState = ToolWindowSettings.getInstance().getQueryState();
+        this.docPanel.setVisible(queryState.isDisplayOriginalText());
     }
 
     public JComponent createComponent() {
@@ -156,7 +154,7 @@ public class JsonQueryComponentProvider implements Disposable {
             docText = Json5Util.convertJson5ToJson(docText);
         }
 
-        EvaluateResult result = JsonQueryLanguage.JSONPath == queryState.querySchema
+        EvaluateResult result = JsonQueryLanguage.JSONPath == queryState.getQueryLanguage()
                 ? JsonPathEvaluator.evaluate(path, docText)
                 : JmesPathEvaluator.evaluate(path, docText);
 

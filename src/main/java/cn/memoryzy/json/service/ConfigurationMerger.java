@@ -3,6 +3,7 @@ package cn.memoryzy.json.service;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -27,6 +28,7 @@ import org.jetbrains.jps.model.serialization.JDomSerializationUtil;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,10 +48,6 @@ public final class ConfigurationMerger {
     private final Element settingsElement = getPluginSettingsElement();
     private final Element blacklistPersistentDataElement = getBlacklistPersistentDataElement();
 
-    // TODO 放在app启动时执行
-
-    // TODO 初次导入完成后，在原来的xml中添加一个标记，表示已经同步，但是最好是直接删掉xml
-
     public static ConfigurationMerger getInstance() {
         return ApplicationManager.getApplication().getService(ConfigurationMerger.class);
     }
@@ -62,7 +60,8 @@ public final class ConfigurationMerger {
             mergeToolWindowLegacySettings();
             mergeSerializationLegacySettings();
             mergeBlacklistLegacyData();
-
+            // 删除旧配置文件
+//            deleteLegacyPluginSettingsFile();
         } catch (Exception e) {
             LOG.warn("[Json Assistant] An exception occurred when merging the old configuration", e);
         }
@@ -397,6 +396,11 @@ public final class ConfigurationMerger {
         return null;
     }
 
+    private void deleteLegacyPluginSettingsFile() {
+        File file = PlatformUtil.getOptionsConfigFile("JsonAssistantPersistentState");
+        FileUtil.del(file);
+    }
+
     private Element getBlacklistPersistentDataElement() {
         try {
             File file = PlatformUtil.getOptionsConfigFile("ClipboardDataBlacklistPersistentState");
@@ -412,6 +416,11 @@ public final class ConfigurationMerger {
         return null;
     }
 
+    private void deleteLegacyBlacklistPersistentFile() {
+        File file = PlatformUtil.getOptionsConfigFile("ClipboardDataBlacklistPersistentState");
+        FileUtil.del(file);
+    }
+
     private Element getHistoryPersistentDataElement(Project project) {
         try {
             ComponentManagerSettings projectSettings = PlatformUtil.createProjectSettings(project, "JsonAssistantHistoryState.xml");
@@ -421,6 +430,12 @@ public final class ConfigurationMerger {
         }
 
         return null;
+    }
+
+    private void deleteLegacyHistoryPersistentFile(Project project) {
+        ComponentManagerSettings projectSettings = PlatformUtil.createProjectSettings(project, "JsonAssistantHistoryState.xml");
+        Path path = projectSettings.getPath();
+        FileUtil.del(path);
     }
 
 }

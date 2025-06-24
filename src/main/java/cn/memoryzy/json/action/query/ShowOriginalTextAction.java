@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.query;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.service.persistent.state.QueryState;
+import cn.memoryzy.json.service.persistent.state.v2.QueryState;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -33,12 +33,12 @@ public class ShowOriginalTextAction extends DumbAwareToggleAction implements Upd
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return queryState.showOriginalText;
+        return queryState.isDisplayOriginalText();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        queryState.showOriginalText = state;
+        queryState.setDisplayOriginalText(state);
         queryComponentProvider.toggleJsonDocumentVisibility(state);
     }
 }

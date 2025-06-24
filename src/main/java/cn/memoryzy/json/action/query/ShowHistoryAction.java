@@ -3,8 +3,8 @@ package cn.memoryzy.json.action.query;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.enums.JsonQueryLanguage;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.QueryState;
+import cn.memoryzy.json.service.persistent.state.v2.QueryState;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.panel.SearchWrapper;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.find.FindBundle;
@@ -41,7 +41,7 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
         super(FindBundle.message("find.search.history"), null, AllIcons.Actions.SearchWithHistory);
         this.searchWrapper = searchWrapper;
         this.searchTextField = searchTextField;
-        this.queryState = JsonAssistantPersistentState.getInstance().queryState;
+        this.queryState = ToolWindowSettings.getInstance().getQueryState();
         registerCustomShortcutSet(KeymapUtil.getActiveKeymapShortcuts("ShowSearchHistory"), searchTextField);
     }
 
@@ -66,13 +66,13 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
     }
 
     public static List<String> getHistory(QueryState queryState, Project project) {
-        String historyPropertyName = queryState.querySchema == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
+        String historyPropertyName = queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
         String history = PropertiesComponent.getInstance(project).getValue(historyPropertyName);
         return StrUtil.isNotBlank(history) ? StrUtil.split(history, '\n') : List.of();
     }
 
     public static void setHistory(QueryState queryState, Project project, Collection<String> history) {
-        String historyPropertyName = queryState.querySchema == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
+        String historyPropertyName = queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
         PropertiesComponent.getInstance(project).setValue(historyPropertyName, StrUtil.join("\n", history));
     }
 
@@ -82,7 +82,7 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
             return;
         }
 
-        QueryState queryState = JsonAssistantPersistentState.getInstance().queryState;
+        QueryState queryState = ToolWindowSettings.getInstance().getQueryState();
         ArrayDeque<String> history = new ArrayDeque<>(getHistory(queryState, project));
         if (!history.contains(text)) {
             history.addFirst(text);
