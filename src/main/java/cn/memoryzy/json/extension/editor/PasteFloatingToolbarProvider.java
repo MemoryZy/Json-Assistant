@@ -148,7 +148,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
 
     private void registerOnChangeHandlers() {
         // 更新工具栏组件状态
-        projectConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, this::updateToolbarState);
+        projectConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, (RefreshFloatToolbarEvent) this::updateToolbarState);
         // 添加已使用的剪贴板数据
 
     }
