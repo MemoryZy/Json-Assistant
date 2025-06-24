@@ -596,6 +596,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), editorAppearanceState);
             // 切换展示折叠区域
             toggleFoldingOutline(editor, editorAppearanceState.foldingOutline);
+
+
+
+
+//            project.getMessageBus().syncPublisher();
         }
 
         @Override

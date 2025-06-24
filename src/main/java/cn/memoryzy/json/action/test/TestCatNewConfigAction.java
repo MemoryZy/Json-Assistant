@@ -1,10 +1,10 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
-import cn.memoryzy.json.service.persistent.v2.*;
+import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,20 +19,31 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        BlacklistManager blacklistManager = BlacklistManager.getInstance();
+//        BlacklistManager blacklistManager = BlacklistManager.getInstance();
+//
+//        GeneralSettings generalSettings = GeneralSettings.getInstance();
+//
+//        HistoryManager historyManager = HistoryManager.getInstance(getEventProject(e));
+//
+//        SerializationSettings serializationSettings = SerializationSettings.getInstance();
+//
+//        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+//
+//        JsonRecord jsonRecord = new JsonRecord()
+//                .setId(123);
+//
+//        historyManager.addEntry(jsonRecord);
 
-        GeneralSettings generalSettings = GeneralSettings.getInstance();
+        MessageBus messageBus = e.getProject().getMessageBus();
 
-        HistoryManager historyManager = HistoryManager.getInstance(getEventProject(e));
+        RefreshFloatToolbarEvent refreshFloatToolbarEvent = messageBus.syncPublisher(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR);
 
-        SerializationSettings serializationSettings = SerializationSettings.getInstance();
+        System.out.println("["  + Thread.currentThread().getName() + "] send");
 
-        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        refreshFloatToolbarEvent.accept(null);
 
-        JsonRecord jsonRecord = new JsonRecord()
-                .setId(123);
 
-        historyManager.addEntry(jsonRecord);
+
 
         System.out.println();
     }

@@ -3,6 +3,7 @@ package cn.memoryzy.json.extension.editor;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
+import cn.memoryzy.json.event.RegisterClipboardUsageEvent;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
@@ -12,6 +13,7 @@ import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
+import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -24,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Map;
@@ -136,21 +139,17 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
      * 兼容203版本
      */
     public void register(@NotNull FloatingToolbarComponent component, @NotNull Disposable disposable) {
-        // TODO 将register方法实现抽取为公共方法，再进行实现（想办法获取DataContext对象）
-
-        // DataManager manager = DataManager.getInstance();
-// manager.getDataContextFromFocusAsync()
-
-        // TODO 更稳妥的方式是用 FloatingToolbarComponent的实现类来获取，若获取不到，则取 实现类的 parentComponent、contextComponent 等
-
-
+        DataManager manager = DataManager.getInstance();
+        DataContext dataContext = manager.getDataContext((Component) component);
+        register(dataContext, component, disposable);
     }
+
 
     private void registerOnChangeHandlers() {
         // 更新工具栏组件状态
         projectConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, (RefreshFloatToolbarEvent) this::updateToolbarState);
         // 添加已使用的剪贴板数据
-
+        projectConnection.subscribe(RegisterClipboardUsageEvent.ON_REGISTER_CLIPBOARD_USAGE, (RegisterClipboardUsageEvent) this::registerGlobalUsage);
     }
 
     /**
@@ -159,6 +158,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     private boolean isHashUsedGlobally(String hash) {
         return USED_HASHES.contains(hash);
     }
+
 
     private void updateToolbarState(Editor editor) {
         // 获取剪贴板数据
