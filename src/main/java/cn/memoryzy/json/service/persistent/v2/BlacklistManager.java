@@ -4,6 +4,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.annotations.Attribute;
@@ -19,8 +20,9 @@ import java.util.List;
  * @author Memory
  * @since 2025/6/18
  */
+@Service(Service.Level.APP)
 @State(name = "Json Blacklist", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_BLACKLIST_FILE)})
-public class BlacklistManager implements PersistentStateComponent<BlacklistManager> {
+public final class BlacklistManager implements PersistentStateComponent<BlacklistManager> {
 
     /**
      * 最大保留记录数

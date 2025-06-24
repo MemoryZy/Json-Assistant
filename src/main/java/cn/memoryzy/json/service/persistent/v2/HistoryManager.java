@@ -2,10 +2,7 @@ package cn.memoryzy.json.service.persistent.v2;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
-import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.RoamingType;
-import com.intellij.openapi.components.State;
-import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +14,9 @@ import java.util.*;
  * @author Memory
  * @since 2025/6/18
  */
+@Service(Service.Level.PROJECT)
 @State(name = "Json History", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_HISTORY_FILE, roamingType = RoamingType.DISABLED)})
-public class HistoryManager implements PersistentStateComponent<HistoryManager> {
+public final class HistoryManager implements PersistentStateComponent<HistoryManager> {
 
     /**
      * 最大保留记录数

@@ -7,6 +7,7 @@ import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.state.v2.QueryState;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -19,8 +20,9 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2025/6/17
  */
+@Service(Service.Level.APP)
 @State(name = "ToolWindow", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
-public class ToolWindowSettings implements PersistentStateComponent<ToolWindowSettings> {
+public final class ToolWindowSettings implements PersistentStateComponent<ToolWindowSettings> {
 
     public static ToolWindowSettings getInstance() {
         return ApplicationManager.getApplication().getService(ToolWindowSettings.class);

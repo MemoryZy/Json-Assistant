@@ -5,6 +5,7 @@ import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
 import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
@@ -16,8 +17,9 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/6/17
  */
+@Service(Service.Level.APP)
 @State(name = "Serialization/Deserialization", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
-public class SerializationSettings implements PersistentStateComponent<SerializationSettings> {
+public final class SerializationSettings implements PersistentStateComponent<SerializationSettings> {
 
     public static SerializationSettings getInstance() {
         return ApplicationManager.getApplication().getService(SerializationSettings.class);
