@@ -6,7 +6,6 @@ import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -38,7 +37,7 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
     private Deque<JsonRecord> histories = new ArrayDeque<>(MAX_HISTORY_ITEMS);
 
     @Override
-    public @Nullable HistoryManager getState() {
+    public @NotNull HistoryManager getState() {
         return this;
     }
 

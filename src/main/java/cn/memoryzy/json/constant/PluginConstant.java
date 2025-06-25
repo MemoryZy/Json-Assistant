@@ -59,8 +59,8 @@ public interface PluginConstant {
 
     String JSON_EXAMPLE_ID = JsonAssistantPlugin.PLUGIN_ID_NAME + "#EXAMPLE";
 
-    String JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME = "View";
-    String AUXILIARY_TREE_TOOL_WINDOW_DISPLAY_NAME = "Tab";
+    String MAIN_WINDOW_DISPLAY_NAME = "View";
+    String AUXILIARY_TREE_WINDOW_DISPLAY_NAME = "Tab";
 
     String OUTLINE_PROPERTY = "JComponent.outline";
     String ERROR_VALUE = "error";
@@ -77,6 +77,8 @@ public interface PluginConstant {
     String en_US = "en_US";
 
     String zh_CN = "zh_CN";
+
+    String MANUAL_SAVE_HISTORY_REMINDER = JsonAssistantPlugin.PLUGIN_ID_NAME + ".MANUAL_SAVE_HISTORY_REMINDER";
 
 
     String[] COLLECTION_FQN = {

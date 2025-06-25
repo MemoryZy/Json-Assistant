@@ -5,6 +5,9 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.TreeViewMode;
+import cn.memoryzy.json.event.ColorSchemeChangedEvent;
+import cn.memoryzy.json.event.FoldingOutlineToggleEvent;
+import cn.memoryzy.json.event.LineNumbersToggleEvent;
 import cn.memoryzy.json.service.persistent.state.v2.*;
 import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
 import cn.memoryzy.json.service.persistent.v2.SerializationSettings;
@@ -13,6 +16,7 @@ import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.ui.icon.CircleIcon;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.TitledSeparator;
@@ -20,6 +24,7 @@ import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
+import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -464,17 +469,53 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // ----------------------------------- 外观
         EditorVisualState visualState = toolWindowSettings.getVisualState();
+        boolean oldShowLineNumbers = visualState.isShowLineNumbers();
+        boolean oldShowFoldingOutline = visualState.isShowFoldingOutline();
+        ColorScheme oldColorScheme = visualState.getColorScheme();
+
         visualState.setShowLineNumbers(showLineNumbersCheckBox.isSelected());
         visualState.setShowFoldingOutline(showFoldingOutlineCheckBox.isSelected());
-
-        if (isIdea) {
-            ColorScheme selectedScheme = backgroundComboBox.getItem();
-            visualState.setColorScheme(selectedScheme);
-        }
+        if (isIdea) visualState.setColorScheme(backgroundComboBox.getItem());
 
         // 常规
         TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
         treeStructureState.setTreeViewMode(treeViewModeComboBox.getItem());
+
+        // 发布配置更新事件
+        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme);
+    }
+
+    /**
+     * 针对性地发布配置更新事件
+     */
+    private void fireConfigurationUpdateEvent(boolean oldShowLineNumbers, boolean oldShowFoldingOutline, ColorScheme oldColorScheme) {
+        boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
+        boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
+        ColorScheme newColorScheme = backgroundComboBox.getItem();
+
+        boolean showLineNumbersUpdate = !Objects.equals(oldShowLineNumbers, newShowLineNumbers);
+        boolean showFoldingOutlineUpdate = !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline);
+        boolean colorSchemeUpdate = !Objects.equals(oldColorScheme, newColorScheme);
+
+        // 对比新旧配置，针对性的进行事件发布
+        if (showLineNumbersUpdate || showFoldingOutlineUpdate || (isIdea && colorSchemeUpdate)) {
+            MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
+
+            // 切换展示行号事件
+            if (showLineNumbersUpdate) {
+                messageBus.syncPublisher(LineNumbersToggleEvent.TOPIC).toggle(newShowLineNumbers);
+            }
+
+            // 切换展示折叠轮廓事件
+            if (showFoldingOutlineUpdate) {
+                messageBus.syncPublisher(FoldingOutlineToggleEvent.TOPIC).toggle(newShowFoldingOutline);
+            }
+
+            // 切换编辑器背景色事件
+            if (isIdea && colorSchemeUpdate) {
+                messageBus.syncPublisher(ColorSchemeChangedEvent.TOPIC).change(newColorScheme);
+            }
+        }
     }
 
 }

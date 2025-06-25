@@ -139,14 +139,14 @@ public class ToolWindowUtil {
     public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType) {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
-        String displayName = PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
+        String displayName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
         Content content = contentFactory.createContent(window.createComponent(), displayName, false);
         content.setDisposer(window);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
-        window.setContent(content);
+        window.setCurrentContent(content);
         return content;
     }
 

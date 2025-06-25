@@ -70,8 +70,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 /**
  * @author Memory
@@ -485,6 +485,7 @@ public class PlatformUtil {
 
 
     public static Editor createEditor(Project project, String fileName, FileType fileType, boolean isViewer, EditorKind kind, String text) {
+        fileName = fileName + "." + fileType.getDefaultExtension();
         VirtualFile sourceVirtualFile = new LightVirtualFile(fileName, fileType, text);
         PsiFile sourceFile = PsiManager.getInstance(project).findFile(sourceVirtualFile);
 

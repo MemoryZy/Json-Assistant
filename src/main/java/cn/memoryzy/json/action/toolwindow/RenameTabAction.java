@@ -173,14 +173,14 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
     }
 
     private boolean isDefaultName(String name) {
-        if (StrUtil.equalsIgnoreCase(PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, name)) {
+        if (StrUtil.equalsIgnoreCase(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, name)) {
             return true;
         }
 
         if (name.length() >= 4) {
             String prefix = name.substring(0, 4);
             String postfix = name.substring(4);
-            return StrUtil.equalsIgnoreCase(PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, prefix) && ReUtil.isMatch("\\d+", postfix);
+            return StrUtil.equalsIgnoreCase(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, prefix) && ReUtil.isMatch("\\d+", postfix);
         }
 
         return true;

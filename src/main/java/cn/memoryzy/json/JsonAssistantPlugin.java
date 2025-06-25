@@ -14,6 +14,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class JsonAssistantPlugin {
 
+    public static final String PLUGIN_AUTHOR = "Memory";
+
     public static final String PLUGIN_ID = "cn.memoryzy.json";
     public static final String PLUGIN_NAME = "Json Assistant";
     public static final String PLUGIN_ID_NAME = PLUGIN_ID + ".Json-Assistant";

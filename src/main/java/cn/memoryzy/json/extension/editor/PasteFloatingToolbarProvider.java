@@ -58,9 +58,10 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     private static final Map<WeakReference<Editor>, FloatingToolbarComponent> FLOATING_COMPONENT_MAP = new WeakHashMap<>();
 
     /**
-     * 存储所有已使用的剪贴板哈希值
+     * 存储所有已使用的剪贴板数据哈希值
      */
-    private final Set<String> USED_HASHES = ConcurrentHashMap.newKeySet();
+    private static final Set<String> USED_HASHES = ConcurrentHashMap.newKeySet();
+
 
     @NotNull
     public ActionGroup getActionGroup() {
@@ -100,7 +101,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         FLOATING_COMPONENT_MAP.put(new WeakReference<>(editor), component);
 
         // 获取剪贴板数据
-        String clipboard = PlatformUtil.getClipboard();
+        String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
         if (StrUtil.isBlank(clipboard)) {
             return;
         }
@@ -148,49 +149,40 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
      */
     private void registerEventHandlers() {
         // 更新工具栏组件状态
-        applicationConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, (RefreshFloatToolbarEvent) this::updateToolbarState);
+        applicationConnection.subscribe(RefreshFloatToolbarEvent.TOPIC, (RefreshFloatToolbarEvent) this::updateToolbarState);
         // 添加已使用的剪贴板数据
-        applicationConnection.subscribe(RegisterClipboardUsageEvent.ON_REGISTER_CLIPBOARD_USAGE, (RegisterClipboardUsageEvent) this::registerGlobalUsage);
+        applicationConnection.subscribe(RegisterClipboardUsageEvent.TOPIC, (RegisterClipboardUsageEvent) this::registerGlobalUsage);
     }
 
     /**
      * 全局哈希检查
      */
-    private boolean isHashUsedGlobally(String hash) {
+    public static boolean isHashUsedGlobally(String hash) {
         return USED_HASHES.contains(hash);
     }
 
 
-    private void updateToolbarState(Editor editor) {
-        // 获取剪贴板数据
-        String clipboard = PlatformUtil.getClipboard();
-        if (StrUtil.isBlank(clipboard)) {
-            return;
-        }
-
+    /**
+     * 更新工具栏组件状态
+     */
+    private void updateToolbarState(Editor editor, String clipboard) {
         // 能否被转为 Json
         ClipboardTextConversionContext context = new ClipboardTextConversionContext();
         String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
-        if (StrUtil.isBlank(processedText)) {
-            return;
-        }
+        if (StrUtil.isBlank(processedText)) return;
 
         // 是否含有值
         JsonWrapper wrapper = context.getStrategy() instanceof Json5ConversionStrategy
                 ? Json5Util.parse(processedText)
                 : JsonUtil.parse(processedText);
 
-        if (null == wrapper || wrapper.noItems()) {
-            return;
-        }
+        if (null == wrapper || wrapper.noItems()) return;
 
         // 计算哈希值
         String hash = JsonAssistantUtil.calculateSHA256(clipboard);
 
         // 检查全局使用状态
-        if (isHashUsedGlobally(hash)) {
-            return;
-        }
+        if (isHashUsedGlobally(hash)) return;
 
         // 展示
         FloatingToolbarComponent component = null;

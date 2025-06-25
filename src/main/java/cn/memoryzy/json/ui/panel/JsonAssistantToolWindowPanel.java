@@ -56,13 +56,31 @@ public class JsonAssistantToolWindowPanel extends JPanel {
     }
 
     // region Getter、Setter
-    public void setEditor(EditorEx editor) {
+    public JsonAssistantToolWindowPanel setEditor(EditorEx editor) {
         this.editor = editor;
+        return this;
     }
 
-    public void setTreeProvider(JsonStructureComponentProvider treeProvider) {
+    public JsonAssistantToolWindowPanel setTreeProvider(JsonStructureComponentProvider treeProvider) {
         this.treeProvider = treeProvider;
+        return this;
     }
+
+    public JsonAssistantToolWindowPanel setQueryProvider(JsonQueryComponentProvider queryProvider) {
+        this.queryProvider = queryProvider;
+        return this;
+    }
+
+    public JsonAssistantToolWindowPanel setGridProvider(JsonGridComponentProvider gridProvider) {
+        this.gridProvider = gridProvider;
+        return this;
+    }
+
+    public JsonAssistantToolWindowPanel setCardLayout(CombineCardLayout cardLayout) {
+        this.cardLayout = cardLayout;
+        return this;
+    }
+
 
     @NotNull
     public EditorEx getEditor() {
@@ -77,24 +95,12 @@ public class JsonAssistantToolWindowPanel extends JPanel {
         return queryProvider;
     }
 
-    public void setQueryProvider(JsonQueryComponentProvider queryProvider) {
-        this.queryProvider = queryProvider;
-    }
-
     public JsonGridComponentProvider getGridProvider() {
         return gridProvider;
     }
 
-    public void setGridProvider(JsonGridComponentProvider gridProvider) {
-        this.gridProvider = gridProvider;
-    }
-
     public CombineCardLayout getCardLayout() {
         return cardLayout;
-    }
-
-    public void setCardLayout(CombineCardLayout cardLayout) {
-        this.cardLayout = cardLayout;
     }
 
     // endregion

@@ -8,8 +8,7 @@ import com.intellij.util.messages.Topic;
  */
 public interface RegisterClipboardUsageEvent {
 
-    Topic<RegisterClipboardUsageEvent> ON_REGISTER_CLIPBOARD_USAGE =
-            Topic.create("Register Clipboard Usage", RegisterClipboardUsageEvent.class);
+    Topic<RegisterClipboardUsageEvent> TOPIC = Topic.create("Register Clipboard Usage", RegisterClipboardUsageEvent.class);
 
     void accept(String hash);
 

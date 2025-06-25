@@ -5,6 +5,7 @@ import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.v2.EditorVisualState;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.state.v2.QueryState;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Service(Service.Level.APP)
 @State(name = "ToolWindow", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
-public final class ToolWindowSettings implements PersistentStateComponent<ToolWindowSettings> {
+public final class ToolWindowSettings implements PersistentStateComponent<ToolWindowSettings>, Disposable {
 
     public static ToolWindowSettings getInstance() {
         return ApplicationManager.getApplication().getService(ToolWindowSettings.class);
@@ -107,5 +108,10 @@ public final class ToolWindowSettings implements PersistentStateComponent<ToolWi
     @Attribute
     public Integer getVersion() {
         return version;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

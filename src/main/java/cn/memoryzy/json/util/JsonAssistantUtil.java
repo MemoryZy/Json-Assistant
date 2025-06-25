@@ -1,6 +1,7 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.text.NamingCase;
@@ -341,6 +342,13 @@ public class JsonAssistantUtil {
         } catch (NumberFormatException e) {
             return false; // Not a valid number
         }
+    }
+
+    public static boolean isTimestampToday(long timestamp) {
+        if (timestamp <= 0) return false;
+        DateTime date = DateUtil.date(timestamp);
+        long l = DateUtil.betweenDay(date, new Date(), false);
+        return l == 0;
     }
 
     public static BigDecimal parseNumber(String value) {

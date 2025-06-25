@@ -1,8 +1,10 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
+import cn.memoryzy.json.enums.ColorScheme;
+import cn.memoryzy.json.event.ColorSchemeChangedEvent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
@@ -34,14 +36,19 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
 //
 //        historyManager.addEntry(jsonRecord);
 
-        MessageBus messageBus = e.getProject().getMessageBus();
+//        MessageBus messageBus = e.getProject().getMessageBus();
+//
+//        RefreshFloatToolbarEvent refreshFloatToolbarEvent = messageBus.syncPublisher(RefreshFloatToolbarEvent.TOPIC);
+//
+//        System.out.println("["  + Thread.currentThread().getName() + "] send");
+//
+//        refreshFloatToolbarEvent.accept(null);
 
-        RefreshFloatToolbarEvent refreshFloatToolbarEvent = messageBus.syncPublisher(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR);
+        MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
 
-        System.out.println("["  + Thread.currentThread().getName() + "] send");
+        ColorSchemeChangedEvent colorSchemeChangedEvent = messageBus.syncPublisher(ColorSchemeChangedEvent.TOPIC);
 
-        refreshFloatToolbarEvent.accept(null);
-
+        colorSchemeChangedEvent.change(ColorScheme.Classic);
 
 
 

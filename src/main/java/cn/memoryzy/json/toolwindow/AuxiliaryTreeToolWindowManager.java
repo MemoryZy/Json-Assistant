@@ -112,7 +112,7 @@ public final class AuxiliaryTreeToolWindowManager {
             concatStr += " " + (contentCount + 1);
         }
 
-        return PluginConstant.AUXILIARY_TREE_TOOL_WINDOW_DISPLAY_NAME + concatStr;
+        return PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME + concatStr;
     }
 
 

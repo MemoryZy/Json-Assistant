@@ -14,6 +14,7 @@ import javax.swing.*;
  * @since 2024/9/13
  */
 public class JsonAssistantMainConfigurable implements Configurable {
+
     private JsonAssistantMainConfigurableComponentProvider componentProvider;
 
     @Override

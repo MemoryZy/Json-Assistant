@@ -10,7 +10,6 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.annotations.XCollection;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +43,7 @@ public final class BlacklistManager implements PersistentStateComponent<Blacklis
     private List<JsonRecord> blacklist = new ArrayList<>(MAX_BLACKLIST_SIZE);
 
     @Override
-    public @Nullable BlacklistManager getState() {
+    public @NotNull BlacklistManager getState() {
         return this;
     }
 

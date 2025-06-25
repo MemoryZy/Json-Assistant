@@ -9,8 +9,8 @@ import com.intellij.util.messages.Topic;
  */
 public interface RefreshFloatToolbarEvent {
 
-    Topic<RefreshFloatToolbarEvent> ON_REFRESH_FLOAT_TOOLBAR = Topic.create("Refresh Float Toolbar", RefreshFloatToolbarEvent.class);
+    Topic<RefreshFloatToolbarEvent> TOPIC = Topic.create("Refresh Float Toolbar", RefreshFloatToolbarEvent.class);
 
-    void accept(Editor editor);
+    void accept(Editor editor, String clipboard);
 
 }
