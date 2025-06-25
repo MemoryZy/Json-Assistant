@@ -11,7 +11,6 @@ import cn.memoryzy.json.action.debug.RuntimeObjectToJsonAction;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.FileTypes;
-import cn.memoryzy.json.model.ProgressContext;
 import cn.memoryzy.json.model.RecursionContext;
 import com.intellij.debugger.engine.DebugProcessImpl;
 import com.intellij.debugger.engine.JavaStackFrame;
@@ -234,14 +233,10 @@ public class JavaDebugUtil {
      *
      * @param project         当前项目上下文，用于获取必要的环境信息。
      * @param value           要检索其具体值的对象。
-     * @param progressContext
      * @return 返回值的具体表示形式，可能是原始类型、字符串、数组、集合、映射或普通对象。
      */
-    public static Object getValue(Project project, Value value, RecursionContext context, ProgressContext progressContext) {
+    public static Object getValue(Project project, Value value, RecursionContext context) {
         if (value == null) return null;
-
-        // 更新节点计数
-        progressContext.incrementProcessedNodes();
 
         // 基础类型和字符串直接返回
         if (value instanceof PrimitiveValue) {
@@ -278,16 +273,16 @@ public class JavaDebugUtil {
 
             try {
                 if (isArrayType) {
-                    return getArrayValue(project, (ArrayReference) ref, context, progressContext);
+                    return getArrayValue(project, (ArrayReference) ref, context);
 
                 } else if (isCollectionType) {
-                    return getCollectionValue(project, ref, context, progressContext);
+                    return getCollectionValue(project, ref, context);
 
                 } else if (isMapType) {
-                    return getMapValue(project, ref, context, progressContext);
+                    return getMapValue(project, ref, context);
 
                 } else {
-                    return getObjectValue(project, ref, context, progressContext);
+                    return getObjectValue(project, ref, context);
                 }
             } finally {
                 if (!isContainer) {
@@ -307,13 +302,13 @@ public class JavaDebugUtil {
      * @param context   上下文
      * @return Map对象值
      */
-    private static Object getMapValue(Project project, ObjectReference reference, RecursionContext context, ProgressContext progressContext) {
+    private static Object getMapValue(Project project, ObjectReference reference, RecursionContext context) {
         Map<String, Object> resultMap = new LinkedHashMap<>();
         List<ImmutablePair<Value, Value>> immutablePairs = invokeMapMethod(project, reference);
         for (ImmutablePair<Value, Value> pair : immutablePairs) {
             // 调用不计数的方法
-            Object key = getValueWithoutDepth(project, pair.getKey(), context, progressContext);
-            Object value = getValueWithoutDepth(project, pair.getValue(), context, progressContext);
+            Object key = getValueWithoutDepth(project, pair.getKey(), context);
+            Object value = getValueWithoutDepth(project, pair.getValue(), context);
             resultMap.put(String.valueOf(key), value);
         }
 
@@ -327,10 +322,10 @@ public class JavaDebugUtil {
      * @param context   上下文
      * @return 集合值
      */
-    private static Object getCollectionValue(Project project, ObjectReference reference, RecursionContext context, ProgressContext progressContext) {
+    private static Object getCollectionValue(Project project, ObjectReference reference, RecursionContext context) {
         Value value = invokeMethod(project, reference, "toArray");
         if (value != null) {
-            return getValue(project, value, context, progressContext);
+            return getValue(project, value, context);
         }
 
         return List.of();
@@ -344,11 +339,11 @@ public class JavaDebugUtil {
      * @param context        上下文
      * @return 数组值
      */
-    public static List<Object> getArrayValue(Project project, ArrayReference arrayReference, RecursionContext context, ProgressContext progressContext) {
+    public static List<Object> getArrayValue(Project project, ArrayReference arrayReference, RecursionContext context) {
         List<Object> resultList = new ArrayList<>();
         for (Value childrenValue : arrayReference.getValues()) {
             // 不增加深度计数的方法
-            resultList.add(getValueWithoutDepth(project, childrenValue, context, progressContext));
+            resultList.add(getValueWithoutDepth(project, childrenValue, context));
         }
 
         return resultList;
@@ -357,11 +352,11 @@ public class JavaDebugUtil {
     /**
      * 不增加深度计数的值获取方法
      */
-    private static Object getValueWithoutDepth(Project project, Value value, RecursionContext context, ProgressContext progressContext) {
+    private static Object getValueWithoutDepth(Project project, Value value, RecursionContext context) {
         // 保存当前深度
         int savedDepth = context.getCurrentDepth();
         // 获取值但不增加深度计数
-        Object result = getValue(project, value, context, progressContext);
+        Object result = getValue(project, value, context);
         // 恢复原始深度
         context.setCurrentDepth(savedDepth);
         return result;
@@ -416,7 +411,7 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return 对象类型值
      */
-    public static Object getObjectValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
+    public static Object getObjectValue(Project project, ObjectReference objectReference, RecursionContext context) {
         String typeName = objectReference.referenceType().name();
         // 处理常用包装类型
         switch (typeName) {
@@ -428,23 +423,23 @@ public class JavaDebugUtil {
             case "java.lang.Byte":
             case "java.lang.Character":
             case "java.lang.Boolean":
-                return getFieldValue(project, objectReference, "value", context, progressContext);
+                return getFieldValue(project, objectReference, "value", context);
             case "java.lang.String":
                 return getStringValue((StringReference) objectReference);
             case "java.util.Date":
-                return getDateValue(project, objectReference, context, progressContext);
+                return getDateValue(project, objectReference, context);
             case "java.sql.Time":
-                return getTimeValue(project, objectReference, context, progressContext);
+                return getTimeValue(project, objectReference, context);
             case "java.time.LocalDateTime":
-                return getLocalDateTimeValue(project, objectReference, context, progressContext);
+                return getLocalDateTimeValue(project, objectReference, context);
             case "java.time.LocalDate":
-                return getLocalDateValue(project, objectReference, context, progressContext);
+                return getLocalDateValue(project, objectReference, context);
             case "java.time.LocalTime":
-                return getLocalTimeValue(project, objectReference, context, progressContext);
+                return getLocalTimeValue(project, objectReference, context);
             case "java.math.BigDecimal":
-                return getBigDecimalValue(project, objectReference, context, progressContext);
+                return getBigDecimalValue(project, objectReference, context);
             default:
-                return getBeanValue(project, objectReference, context, progressContext);
+                return getBeanValue(project, objectReference, context);
         }
     }
 
@@ -457,7 +452,7 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return 类型属性值列表
      */
-    private static Object getBeanValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
+    private static Object getBeanValue(Project project, ObjectReference objectReference, RecursionContext context) {
         if (!isBeanType(project, objectReference)) {
             return null;
         }
@@ -466,7 +461,7 @@ public class JavaDebugUtil {
         List<Field> fields = getFields(objectReference);
         for (Field field : fields) {
             Value value = objectReference.getValue(field);
-            resultMap.put(field.name(), getValue(project, value, context, progressContext));
+            resultMap.put(field.name(), getValue(project, value, context));
         }
 
         Boolean resolveComment = project.getUserData(RuntimeObjectToJsonAction.RESOLVE_COMMENT_KEY);
@@ -499,8 +494,8 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return BigDecimal值
      */
-    private static BigDecimal getBigDecimalValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
-        Object stringCache = getFieldValue(project, objectReference, "stringCache", context, progressContext);
+    private static BigDecimal getBigDecimalValue(Project project, ObjectReference objectReference, RecursionContext context) {
+        Object stringCache = getFieldValue(project, objectReference, "stringCache", context);
         if (stringCache instanceof String) {
             return new BigDecimal((String) stringCache);
         }
@@ -517,8 +512,8 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return 时间值
      */
-    public static String getDateValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
-        Object fastTime = getFieldValue(project, objectReference, "fastTime", context, progressContext);
+    public static String getDateValue(Project project, ObjectReference objectReference, RecursionContext context) {
+        Object fastTime = getFieldValue(project, objectReference, "fastTime", context);
         if (fastTime instanceof Long) {
             long timestamp = (Long) fastTime;
             return JsonAssistantUtil.formatDateBasedOnTimestampDetails(timestamp);
@@ -535,8 +530,8 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return 时间值
      */
-    private static Object getTimeValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
-        Object fastTime = getFieldValue(project, objectReference, "fastTime", context, progressContext);
+    private static Object getTimeValue(Project project, ObjectReference objectReference, RecursionContext context) {
+        Object fastTime = getFieldValue(project, objectReference, "fastTime", context);
         if (fastTime instanceof Long) {
             LocalDateTime localDateTime = LocalDateTimeUtil.of((Long) fastTime);
             return LocalDateTimeUtil.format(localDateTime, DatePattern.NORM_TIME_PATTERN);
@@ -553,7 +548,7 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return 时间值
      */
-    private static String getLocalDateTimeValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
+    private static String getLocalDateTimeValue(Project project, ObjectReference objectReference, RecursionContext context) {
         ReferenceType referenceType = objectReference.referenceType();
         Field dateField = referenceType.fieldByName("date");
         Field timeField = referenceType.fieldByName("time");
@@ -562,11 +557,11 @@ public class JavaDebugUtil {
 
         String result = null;
         if (dateValue != null) {
-            result = getLocalDateValue(project, (ObjectReference) dateValue, context, progressContext);
+            result = getLocalDateValue(project, (ObjectReference) dateValue, context);
         }
 
         if (timeValue != null) {
-            String localTimeValue = getLocalTimeValue(project, (ObjectReference) timeValue, context, progressContext);
+            String localTimeValue = getLocalTimeValue(project, (ObjectReference) timeValue, context);
             if (StrUtil.isNotBlank(result)) {
                 result += " " + localTimeValue;
             }
@@ -582,10 +577,10 @@ public class JavaDebugUtil {
      * @param objectReference 要检索其具体值的对象
      * @return 时间值
      */
-    private static String getLocalDateValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
-        Integer year = (Integer) getFieldValue(project, objectReference, "year", context, progressContext);
-        Short month = (Short) getFieldValue(project, objectReference, "month", context, progressContext);
-        Short day = (Short) getFieldValue(project, objectReference, "day", context, progressContext);
+    private static String getLocalDateValue(Project project, ObjectReference objectReference, RecursionContext context) {
+        Integer year = (Integer) getFieldValue(project, objectReference, "year", context);
+        Short month = (Short) getFieldValue(project, objectReference, "month", context);
+        Short day = (Short) getFieldValue(project, objectReference, "day", context);
 
         if (year != null && month != null && day != null) {
             return LocalDate.of(year, month, day).toString();
@@ -602,11 +597,11 @@ public class JavaDebugUtil {
      * @param context         上下文
      * @return 时间值
      */
-    private static String getLocalTimeValue(Project project, ObjectReference objectReference, RecursionContext context, ProgressContext progressContext) {
-        Byte hour = (Byte) getFieldValue(project, objectReference, "hour", context, progressContext);
-        Byte minute = (Byte) getFieldValue(project, objectReference, "minute", context, progressContext);
-        Byte second = (Byte) getFieldValue(project, objectReference, "second", context, progressContext);
-        Integer nano = (Integer) getFieldValue(project, objectReference, "nano", context, progressContext);
+    private static String getLocalTimeValue(Project project, ObjectReference objectReference, RecursionContext context) {
+        Byte hour = (Byte) getFieldValue(project, objectReference, "hour", context);
+        Byte minute = (Byte) getFieldValue(project, objectReference, "minute", context);
+        Byte second = (Byte) getFieldValue(project, objectReference, "second", context);
+        Integer nano = (Integer) getFieldValue(project, objectReference, "nano", context);
 
         if (hour != null && minute != null && second != null) {
             if (nano == null) {
@@ -628,11 +623,11 @@ public class JavaDebugUtil {
      * @param fieldName       字段名
      * @return 字段值
      */
-    public static Object getFieldValue(Project project, ObjectReference objectReference, String fieldName, RecursionContext context, ProgressContext progressContext) {
+    public static Object getFieldValue(Project project, ObjectReference objectReference, String fieldName, RecursionContext context) {
         ReferenceType referenceType = objectReference.referenceType();
         Field field = referenceType.fieldByName(fieldName);
         Value value = objectReference.getValue(field);
-        return getValue(project, value, context, progressContext);
+        return getValue(project, value, context);
     }
 
 

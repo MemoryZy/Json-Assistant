@@ -4,7 +4,6 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.FileTypes;
-import cn.memoryzy.json.model.ProgressContext;
 import cn.memoryzy.json.model.RecursionContext;
 import cn.memoryzy.json.model.RecursiveResult;
 import cn.memoryzy.json.util.*;
@@ -73,7 +72,6 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 indicator.setText(JsonAssistantBundle.messageOnSystem("progress.convert.to.json.text"));
-                indicator.setFraction(0);
 
                 RecursiveResult result;
                 try {
@@ -82,18 +80,13 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                     // 解析树节点值
                     Value value = JavaDebugUtil.parseTreeNode(dataContext);
                     if (null == value) return;
-                    indicator.setFraction(0.1);
 
                     // 不需要关注递归的深度，只要出现了异常，直接报告用户即可
                     RecursionContext context = new RecursionContext(MAX_DEPTH);
 
-                    // 创建进度上下文
-                    // 估算节点总数 - 初始为1000，实际会调整
-                    ProgressContext progressContext = new ProgressContext(indicator, 0.1, 0.9, 10000);
-
                     // 调用READ线程执行
                     Object jsonValue = application.runReadAction(
-                            (ThrowableComputable<Object, RuntimeException>) () -> JavaDebugUtil.getValue(project, value, context, progressContext));
+                            (ThrowableComputable<Object, RuntimeException>) () -> JavaDebugUtil.getValue(project, value, context));
 
                     // 包装结果
                     result = new RecursiveResult(jsonValue, context);
@@ -109,7 +102,6 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                         application.invokeLater(() -> ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, jsonConverter.apply(resultValue), FileTypeHolder.JSON5));
                     }
 
-                    indicator.setFraction(1.0);
                     indicator.setText(JsonAssistantBundle.messageOnSystem("progress.convert.to.json.finished.text"));
 
                 } catch (StackOverflowError ex) {
