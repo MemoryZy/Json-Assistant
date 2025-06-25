@@ -50,7 +50,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 消息总线（应用级）
      */
-    private MessageBusConnection applicationConnection;
+    private final MessageBusConnection applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
 
     /**
      * 浮动工具栏组件
@@ -93,11 +93,8 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
             return;
         }
 
-        // 给自定义的编辑器添加事件订阅，编辑器得到焦点时，就触发一下这个事件
-        if (null == applicationConnection) {
-            applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
-            registerOnChangeHandlers();
-        }
+        // 给自定义的编辑器添加事件订阅
+        registerEventHandlers();
 
         // 缓存浮动工具栏
         FLOATING_COMPONENT_MAP.put(new WeakReference<>(editor), component);
@@ -146,7 +143,10 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     }
 
 
-    private void registerOnChangeHandlers() {
+    /**
+     * 注册事件处理器（消费者）
+     */
+    private void registerEventHandlers() {
         // 更新工具栏组件状态
         applicationConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, (RefreshFloatToolbarEvent) this::updateToolbarState);
         // 添加已使用的剪贴板数据
