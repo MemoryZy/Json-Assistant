@@ -19,6 +19,7 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
@@ -44,12 +45,12 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 最大存储量
      */
-    public static final int MAX_HASHES = 100;
+    public static final int MAX_HASHES = 200;
 
     /**
-     * 消息总线
+     * 消息总线（应用级）
      */
-    private MessageBusConnection projectConnection;
+    private MessageBusConnection applicationConnection;
 
     /**
      * 浮动工具栏组件
@@ -93,8 +94,8 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         }
 
         // 给自定义的编辑器添加事件订阅，编辑器得到焦点时，就触发一下这个事件
-        if (null == projectConnection) {
-            projectConnection = project.getMessageBus().connect(this);
+        if (null == applicationConnection) {
+            applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
             registerOnChangeHandlers();
         }
 
@@ -147,9 +148,9 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
 
     private void registerOnChangeHandlers() {
         // 更新工具栏组件状态
-        projectConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, (RefreshFloatToolbarEvent) this::updateToolbarState);
+        applicationConnection.subscribe(RefreshFloatToolbarEvent.ON_REFRESH_FLOAT_TOOLBAR, (RefreshFloatToolbarEvent) this::updateToolbarState);
         // 添加已使用的剪贴板数据
-        projectConnection.subscribe(RegisterClipboardUsageEvent.ON_REGISTER_CLIPBOARD_USAGE, (RegisterClipboardUsageEvent) this::registerGlobalUsage);
+        applicationConnection.subscribe(RegisterClipboardUsageEvent.ON_REGISTER_CLIPBOARD_USAGE, (RegisterClipboardUsageEvent) this::registerGlobalUsage);
     }
 
     /**
@@ -222,7 +223,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     @Override
     public void dispose() {
         USED_HASHES.clear();
-        projectConnection.disconnect();
+        applicationConnection.disconnect();
     }
 
 }
