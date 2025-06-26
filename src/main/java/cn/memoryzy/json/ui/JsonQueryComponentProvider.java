@@ -76,13 +76,13 @@ public class JsonQueryComponentProvider implements Disposable {
 
         this.resultWrapper = new JBPanelWithEmptyText(new BorderLayout());
         this.resultLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.result"));
-        this.resultEditor = createJsonEditor("result.json5", true, EditorKind.PREVIEW);
+        this.resultEditor = createJsonEditor("result", true, EditorKind.PREVIEW);
 
         this.errorOutputArea = new JBTextArea();
         this.errorOutputContainer = new JBScrollPane(errorOutputArea);
 
         this.docLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.doc"));
-        this.docEditor = createJsonEditor("original.json5", false, EditorKind.MAIN_EDITOR);
+        this.docEditor = createJsonEditor("original", false, EditorKind.MAIN_EDITOR);
         this.docPanel = new BorderLayoutPanel().addToTop(docLabel).addToCenter(docEditor.getComponent());
 
         this.queryState = ToolWindowSettings.getInstance().getQueryState();
@@ -94,18 +94,19 @@ public class JsonQueryComponentProvider implements Disposable {
         panel.add(createFirstComponent(), BorderLayout.NORTH);
         panel.add(createSecondComponent(), BorderLayout.CENTER);
 
-        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(true, false);
-        simpleToolWindowPanel.setToolbar(createToolbar());
-        simpleToolWindowPanel.setContent(panel);
-        return simpleToolWindowPanel;
+        SimpleToolWindowPanel windowPanel = new SimpleToolWindowPanel(true, false);
+        windowPanel.setToolbar(createToolbar(windowPanel));
+        windowPanel.setContent(panel);
+        return windowPanel;
     }
 
-    public JComponent createToolbar() {
+    public JComponent createToolbar(SimpleToolWindowPanel windowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
         actionGroup.add(new SwitchAction(queryState, this));
         actionGroup.add(new ShowOriginalTextAction(queryState, this));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
+        toolbar.setTargetComponent(windowPanel);
         return toolbar.getComponent();
     }
 

@@ -1,23 +1,14 @@
 package cn.memoryzy.json.action.toolwindow;
 
-import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
-import cn.memoryzy.json.service.persistent.state.JsonEntry;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -107,8 +98,6 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
 
                         String name = textField.getText();
                         content.setDisplayName(name);
-
-                        asyncUpdateName(project, name, content);
                     }
                     balloon.hide();
                 }
@@ -135,54 +124,4 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         event.getPresentation().setEnabledAndVisible(enabled);
     }
 
-    private void asyncUpdateName(Project project, String name, Content content) {
-        // 寻找历史记录，找到相同记录，更改名称
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (isDefaultName(name)) {
-                return;
-            }
-
-            EditorEx editor = ToolWindowUtil.getEditorOnContent(content);
-            if (editor == null) {
-                return;
-            }
-
-            String text = editor.getDocument().getText();
-            if (StrUtil.isBlank(text)) {
-                return;
-            }
-
-            JsonWrapper jsonWrapper = null;
-            if (JsonUtil.isJson(text)) {
-                jsonWrapper = JsonUtil.parse(text);
-            } else if (Json5Util.isJson5(text)) {
-                jsonWrapper = Json5Util.parse(text);
-            }
-
-            if (jsonWrapper == null) {
-                return;
-            }
-
-            HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).history;
-            for (JsonEntry entry : history) {
-                if (Objects.equals(jsonWrapper, entry.getJsonWrapper())) {
-                    entry.setName(name);
-                }
-            }
-        });
-    }
-
-    private boolean isDefaultName(String name) {
-        if (StrUtil.equalsIgnoreCase(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, name)) {
-            return true;
-        }
-
-        if (name.length() >= 4) {
-            String prefix = name.substring(0, 4);
-            String postfix = name.substring(4);
-            return StrUtil.equalsIgnoreCase(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, prefix) && ReUtil.isMatch("\\d+", postfix);
-        }
-
-        return true;
-    }
 }

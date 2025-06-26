@@ -1,12 +1,9 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.event.ColorSchemeChangedEvent;
+import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -44,12 +41,15 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
 //
 //        refreshFloatToolbarEvent.accept(null);
 
-        MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
+        // MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
+        //
+        // ColorSchemeChangedEvent colorSchemeChangedEvent = messageBus.syncPublisher(ColorSchemeChangedEvent.TOPIC);
+        //
+        // colorSchemeChangedEvent.change(ColorScheme.Classic);
 
-        ColorSchemeChangedEvent colorSchemeChangedEvent = messageBus.syncPublisher(ColorSchemeChangedEvent.TOPIC);
+        HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
 
-        colorSchemeChangedEvent.change(ColorScheme.Classic);
-
+        manager.convertAndShow();
 
 
         System.out.println();

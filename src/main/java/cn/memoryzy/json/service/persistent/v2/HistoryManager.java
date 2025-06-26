@@ -75,7 +75,7 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
     /**
      * 获取最近的历史记录（倒序：最新记录在前）
      */
-    public synchronized List<JsonRecord> getRecentHistory() {
+    public synchronized List<JsonRecord> getRecentHistories() {
         // 将历史记录拷贝到临时列表（避免直接操作原始数据）
         List<JsonRecord> recent = new ArrayList<>(histories);
         recent.sort(Comparator.comparingLong(JsonRecord::getUpdateTime).reversed());

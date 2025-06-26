@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -206,6 +207,23 @@ public class ToolWindowUtil {
     public static void moveWindowToRightBottom(ToolWindow toolWindow) {
         toolWindow.setAnchor(ToolWindowAnchor.RIGHT, null);
         toolWindow.setSplitMode(true, null);
+    }
+
+
+    /**
+     * 目前此方法用于处理最后一个标签页关闭的情况
+     */
+    public static Disposable createAuxWindowContentDisposer(Project project, ToolWindow toolWindow) {
+        return () -> {
+            // 当最后一个标签页关闭，工具窗口暂时隐藏
+            ContentManager contentManager = toolWindow.getContentManager();
+            int contentCount = contentManager.getContentCount();
+            if (contentCount == 0) {
+                toolWindow.setAvailable(false);
+                // 当辅助窗口被关闭时，再将Json 编辑器窗口移回右下角
+                ToolWindowUtil.moveWindowToRightBottom(ToolWindowUtil.getJsonAssistantToolWindow(project));
+            }
+        };
     }
 
 }

@@ -28,7 +28,6 @@ import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +54,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 浮动工具栏组件
      */
-    private static final Map<WeakReference<Editor>, FloatingToolbarComponent> FLOATING_COMPONENT_MAP = new WeakHashMap<>();
+    private final Map<Editor, FloatingToolbarComponent> floatingComponentMap = new WeakHashMap<>();
 
     /**
      * 存储所有已使用的剪贴板数据哈希值
@@ -98,7 +97,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         registerEventHandlers();
 
         // 缓存浮动工具栏
-        FLOATING_COMPONENT_MAP.put(new WeakReference<>(editor), component);
+        floatingComponentMap.put(editor, component);
 
         // 获取剪贴板数据
         String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
@@ -166,39 +165,50 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
      * 更新工具栏组件状态
      */
     private void updateToolbarState(Editor editor, String clipboard) {
+        // 还有一种方式可以防止 在原floatingComponentMap在 Editor 未回收时丢失弱引用，就是在原Editor释放前，先一步remove此Editor所表示的键值对，
+        // 但是这样可能会和此方法冲突
+
+        // 展示
+        FloatingToolbarComponent component = null;
+        for (Editor cached : new ArrayList<>(floatingComponentMap.keySet())) {
+            if (cached == null || cached.isDisposed()) {
+                // 清理无效引用
+                floatingComponentMap.remove(cached);
+            } else if (cached == editor) {
+                component = floatingComponentMap.get(cached);
+            }
+        }
+
+        if (null == component) return;
+
         // 能否被转为 Json
         ClipboardTextConversionContext context = new ClipboardTextConversionContext();
         String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
-        if (StrUtil.isBlank(processedText)) return;
+        if (StrUtil.isBlank(processedText)) {
+            component.scheduleHide();
+            return;
+        }
 
         // 是否含有值
         JsonWrapper wrapper = context.getStrategy() instanceof Json5ConversionStrategy
                 ? Json5Util.parse(processedText)
                 : JsonUtil.parse(processedText);
 
-        if (null == wrapper || wrapper.noItems()) return;
+        if (null == wrapper || wrapper.noItems()) {
+            component.scheduleHide();
+            return;
+        }
 
         // 计算哈希值
         String hash = JsonAssistantUtil.calculateSHA256(clipboard);
 
         // 检查全局使用状态
-        if (isHashUsedGlobally(hash)) return;
-
-        // 展示
-        FloatingToolbarComponent component = null;
-        for (WeakReference<Editor> ref : new ArrayList<>(FLOATING_COMPONENT_MAP.keySet())) {
-            Editor cached = ref.get();
-            if (cached == null || cached.isDisposed()) {
-                // 清理无效引用
-                FLOATING_COMPONENT_MAP.remove(ref);
-            } else if (cached == editor) {
-                component = FLOATING_COMPONENT_MAP.get(ref);
-            }
+        if (isHashUsedGlobally(hash)) {
+            component.scheduleHide();
+            return;
         }
 
-        if (null != component) {
-            component.scheduleShow();
-        }
+        component.scheduleShow();
     }
 
     /**

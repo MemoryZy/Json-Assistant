@@ -128,12 +128,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         this.visualState = toolWindowSettings.getVisualState();
         this.historyOptionState = toolWindowSettings.getHistoryState();
         this.historyManager = HistoryManager.getInstance(project);
+        // 创建编辑器
+        this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType, false, EditorKind.MAIN_EDITOR, "");
     }
 
     public JComponent createComponent() {
-        // 创建编辑器
-        this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType, false, EditorKind.MAIN_EDITOR, "");
-
         // 配置编辑器的外观
         configureEditorAppearance();
         // 配置编辑器的行为

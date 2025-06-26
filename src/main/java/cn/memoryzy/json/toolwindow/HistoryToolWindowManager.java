@@ -2,12 +2,9 @@ package cn.memoryzy.json.toolwindow;
 
 import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
-import cn.memoryzy.json.action.toolwindow.RenameTabAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.model.EditorContext;
-import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.AuxiliaryTreeToolWindowComponentProvider;
+import cn.memoryzy.json.ui.JsonHistoryToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.Separator;
@@ -23,47 +20,33 @@ import com.intellij.ui.content.ContentManager;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-
 /**
- * 管理树结构工具窗口的行为
- *
  * @author Memory
- * @since 2024/12/12
+ * @since 2025/6/26
  */
 @Service(Service.Level.PROJECT)
-public final class AuxiliaryTreeToolWindowManager implements Disposable {
+public final class HistoryToolWindowManager implements Disposable {
 
     private final Project project;
     private final ToolWindow toolWindow;
 
-    public AuxiliaryTreeToolWindowManager(Project project) {
+    public HistoryToolWindowManager(Project project) {
         this.project = project;
         this.toolWindow = createToolWindow(project);
     }
 
-    public static AuxiliaryTreeToolWindowManager getInstance(@NotNull Project project) {
-        return project.getService(AuxiliaryTreeToolWindowManager.class);
+    public static HistoryToolWindowManager getInstance(@NotNull Project project) {
+        return project.getService(HistoryToolWindowManager.class);
     }
-
-    public void convertAndShow(JsonWrapper jsonWrapper, EditorContext editorContext) {
-        // 为其分配一个标签页，用于展示
-        AuxiliaryTreeToolWindowComponentProvider provider = new AuxiliaryTreeToolWindowComponentProvider(jsonWrapper);
-        // 创建标签页
-        createToolWindowContent(provider.createComponent(toolWindow.getComponent(), editorContext));
-        // 展示
-        show();
-    }
-
 
     @SuppressWarnings("deprecation")
     private ToolWindow createToolWindow(Project project) {
         ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
-        ToolWindow toolWindow = windowManager.getToolWindow(PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID);
+        ToolWindow toolWindow = windowManager.getToolWindow(PluginConstant.HISTORY_TOOLWINDOW_ID);
         if (toolWindow == null) {
             // 这里的parentDisposable无效
             toolWindow = windowManager.registerToolWindow(
-                    PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID,
+                    PluginConstant.HISTORY_TOOLWINDOW_ID,
                     true,
                     ToolWindowAnchor.RIGHT,
                     this,
@@ -71,10 +54,11 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
                     true);
         }
 
-        String title = JsonAssistantBundle.message("toolwindow.auxiliary.tree.name");
+        String title = JsonAssistantBundle.message("toolwindow.history.name");
         toolWindow.setTitle(title);
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
+        // 右键弹出菜单
         registerAction(toolWindow);
         return toolWindow;
     }
@@ -83,7 +67,6 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
-        group.add(new RenameTabAction());
         group.add(new FloatingWindowAction(toolWindow));
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
@@ -91,28 +74,12 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         toolWindow.setAdditionalGearActions(group);
     }
 
-
-    private void createToolWindowContent(JComponent component) {
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        ContentManager contentManager = toolWindow.getContentManager();
-        int count = contentManager.getContentCount();
-
-        Content content = contentFactory.createContent(component, getDisplayName(count), false);
-        content.setCloseable(true);
-        content.setDisposer(ToolWindowUtil.createAuxWindowContentDisposer(project, toolWindow));
-        contentManager.addContent(content, count);
-        contentManager.setSelectedContent(content, true);
+    public void convertAndShow() {
+        // 创建标签页
+        createToolWindowContent();
+        // 展示
+        show();
     }
-
-    private String getDisplayName(int contentCount) {
-        String concatStr = "";
-        if (contentCount > 0) {
-            concatStr += " " + (contentCount + 1);
-        }
-
-        return PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME + concatStr;
-    }
-
 
     private void show() {
         if (!toolWindow.isAvailable()) {
@@ -126,16 +93,19 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         toolWindow.show();
     }
 
-    public Project getProject() {
-        return project;
-    }
+    private void createToolWindowContent() {
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        ContentManager contentManager = toolWindow.getContentManager();
 
-    public ToolWindow getToolWindow() {
-        return toolWindow;
+        JsonHistoryToolWindowComponentProvider provider = new JsonHistoryToolWindowComponentProvider(project);
+        Content content = contentFactory.createContent(provider.createComponent(), "", false);
+        content.setCloseable(false);
+        content.setDisposer(provider);
+        contentManager.addContent(content, 0);
+        contentManager.setSelectedContent(content, true);
     }
 
     @Override
     public void dispose() {
     }
-
 }
