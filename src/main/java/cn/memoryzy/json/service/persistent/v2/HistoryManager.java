@@ -1,7 +1,11 @@
 package cn.memoryzy.json.service.persistent.v2;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
+import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.Attribute;
@@ -48,42 +52,34 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
         trimHistory();
     }
 
+
     /**
-     * 添加新查询记录到历史
+     * 添加新记录到历史
      *
-     * @param record 查询记录对象
+     * @param record 记录对象
      */
     public synchronized void addEntry(JsonRecord record) {
-        // 避免添加重复的连续记录
-        if (!histories.isEmpty() && histories.peekLast().equals(record)) {
-            return;
+        JsonWrapper wrapper = record.getWrapper();
+        // 避免添加重复记录
+        if (!exists(wrapper)) {
+            // 计算并补充属性
+            populateMissingAttributes(record);
+            // 添加
+            histories.addLast(record);
+            // 裁剪
+            trimHistory();
         }
-
-        histories.addLast(record);
-        trimHistory();
     }
+
 
     /**
      * 获取最近的历史记录（倒序：最新记录在前）
-     *
-     * @param maxItems 最多返回的记录数
      */
-    public synchronized List<JsonRecord> getRecentHistory(int maxItems) {
-        List<JsonRecord> recent = new ArrayList<>(maxItems);
-        Iterator<JsonRecord> it = histories.descendingIterator();
-
-        for (int i = 0; i < maxItems && it.hasNext(); i++) {
-            recent.add(it.next());
-        }
-
+    public synchronized List<JsonRecord> getRecentHistory() {
+        // 将历史记录拷贝到临时列表（避免直接操作原始数据）
+        List<JsonRecord> recent = new ArrayList<>(histories);
+        recent.sort(Comparator.comparingLong(JsonRecord::getUpdateTime).reversed());
         return recent;
-    }
-
-    /**
-     * 获取完整历史记录（正序：从旧到新）
-     */
-    public synchronized List<JsonRecord> getFullHistory() {
-        return new ArrayList<>(histories);
     }
 
     /**
@@ -94,6 +90,28 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
     }
 
     /**
+     * 判断是否已经存在
+     *
+     * @param wrapper 要添加的元素
+     * @return 存在则返回true，不存在则返回false
+     */
+    public boolean exists(JsonWrapper wrapper) {
+        return histories.stream().anyMatch(record -> Objects.equals(wrapper, record.getWrapper()));
+    }
+
+
+    /**
+     * 查找相同结构的记录
+     *
+     * @param wrapper 结构
+     * @return 记录
+     */
+    public JsonRecord find(JsonWrapper wrapper) {
+        return histories.stream().filter(record -> Objects.equals(wrapper, record.getWrapper())).findFirst().orElse(null);
+    }
+
+
+    /**
      * 裁剪历史记录到最大容量
      */
     private void trimHistory() {
@@ -102,6 +120,38 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
             histories.removeFirst();
         }
     }
+
+    /**
+     * 补充记录属性
+     *
+     * @param record 记录
+     */
+    private void populateMissingAttributes(JsonRecord record) {
+        if (null == record.getId()) {
+            record.setId(histories.stream().map(JsonRecord::getId).max(Integer::compareTo).orElse(-1) + 1);
+        }
+
+        if (StrUtil.isBlank(record.getDisplayText())) {
+            record.setDisplayText(getShortText(record.getWrapper()));
+        }
+
+        Long createTime = record.getCreateTime();
+        if (null == createTime || createTime <= 0) {
+            record.setCreateTime(System.currentTimeMillis());
+        }
+
+        Long updateTime = record.getUpdateTime();
+        if (null == updateTime || updateTime <= 0) {
+            record.setUpdateTime(System.currentTimeMillis());
+        }
+    }
+
+    private String getShortText(JsonWrapper wrapper) {
+        String jsonString = JsonUtil.compressJson(wrapper);
+        return JsonAssistantUtil.truncateText(Objects.requireNonNull(jsonString), 80, "...");
+        // return StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);
+    }
+
 
     @Attribute
     public Integer getVersion() {

@@ -334,20 +334,16 @@ public final class ConfigurationMerger {
 
             for (Object el : arrayWrapper) {
                 ObjectWrapper element = (ObjectWrapper) el;
-                Integer id = (Integer) element.get("id");
                 String name = (String) element.get("name");
                 String shortText = (String) element.get("shortText");
                 String jsonString = (String) element.get("jsonString");
                 JsonWrapper jsonWrapper = (JsonWrapper) element.get("jsonWrapper");
                 Object insertTimeTmp = element.get("insertTime");
 
-                // 若id和原文都不存在
-                if (null == id || StrUtil.isBlank(jsonString)) {
-                    continue;
-                }
+                // 若原文不存在
+                if (StrUtil.isBlank(jsonString)) continue;
 
                 JsonRecord record = new JsonRecord()
-                        .setId(id)
                         .setRawText(jsonString)
                         .setSourceType(JsonUtil.isJson(jsonString) ? DataFormatType.JSON : DataFormatType.JSON5);
 

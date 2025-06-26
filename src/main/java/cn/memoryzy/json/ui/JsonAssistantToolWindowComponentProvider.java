@@ -7,6 +7,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
+import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.ColorSchemeChangedEvent;
 import cn.memoryzy.json.event.FoldingOutlineToggleEvent;
 import cn.memoryzy.json.event.LineNumbersToggleEvent;
@@ -22,6 +23,7 @@ import cn.memoryzy.json.service.persistent.state.JsonEntry;
 import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.v2.EditorVisualState;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
+import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import cn.memoryzy.json.service.persistent.v2.HistoryManager;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
@@ -41,14 +43,16 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.actions.AbstractToggleUseSoftWrapsAction;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -65,7 +69,6 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -238,13 +241,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private void configureEditorBehavior() {
         MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(behaviorState, historyOptionState, historyManager);
         Disposer.register(this, focusMonitor);
+
         currentEditor.addFocusListener(focusMonitor);
         currentEditor.getDocument().addDocumentListener(new EditorLineChangeMonitor(currentEditor));
 
-        // 手动储存历史记录
         DumbAwareAction.create(event -> {
             if (historyOptionState.isEnableHistory() && !historyOptionState.isAutoRecordHistory()) {
-                performAction(false);
+                // 手动储存历史记录
+                saveHistoryManually();
             }
         }).registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl S"), currentEditor.getComponent());
 
@@ -337,6 +341,50 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         }
 
         currentEditor.getComponent().setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
+    }
+
+
+    private void saveHistoryManually() {
+        // TODO 手动保存的话，可以通过toolwindow.notifyBallon的方式提醒是否要加名字
+
+        // 获取编辑器内容
+        String content = StrUtil.trim(currentEditor.getDocument().getText());
+        // 检查内容有效性
+        if (StrUtil.isBlank(content)) return;
+
+        // 解析格式
+        JsonWrapper wrapper = null;
+        DataFormatType formatType = DataFormatType.JSON;
+        if (JsonUtil.isJson(content)) {
+            wrapper = JsonUtil.parse(content);
+
+        } else if (Json5Util.isJson5(content)) {
+            formatType = DataFormatType.JSON5;
+            wrapper = Json5Util.parse(content);
+            // 由这里再进行格式化（不可避免会去掉一些Array上的注释）
+            content = Json5Util.formatJson5WithComment(content);
+        }
+
+        if (null == wrapper || wrapper.noItems()) return;
+
+        // 手动保存
+        JsonRecord record = historyManager.find(wrapper);
+
+        // 新增
+        if (null == record) {
+            historyManager.addEntry(record = new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+        } else {
+
+        }
+
+        // 若已存在此记录，则更新其updateTime，以及后续指定名称
+
+
+
+        // TODO 最简单的是只新增，不修改历史记录内容，碰到相同名的、相同结构的直接提醒
+
+        // TODO 把历史记录做成一个toolwindow，这样看着更直观（看看是底部还是侧边）
+
     }
 
 
@@ -518,25 +566,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
     private StructureSetting getStructureSetting() {
         return new StructureSetting().setNeedBorder(false).setNeedToolbar(true).setExpandLevel(3);
-    }
-
-    private class FocusListenerImpl implements FocusChangeListener {
-
-        @Override
-        public void focusGained(@NotNull Editor e) {
-            // --------------------------- 获取焦点时
-            // 获取剪贴板的 JSON 并设置到编辑器内
-            pasteJsonToEditor();
-        }
-
-        @Override
-        public void focusLost(@NotNull Editor editor) {
-            // --------------------------- 失去焦点时
-            // 添加当前编辑器的 JSON 至历史记录
-            if (historyOptionState.isEnableHistory() && historyOptionState.isAutoRecordHistory()) {
-                scheduleDebouncedAction();
-            }
-        }
     }
 
 }
