@@ -369,13 +369,16 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         // 手动保存
         JsonRecord record = historyManager.find(wrapper);
+        // 判断是否为新增
+        boolean isAdd = null == record;
 
-        // 新增
-        if (null == record) {
+        if (isAdd) {
+            // 新增
             historyManager.addEntry(record = new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
-        } else {
-
         }
+
+
+
 
         // 若已存在此记录，则更新其updateTime，以及后续指定名称
 
