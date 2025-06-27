@@ -1,36 +1,35 @@
-package cn.memoryzy.json.ui.panel;
+package cn.memoryzy.json.ui.editor;
 
 import cn.memoryzy.json.action.query.ShowHistoryAction;
 import cn.memoryzy.json.ui.component.SearchHistoryButton;
-import cn.memoryzy.json.ui.editor.SearchTextField2;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Predicate;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 /**
  * @author Memory
- * @since 2024/12/17
+ * @since 2025/6/27
  */
-public class SearchWrapper extends NonOpaquePanel {
+public class AutoCompleteWrapper extends NonOpaquePanel {
 
-    private final SearchTextField2 searchTextField2;
+    private final TextFieldWithAutoCompletion<String> completion;
 
-    public SearchWrapper(Project project, FileType fileType, Predicate<String> predicate, Supplier<String> propertyNameSupplier) {
+    public AutoCompleteWrapper(Project project, Collection<String> variants, Supplier<String> propertyNameSupplier) {
         super(new BorderLayout());
-        this.searchTextField2 = new SearchTextField2(project, fileType, predicate, propertyNameSupplier);
+        this.completion = new ModernTextFieldWithAutoCompletion(project, variants);
         this.initComponents(propertyNameSupplier);
     }
 
     private void initComponents(Supplier<String> propertyNameSupplier) {
-        ShowHistoryAction showHistoryAction = new ShowHistoryAction(this, searchTextField2, propertyNameSupplier);
+        ShowHistoryAction showHistoryAction = new ShowHistoryAction(this, completion, propertyNameSupplier);
         SearchHistoryButton searchHistoryButton = new SearchHistoryButton(showHistoryAction, false);
 
         JPanel historyButtonWrapper = new NonOpaquePanel(new BorderLayout());
@@ -38,7 +37,7 @@ public class SearchWrapper extends NonOpaquePanel {
         historyButtonWrapper.add(searchHistoryButton, BorderLayout.NORTH);
 
         add(historyButtonWrapper, BorderLayout.WEST);
-        add(searchTextField2, BorderLayout.CENTER);
+        add(completion, BorderLayout.CENTER);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
         setOpaque(true);
     }
@@ -49,7 +48,12 @@ public class SearchWrapper extends NonOpaquePanel {
         this.setBackground(UIUtil.getTextFieldBackground());
     }
 
-    public void clearSearchText() {
-        searchTextField2.setText("");
+    public JComponent getPreferredFocusedComponent() {
+        return completion;
     }
+
+    public void setVariants(Collection<String> variants) {
+        completion.setVariants(variants);
+    }
+
 }

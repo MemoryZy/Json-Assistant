@@ -40,7 +40,6 @@ import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorFactory;
@@ -67,7 +66,6 @@ import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
@@ -87,13 +85,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
     public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
 
-    /**
-     * 消息总线（应用级）
-     */
-    public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
-
     private final Project project;
-    private final FileType fileType;
     private final boolean isInitialTab;
 
     private final JsonHistoryPersistentState historyState;
@@ -105,7 +97,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     /**
      * 当前编辑器
      */
-    private EditorEx currentEditor;
+    private final EditorEx currentEditor;
 
     /**
      * 当前内容页
@@ -118,7 +110,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
     public JsonAssistantToolWindowComponentProvider(Project project, FileType fileType, boolean isInitialTab) {
         this.project = project;
-        this.fileType = fileType;
         this.isInitialTab = isInitialTab;
         // TODO 待修改
         this.historyState = JsonHistoryPersistentState.getInstance(project);
@@ -260,9 +251,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
      */
     private void registerConfigurationUpdateEventHandlers() {
         // 切换行号展示
-        APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
-        APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
-        APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
     }
 
     public JComponent createToolbar(SimpleToolWindowPanel toolWindowPanel) {

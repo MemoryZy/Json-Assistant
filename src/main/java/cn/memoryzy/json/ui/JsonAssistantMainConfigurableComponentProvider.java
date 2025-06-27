@@ -5,9 +5,7 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.TreeViewMode;
-import cn.memoryzy.json.event.ColorSchemeChangedEvent;
-import cn.memoryzy.json.event.FoldingOutlineToggleEvent;
-import cn.memoryzy.json.event.LineNumbersToggleEvent;
+import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.service.persistent.state.v2.*;
 import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
 import cn.memoryzy.json.service.persistent.v2.SerializationSettings;
@@ -463,6 +461,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // ----------------------------------- 历史记录
         HistoryState historyState = toolWindowSettings.getHistoryState();
+        boolean oldEnableHistory = historyState.isEnableHistory();
+        HistoryDisplayMode oldHistoryDisplayMode = historyState.getHistoryDisplayMode();
+
         historyState.setEnableHistory(enableHistoryCheckBox.isSelected());
         historyState.setAutoRecordHistory(autoRecordHistoryRadioBtn.isSelected());
         historyState.setHistoryDisplayMode(historyStyleComboBox.getItem());
@@ -482,23 +483,32 @@ public class JsonAssistantMainConfigurableComponentProvider {
         treeStructureState.setTreeViewMode(treeViewModeComboBox.getItem());
 
         // 发布配置更新事件
-        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme);
+        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme, oldEnableHistory, oldHistoryDisplayMode);
     }
 
     /**
      * 针对性地发布配置更新事件
      */
-    private void fireConfigurationUpdateEvent(boolean oldShowLineNumbers, boolean oldShowFoldingOutline, ColorScheme oldColorScheme) {
+    private void fireConfigurationUpdateEvent(boolean oldShowLineNumbers,
+                                              boolean oldShowFoldingOutline,
+                                              ColorScheme oldColorScheme,
+                                              boolean oldEnableHistory,
+                                              HistoryDisplayMode oldHistoryDisplayMode) {
+
         boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
         boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
         ColorScheme newColorScheme = backgroundComboBox.getItem();
+        boolean newEnableHistory = enableHistoryCheckBox.isSelected();
+        HistoryDisplayMode newHistoryDisplayMode = historyStyleComboBox.getItem();
 
         boolean showLineNumbersUpdate = !Objects.equals(oldShowLineNumbers, newShowLineNumbers);
         boolean showFoldingOutlineUpdate = !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline);
         boolean colorSchemeUpdate = !Objects.equals(oldColorScheme, newColorScheme);
+        boolean enableHistoryUpdate = !Objects.equals(oldEnableHistory, newEnableHistory);
+        boolean historyDisplayModeUpdate = !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode);
 
         // 对比新旧配置，针对性的进行事件发布
-        if (showLineNumbersUpdate || showFoldingOutlineUpdate || (isIdea && colorSchemeUpdate)) {
+        if (showLineNumbersUpdate || showFoldingOutlineUpdate || (isIdea && colorSchemeUpdate) || enableHistoryUpdate || historyDisplayModeUpdate) {
             MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
 
             // 切换展示行号事件
@@ -514,6 +524,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
             // 切换编辑器背景色事件
             if (isIdea && colorSchemeUpdate) {
                 messageBus.syncPublisher(ColorSchemeChangedEvent.TOPIC).change(newColorScheme);
+            }
+
+            if (enableHistoryUpdate) {
+                messageBus.syncPublisher(HistoryToggleEvent.TOPIC).toggle(newEnableHistory);
+            }
+
+            if (historyDisplayModeUpdate) {
+                messageBus.syncPublisher(HistoryViewChangedEvent.TOPIC).change(newHistoryDisplayMode);
             }
         }
     }

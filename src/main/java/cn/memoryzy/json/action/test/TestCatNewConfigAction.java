@@ -1,6 +1,5 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -47,10 +46,30 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //
         // colorSchemeChangedEvent.change(ColorScheme.Classic);
 
-        HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
+        // HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
+        // manager.convertAndShow();
 
-        manager.convertAndShow();
 
+
+
+        // List<String> list = List.of("航班监控", "航班设置", "航班注释", "Search");
+
+
+        // TextFieldWithAutoCompletion<String> completion = TextFieldWithAutoCompletion.create(
+        //         getEventProject(e),
+        //         list,
+        //         null,
+        //         true,
+        //         "kkkk"
+        // );
+
+
+
+        // BorderLayoutPanel panel = new BorderLayoutPanel().addToCenter(completion);
+        //
+        // new DialogBuilder()
+        //         .centerPanel(panel)
+        //                 .show();
 
         System.out.println();
     }

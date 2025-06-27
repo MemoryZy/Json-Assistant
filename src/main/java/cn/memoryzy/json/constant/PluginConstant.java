@@ -35,7 +35,9 @@ public interface PluginConstant {
      */
     String SOFT_WRAPS_SELECT_STATE = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SOFT_WRAPS_SELECT_STATE";
 
-
+    String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
+    String JMES_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JmesPathHistory";
+    String HISTORY_SEARCH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".History";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
 

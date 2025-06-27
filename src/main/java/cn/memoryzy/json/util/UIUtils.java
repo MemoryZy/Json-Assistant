@@ -71,6 +71,10 @@ public class UIUtils {
      */
     public static final String JSON_GRID_CARD_NAME = "grid";
 
+    public static final String HISTORY_LIST_CARD_NAME = "list";
+
+    public static final String HISTORY_TREE_CARD_NAME = "tree";
+
 
     /**
      * 生成 IDE 默认编辑器组件

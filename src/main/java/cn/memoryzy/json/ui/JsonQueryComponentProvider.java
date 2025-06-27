@@ -6,6 +6,7 @@ import cn.memoryzy.json.action.query.ShowOriginalTextAction;
 import cn.memoryzy.json.action.query.SwitchAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonQueryLanguage;
 import cn.memoryzy.json.model.jsonpath.EvaluateResult;
 import cn.memoryzy.json.model.jsonpath.IncorrectDocument;
@@ -46,6 +47,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author Memory
@@ -72,7 +74,12 @@ public class JsonQueryComponentProvider implements Disposable {
 
     public JsonQueryComponentProvider(Project project) {
         this.project = project;
-        this.searchWrapper = new SearchWrapper(project, PlainTextFileType.INSTANCE, this::evaluate);
+        this.queryState = ToolWindowSettings.getInstance().getQueryState();
+
+        Supplier<String> propertyNameSupplier = () -> (queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath)
+                ? PluginConstant.JSON_PATH_HISTORY_KEY : PluginConstant.JMES_PATH_HISTORY_KEY;
+
+        this.searchWrapper = new SearchWrapper(project, PlainTextFileType.INSTANCE, this::evaluate, propertyNameSupplier);
 
         this.resultWrapper = new JBPanelWithEmptyText(new BorderLayout());
         this.resultLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.result"));
@@ -84,8 +91,6 @@ public class JsonQueryComponentProvider implements Disposable {
         this.docLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.doc"));
         this.docEditor = createJsonEditor("original", false, EditorKind.MAIN_EDITOR);
         this.docPanel = new BorderLayoutPanel().addToTop(docLabel).addToCenter(docEditor.getComponent());
-
-        this.queryState = ToolWindowSettings.getInstance().getQueryState();
         this.docPanel.setVisible(queryState.isDisplayOriginalText());
     }
 
@@ -118,7 +123,7 @@ public class JsonQueryComponentProvider implements Disposable {
         // 一个Json原文编辑器（默认颜色），一个计算结果编辑器（跟随主界面）
         JBSplitter splitter = new JBSplitter(true, 0.5f);
         // 保存拆分比例
-        splitter.setSplitterProportionKey(SPLITTER_PROPORTION_KEY);
+        splitter.setAndLoadSplitterProportionKey(SPLITTER_PROPORTION_KEY);
 
         resultWrapper.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("json.query.evaluate.no.result"));
         resultLabel.setBorder(JBUI.Borders.empty(3, 6));

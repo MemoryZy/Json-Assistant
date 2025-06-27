@@ -1,11 +1,6 @@
 package cn.memoryzy.json.action.query;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.enums.JsonQueryLanguage;
-import cn.memoryzy.json.service.persistent.state.v2.QueryState;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
-import cn.memoryzy.json.ui.panel.SearchWrapper;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.find.FindBundle;
 import com.intellij.icons.AllIcons;
@@ -20,9 +15,9 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.ArrayDeque;
-import java.util.Collection;
+import java.awt.*;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author Memory
@@ -30,25 +25,21 @@ import java.util.List;
  */
 public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackground {
 
-    public static final String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
-    public static final String JMES_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JmesPathHistory";
-
-    private final SearchWrapper searchWrapper;
+    private final Component searchWrapper;
     private final JComponent searchTextField;
-    private final QueryState queryState;
+    private final Supplier<String> propertyNameSupplier;
 
-    public ShowHistoryAction(SearchWrapper searchWrapper, JComponent searchTextField) {
+    public ShowHistoryAction(Component searchWrapper, JComponent searchTextField, Supplier<String> propertyNameSupplier) {
         super(FindBundle.message("find.search.history"), null, AllIcons.Actions.SearchWithHistory);
         this.searchWrapper = searchWrapper;
         this.searchTextField = searchTextField;
-        this.queryState = ToolWindowSettings.getInstance().getQueryState();
+        this.propertyNameSupplier = propertyNameSupplier;
         registerCustomShortcutSet(KeymapUtil.getActiveKeymapShortcuts("ShowSearchHistory"), searchTextField);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        List<String> history = getHistory(queryState, e.getProject());
-        showCompletionPopup(history);
+        showCompletionPopup(getHistory(e.getProject()));
     }
 
     private void showCompletionPopup(List<String> list) {
@@ -65,38 +56,9 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
                 .showUnderneathOf(searchWrapper);
     }
 
-    public static List<String> getHistory(QueryState queryState, Project project) {
-        String historyPropertyName = queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
-        String history = PropertiesComponent.getInstance(project).getValue(historyPropertyName);
+    public List<String> getHistory(Project project) {
+        String history = PropertiesComponent.getInstance(project).getValue(propertyNameSupplier.get());
         return StrUtil.isNotBlank(history) ? StrUtil.split(history, '\n') : List.of();
     }
 
-    public static void setHistory(QueryState queryState, Project project, Collection<String> history) {
-        String historyPropertyName = queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath ? JSON_PATH_HISTORY_KEY : JMES_PATH_HISTORY_KEY;
-        PropertiesComponent.getInstance(project).setValue(historyPropertyName, StrUtil.join("\n", history));
-    }
-
-
-    public static void addHistory(Project project, String text) {
-        if (StrUtil.isBlank(text)) {
-            return;
-        }
-
-        QueryState queryState = ToolWindowSettings.getInstance().getQueryState();
-        ArrayDeque<String> history = new ArrayDeque<>(getHistory(queryState, project));
-        if (!history.contains(text)) {
-            history.addFirst(text);
-            if (history.size() > 10) {
-                history.removeLast();
-            }
-            setHistory(queryState, project, history);
-        } else {
-            if (history.getFirst().equals(text)) {
-                return;
-            }
-            history.remove(text);
-            history.addFirst(text);
-            setHistory(queryState, project, history);
-        }
-    }
 }

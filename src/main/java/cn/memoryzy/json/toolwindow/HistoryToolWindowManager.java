@@ -4,6 +4,7 @@ import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.event.HistoryToggleEvent;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.Disposable;
@@ -48,8 +49,8 @@ public final class HistoryToolWindowManager implements Disposable {
             // 这里的parentDisposable无效
             toolWindow = windowManager.registerToolWindow(
                     PluginConstant.HISTORY_TOOLWINDOW_ID,
-                    true,
-                    ToolWindowAnchor.RIGHT,
+                    false,
+                    ToolWindowAnchor.BOTTOM,
                     this,
                     true,
                     true);
@@ -61,6 +62,9 @@ public final class HistoryToolWindowManager implements Disposable {
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
         // 右键弹出菜单
         registerAction((ToolWindowEx) toolWindow);
+        // 注册配置更新事件
+        registerConfigurationUpdateEventHandlers();
+
         return toolWindow;
     }
 
@@ -76,6 +80,10 @@ public final class HistoryToolWindowManager implements Disposable {
         toolWindow.setAdditionalGearActions(group);
     }
 
+    private void registerConfigurationUpdateEventHandlers() {
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryToggleEvent.TOPIC, (HistoryToggleEvent) this::setToolWindowAvailable);
+    }
+
     public void convertAndShow() {
         // 创建标签页
         createToolWindowContent();
@@ -89,7 +97,7 @@ public final class HistoryToolWindowManager implements Disposable {
         }
 
         // 将 Json 编辑器窗口移至右上角
-        ToolWindowUtil.moveWindowToRightTop(ToolWindowUtil.getJsonAssistantToolWindow(project));
+        // ToolWindowUtil.moveWindowToBottomRight(toolWindow);
 
         // 辅助窗口只允许打开一个，会自动隐藏其他的窗口
         toolWindow.show();
@@ -100,11 +108,15 @@ public final class HistoryToolWindowManager implements Disposable {
         ContentManager contentManager = toolWindow.getContentManager();
 
         HistoryToolWindowComponentProvider provider = new HistoryToolWindowComponentProvider(project);
-        Content content = contentFactory.createContent(provider.createComponent(), "", false);
+        Content content = contentFactory.createContent(provider.createComponent(), "", true);
         content.setCloseable(false);
         content.setDisposer(provider);
         contentManager.addContent(content, 0);
         contentManager.setSelectedContent(content, true);
+    }
+
+    public void setToolWindowAvailable(boolean value) {
+        toolWindow.setAvailable(value);
     }
 
     @Override
