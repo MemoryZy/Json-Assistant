@@ -4,7 +4,7 @@ import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.ui.JsonHistoryToolWindowComponentProvider;
+import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.Separator;
@@ -13,6 +13,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
@@ -59,11 +60,11 @@ public final class HistoryToolWindowManager implements Disposable {
         toolWindow.setStripeTitle(title);
         toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
         // 右键弹出菜单
-        registerAction(toolWindow);
+        registerAction((ToolWindowEx) toolWindow);
         return toolWindow;
     }
 
-    private void registerAction(ToolWindow toolWindow) {
+    private void registerAction(ToolWindowEx toolWindow) {
         // 右键弹出菜单
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
@@ -71,6 +72,7 @@ public final class HistoryToolWindowManager implements Disposable {
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         group.add(Separator.create());
+        // 在203、213等低版本ide中，setAdditionalGearActions方法是属于ToolWindowEx的，单纯用ToolWindow会出错
         toolWindow.setAdditionalGearActions(group);
     }
 
@@ -97,7 +99,7 @@ public final class HistoryToolWindowManager implements Disposable {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ContentManager contentManager = toolWindow.getContentManager();
 
-        JsonHistoryToolWindowComponentProvider provider = new JsonHistoryToolWindowComponentProvider(project);
+        HistoryToolWindowComponentProvider provider = new HistoryToolWindowComponentProvider(project);
         Content content = contentFactory.createContent(provider.createComponent(), "", false);
         content.setCloseable(false);
         content.setDisposer(provider);

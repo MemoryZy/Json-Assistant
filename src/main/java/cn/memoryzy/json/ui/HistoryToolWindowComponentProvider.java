@@ -30,14 +30,14 @@ import java.util.List;
  * @author Memory
  * @since 2025/6/26
  */
-public class JsonHistoryToolWindowComponentProvider implements Disposable {
+public class HistoryToolWindowComponentProvider implements Disposable {
 
     private final Project project;
     private final HistoryManager historyManager;
 
     private final Editor recordEditor;
 
-    public JsonHistoryToolWindowComponentProvider(Project project) {
+    public HistoryToolWindowComponentProvider(Project project) {
         this.project = project;
         this.historyManager = HistoryManager.getInstance(project);
 
