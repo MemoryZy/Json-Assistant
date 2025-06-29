@@ -1,5 +1,6 @@
 package cn.memoryzy.json.action.test;
 
+import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -46,8 +47,8 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //
         // colorSchemeChangedEvent.change(ColorScheme.Classic);
 
-        // HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
-        // manager.convertAndShow();
+        HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
+        manager.convertAndShow();
 
 
 

@@ -96,9 +96,6 @@ public final class HistoryToolWindowManager implements Disposable {
             toolWindow.setAvailable(true);
         }
 
-        // 将 Json 编辑器窗口移至右上角
-        // ToolWindowUtil.moveWindowToBottomRight(toolWindow);
-
         // 辅助窗口只允许打开一个，会自动隐藏其他的窗口
         toolWindow.show();
     }

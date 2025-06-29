@@ -1,7 +1,10 @@
 package cn.memoryzy.json.service.persistent.v2;
 
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import cn.memoryzy.json.util.JsonAssistantUtil;
@@ -12,6 +15,7 @@ import com.intellij.util.xmlb.annotations.Attribute;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Memory
@@ -80,6 +84,18 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
         List<JsonRecord> recent = new ArrayList<>(histories);
         recent.sort(Comparator.comparingLong(JsonRecord::getUpdateTime).reversed());
         return recent;
+    }
+
+    /**
+     * 将历史记录以更新时间进行分组
+     *
+     * @return 分组结果
+     */
+    public synchronized Map<String, List<JsonRecord>> groupByUpdateTime() {
+        return histories.stream().collect(Collectors.groupingBy(record -> {
+            String timeStr = DateUtil.format(new Date(record.getUpdateTime()), DatePattern.NORM_DATE_FORMATTER);
+            return timeStr != null ? timeStr : PluginConstant.UNKNOWN;
+        }));
     }
 
     /**
