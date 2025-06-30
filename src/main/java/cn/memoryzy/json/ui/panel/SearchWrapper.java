@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +18,7 @@ import java.util.function.Supplier;
  * @author Memory
  * @since 2024/12/17
  */
-public class SearchWrapper extends NonOpaquePanel {
+public class SearchWrapper extends TransparentContainer {
 
     private final SearchTextField2 searchTextField2;
 
@@ -40,16 +39,10 @@ public class SearchWrapper extends NonOpaquePanel {
         add(historyButtonWrapper, BorderLayout.WEST);
         add(searchTextField2, BorderLayout.CENTER);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
-        setOpaque(true);
-    }
-
-    @Override
-    public void updateUI() {
-        super.updateUI();
-        this.setBackground(UIUtil.getTextFieldBackground());
     }
 
     public void clearSearchText() {
         searchTextField2.setText("");
     }
+
 }

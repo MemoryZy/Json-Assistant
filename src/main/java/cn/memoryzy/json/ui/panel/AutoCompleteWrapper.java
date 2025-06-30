@@ -1,13 +1,13 @@
-package cn.memoryzy.json.ui.editor;
+package cn.memoryzy.json.ui.panel;
 
 import cn.memoryzy.json.action.query.ShowHistoryAction;
 import cn.memoryzy.json.ui.component.SearchHistoryButton;
+import cn.memoryzy.json.ui.editor.ModernTextFieldWithAutoCompletion;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  * @author Memory
  * @since 2025/6/27
  */
-public class AutoCompleteWrapper extends NonOpaquePanel {
+public class AutoCompleteWrapper extends TransparentContainer {
 
     private final TextFieldWithAutoCompletion<String> completion;
 
@@ -39,13 +39,6 @@ public class AutoCompleteWrapper extends NonOpaquePanel {
         add(historyButtonWrapper, BorderLayout.WEST);
         add(completion, BorderLayout.CENTER);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
-        setOpaque(true);
-    }
-
-    @Override
-    public void updateUI() {
-        super.updateUI();
-        this.setBackground(UIUtil.getTextFieldBackground());
     }
 
     public JComponent getPreferredFocusedComponent() {

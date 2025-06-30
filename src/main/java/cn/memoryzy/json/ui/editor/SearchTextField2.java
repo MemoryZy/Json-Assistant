@@ -5,9 +5,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.EditorTextField;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -24,7 +22,7 @@ import java.util.function.Supplier;
  * @author Memory
  * @since 2024/12/27
  */
-public class SearchTextField2 extends EditorTextField {
+public class SearchTextField2 extends BorderlessEditorTextField {
 
     private final Project project;
     private final Predicate<String> predicate;
@@ -54,13 +52,10 @@ public class SearchTextField2 extends EditorTextField {
 
     @Override
     protected @NotNull EditorEx createEditor() {
-        EditorEx editor = super.createEditor();
-        editor.setBorder(JBUI.Borders.empty());
-        JComponent component = editor.getComponent();
+        EditorEx editorEx = super.createEditor();
+        JComponent component = editorEx.getComponent();
         component.setBorder(JBUI.Borders.empty(4, 0, 3, 6));
-        component.setOpaque(false);
-        editor.setBackgroundColor(UIUtil.getTextFieldBackground());
-        return editor;
+        return editorEx;
     }
 
     private void addHistory(String text) {
