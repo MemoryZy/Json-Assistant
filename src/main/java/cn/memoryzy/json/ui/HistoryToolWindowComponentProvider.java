@@ -44,10 +44,7 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -119,9 +116,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private JComponent createToolbar(SimpleToolWindowPanel windowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new AddHistoryAction());
-        actionGroup.add(new RemoveHistoryAction());
-        actionGroup.add(new EditHistoryAction());
+        actionGroup.add(new AddHistoryAction(this));
+        actionGroup.add(new RemoveHistoryAction(this));
+        actionGroup.add(new EditHistoryAction(this));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, true);
         toolbar.setTargetComponent(windowPanel);
@@ -146,6 +143,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private JComponent createSecondComponent() {
+        // 名称编辑器
         namePanel.addToCenter(nameTextField);
         namePanel.setBorder(JBUI.Borders.empty(2, 0, 5, 0));
 
@@ -158,6 +156,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         updateButtonPanel.add(Box.createHorizontalStrut(2)); // 按钮间距
         updateButtonPanel.add(cancelButton);
         updateButtonPanel.setBorder(JBUI.Borders.empty(5, 0, 5, 8));
+
+        // 默认隐藏
+        namePanel.setVisible(false);
+        updateButtonPanel.setVisible(false);
 
         return new BorderLayoutPanel()
                 .addToTop(namePanel)
@@ -317,7 +319,28 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return HistoryDisplayMode.LIST == mode ? UIUtils.HISTORY_LIST_CARD_NAME : UIUtils.HISTORY_TREE_CARD_NAME;
     }
 
+    @SuppressWarnings("DataFlowIssue")
+    public void executeEditAction(boolean isUpdate) {
+//        // 获取当前显示的样式
+//        HistoryDisplayMode mode = historyState.getHistoryDisplayMode();
+//        // 获取选中的元素
+//        JsonRecord record;
+//        if (HistoryDisplayMode.LIST == mode) {
+//            record = showList.getSelectedValue();
+//        } else {
+//            HistoryTreeNode2 treeNode = (HistoryTreeNode2) showTree.getSelectionPath().getLastPathComponent();
+//            record = treeNode.getValue();
+//        }
+
+        displayEditView(isUpdate);
+    }
+
+
+
+
     // TODO 当用户选择 “指定名称” 时，打开此工具窗，打开更新页面，定位到指定记录，并且把焦点放在名称编辑器上
+
+    // TODO 还差一个导入按钮，或者不要也可以
 
     // ----------------------------------- 逻辑 -----------------------------------
 
@@ -325,7 +348,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     }
 
-    private void displayEditView() {
+    private void displayEditView(boolean isUpdate) {
+        // 展示编辑框和按钮
+        namePanel.setVisible(true);
+        updateButtonPanel.setVisible(true);
 
     }
 
