@@ -1,6 +1,8 @@
 package cn.memoryzy.json.ui.editor;
 
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.JBUI;
@@ -30,5 +32,12 @@ public class ModernTextFieldWithAutoCompletion extends TextFieldWithAutoCompleti
         component.setOpaque(false);
         editor.setBackgroundColor(UIUtil.getTextFieldBackground());
         return editor;
+    }
+
+    public void globalSchemeChange() {
+        EditorImpl editor = (EditorImpl) getEditor();
+        if (null == editor) return;
+        editor.getComponent().setBackground(UIUtil.getTextFieldBackground());
+        UIUtils.repaintEditor(editor);
     }
 }

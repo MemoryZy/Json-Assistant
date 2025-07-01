@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.toolwindow.history;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -13,8 +14,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AddHistoryAction extends DumbAwareAction implements UpdateInBackground {
 
-    public AddHistoryAction() {
+    private final HistoryToolWindowComponentProvider provider;
+
+    public AddHistoryAction(HistoryToolWindowComponentProvider provider) {
         super(JsonAssistantBundle.messageOnSystem("action.add.history.text"), null, IconUtil.getAddIcon());
+        this.provider = provider;
     }
 
     @Override

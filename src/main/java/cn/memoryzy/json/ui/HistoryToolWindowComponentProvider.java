@@ -18,6 +18,7 @@ import cn.memoryzy.json.service.persistent.v2.HistoryManager;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.node.HistoryTreeNode2;
 import cn.memoryzy.json.ui.panel.AutoCompleteWrapper;
+import cn.memoryzy.json.ui.panel.EditWrapper;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIUtils;
@@ -27,11 +28,15 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.colors.EditorColorsListener;
+import com.intellij.openapi.editor.colors.EditorColorsManager;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
@@ -42,13 +47,16 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
+import java.awt.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -56,7 +64,7 @@ import java.util.stream.Collectors;
  * @author Memory
  * @since 2025/6/26
  */
-public class HistoryToolWindowComponentProvider implements Disposable {
+public class HistoryToolWindowComponentProvider implements Disposable, EditorColorsListener {
 
     /**
      * 分割比例持久化
@@ -75,10 +83,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private final Tree showTree;
 
     // ----------------------- right
-    private final EditorTextField nameTextField;
-    private final BorderLayoutPanel namePanel;
     private final Editor recordEditor;
-    private final JPanel updateButtonPanel;
+    private final JPanel updatePanel;
+    private final EditWrapper nameEditorWrapper;
     private final JButton addButton;
     private final JButton updateButton;
     private final JButton cancelButton;
@@ -97,12 +104,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         // ----------------------- right
         this.recordEditor = createJsonEditor();
-        this.nameTextField = createNameTextField();
-        this.namePanel = new BorderLayoutPanel();
+        this.nameEditorWrapper = new EditWrapper(project);
         this.addButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.add.button"));
         this.updateButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.update.button"));
         this.cancelButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.cancel.button"));
-        this.updateButtonPanel = new JPanel();
+        this.updatePanel = new JPanel(new GridBagLayout());
     }
 
     public JComponent createComponent() {
@@ -119,9 +125,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private JComponent createToolbar(SimpleToolWindowPanel windowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new AddHistoryAction());
-        actionGroup.add(new RemoveHistoryAction());
-        actionGroup.add(new EditHistoryAction());
+        actionGroup.add(new AddHistoryAction(this));
+        actionGroup.add(new RemoveHistoryAction(this));
+        actionGroup.add(new EditHistoryAction(this));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, true);
         toolbar.setTargetComponent(windowPanel);
@@ -140,29 +146,45 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         cardLayout.show(cardPanel, getViewMode(historyState.getHistoryDisplayMode()));
 
         registerConfigurationUpdateEventHandlers();
+        registerGlobalSchemeChangeEventHandlers();
 
         // TODO 当点击修改按钮时，把列表隐藏，展示一个输入框、一个编辑器，在其中编辑名称及json，还有一个按钮
         return new BorderLayoutPanel().addToTop(completeWrapper).addToCenter(cardPanel);
     }
 
     private JComponent createSecondComponent() {
-        namePanel.addToCenter(nameTextField);
-        namePanel.setBorder(JBUI.Borders.empty(2, 0, 5, 0));
-
-        // 指定按钮位置
-        updateButtonPanel.setLayout(new BoxLayout(updateButtonPanel, BoxLayout.X_AXIS));
-        updateButtonPanel.add(Box.createHorizontalGlue()); // 左侧胶水撑开空间
-        updateButtonPanel.add(addButton);
-        updateButtonPanel.add(Box.createHorizontalStrut(2)); // 按钮间距
-        updateButtonPanel.add(updateButton);
-        updateButtonPanel.add(Box.createHorizontalStrut(2)); // 按钮间距
-        updateButtonPanel.add(cancelButton);
-        updateButtonPanel.setBorder(JBUI.Borders.empty(5, 0, 5, 8));
+        configureUpdatePanel();
 
         return new BorderLayoutPanel()
-                .addToTop(namePanel)
                 .addToCenter(recordEditor.getComponent())
-                .addToBottom(updateButtonPanel);
+                .addToBottom(updatePanel);
+    }
+
+    private void configureUpdatePanel() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = JBUI.insets(3); // 组件间距
+
+        // 1. 左侧输入框（占据剩余空间）
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0; // 关键：水平权重
+        updatePanel.add(nameEditorWrapper, gbc);
+
+        // 2. 右侧按钮组（留出右侧空间）
+        gbc.gridx = 1;
+        gbc.weightx = 0; // 重置权重
+        JPanel buttonGroup = new JPanel(new FlowLayout(FlowLayout.TRAILING, 3, 0));
+        buttonGroup.add(addButton);
+        buttonGroup.add(updateButton);
+        buttonGroup.add(cancelButton);
+        buttonGroup.setBorder(JBUI.Borders.emptyRight(8)); // 右侧15px空隙
+        updatePanel.add(buttonGroup, gbc);
+
+        updatePanel.setBorder(JBUI.Borders.empty(5, 0, 3, 0));
+
+        // 默认隐藏
+        updatePanel.setVisible(false);
     }
 
     private JScrollPane createListScrollPane() {
@@ -219,6 +241,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private void registerConfigurationUpdateEventHandlers() {
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
+    }
+
+    private void registerGlobalSchemeChangeEventHandlers() {
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) this);
     }
 
     private void applyViewMode(HistoryDisplayMode mode) {
@@ -279,9 +305,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 设置显示的缩进导轨
         settings.setIndentGuidesShown(true);
         // 折叠块显示
-        settings.setFoldingOutlineShown(true);
+        settings.setFoldingOutlineShown(false);
         // 折叠块、行号所展示的区域
-        settings.setLineMarkerAreaShown(false);
+        settings.setLineMarkerAreaShown(true);
 
         ErrorStripeEditorCustomization.DISABLED.customize(editor);
         Objects.requireNonNull(SpellCheckingEditorCustomizationProvider.getInstance().getDisabledCustomization()).customize(editor);
@@ -294,7 +320,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         JComponent component = editor.getComponent();
         component.setFont(UIUtils.consolasFont(15));
-        component.setBorder(JBUI.Borders.customLine(editor.getBackgroundColor(), 0, 4, 0, 0));
 
         return editor;
     }
@@ -317,7 +342,26 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return HistoryDisplayMode.LIST == mode ? UIUtils.HISTORY_LIST_CARD_NAME : UIUtils.HISTORY_TREE_CARD_NAME;
     }
 
+    @SuppressWarnings("DataFlowIssue")
+    public void executeEditAction(boolean isUpdate) {
+//        // 获取当前显示的样式
+//        HistoryDisplayMode mode = historyState.getHistoryDisplayMode();
+//        // 获取选中的元素
+//        JsonRecord record;
+//        if (HistoryDisplayMode.LIST == mode) {
+//            record = showList.getSelectedValue();
+//        } else {
+//            HistoryTreeNode2 treeNode = (HistoryTreeNode2) showTree.getSelectionPath().getLastPathComponent();
+//            record = treeNode.getValue();
+//        }
+
+        displayEditView(isUpdate);
+    }
+
+
     // TODO 当用户选择 “指定名称” 时，打开此工具窗，打开更新页面，定位到指定记录，并且把焦点放在名称编辑器上
+
+    // TODO 还差一个导入按钮，或者不要也可以
 
     // ----------------------------------- 逻辑 -----------------------------------
 
@@ -325,8 +369,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     }
 
-    private void displayEditView() {
-
+    private void displayEditView(boolean isUpdate) {
+        // 展示编辑框和按钮
+        updatePanel.setVisible(true);
     }
 
     private void dismissEditView() {
@@ -334,8 +379,15 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     @Override
+    public void globalSchemeChange(@Nullable EditorColorsScheme scheme) {
+        if (null == scheme) return;
+        completeWrapper.globalSchemeChange();
+    }
+
+    @Override
     public void dispose() {
         EditorFactory.getInstance().releaseEditor(recordEditor);
+        Disposer.dispose(this);
     }
 
 }

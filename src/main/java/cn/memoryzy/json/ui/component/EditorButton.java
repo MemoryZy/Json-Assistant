@@ -11,9 +11,9 @@ import javax.swing.*;
  * @author Memory
  * @since 2024/12/29
  */
-public class SearchHistoryButton extends ActionButton {
+public class EditorButton extends ActionButton {
 
-    public SearchHistoryButton(AnAction action, boolean focusable) {
+    public EditorButton(AnAction action, boolean focusable) {
         super(action, action.getTemplatePresentation().clone(), ActionPlaces.UNKNOWN, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
         setLook(ActionButtonLook.INPLACE_LOOK);
         setFocusable(focusable);

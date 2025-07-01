@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.panel;
 
 import cn.memoryzy.json.action.query.ShowHistoryAction;
-import cn.memoryzy.json.ui.component.SearchHistoryButton;
+import cn.memoryzy.json.ui.component.EditorButton;
 import cn.memoryzy.json.ui.editor.SearchTextField2;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
@@ -30,7 +30,7 @@ public class SearchWrapper extends TransparentContainer {
 
     private void initComponents(Supplier<String> propertyNameSupplier) {
         ShowHistoryAction showHistoryAction = new ShowHistoryAction(this, searchTextField2, propertyNameSupplier);
-        SearchHistoryButton searchHistoryButton = new SearchHistoryButton(showHistoryAction, false);
+        EditorButton searchHistoryButton = new EditorButton(showHistoryAction, false);
 
         JPanel historyButtonWrapper = new NonOpaquePanel(new BorderLayout());
         historyButtonWrapper.setBorder(JBUI.Borders.empty(3, 6));
@@ -44,5 +44,7 @@ public class SearchWrapper extends TransparentContainer {
     public void clearSearchText() {
         searchTextField2.setText("");
     }
+
+
 
 }

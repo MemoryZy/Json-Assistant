@@ -1,11 +1,10 @@
 package cn.memoryzy.json.ui.panel;
 
 import cn.memoryzy.json.action.query.ShowHistoryAction;
-import cn.memoryzy.json.ui.component.SearchHistoryButton;
+import cn.memoryzy.json.ui.component.EditorButton;
 import cn.memoryzy.json.ui.editor.ModernTextFieldWithAutoCompletion;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.util.ui.JBUI;
 
@@ -20,7 +19,7 @@ import java.util.function.Supplier;
  */
 public class AutoCompleteWrapper extends TransparentContainer {
 
-    private final TextFieldWithAutoCompletion<String> completion;
+    private final ModernTextFieldWithAutoCompletion completion;
 
     public AutoCompleteWrapper(Project project, Collection<String> variants, Supplier<String> propertyNameSupplier) {
         super(new BorderLayout());
@@ -30,7 +29,7 @@ public class AutoCompleteWrapper extends TransparentContainer {
 
     private void initComponents(Supplier<String> propertyNameSupplier) {
         ShowHistoryAction showHistoryAction = new ShowHistoryAction(this, completion, propertyNameSupplier);
-        SearchHistoryButton searchHistoryButton = new SearchHistoryButton(showHistoryAction, false);
+        EditorButton searchHistoryButton = new EditorButton(showHistoryAction, false);
 
         JPanel historyButtonWrapper = new NonOpaquePanel(new BorderLayout());
         historyButtonWrapper.setBorder(JBUI.Borders.empty(3, 6));
@@ -47,6 +46,10 @@ public class AutoCompleteWrapper extends TransparentContainer {
 
     public void setVariants(Collection<String> variants) {
         completion.setVariants(variants);
+    }
+
+    public void globalSchemeChange() {
+        completion.globalSchemeChange();
     }
 
 }

@@ -27,6 +27,8 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.editor.colors.EditorColorsListener;
+import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -43,6 +45,7 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.apache.commons.lang3.ArrayUtils;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,7 +56,7 @@ import java.util.function.Supplier;
  * @author Memory
  * @since 2024/12/17
  */
-public class JsonQueryComponentProvider implements Disposable {
+public class JsonQueryComponentProvider implements Disposable, EditorColorsListener {
 
     public static final String SPLITTER_PROPORTION_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SplitterProportionKey";
     public static final Key<Boolean> QUERY_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".QueryEditorFlag");
@@ -289,4 +292,8 @@ public class JsonQueryComponentProvider implements Disposable {
         });
     }
 
+    @Override
+    public void globalSchemeChange(@Nullable EditorColorsScheme scheme) {
+
+    }
 }

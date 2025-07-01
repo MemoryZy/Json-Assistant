@@ -218,7 +218,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         JComponent component = currentEditor.getComponent();
         component.setFont(UIUtils.consolasFont(15));
-        component.setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
 
         // 切换软换行状态
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
@@ -329,8 +328,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
                 currentEditor.setColorsScheme(new EditorBackgroundScheme(defaultColorsScheme, newColor));
             }
         }
-
-        currentEditor.getComponent().setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
     }
 
 

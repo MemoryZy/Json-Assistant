@@ -86,6 +86,7 @@ public class JsonAssistantIcons {
         public static final Icon SWITCH = load("/icons/toolwindow/switch.svg");
         public static final Icon TEXT = load("/icons/toolwindow/text.svg");
         public static final Icon GRID = load("/icons/toolwindow/grid.svg");
+        public static final Icon EDIT = load("/icons/toolwindow/edit.svg");
 
     }
 
