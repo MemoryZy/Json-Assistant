@@ -48,8 +48,4 @@ public class AutoCompleteWrapper extends TransparentContainer {
         completion.setVariants(variants);
     }
 
-    public void globalSchemeChange() {
-        completion.globalSchemeChange();
-    }
-
 }

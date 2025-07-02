@@ -30,7 +30,6 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
@@ -47,7 +46,6 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
@@ -56,15 +54,15 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @author Memory
  * @since 2025/6/26
  */
-public class HistoryToolWindowComponentProvider implements Disposable, EditorColorsListener {
+public class HistoryToolWindowComponentProvider implements Disposable {
 
     /**
      * 分割比例持久化
@@ -146,7 +144,6 @@ public class HistoryToolWindowComponentProvider implements Disposable, EditorCol
         cardLayout.show(cardPanel, getViewMode(historyState.getHistoryDisplayMode()));
 
         registerConfigurationUpdateEventHandlers();
-        registerGlobalSchemeChangeEventHandlers();
 
         // TODO 当点击修改按钮时，把列表隐藏，展示一个输入框、一个编辑器，在其中编辑名称及json，还有一个按钮
         return new BorderLayoutPanel().addToTop(completeWrapper).addToCenter(cardPanel);
@@ -241,10 +238,6 @@ public class HistoryToolWindowComponentProvider implements Disposable, EditorCol
 
     private void registerConfigurationUpdateEventHandlers() {
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
-    }
-
-    private void registerGlobalSchemeChangeEventHandlers() {
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) this);
     }
 
     private void applyViewMode(HistoryDisplayMode mode) {
@@ -378,11 +371,6 @@ public class HistoryToolWindowComponentProvider implements Disposable, EditorCol
 
     }
 
-    @Override
-    public void globalSchemeChange(@Nullable EditorColorsScheme scheme) {
-        if (null == scheme) return;
-        completeWrapper.globalSchemeChange();
-    }
 
     @Override
     public void dispose() {
