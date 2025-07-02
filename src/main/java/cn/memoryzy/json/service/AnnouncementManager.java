@@ -27,6 +27,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import org.jetbrains.annotations.NotNull;
@@ -51,8 +52,9 @@ public final class AnnouncementManager implements Disposable {
 
     private final Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
 
-    // TODO 需要注意的位置
     public void scheduleDelayedAnnouncement(@NotNull Project project) {
+        if (alarm.isDisposed() || project.isDisposed()) return;
+
         alarm.addRequest(() -> {
             if (!project.isDisposed()) {
                 showAnnouncement(project);
@@ -60,7 +62,9 @@ public final class AnnouncementManager implements Disposable {
         }, 2 * 60 * 1000);
     }
 
-    public static void showAnnouncement(@NotNull Project project) {
+    private void showAnnouncement(@NotNull Project project) {
+        NotificationScheduler scheduler = NotificationScheduler.getInstance();
+
         try {
             // 是否为中国区域
             boolean isChineseLocale = PlatformUtil.isChineseLocale();
@@ -83,14 +87,17 @@ public final class AnnouncementManager implements Disposable {
                     .collect(Collectors.toList());
 
             // 计划显示通知
-            NotificationScheduler.getInstance().addNotifications(notifications, AnnouncementManager::addReadNoticeRecord, project);
+            scheduler.addNotifications(notifications, this::addReadNoticeRecord, project);
 
         } catch (Exception e) {
             LOG.warn("[Json Assistant] The announcement shows an error.", e);
+        } finally {
+            Disposer.dispose(alarm);
+            scheduler.disposeAlarm();
         }
     }
 
-    private static Notification convertNotification(@NotNull Project project, Announcement announcement, boolean isChineseLocale) {
+    private Notification convertNotification(@NotNull Project project, Announcement announcement, boolean isChineseLocale) {
         // 目前只做中英双语
         Map<String, Announcement.LocaleContent> localeMap = announcement.getLocales();
 
@@ -108,7 +115,7 @@ public final class AnnouncementManager implements Disposable {
 
     @NotNull
     @SuppressWarnings("deprecation")
-    private static Notification getFullContentNotification(@NotNull Project project, Announcement announcement, Announcement.LocaleContent localizedNotice) {
+    private Notification getFullContentNotification(@NotNull Project project, Announcement announcement, Announcement.LocaleContent localizedNotice) {
         String title = localizedNotice.getTitle();
         String content = localizedNotice.getContent();
         content = HtmlConstant.wrapBody(content);
@@ -149,7 +156,7 @@ public final class AnnouncementManager implements Disposable {
         return notification;
     }
 
-    private static List<AnAction> collectActions(@NotNull Project project, Announcement announcement, List<Announcement.NoticeAction> noticeActions) {
+    private List<AnAction> collectActions(@NotNull Project project, Announcement announcement, List<Announcement.NoticeAction> noticeActions) {
         List<AnAction> actions = new ArrayList<>();
         if (CollUtil.isNotEmpty(noticeActions)) {
             for (Announcement.NoticeAction noticeAction : noticeActions) {
@@ -176,7 +183,7 @@ public final class AnnouncementManager implements Disposable {
     /**
      * 处理 URL 跳转
      */
-    public static AnAction createUrlAction(@NotNull Project project, String label, String url, Announcement.CommandType command, Announcement announcement) {
+    private AnAction createUrlAction(@NotNull Project project, String label, String url, Announcement.CommandType command, Announcement announcement) {
         Runnable call;
         if (Objects.nonNull(command) && Announcement.CommandType.UNKNOWN != command) {
             Runnable commandAction = createCommandAction(project, command, announcement);
@@ -197,13 +204,13 @@ public final class AnnouncementManager implements Disposable {
         return NotificationAction.createSimpleExpiring(label, call);
     }
 
-    public static AnAction createCommandAction(@NotNull Project project, String label, Announcement.CommandType command, Announcement announcement) {
+    private AnAction createCommandAction(@NotNull Project project, String label, Announcement.CommandType command, Announcement announcement) {
         Runnable commandAction = createCommandAction(project, command, announcement);
         if (null == commandAction) return null;
         return NotificationAction.createSimpleExpiring(label, commandAction);
     }
 
-    public static Runnable createCommandAction(@NotNull Project project, Announcement.CommandType command, Announcement announcement) {
+    private Runnable createCommandAction(@NotNull Project project, Announcement.CommandType command, Announcement announcement) {
         switch (command) {
             case UPDATE: {
                 // 打开插件页面，选中 Json Assistant 插件
@@ -232,7 +239,7 @@ public final class AnnouncementManager implements Disposable {
      *
      * @param announcementId 公告ID
      */
-    private static void addReadNoticeRecord(String announcementId) {
+    private void addReadNoticeRecord(String announcementId) {
         // 添加已读记录
         if (StrUtil.isBlank(announcementId)) return;
 
@@ -245,7 +252,7 @@ public final class AnnouncementManager implements Disposable {
                 .setLastShownTime(System.currentTimeMillis());
     }
 
-    private static void filterAnnouncements(List<Announcement> announcements) {
+    private void filterAnnouncements(List<Announcement> announcements) {
         // 当前时间
         LocalDate now = LocalDate.now();
         // 已读公告
@@ -273,7 +280,7 @@ public final class AnnouncementManager implements Disposable {
      *
      * @return 超出次数返回 true
      */
-    public static boolean isExceedDisplayLimit(Announcement announcement, Map<String, AnnouncementStats> announcementStatsMap) {
+    private boolean isExceedDisplayLimit(Announcement announcement, Map<String, AnnouncementStats> announcementStatsMap) {
         // 公告唯一标识
         String id = announcement.getId();
         // 展示次数
@@ -312,7 +319,7 @@ public final class AnnouncementManager implements Disposable {
      *
      * @return 当前时间超过过期时间返回 true
      */
-    public static boolean isNoticeExpired(Announcement announcement, LocalDate now) {
+    private boolean isNoticeExpired(Announcement announcement, LocalDate now) {
         Date expirationDate = announcement.getExpirationDate();
         // 若过期时间为空，则永不过期
         if (null == expirationDate) {
@@ -330,7 +337,7 @@ public final class AnnouncementManager implements Disposable {
      * @param currentVersion 当前插件版本
      * @return 版本不匹配返回true
      */
-    public static boolean isVersionMismatched(Announcement announcement, String currentVersion) {
+    private boolean isVersionMismatched(Announcement announcement, String currentVersion) {
         String versionConstraints = announcement.getVersionConstraints();
         if (StrUtil.isBlank(versionConstraints)) {
             return false;
@@ -344,7 +351,7 @@ public final class AnnouncementManager implements Disposable {
      *
      * @return 当前时间早于生效日期返回true
      */
-    public static boolean isNoticeNotEffective(Announcement announcement, LocalDate now) {
+    private boolean isNoticeNotEffective(Announcement announcement, LocalDate now) {
         Date effectiveDate = announcement.getEffectiveDate();
         // 若生效日期为空，则立即生效
         if (null == effectiveDate) {
@@ -358,8 +365,7 @@ public final class AnnouncementManager implements Disposable {
     /**
      * 拉取公告内容 (JSON)
      */
-    public static List<Announcement> fetchAnnouncements(boolean isChineseLocale) {
-        // TODO 需要注意的位置
+    private List<Announcement> fetchAnnouncements(boolean isChineseLocale) {
         String url = isChineseLocale
                 ? Urls.ANNOUNCEMENTS_SOURCE_GITEE_LINK
                 : Urls.ANNOUNCEMENTS_SOURCE_GITHUB_LINK;

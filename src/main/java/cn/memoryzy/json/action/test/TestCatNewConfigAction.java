@@ -48,7 +48,7 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         // colorSchemeChangedEvent.change(ColorScheme.Classic);
 
         HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
-        manager.convertAndShow();
+        manager.show();
 
 
 

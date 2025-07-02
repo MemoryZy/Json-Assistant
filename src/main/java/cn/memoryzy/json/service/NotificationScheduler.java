@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import com.intellij.util.Consumer;
@@ -41,6 +42,8 @@ public final class NotificationScheduler implements Disposable {
     }
 
     public void addNotifications(List<Notification> notifications, Consumer<String> consumer, @NotNull Project project) {
+        if (alarm.isDisposed()) return;
+
         // 直接操作队列（线程安全）
         notificationQueue.addAll(notifications);
         // 尝试立即显示（非阻塞）
@@ -121,6 +124,10 @@ public final class NotificationScheduler implements Disposable {
     private void handleEmptyQueue() {
         isShowing.set(false);
         alarm.cancelAllRequests(); // 彻底清理残留任务
+    }
+
+    public void disposeAlarm() {
+        Disposer.dispose(alarm);
     }
 
     @Override

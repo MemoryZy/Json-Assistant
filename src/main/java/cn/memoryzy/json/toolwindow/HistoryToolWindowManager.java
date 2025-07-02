@@ -64,6 +64,8 @@ public final class HistoryToolWindowManager implements Disposable {
         registerAction((ToolWindowEx) toolWindow);
         // 注册配置更新事件
         registerConfigurationUpdateEventHandlers();
+        // 添加默认 Content
+        createToolWindowContent(toolWindow);
 
         return toolWindow;
     }
@@ -84,14 +86,7 @@ public final class HistoryToolWindowManager implements Disposable {
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryToggleEvent.TOPIC, (HistoryToggleEvent) this::setToolWindowAvailable);
     }
 
-    public void convertAndShow() {
-        // 创建标签页
-        createToolWindowContent();
-        // 展示
-        show();
-    }
-
-    private void show() {
+    public void show() {
         if (!toolWindow.isAvailable()) {
             toolWindow.setAvailable(true);
         }
@@ -100,7 +95,7 @@ public final class HistoryToolWindowManager implements Disposable {
         toolWindow.show();
     }
 
-    private void createToolWindowContent() {
+    private void createToolWindowContent(ToolWindow toolWindow) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ContentManager contentManager = toolWindow.getContentManager();
 

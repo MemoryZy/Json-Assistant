@@ -150,7 +150,7 @@ public class ToolWindowUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType, false);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType);
         Content content = contentFactory.createContent(window.createComponent(), displayName, false);
         content.setDisposer(window);
         contentManager.addContent(content, contentCount);

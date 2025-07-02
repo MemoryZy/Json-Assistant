@@ -30,10 +30,10 @@ import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
@@ -233,12 +233,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return UIUtils.wrapScrollPane(showTree);
     }
 
-    private EditorTextField createNameTextField() {
-        EditorTextField editorTextField = new EditorTextField(project, PlainTextFileType.INSTANCE);
-        editorTextField.setPlaceholder("Name");
-        return editorTextField;
-    }
-
     private void registerConfigurationUpdateEventHandlers() {
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
     }
@@ -368,12 +362,23 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private void displayEditView(boolean isUpdate) {
         // 展示编辑框和按钮
         updatePanel.setVisible(true);
-        updateButton.setVisible(true);
 
+        if (isUpdate) {
+            updateButton.setVisible(true);
+            IdeFocusManager.findInstance().requestFocus(updateButton, true);
+        } else {
+            addButton.setVisible(true);
+            IdeFocusManager.findInstance().requestFocus(addButton, true);
+        }
 
+        showList.setEnabled(false);
+        showTree.setEnabled(false);
     }
 
     private void dismissEditView() {
+        updatePanel.setVisible(false);
+        addButton.setVisible(false);
+        updateButton.setVisible(false);
 
     }
 

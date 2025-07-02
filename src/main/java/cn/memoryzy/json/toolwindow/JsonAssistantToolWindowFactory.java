@@ -56,7 +56,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
         // 主界面
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON5, true);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON5);
 
         // 补充工具窗口的操作栏
         toolWindowEx.setTabActions(createTabActions(contentFactory, toolWindowEx));

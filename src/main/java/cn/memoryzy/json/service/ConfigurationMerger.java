@@ -61,7 +61,8 @@ public final class ConfigurationMerger {
             mergeSerializationLegacySettings();
             mergeBlacklistLegacyData();
             // 删除旧配置文件
-//            deleteLegacyPluginSettingsFile();
+            deleteLegacyPluginSettingsFile();
+            deleteLegacyBlacklistPersistentFile();
         } catch (Exception e) {
             LOG.warn("[Json Assistant] An exception occurred when merging the old configuration", e);
         }
@@ -70,6 +71,7 @@ public final class ConfigurationMerger {
     public void mergeProjectLegacySettings(Project project) {
         try {
             mergeHistoryLegacySettings(project);
+            deleteLegacyHistoryPersistentFile(project);
         } catch (Exception e) {
             LOG.warn("[Json Assistant] An exception occurred when merging the old project configuration", e);
         }

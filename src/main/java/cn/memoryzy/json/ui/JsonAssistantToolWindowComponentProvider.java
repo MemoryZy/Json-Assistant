@@ -4,22 +4,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.DataTypeConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.ColorSchemeChangedEvent;
 import cn.memoryzy.json.event.FoldingOutlineToggleEvent;
 import cn.memoryzy.json.event.LineNumbersToggleEvent;
-import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
-import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
-import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
-import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
-import cn.memoryzy.json.service.persistent.state.JsonEntry;
 import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.v2.EditorVisualState;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
@@ -27,20 +19,14 @@ import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import cn.memoryzy.json.service.persistent.v2.HistoryManager;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
-import cn.memoryzy.json.ui.dialog.ManuallySaveHistoryDialog;
-import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
 import cn.memoryzy.json.ui.listener.EditorLineChangeMonitor;
 import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.*;
-import com.google.common.collect.Lists;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.notification.NotificationAction;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
@@ -49,7 +35,6 @@ import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.actions.AbstractToggleUseSoftWrapsAction;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.fileTypes.FileType;
@@ -60,8 +45,6 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
@@ -71,10 +54,6 @@ import com.intellij.util.ui.JBUI;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
@@ -84,14 +63,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
     public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
+    public static final String HISTORY_ADD_JUMP_KEY = "ADD";
+    public static final String HISTORY_EXIST_JUMP_KEY = "EXIST";
 
     private final Project project;
-    private final boolean isInitialTab;
-
-    private final JsonHistoryPersistentState historyState;
     private final EditorBehaviorState behaviorState;
     private final EditorVisualState visualState;
-    private final HistoryState historyOptionState;
+    private final HistoryState historyState;
     private final HistoryManager historyManager;
 
     /**
@@ -104,20 +82,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
      */
     private Content currentContent;
 
-    // TODO 这个必须改，不然线程池太多
-    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-    private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
 
-    public JsonAssistantToolWindowComponentProvider(Project project, FileType fileType, boolean isInitialTab) {
+    public JsonAssistantToolWindowComponentProvider(Project project, FileType fileType) {
         this.project = project;
-        this.isInitialTab = isInitialTab;
-        // TODO 待修改
-        this.historyState = JsonHistoryPersistentState.getInstance(project);
-
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         this.behaviorState = toolWindowSettings.getBehaviorState();
         this.visualState = toolWindowSettings.getVisualState();
-        this.historyOptionState = toolWindowSettings.getHistoryState();
+        this.historyState = toolWindowSettings.getHistoryState();
         this.historyManager = HistoryManager.getInstance(project);
         // 创建编辑器
         this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType, false, EditorKind.MAIN_EDITOR, "");
@@ -228,14 +199,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     }
 
     private void configureEditorBehavior() {
-        MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(behaviorState, historyOptionState, historyManager);
+        MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(behaviorState, historyState, historyManager);
         Disposer.register(this, focusMonitor);
 
         currentEditor.addFocusListener(focusMonitor);
         currentEditor.getDocument().addDocumentListener(new EditorLineChangeMonitor(currentEditor));
 
         DumbAwareAction.create(event -> {
-            if (historyOptionState.isEnableHistory() && !historyOptionState.isAutoRecordHistory()) {
+            if (historyState.isEnableHistory() && !historyState.isAutoRecordHistory()) {
                 // 手动储存历史记录
                 saveHistoryManually();
             }
@@ -332,8 +303,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
 
     private void saveHistoryManually() {
-        // TODO 手动保存的话，可以通过toolwindow.notifyBallon的方式提醒是否要加名字
-
         // 获取编辑器内容
         String content = StrUtil.trim(currentEditor.getDocument().getText());
         // 检查内容有效性
@@ -354,197 +323,44 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         if (null == wrapper || wrapper.noItems()) return;
 
-        // 手动保存
+        // 查找
         JsonRecord record = historyManager.find(wrapper);
         // 判断是否为新增
-        boolean isAdd = null == record;
+        boolean isAdd = (null == record);
+        // 提示信息
+        String message;
 
         if (isAdd) {
             // 新增
-            historyManager.addEntry(record = new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+            historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+            message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_ADD_JUMP_KEY);
+        } else {
+            message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_EXIST_JUMP_KEY);
         }
 
+        // 提示粘贴成功的消息
+        ToolWindowManager.getInstance(project).notifyByBalloon(
+                PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
+                MessageType.INFO,
+                message,
+                null,
+                e -> {
+                    String url = e.getDescription();
+                    if (Objects.equals(HISTORY_ADD_JUMP_KEY, url)) {
+                        // TODO 打开历史记录窗口，展示刚添加的记录，给名称编辑器指定焦点
 
+                    } else if (Objects.equals(HISTORY_EXIST_JUMP_KEY, url)) {
+                        // TODO 打开历史记录窗口，展示这条重复记录，给名称编辑器指定焦点
 
-
-        // 若已存在此记录，则更新其updateTime，以及后续指定名称
-
-
-
-        // TODO 最简单的是只新增，不修改历史记录内容，碰到相同名的、相同结构的直接提醒
-
-        // TODO 把历史记录做成一个toolwindow，这样看着更直观（看看是底部还是侧边）
-
-    }
-
-
-    private void pasteJsonToEditor() {
-        if (isInitialTab && behaviorState.isAutoRecognizeFormats()) {
-            String text = currentEditor.getDocument().getText();
-            if (StrUtil.isBlank(text)) {
-                String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
-                if (StrUtil.isNotBlank(clipboard)) {
-                    // 尝试不同格式数据策略
-                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
-                    String jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
-
-                    if (StrUtil.isNotBlank(jsonStr)) {
-                        ClipboardTextConversionStrategy strategy = context.getStrategy();
-                        JsonWrapper wrapper;
-                        String formattedStr;
-                        if (strategy instanceof Json5ConversionStrategy) {
-                            wrapper = Json5Util.parse(jsonStr);
-                            formattedStr = Json5Util.formatJson5(jsonStr);
-                        } else {
-                            wrapper = JsonUtil.parse(jsonStr);
-                            formattedStr = JsonUtil.formatJson(jsonStr);
-                        }
-
-                        // 过滤
-                        if ((wrapper != null && wrapper.noItems()) || PreviewClipboardDataDialog.existsInBlacklist(wrapper)) {
-                            return;
-                        }
-
-                        String type = strategy.type();
-                        if (behaviorState.isShouldPromptBeforeImport()) {
-                            new PreviewClipboardDataDialog(project, currentEditor, type, formattedStr, clipboard).show();
-                        } else {
-                            WriteCommandAction.runWriteCommandAction(project, () -> {
-                                boolean isJson5 = DataTypeConstant.JSON5.equals(type);
-                                DocumentEx document = currentEditor.getDocument();
-                                PsiFile psiFile = PlatformUtil.getPsiFile(project, document);
-
-                                PlatformUtil.setDocumentText(document, isJson5 ? clipboard : formattedStr);
-                                CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength());
-                            });
-
-                            // 提示粘贴成功的消息
-                            ToolWindowManager.getInstance(project).notifyByBalloon(
-                                    PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
-                                    MessageType.INFO,
-                                    JsonAssistantBundle.messageOnSystem("hint.paste.json"));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    private void scheduleDebouncedAction() {
-        // 取消之前的任务
-        cancelPendingTask();
-
-        // 提交新任务（500ms防抖窗口）
-        ScheduledFuture<?> newTask = executor.schedule(() ->
-                        SwingUtilities.invokeLater(() -> performAction(true)),
-                3000, TimeUnit.MILLISECONDS
-        );
-
-        pendingTask.set(newTask);
-    }
-
-
-    private void performAction(boolean auto) {
-        HistoryLimitedList historyList = historyState.history;
-
-        boolean isJson5 = false;
-        String text = StrUtil.trim(currentEditor.getDocument().getText());
-        JsonWrapper jsonWrapper = null;
-        if (JsonUtil.isJson(text)) {
-            jsonWrapper = JsonUtil.parse(text);
-
-        } else if (Json5Util.isJson5(text)) {
-            isJson5 = true;
-            jsonWrapper = Json5Util.parse(text);
-            // 由这里再进行格式化（不可避免会去掉一些Array上的注释）
-            text = Json5Util.formatJson5WithComment(text);
-        }
-
-        if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
-            // 判断之前是否存在此数据
-            JsonEntry oldEntry = historyList.filterItem(jsonWrapper);
-            String oldName = (null == oldEntry) ? "" : oldEntry.getName();
-
-            // 保存（如果之前存在，则会将之前的删除，并顶到第一位，不存在则新建）
-            JsonEntry newEntry = isJson5 ? historyList.add(project, jsonWrapper, text) : historyList.add(project, jsonWrapper);
-
-            if (!auto) {
-                NotificationAction skipAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.skip.text"), () -> {
-                });
-                NotificationAction assignNameAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.assign.name.text"), () -> {
-                    // 当点击指定名称选项时，弹出窗口，要求填写名称
-                    ManuallySaveHistoryDialog dialog = new ManuallySaveHistoryDialog(project, historyList, oldName);
-                    if (dialog.showAndGet()) {
-                        String newName = dialog.getNewName();
-                        newEntry.setName(newName);
-
-                        // 判断新名称是否与原来的名称一样，若是，则删掉原来的（排除新存储的记录）
-                        JsonEntry jsonEntry = historyList.stream()
-                                .filter(el -> Objects.equals(el.getName(), newName) && !Objects.equals(el.getId(), newEntry.getId()))
-                                .findFirst()
-                                .orElse(null);
-
-                        if (Objects.nonNull(jsonEntry)) {
-                            historyList.removeById(jsonEntry.getId());
-                        }
-
-                        // 1.数据相同，原名存在，更改后
-                        // 2.数据不同，名字存在，覆盖后
-                        // 3.新增，赋名
-                        String tipContent;
-                        if (Objects.isNull(oldEntry)) {
-                            // 新增记录并赋予名称
-                            tipContent = JsonAssistantBundle.messageOnSystem("hint.new.recordName");
-
-                        } else if (!StrUtil.equals(oldName, newName)) {
-                            // 数据相同，新旧名称不同
-                            tipContent = JsonAssistantBundle.messageOnSystem("hint.update.recordName");
-
-                        } else {
-                            // 数据不同，名字相同，把旧数据覆盖
-                            tipContent = JsonAssistantBundle.messageOnSystem("hint.update.recordData");
-                        }
-
-                        // 提示
-                        ToolWindowManager.getInstance(project).notifyByBalloon(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, MessageType.INFO, tipContent);
                     }
                 });
-
-                // 通知
-                Notifications.showNotification(
-                        null,
-                        JsonAssistantBundle.messageOnSystem("notification.save.history.content"),
-                        NotificationType.INFORMATION,
-                        Lists.newArrayList(assignNameAction, skipAction),
-                        project);
-            }
-        }
     }
 
-
-    private void cancelPendingTask() {
-        ScheduledFuture<?> task = pendingTask.getAndSet(null);
-        if (task != null && !task.isDone()) {
-            task.cancel(false);
-        }
-    }
 
     @Override
     public void dispose() {
         EditorFactory.getInstance().releaseEditor(currentEditor);
-        // 清理资源
-        cancelPendingTask();
-        executor.shutdownNow();
-        try {
-            if (!executor.awaitTermination(500, TimeUnit.MILLISECONDS)) {
-                LOG.error("[Json Assistant] The Executor does not shut down properly");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
-
 
     public Content getCurrentContent() {
         return currentContent;
