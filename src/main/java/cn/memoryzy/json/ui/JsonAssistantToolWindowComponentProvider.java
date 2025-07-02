@@ -9,6 +9,7 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.ColorSchemeChangedEvent;
 import cn.memoryzy.json.event.FoldingOutlineToggleEvent;
+import cn.memoryzy.json.event.HistoryAddedEvent;
 import cn.memoryzy.json.event.LineNumbersToggleEvent;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
@@ -27,6 +28,7 @@ import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
@@ -343,6 +345,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         if (isAdd) {
             // 新增
             historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+            // 触发事件
+            ApplicationManager.getApplication().getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
             message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_ADD_JUMP_KEY);
         } else {
             message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_EXIST_JUMP_KEY);

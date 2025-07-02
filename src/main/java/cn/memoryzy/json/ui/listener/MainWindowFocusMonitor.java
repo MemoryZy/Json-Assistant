@@ -2,6 +2,7 @@ package cn.memoryzy.json.ui.listener;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.DataFormatType;
+import cn.memoryzy.json.event.HistoryAddedEvent;
 import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
@@ -130,6 +131,8 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
 
         // 自动保存的话，无需指定名称
         historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+        // 触发事件
+        ApplicationManager.getApplication().getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
     }
 
     /**

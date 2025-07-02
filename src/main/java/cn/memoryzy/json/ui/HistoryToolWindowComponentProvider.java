@@ -11,6 +11,7 @@ import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
+import cn.memoryzy.json.event.HistoryAddedEvent;
 import cn.memoryzy.json.event.HistoryViewChangedEvent;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
@@ -46,8 +47,6 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.time.LocalDate;
@@ -117,6 +116,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         splitter.setFirstComponent(createFirstComponent());
         splitter.setSecondComponent(createSecondComponent());
 
+        // 注册配置更新事件
+        registerConfigurationUpdateEventHandlers();
+        // 注册历史记录添加事件
+        registerHistoryAddedEventHandlers();
+
         SimpleToolWindowPanel windowPanel = new SimpleToolWindowPanel(false, false);
         windowPanel.setToolbar(createToolbar(windowPanel));
         windowPanel.setContent(splitter);
@@ -145,9 +149,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 默认显示
         cardLayout.show(cardPanel, getViewMode(historyState.getHistoryDisplayMode()));
 
-        registerConfigurationUpdateEventHandlers();
-
-        // TODO 当点击修改按钮时，把列表隐藏，展示一个输入框、一个编辑器，在其中编辑名称及json，还有一个按钮
         return new BorderLayoutPanel().addToTop(completeWrapper).addToCenter(cardPanel);
     }
 
@@ -206,6 +207,12 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         });
         showList.addListSelectionListener(e -> refreshEditor(showList.getSelectedValue()));
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
+
+        // 将标准方向键（↑↓←→）、PageUp/PageDown、Home/End 等按键绑定到列表的滚动操作
+        ScrollingUtil.installActions(showList);
+        // 确保列表始终存在有效的选中项
+        ScrollingUtil.ensureSelectionExists(showList);
+        // 滚动包装
         return UIUtils.wrapScrollPane(showList);
     }
 
@@ -258,8 +265,24 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
     }
 
+    private void registerHistoryAddedEventHandlers() {
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryAddedEvent.TOPIC, (HistoryAddedEvent) this::refreshHistoryComponent);
+    }
+
     private void applyViewMode(HistoryDisplayMode mode) {
         cardLayout.show(cardPanel, getViewMode(mode));
+    }
+
+    private void refreshHistoryComponent() {
+        DefaultListModel<JsonRecord> model = (DefaultListModel<JsonRecord>) showList.getModel();
+        model.removeAllElements();
+
+        // 列表
+        List<JsonRecord> recentHistories = historyManager.getRecentHistories();
+        model.addAll(recentHistories);
+
+        // 树
+
     }
 
     private DefaultListModel<JsonRecord> createListModel() {
