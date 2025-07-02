@@ -26,7 +26,7 @@ public class ModernTextFieldWithAutoCompletion extends TextFieldWithAutoCompleti
         EditorEx editor = super.createEditor();
         editor.setBorder(JBUI.Borders.empty());
         JComponent component = editor.getComponent();
-        component.setBorder(JBUI.Borders.empty(4, 0, 3, 6));
+        component.setBorder(JBUI.Borders.empty(5, 0, 3, 6));
         component.setOpaque(false);
         editor.setBackgroundColor(UIUtil.getTextFieldBackground());
         return editor;

@@ -28,8 +28,6 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.editor.*;
-import com.intellij.openapi.editor.colors.EditorColorsListener;
-import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
@@ -102,7 +100,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         // ----------------------- right
         this.recordEditor = createJsonEditor();
-        this.nameEditorWrapper = new EditWrapper(project);
+        this.nameEditorWrapper = new EditWrapper(project, JsonAssistantBundle.messageOnSystem("toolwindow.history.edit.action.name"));
         this.addButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.add.button"));
         this.updateButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.update.button"));
         this.cancelButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.cancel.button"));
@@ -158,6 +156,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void configureUpdatePanel() {
+        nameEditorWrapper.setPlaceholder("Name");
+        nameEditorWrapper.setShowPlaceholderWhenFocused(true);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = JBUI.insets(3); // 组件间距
@@ -182,6 +183,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         // 默认隐藏
         updatePanel.setVisible(false);
+        addButton.setVisible(false);
+        updateButton.setVisible(false);
     }
 
     private JScrollPane createListScrollPane() {
@@ -365,6 +368,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private void displayEditView(boolean isUpdate) {
         // 展示编辑框和按钮
         updatePanel.setVisible(true);
+        updateButton.setVisible(true);
+
+
     }
 
     private void dismissEditView() {

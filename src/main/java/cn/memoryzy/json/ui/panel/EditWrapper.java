@@ -25,14 +25,14 @@ public class EditWrapper extends TransparentContainer {
 
     private final EditTextField editTextField;
 
-    public EditWrapper(Project project) {
+    public EditWrapper(Project project, String editActionName) {
         super(new BorderLayout());
         this.editTextField = new EditTextField(project, PlainTextFileType.INSTANCE);
-        this.initComponents();
+        this.initComponents(editActionName);
     }
 
-    private void initComponents() {
-        AnAction action = new AnAction("", null, JsonAssistantIcons.ToolWindow.EDIT) {
+    private void initComponents(String editActionName) {
+        AnAction action = new AnAction(editActionName, null, JsonAssistantIcons.ToolWindow.EDIT) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
             }
@@ -49,6 +49,13 @@ public class EditWrapper extends TransparentContainer {
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 1, 1, 1));
     }
 
+    public void setPlaceholder(String text) {
+        editTextField.setPlaceholder(text);
+    }
+
+    public void setShowPlaceholderWhenFocused(boolean flag) {
+        editTextField.setShowPlaceholderWhenFocused(flag);
+    }
 
     private static class EditTextField extends BorderlessEditorTextField {
         public EditTextField(Project project, FileType fileType) {
@@ -59,7 +66,7 @@ public class EditWrapper extends TransparentContainer {
         protected @NotNull EditorEx createEditor() {
             EditorEx editorEx = super.createEditor();
             JComponent component = editorEx.getComponent();
-            component.setBorder(JBUI.Borders.empty(4, 0, 3, 6));
+            component.setBorder(JBUI.Borders.empty(5, 0, 3, 6));
             return editorEx;
         }
     }
