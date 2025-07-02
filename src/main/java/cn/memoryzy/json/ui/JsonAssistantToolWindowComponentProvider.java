@@ -33,6 +33,7 @@ import com.intellij.openapi.editor.EditorKind;
 import com.intellij.openapi.editor.EditorSettings;
 import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.actions.AbstractToggleUseSoftWrapsAction;
+import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.ex.EditorEx;
@@ -50,6 +51,7 @@ import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,7 +61,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonAssistantToolWindowComponentProvider implements Disposable {
+public class JsonAssistantToolWindowComponentProvider implements Disposable, EditorColorsListener {
 
     private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
     public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
@@ -101,6 +103,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         configureEditorBehavior();
         // 注册配置更新事件的处理器
         registerConfigurationUpdateEventHandlers();
+        // 注册主题更新事件的处理器
+        registerGlobalThemeChangedEventHandlers();
 
         // 主面板（携带工具栏）
         SimpleToolWindowPanel toolWindowPanel = new SimpleToolWindowPanel(false, false);
@@ -114,6 +118,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         toolWindowPanel.setProvideQuickActions(true);
         return toolWindowPanel;
     }
+
 
     private JsonAssistantToolWindowPanel createRootPanel(SimpleToolWindowPanel simpleToolWindowPanel, CombineCardLayout cardLayout, JPanel cardPanel) {
         JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, getStructureSetting());
@@ -189,6 +194,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
 
         JComponent component = currentEditor.getComponent();
         component.setFont(UIUtils.consolasFont(15));
+        component.setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
 
         // 切换软换行状态
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
@@ -224,6 +230,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
         ToolWindowUtil.APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
+    }
+
+    private void registerGlobalThemeChangedEventHandlers() {
+        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) this);
     }
 
     public JComponent createToolbar(SimpleToolWindowPanel toolWindowPanel) {
@@ -357,11 +367,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
     }
 
 
-    @Override
-    public void dispose() {
-        EditorFactory.getInstance().releaseEditor(currentEditor);
-    }
-
     public Content getCurrentContent() {
         return currentContent;
     }
@@ -374,4 +379,13 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         return new StructureSetting().setNeedBorder(false).setNeedToolbar(true).setExpandLevel(3);
     }
 
+    @Override
+    public void globalSchemeChange(@Nullable EditorColorsScheme scheme) {
+        currentEditor.getComponent().setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
+    }
+
+    @Override
+    public void dispose() {
+        EditorFactory.getInstance().releaseEditor(currentEditor);
+    }
 }

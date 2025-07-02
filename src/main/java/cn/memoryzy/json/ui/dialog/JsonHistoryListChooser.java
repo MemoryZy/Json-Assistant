@@ -78,9 +78,12 @@ public class JsonHistoryListChooser extends DialogWrapper {
         showList = new JBList<>(fillHistoryListModel());
         showList.setFont(UIUtils.jetBrainsMonoFont(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
+
         showList.setCellRenderer(new StyleListCellRenderer());
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
+
         showList.addMouseListener(new ListRightClickPopupMenuMouseAdapter(showList, buildRightMousePopupMenu()));
 
         // 初始化鼠标左键双击事件

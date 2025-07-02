@@ -27,13 +27,13 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
@@ -46,10 +46,9 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -85,6 +84,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private final JButton addButton;
     private final JButton updateButton;
     private final JButton cancelButton;
+
+    /**
+     * 刷新编辑器光标
+     */
+    private int lastLineCount = 0;
 
     public HistoryToolWindowComponentProvider(Project project) {
         this.project = project;
@@ -200,6 +204,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
             }
         });
+        showList.addListSelectionListener(e -> refreshEditor(showList.getSelectedValue()));
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
         return UIUtils.wrapScrollPane(showList);
     }
@@ -229,7 +234,23 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             }
         });
 
-        new TreeSpeedSearch(showTree);
+        showTree.addTreeSelectionListener(e -> {
+            TreePath selectionPath = showTree.getSelectionPath();
+            if (selectionPath != null) {
+                HistoryTreeNode2 treeNode = (HistoryTreeNode2) selectionPath.getLastPathComponent();
+                if (HistoryTreeNodeType.GROUP.equals(treeNode.getNodeType())) {
+                    WriteCommandAction.runWriteCommandAction(project, () -> {
+                        Document document = recordEditor.getDocument();
+                        PlatformUtil.setDocumentText(document, "");
+                        refreshDocument(document);
+                    });
+
+                } else {
+                    refreshEditor(treeNode.getValue());
+                }
+            }
+        });
+
         return UIUtils.wrapScrollPane(showTree);
     }
 
@@ -365,10 +386,12 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         if (isUpdate) {
             updateButton.setVisible(true);
-            IdeFocusManager.findInstance().requestFocus(updateButton, true);
+            updatePanel.getRootPane().setDefaultButton(updateButton);
+//            IdeFocusManager.findInstance().requestFocus(updateButton, true);
         } else {
             addButton.setVisible(true);
-            IdeFocusManager.findInstance().requestFocus(addButton, true);
+//            IdeFocusManager.findInstance().requestFocus(addButton, true);
+            updatePanel.getRootPane().setDefaultButton(addButton);
         }
 
         showList.setEnabled(false);
@@ -382,6 +405,24 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     }
 
+    private void refreshEditor(JsonRecord record) {
+        if (record != null) {
+            Document document = recordEditor.getDocument();
+            WriteCommandAction.runWriteCommandAction(project, () -> {
+                PlatformUtil.setDocumentText(document, record.getRawText());
+                refreshDocument(document);
+            });
+        }
+    }
+
+    private void refreshDocument(Document document) {
+        // -------------- 重新绘制
+        int newLineCount = document.getLineCount();
+        if (lastLineCount != newLineCount) {
+            lastLineCount = newLineCount;
+            UIUtils.repaintEditor(recordEditor);
+        }
+    }
 
     @Override
     public void dispose() {
