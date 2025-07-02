@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
@@ -50,8 +51,8 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -202,6 +203,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
                 append((StrUtil.isNotBlank(name) ? name : value.getDisplayText()), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                 // setIcon(AllIcons.FileTypes.Json);
+                if (!list.isEnabled()) {
+                    list.setForeground(JBColor.GRAY);
+                }
+
                 SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
             }
         });
@@ -235,6 +240,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 } else {
                     setIcon(JsonAssistantIcons.GROUP);
                     append(treeNode + " (" + treeNode.getSize() + ")");
+                }
+
+                if (!tree.isEnabled()) {
+                    tree.setForeground(JBColor.GRAY);
                 }
 
                 SpeedSearchUtil.applySpeedSearchHighlighting(tree, this, true, selected);
@@ -274,14 +283,28 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void refreshHistoryComponent() {
+        refreshListComponent();
+        refreshTreeComponent();
+    }
+
+    private void refreshListComponent() {
+        JsonRecord selectedValue = showList.getSelectedValue();
+        List<JsonRecord> recentHistories = historyManager.getRecentHistories();
+
         DefaultListModel<JsonRecord> model = (DefaultListModel<JsonRecord>) showList.getModel();
         model.removeAllElements();
-
-        // 列表
-        List<JsonRecord> recentHistories = historyManager.getRecentHistories();
         model.addAll(recentHistories);
 
-        // 树
+        if (null != selectedValue && CollUtil.isNotEmpty(recentHistories)) {
+            // 依旧选中刚才选择的元素
+            showList.setSelectedIndex(recentHistories.indexOf(selectedValue));
+        } else {
+            // 确保列表始终存在有效的选中项
+            ScrollingUtil.ensureSelectionExists(showList);
+        }
+    }
+
+    private void refreshTreeComponent() {
 
     }
 
@@ -419,6 +442,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         showList.setEnabled(false);
         showTree.setEnabled(false);
+
+        showList.repaint();
+        showTree.repaint();
     }
 
     private void dismissEditView() {

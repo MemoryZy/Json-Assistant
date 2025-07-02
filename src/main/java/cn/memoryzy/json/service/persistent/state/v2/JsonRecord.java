@@ -8,6 +8,8 @@ import cn.memoryzy.json.service.persistent.converter.JsonWrapperConverter;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Tag;
 
+import java.util.Objects;
+
 /**
  * @author Memory
  * @since 2025/6/15
@@ -151,5 +153,19 @@ public class JsonRecord {
 
     public Integer getDataSize() {
         return dataSize;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JsonRecord record = (JsonRecord) o;
+        return Objects.equals(id, record.id) && Objects.equals(name, record.name) && Objects.equals(displayText, record.displayText) && Objects.equals(rawText, record.rawText) && sourceType == record.sourceType && Objects.equals(wrapper, record.wrapper) && Objects.equals(createTime, record.createTime) && Objects.equals(updateTime, record.updateTime) && Objects.equals(dataSize, record.dataSize);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, displayText, rawText, sourceType, wrapper, createTime, updateTime, dataSize);
     }
 }
