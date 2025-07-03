@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui.decorator;
 
 import cn.memoryzy.json.util.UIUtils;
+import com.intellij.openapi.editor.impl.EditorComponentImpl;
 import com.intellij.openapi.ui.ComponentValidator;
 import com.intellij.openapi.ui.ValidationInfo;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
@@ -43,6 +44,8 @@ public class TextEditorErrorPopupDecorator {
             UIUtils.addRemoveErrorListener((JTextField) myTextField);
         } else if (myTextField instanceof EditorTextField) {
             UIUtils.addRemoveErrorListener((EditorTextField) myTextField);
+        } else if (myTextField instanceof EditorComponentImpl) {
+            UIUtils.addRemoveErrorListener((EditorComponentImpl) myTextField);
         }
     }
 

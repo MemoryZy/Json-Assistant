@@ -21,7 +21,6 @@ import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.node.HistoryTreeNode2;
 import cn.memoryzy.json.ui.panel.AutoCompleteWrapper;
 import cn.memoryzy.json.ui.panel.EditWrapper;
-import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIUtils;
@@ -34,7 +33,6 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
@@ -55,7 +53,6 @@ import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -75,6 +72,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private final Project project;
     private final HistoryManager historyManager;
     private final HistoryState historyState;
+
+    private final SimpleToolWindowPanel windowPanel;
 
     // ----------------------- left
     private final AutoCompleteWrapper completeWrapper;
@@ -101,6 +100,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         this.historyManager = HistoryManager.getInstance(project);
         this.historyState = ToolWindowSettings.getInstance().getHistoryState();
 
+        this.windowPanel = new SimpleToolWindowPanel(false, false);
         // ----------------------- left
         this.cardLayout = new JBCardLayout();
         this.cardPanel = new JPanel(cardLayout);
@@ -110,10 +110,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         // ----------------------- right
         this.recordEditor = createJsonEditor();
+        // new TextEditorErrorPopupDecorator(windowPanel.getRootPane(), recordEditor);
         this.nameEditorWrapper = new EditWrapper(project, JsonAssistantBundle.messageOnSystem("toolwindow.history.edit.action.name"));
         this.addButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.add.button"));
-        this.updateButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.update.button"));
-        this.updateButton.setAction(new UpdateAction());
+        this.updateButton = new JButton(new UpdateAction());
         this.cancelButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.cancel.button"));
         this.updatePanel = new JPanel(new GridBagLayout());
     }
@@ -129,7 +129,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 注册历史记录添加事件
         registerHistoryAddedEventHandlers();
 
-        SimpleToolWindowPanel windowPanel = new SimpleToolWindowPanel(false, false);
         windowPanel.setToolbar(createToolbar(windowPanel));
         windowPanel.setContent(splitter);
         return windowPanel;
@@ -536,16 +535,34 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         private JsonRecord record;
 
+        public UpdateAction() {
+            super(JsonAssistantBundle.messageOnSystem("toolwindow.history.update.button"));
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
             if (null == record) return;
+
+
 
             // 1.判断Json编辑器内是否是正确文本
 
             // 2.名称有没有超过限制
 
             // 3.保存
-            record.setName(nameEditorWrapper.)
+            // historyManager.
+
+            // record.setName(nameEditorWrapper.getText())
+            //         .setRawText(recordEditor.getDocument().getText())
+            //         .setUpdateTime(System.currentTimeMillis())
+                    // .setWrapper()
+                    // .setDisplayText()
+
+            JComponent component = recordEditor.getComponent();
+            JComponent contentComponent = recordEditor.getContentComponent();
+
+            System.out.println();
+
         }
 
         public UpdateAction setRecord(JsonRecord record) {

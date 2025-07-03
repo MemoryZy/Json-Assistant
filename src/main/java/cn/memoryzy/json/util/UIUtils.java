@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.impl.EditorComponentImpl;
 import com.intellij.openapi.fileEditor.TextEditor;
 import com.intellij.openapi.fileEditor.impl.text.TextEditorProvider;
 import com.intellij.openapi.fileTypes.FileType;
@@ -41,8 +42,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 
 /**
@@ -210,6 +211,10 @@ public class UIUtils {
         addRemoveErrorListener(textField, textField);
     }
 
+    public static void addRemoveErrorListener(EditorComponentImpl editorComponent) {
+        addRemoveErrorListener(editorComponent, editorComponent);
+    }
+
     public static void addRemoveErrorListener(JTextField textField, JComponent target) {
         textField.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override
@@ -227,6 +232,20 @@ public class UIUtils {
 
     public static void addRemoveErrorListener(EditorTextField textField, JComponent target) {
         textField.addDocumentListener(new DocumentListener() {
+            @Override
+            public void documentChanged(com.intellij.openapi.editor.event.@NotNull DocumentEvent event) {
+                Object outlineValue = target.getClientProperty(PluginConstant.OUTLINE_PROPERTY);
+                if (Objects.equals(outlineValue, PluginConstant.ERROR_VALUE)) {
+                    target.putClientProperty(PluginConstant.OUTLINE_PROPERTY, null);
+                    target.revalidate();
+                    target.repaint();
+                }
+            }
+        });
+    }
+
+    public static void addRemoveErrorListener(EditorComponentImpl textField, JComponent target) {
+        textField.getEditor().getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(com.intellij.openapi.editor.event.@NotNull DocumentEvent event) {
                 Object outlineValue = target.getClientProperty(PluginConstant.OUTLINE_PROPERTY);
