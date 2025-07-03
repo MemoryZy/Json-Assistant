@@ -49,12 +49,24 @@ public class EditWrapper extends TransparentContainer {
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 1, 1, 1));
     }
 
+    public void setText(String text) {
+        editTextField.setText(text);
+    }
+
+    public String getText() {
+        return editTextField.getText();
+    }
+
     public void setPlaceholder(String text) {
         editTextField.setPlaceholder(text);
     }
 
     public void setShowPlaceholderWhenFocused(boolean flag) {
         editTextField.setShowPlaceholderWhenFocused(flag);
+    }
+
+    public JComponent getPreferredFocusedComponent() {
+        return editTextField;
     }
 
     private static class EditTextField extends BorderlessEditorTextField {

@@ -21,6 +21,7 @@ import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.node.HistoryTreeNode2;
 import cn.memoryzy.json.ui.panel.AutoCompleteWrapper;
 import cn.memoryzy.json.ui.panel.EditWrapper;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIUtils;
@@ -33,9 +34,11 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
+import com.intellij.openapi.editor.impl.EditorImpl;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
@@ -43,6 +46,7 @@ import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -50,6 +54,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -107,6 +113,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         this.nameEditorWrapper = new EditWrapper(project, JsonAssistantBundle.messageOnSystem("toolwindow.history.edit.action.name"));
         this.addButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.add.button"));
         this.updateButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.update.button"));
+        this.updateButton.setAction(new UpdateAction());
         this.cancelButton = new JButton(JsonAssistantBundle.messageOnSystem("toolwindow.history.cancel.button"));
         this.updatePanel = new JPanel(new GridBagLayout());
     }
@@ -130,9 +137,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private JComponent createToolbar(SimpleToolWindowPanel windowPanel) {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new AddHistoryAction(this));
-        actionGroup.add(new RemoveHistoryAction(this));
-        actionGroup.add(new EditHistoryAction(this));
+        actionGroup.add(new AddHistoryAction(this, windowPanel));
+        actionGroup.add(new RemoveHistoryAction(this, windowPanel));
+        actionGroup.add(new EditHistoryAction(this, windowPanel));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, true);
         toolbar.setTargetComponent(windowPanel);
@@ -148,7 +155,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         cardPanel.add(treeScrollPane, UIUtils.HISTORY_TREE_CARD_NAME);
 
         // 默认显示
-        cardLayout.show(cardPanel, getViewMode(historyState.getHistoryDisplayMode()));
+        cardLayout.show(cardPanel, getViewMode());
 
         return new BorderLayoutPanel().addToTop(completeWrapper).addToCenter(cardPanel);
     }
@@ -203,14 +210,25 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
                 append((StrUtil.isNotBlank(name) ? name : value.getDisplayText()), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
                 // setIcon(AllIcons.FileTypes.Json);
+
                 if (!list.isEnabled()) {
+                    setEnabled(false);
                     list.setForeground(JBColor.GRAY);
+                    list.setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.history.tree.disabled.text"));
+                } else {
+                    if (!isEnabled()) setEnabled(true);
+                    list.setForeground(UIUtil.getListForeground());
+                    list.setToolTipText(null);
                 }
 
                 SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
             }
         });
-        showList.addListSelectionListener(e -> refreshEditor(showList.getSelectedValue()));
+        showList.addListSelectionListener(e -> {
+            if (UIUtils.HISTORY_LIST_CARD_NAME.equals(getViewMode())) {
+                refreshEditor(showList.getSelectedValue());
+            }
+        });
         showList.setEmptyText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
 
         // 将标准方向键（↑↓←→）、PageUp/PageDown、Home/End 等按键绑定到列表的滚动操作
@@ -243,7 +261,13 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 }
 
                 if (!tree.isEnabled()) {
+                    setEnabled(false);
                     tree.setForeground(JBColor.GRAY);
+                    tree.setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.history.tree.disabled.text"));
+                } else {
+                    if (!isEnabled()) setEnabled(true);
+                    tree.setForeground(UIUtil.getTreeForeground());
+                    tree.setToolTipText(null);
                 }
 
                 SpeedSearchUtil.applySpeedSearchHighlighting(tree, this, true, selected);
@@ -251,18 +275,20 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         });
 
         showTree.addTreeSelectionListener(e -> {
-            TreePath selectionPath = showTree.getSelectionPath();
-            if (selectionPath != null) {
-                HistoryTreeNode2 treeNode = (HistoryTreeNode2) selectionPath.getLastPathComponent();
-                if (HistoryTreeNodeType.GROUP.equals(treeNode.getNodeType())) {
-                    WriteCommandAction.runWriteCommandAction(project, () -> {
-                        Document document = recordEditor.getDocument();
-                        PlatformUtil.setDocumentText(document, "");
-                        refreshDocument(document);
-                    });
+            if (UIUtils.HISTORY_TREE_CARD_NAME.equals(getViewMode())) {
+                TreePath selectionPath = showTree.getSelectionPath();
+                if (selectionPath != null) {
+                    HistoryTreeNode2 treeNode = (HistoryTreeNode2) selectionPath.getLastPathComponent();
+                    if (HistoryTreeNodeType.GROUP.equals(treeNode.getNodeType())) {
+                        WriteCommandAction.runWriteCommandAction(project, () -> {
+                            Document document = recordEditor.getDocument();
+                            PlatformUtil.setDocumentText(document, "");
+                            refreshDocument(document);
+                        });
 
-                } else {
-                    refreshEditor(treeNode.getValue());
+                    } else {
+                        refreshEditor(treeNode.getValue());
+                    }
                 }
             }
         });
@@ -305,7 +331,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void refreshTreeComponent() {
-
+        TreeNode rootNode = combineRootTreeNode();
+        DefaultTreeModel model = (DefaultTreeModel) showTree.getModel();
+        model.setRoot(rootNode);
     }
 
     private DefaultListModel<JsonRecord> createListModel() {
@@ -395,26 +423,51 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return variants;
     }
 
-    private String getViewMode(HistoryDisplayMode mode) {
-        return HistoryDisplayMode.LIST == mode ? UIUtils.HISTORY_LIST_CARD_NAME : UIUtils.HISTORY_TREE_CARD_NAME;
+    private String getViewMode() {
+        return getViewMode(historyState.getHistoryDisplayMode());
     }
 
-    @SuppressWarnings("DataFlowIssue")
-    public void executeEditAction(boolean isUpdate) {
-//        // 获取当前显示的样式
-//        HistoryDisplayMode mode = historyState.getHistoryDisplayMode();
-//        // 获取选中的元素
-//        JsonRecord record;
-//        if (HistoryDisplayMode.LIST == mode) {
-//            record = showList.getSelectedValue();
-//        } else {
-//            HistoryTreeNode2 treeNode = (HistoryTreeNode2) showTree.getSelectionPath().getLastPathComponent();
-//            record = treeNode.getValue();
-//        }
+    private String getViewMode(HistoryDisplayMode mode) {
+        return HistoryDisplayMode.LIST == mode
+                ? UIUtils.HISTORY_LIST_CARD_NAME
+                : UIUtils.HISTORY_TREE_CARD_NAME;
+    }
 
+
+    public void executeEditAction(boolean isUpdate) {
+        // 获取当前选中的元素
+        JsonRecord record = getCurrentSelectionValue();
+        // 赋值
+        ((EditorEx) recordEditor).setViewer(false);
+
+        // 原文已经由List和Tree的选中事件写在了编辑器内，无需重复赋值
+        // PlatformUtil.setDocumentText(recordEditor.getDocument(), record.getRawText());
+
+        // 名称
+        nameEditorWrapper.setText(record.getName());
+        ((UpdateAction) updateButton.getAction()).setRecord(record);
+
+        // 展示编辑窗口
         displayEditView(isUpdate);
     }
 
+    public JsonRecord getCurrentSelectionValue() {
+        // 获取当前显示的样式
+        HistoryDisplayMode mode = historyState.getHistoryDisplayMode();
+        // 获取选中的元素
+        JsonRecord record;
+        if (HistoryDisplayMode.LIST == mode) {
+            record = showList.getSelectedValue();
+        } else {
+            record = Optional.ofNullable(showTree.getSelectionPath())
+                    .map(TreePath::getLastPathComponent)
+                    .map(el -> (HistoryTreeNode2) el)
+                    .map(HistoryTreeNode2::getValue)
+                    .orElse(null);
+        }
+
+        return record;
+    }
 
     // TODO 当用户选择 “指定名称” 时，打开此工具窗，打开更新页面，定位到指定记录，并且把焦点放在名称编辑器上
 
@@ -433,12 +486,12 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         if (isUpdate) {
             updateButton.setVisible(true);
             updatePanel.getRootPane().setDefaultButton(updateButton);
-//            IdeFocusManager.findInstance().requestFocus(updateButton, true);
         } else {
             addButton.setVisible(true);
-//            IdeFocusManager.findInstance().requestFocus(addButton, true);
             updatePanel.getRootPane().setDefaultButton(addButton);
         }
+
+        IdeFocusManager.findInstance().requestFocus(nameEditorWrapper.getPreferredFocusedComponent(), true);
 
         showList.setEnabled(false);
         showTree.setEnabled(false);
@@ -478,5 +531,28 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         EditorFactory.getInstance().releaseEditor(recordEditor);
         Disposer.dispose(this);
     }
+
+    private class UpdateAction extends AbstractAction {
+
+        private JsonRecord record;
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (null == record) return;
+
+            // 1.判断Json编辑器内是否是正确文本
+
+            // 2.名称有没有超过限制
+
+            // 3.保存
+            record.setName(nameEditorWrapper.)
+        }
+
+        public UpdateAction setRecord(JsonRecord record) {
+            this.record = record;
+            return this;
+        }
+    }
+
 
 }
