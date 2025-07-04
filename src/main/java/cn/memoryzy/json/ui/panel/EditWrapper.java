@@ -4,6 +4,7 @@ import cn.memoryzy.json.ui.component.EditorButton;
 import cn.memoryzy.json.ui.editor.BorderlessEditorTextField;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.PlainTextFileType;
@@ -16,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -68,6 +70,17 @@ public class EditWrapper extends TransparentContainer {
     public JComponent getPreferredFocusedComponent() {
         return editTextField;
     }
+
+    public Editor getEditor() {
+        return editTextField.getEditor();
+    }
+
+    public void moveToOffset(int offset) {
+        Optional.ofNullable(editTextField.getEditor())
+                .map(Editor::getCaretModel)
+                .ifPresent(caretModel -> caretModel.moveToOffset(offset));
+    }
+
 
     private static class EditTextField extends BorderlessEditorTextField {
         public EditTextField(Project project, FileType fileType) {

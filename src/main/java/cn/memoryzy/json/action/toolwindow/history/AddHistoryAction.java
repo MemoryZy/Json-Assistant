@@ -26,6 +26,11 @@ public class AddHistoryAction extends DumbAwareAction implements UpdateInBackgro
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        provider.executeAddAction();
+    }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(provider.addActionUpdate());
     }
 }

@@ -126,6 +126,26 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
         return histories.stream().filter(record -> Objects.equals(wrapper, record.getWrapper())).findFirst().orElse(null);
     }
 
+    /**
+     * 查找相同名称的记录
+     *
+     * @param name 名称
+     * @return 记录
+     */
+    public JsonRecord findByName(String name) {
+        return histories.stream()
+                .filter(record -> StrUtil.isNotBlank(record.getName()) && Objects.equals(name, record.getName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public void batchRemove(List<Integer> ids) {
+        histories.removeIf(record -> ids.contains(record.getId()));
+    }
+
+    public void batchRemove(Integer... ids) {
+        histories.removeIf(record -> List.of(ids).contains(record.getId()));
+    }
 
     /**
      * 裁剪历史记录到最大容量
@@ -162,7 +182,7 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
         }
     }
 
-    private String getShortText(JsonWrapper wrapper) {
+    public static String getShortText(JsonWrapper wrapper) {
         String jsonString = JsonUtil.compressJson(wrapper);
         return JsonAssistantUtil.truncateText(Objects.requireNonNull(jsonString), 80, "...");
         // return StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);

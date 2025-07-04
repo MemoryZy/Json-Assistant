@@ -72,10 +72,6 @@ public class UIUtils {
      */
     public static final String JSON_GRID_CARD_NAME = "grid";
 
-    public static final String HISTORY_LIST_CARD_NAME = "list";
-
-    public static final String HISTORY_TREE_CARD_NAME = "tree";
-
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -524,6 +520,17 @@ public class UIUtils {
         TreePath path = new TreePath(node.getPath());
         // 使用expandPath方法展开指定的路径
         tree.expandPath(path);
+    }
+
+    /**
+     * 选中节点并滚动到可视区域
+     *
+     * @param node 节点
+     */
+    public static void selectNode(JTree tree, TreeNode node) {
+        TreePath path = new TreePath(((DefaultMutableTreeNode) node).getPath());
+        tree.scrollPathToVisible(path);
+        tree.setSelectionPath(path);
     }
 
 

@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui.panel;
 import cn.memoryzy.json.action.query.ShowHistoryAction;
 import cn.memoryzy.json.ui.component.EditorButton;
 import cn.memoryzy.json.ui.editor.ModernTextFieldWithAutoCompletion;
+import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.panels.NonOpaquePanel;
@@ -42,6 +43,14 @@ public class AutoCompleteWrapper extends TransparentContainer {
 
     public JComponent getPreferredFocusedComponent() {
         return completion;
+    }
+
+    public void addDocumentListener(DocumentListener listener) {
+        completion.addDocumentListener(listener);
+    }
+
+    public void setText(String text) {
+        completion.setText(text);
     }
 
     public void setVariants(Collection<String> variants) {

@@ -26,6 +26,11 @@ public class RemoveHistoryAction extends DumbAwareAction implements UpdateInBack
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        provider.executeRemoveAction();
+    }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(provider.removeActionUpdate());
     }
 }
