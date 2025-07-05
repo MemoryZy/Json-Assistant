@@ -59,7 +59,7 @@ public final class HistoryToolWindowManager implements Disposable {
         String title = JsonAssistantBundle.message("toolwindow.history.name");
         toolWindow.setTitle(title);
         toolWindow.setStripeTitle(title);
-        toolWindow.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE_LOGO);
+        toolWindow.setIcon(JsonAssistantIcons.ToolWindow.HISTORY_LOGO);
         // 右键弹出菜单
         registerAction((ToolWindowEx) toolWindow);
         // 注册配置更新事件

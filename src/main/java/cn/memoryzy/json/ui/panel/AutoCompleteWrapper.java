@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui.panel;
 import cn.memoryzy.json.action.query.ShowHistoryAction;
 import cn.memoryzy.json.ui.component.EditorButton;
 import cn.memoryzy.json.ui.editor.ModernTextFieldWithAutoCompletion;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
@@ -11,7 +12,9 @@ import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -29,6 +32,7 @@ public class AutoCompleteWrapper extends TransparentContainer {
     }
 
     private void initComponents(Supplier<String> propertyNameSupplier) {
+        completion.addNotify();
         ShowHistoryAction showHistoryAction = new ShowHistoryAction(this, completion, propertyNameSupplier);
         EditorButton searchHistoryButton = new EditorButton(showHistoryAction, false);
 
@@ -41,12 +45,18 @@ public class AutoCompleteWrapper extends TransparentContainer {
         setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
     }
 
-    public JComponent getPreferredFocusedComponent() {
+    public ModernTextFieldWithAutoCompletion getPreferredFocusedComponent() {
         return completion;
     }
 
     public void addDocumentListener(DocumentListener listener) {
         completion.addDocumentListener(listener);
+    }
+
+    public void addKeyListener(KeyListener listener) {
+        Optional.ofNullable(completion.getEditor())
+                .map(Editor::getContentComponent)
+                .ifPresent(component -> component.addKeyListener(listener));
     }
 
     public void setText(String text) {

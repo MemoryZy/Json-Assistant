@@ -61,6 +61,8 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -163,17 +165,156 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 默认显示
         cardLayout.show(cardPanel, historyState.getHistoryDisplayMode().name());
 
-        // TODO 注册文档监听
+        // 注册文档监听
         completeWrapper.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                String text = event.getDocument().getText();
+                // 对比时需要不区分大小写
+                String filterName = StrUtil.trim(event.getDocument().getText().toLowerCase());
 
+                filterListItem(filterName);
+                filterTreeNode(filterName);
+            }
+        });
 
+        // 添加键盘事件监听
+        completeWrapper.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                int keyCode = e.getKeyCode();
+                if (keyCode == KeyEvent.VK_DOWN || keyCode == KeyEvent.VK_UP) {
+                    handleNavigationKey();
+                }
             }
         });
 
         return new BorderLayoutPanel().addToTop(completeWrapper).addToCenter(cardPanel);
+    }
+
+    // 处理上下键导航
+    private void handleNavigationKey() {
+        JComponent component = HistoryDisplayMode.LIST == historyState.getHistoryDisplayMode() ? showList : showTree;
+        IdeFocusManager.findInstance().requestFocus(component, true);
+    }
+
+    // 查找第一个可见节点（树）
+    private TreePath findFirstVisiblePath() {
+        HistoryTreeNode2 root = (HistoryTreeNode2) showTree.getModel().getRoot();
+
+        // 找到第一个可见的组节点
+        TreeNode firstGroup = root.getChildAt(0);
+        if (firstGroup.getChildCount() > 0) {
+            // 组节点下有子节点，选择第一个子节点
+            return new TreePath(new Object[]{root, firstGroup, firstGroup.getChildAt(0)});
+        } else {
+            // 没有子节点，选择组节点本身
+            return new TreePath(new Object[]{root, firstGroup});
+        }
+    }
+
+    // todo 名称框编辑后，没有被清除
+
+    private void filterTreeNode(String filterName) {
+        DefaultTreeModel model = (DefaultTreeModel) showTree.getModel();
+        HistoryTreeNode2 rootNode = (HistoryTreeNode2) model.getRoot();
+
+        // 清空过滤：恢复完整树结构
+        if (StrUtil.isBlank(filterName)) {
+            model.setRoot(combineRootTreeNode());
+            expandSingleNode(); // 恢复默认展开状态
+            return;
+        }
+
+        // 创建新根节点
+        HistoryTreeNode2 newRoot = new HistoryTreeNode2();
+        Enumeration<TreeNode> groups = rootNode.children();
+
+        while (groups.hasMoreElements()) {
+            HistoryTreeNode2 groupNode = (HistoryTreeNode2) groups.nextElement();
+            HistoryTreeNode2 filteredGroup = new HistoryTreeNode2(null, groupNode.toString(), 0, HistoryTreeNodeType.GROUP);
+            Enumeration<TreeNode> records = groupNode.children();
+
+            while (records.hasMoreElements()) {
+                HistoryTreeNode2 recordNode = (HistoryTreeNode2) records.nextElement();
+                JsonRecord record = recordNode.getValue();
+
+                // 匹配逻辑：名称或原始内容
+                boolean matches = (record.getName() != null && record.getName().toLowerCase().contains(filterName)) ||
+                        (record.getRawText() != null && record.getRawText().toLowerCase().contains(filterName));
+
+                if (matches) {
+                    // 复制匹配的节点
+                    HistoryTreeNode2 cloned = new HistoryTreeNode2(record, null, null, HistoryTreeNodeType.NODE);
+                    filteredGroup.add(cloned);
+                    filteredGroup.setSize(filteredGroup.getSize() + 1); // 更新组大小
+                }
+            }
+
+            // 添加非空组
+            if (filteredGroup.getSize() > 0) {
+                newRoot.add(filteredGroup);
+            }
+        }
+
+        // 更新树模型并展开所有
+        model.setRoot(newRoot);
+        expandAllGroups();
+    }
+
+    private void filterListItem(String filterName) {
+        // 获取原始数据模型
+        DefaultListModel<JsonRecord> model = (DefaultListModel<JsonRecord>) showList.getModel();
+        List<JsonRecord> recentHistories = historyManager.getRecentHistories();
+
+        if (StrUtil.isBlank(filterName)) {
+            // 清空过滤：恢复完整列表
+            model.removeAllElements();
+            model.addAll(recentHistories);
+            // 确保选中项存在
+            ScrollingUtil.ensureSelectionExists(showList);
+            return;
+        }
+
+        // 过滤逻辑：名称或原始内容匹配
+        List<JsonRecord> filtered = recentHistories.stream()
+                .filter(record -> {
+                    String name = record.getName();
+                    String rawText = record.getRawText();
+                    return (name != null && name.toLowerCase().contains(filterName)) ||
+                            (rawText != null && rawText.toLowerCase().contains(filterName));
+                })
+                .collect(Collectors.toList());
+
+        // 更新列表模型
+        model.removeAllElements();
+        model.addAll(filtered);
+
+        // 处理选中项
+        if (!model.isEmpty()) {
+            showList.setSelectedIndex(0); // 自动选中第一项
+        }
+    }
+
+    // 辅助方法：展开所有组节点
+    private void expandAllGroups() {
+        HistoryTreeNode2 root = (HistoryTreeNode2) showTree.getModel().getRoot();
+        Enumeration<TreeNode> groups = root.children();
+
+        while (groups.hasMoreElements()) {
+            TreeNode group = groups.nextElement();
+            TreePath path = new TreePath(((DefaultMutableTreeNode) group).getPath());
+            showTree.expandPath(path);
+        }
+
+        // 自动选中第一个节点
+        if (root.getChildCount() > 0) {
+            TreeNode firstGroup = root.getChildAt(0);
+            if (firstGroup.getChildCount() > 0) {
+                UIUtils.selectNode(showTree, firstGroup.getChildAt(0));
+            } else {
+                UIUtils.selectNode(showTree, firstGroup);
+            }
+        }
     }
 
     private JComponent createSecondComponent() {
@@ -344,6 +485,18 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         refreshListComponent();
         refreshTreeComponent();
         completeWrapper.setText(null);
+
+        // 确保有选中项
+        if (historyState.getHistoryDisplayMode() == HistoryDisplayMode.LIST) {
+            if (showList.getModel().getSize() > 0 && showList.getSelectedIndex() == -1) {
+                showList.setSelectedIndex(0);
+            }
+        } else {
+            if (showTree.getSelectionCount() == 0) {
+                TreePath firstPath = findFirstVisiblePath();
+                showTree.setSelectionPath(firstPath);
+            }
+        }
     }
 
     private void refreshListComponent() {
@@ -680,13 +833,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         historyManager.batchRemove(ids);
         // 刷新
         refreshHistoryComponent();
-
-        // TODO 如果是树，则保存树的状态
-
-
-        // TODO 如果是列表，则接着选中下一个
-
-
         // 刷新自动完成列表
         completeWrapper.setVariants(getLatestVariants());
     }
@@ -871,6 +1017,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             refreshEditor(currentSelectionValue);
         }
 
+        nameEditorWrapper.setText("");
         updatePanel.setVisible(false);
         addButton.setVisible(false);
         updateButton.setVisible(false);

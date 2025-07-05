@@ -2,8 +2,10 @@
 
 ## [Unreleased]
 
+- 更新历史记录展示形式。
 - 切换识别剪贴板数据的方式。
 - 优化插件性能。
+- Update the display format of the history record.
 - Switch the way of recognizing clipboard data.
 - Optimize the performance of the plugin.
 

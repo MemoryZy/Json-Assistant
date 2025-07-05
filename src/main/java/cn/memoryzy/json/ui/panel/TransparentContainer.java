@@ -18,6 +18,7 @@ public class TransparentContainer extends NonOpaquePanel {
     public TransparentContainer(LayoutManager layout) {
         super(layout);
         setOpaque(true);
+        setBackground(UIUtil.getTextFieldBackground());
     }
 
     @Override

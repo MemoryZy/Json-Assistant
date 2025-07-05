@@ -59,6 +59,23 @@ public class HistoryTreeNode2 extends DefaultMutableTreeNode {
     public HistoryTreeNodeType getNodeType() {
         return nodeType;
     }
+
+    public void setValue(JsonRecord value) {
+        this.value = value;
+    }
+
+    public void setGroupTime(String groupTime) {
+        this.groupTime = groupTime;
+    }
+
+    public void setSize(Integer size) {
+        this.size = size;
+    }
+
+    public void setNodeType(HistoryTreeNodeType nodeType) {
+        this.nodeType = nodeType;
+    }
+
     // endregion
 
     @Override
