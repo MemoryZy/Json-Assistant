@@ -554,6 +554,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void navigateRecord(Integer recordId, boolean shouldEdit) {
+        // 请退出编辑模式后再进行查看
+        if (!showList.isEnabled()) {
+            dismissEditView();
+        }
+
         // 选中对应记录id的记录
         if (HistoryDisplayMode.LIST == historyState.getHistoryDisplayMode()) {
             navigateInList(recordId, shouldEdit);
