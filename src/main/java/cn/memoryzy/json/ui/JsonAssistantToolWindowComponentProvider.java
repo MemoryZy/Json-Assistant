@@ -7,10 +7,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
-import cn.memoryzy.json.event.ColorSchemeChangedEvent;
-import cn.memoryzy.json.event.FoldingOutlineToggleEvent;
-import cn.memoryzy.json.event.HistoryAddedEvent;
-import cn.memoryzy.json.event.LineNumbersToggleEvent;
+import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
@@ -19,6 +16,7 @@ import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import cn.memoryzy.json.service.persistent.v2.HistoryManager;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.listener.EditorLineChangeMonitor;
 import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
@@ -56,6 +54,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
 import java.util.Objects;
 
@@ -344,7 +343,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
         if (isAdd) {
             // 新增
-            historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+            record = historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
             // 触发事件
             ApplicationManager.getApplication().getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
             message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_ADD_JUMP_KEY);
@@ -352,20 +351,22 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
             message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_EXIST_JUMP_KEY);
         }
 
+        NavigateRecordEvent navigateEvent = ApplicationManager.getApplication().getMessageBus().syncPublisher(NavigateRecordEvent.TOPIC);
+
         // 提示粘贴成功的消息
+        JsonRecord finalRecord = record;
         ToolWindowManager.getInstance(project).notifyByBalloon(
                 PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
                 MessageType.INFO,
                 message,
                 null,
                 e -> {
-                    String url = e.getDescription();
-                    if (Objects.equals(HISTORY_ADD_JUMP_KEY, url)) {
-                        // TODO 打开历史记录窗口，展示刚添加的记录，给名称编辑器指定焦点
-
-                    } else if (Objects.equals(HISTORY_EXIST_JUMP_KEY, url)) {
-                        // TODO 打开历史记录窗口，展示这条重复记录，给名称编辑器指定焦点
-
+                    if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
+                        String url = e.getDescription();
+                        HistoryToolWindowManager.getInstance(project).show();
+                        boolean shouldEdit = Objects.equals(HISTORY_ADD_JUMP_KEY, url);
+                        // 打开历史记录窗口，展示刚添加的记录，给名称编辑器指定焦点
+                        navigateEvent.navigate(finalRecord.getId(), shouldEdit);
                     }
                 });
     }

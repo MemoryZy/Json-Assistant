@@ -17,6 +17,7 @@
       "toolwindow": {
         "logo.svg": "icons/toolwindow/logo.svg",
         "structure_logo.svg": "icons/toolwindow/structure_logo.svg",
+        "history_logo.svg": "icons/toolwindow/history_logo.svg",
         "minify.svg": "icons/toolwindow/minify.svg",
         "save.svg": "icons/toolwindow/save.svg",
         "search.svg": "icons/toolwindow/search.svg",
@@ -27,8 +28,7 @@
         "softWrap.svg": "icons/toolwindow/softWrap.svg",
         "switch.svg": "icons/toolwindow/switch.svg",
         "text.svg": "icons/toolwindow/text.svg",
-        "grid.svg": "icons/toolwindow/grid.svg",
-        "history_logo.svg": "icons/toolwindow/history_logo.svg"
+        "grid.svg": "icons/toolwindow/grid.svg"
       },
       "structure": {
         "compare_structure.svg": "icons/structure/compare_structure.svg"

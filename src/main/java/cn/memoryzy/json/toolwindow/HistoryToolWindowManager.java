@@ -5,6 +5,7 @@ import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.event.HistoryToggleEvent;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.Disposable;
@@ -87,6 +88,8 @@ public final class HistoryToolWindowManager implements Disposable {
     }
 
     public void show() {
+        if (!ToolWindowSettings.getInstance().getHistoryState().isEnableHistory()) return;
+
         if (!toolWindow.isAvailable()) {
             toolWindow.setAvailable(true);
         }

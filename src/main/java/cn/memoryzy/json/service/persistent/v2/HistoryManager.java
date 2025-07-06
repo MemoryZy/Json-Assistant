@@ -62,7 +62,7 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
      *
      * @param record 记录对象
      */
-    public synchronized void addEntry(JsonRecord record) {
+    public synchronized JsonRecord addEntry(JsonRecord record) {
         JsonWrapper wrapper = record.getWrapper();
         // 避免添加重复记录
         if (!exists(wrapper)) {
@@ -73,6 +73,8 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
             // 裁剪
             trimHistory();
         }
+
+        return record;
     }
 
 
