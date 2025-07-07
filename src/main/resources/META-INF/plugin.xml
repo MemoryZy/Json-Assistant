@@ -47,16 +47,13 @@
                 bundle="messages.JsonAssistantBundle"
                 key="setting.display.name"/>
 
-        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
-
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
         <fileEditorProvider implementation="cn.memoryzy.json.extension.editor.JsonTreeFileEditorProvider"/>
         <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
-        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.ImportHistoryFloatingToolbarProvider"/>
 
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"

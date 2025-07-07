@@ -16,19 +16,12 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Memory
  * @since 2025/7/7
  */
 public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProvider, Disposable {
-
-    /**
-     * 存储所有已使用的记录数据的ID
-     */
-    private final Set<Integer> USED_RECORD_IDS = ConcurrentHashMap.newKeySet();
 
     public int getPriority() {
         return 0;
@@ -63,10 +56,8 @@ public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProv
             return;
         }
 
-        // 如果所有页面都没有这个记录，那就显示按钮
-
-
-
+        // 默认都予展示
+        component.scheduleShow();
     }
 
     /**
