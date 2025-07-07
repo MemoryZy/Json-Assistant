@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action.deserializer.lombok;
 
-import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;

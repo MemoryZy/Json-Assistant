@@ -10,12 +10,11 @@ import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
-import cn.memoryzy.json.service.persistent.state.v2.EditorVisualState;
-import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
-import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
-import cn.memoryzy.json.service.persistent.v2.HistoryManager;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.HistoryManager;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.state.EditorVisualState;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.JsonRecord;
 import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
 import cn.memoryzy.json.ui.listener.EditorLineChangeMonitor;
@@ -77,8 +76,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
 
     private final Project project;
+    @SuppressWarnings("FieldCanBeLocal")
     private final Content currentContent;
-    private final EditorBehaviorState behaviorState;
     private final EditorVisualState visualState;
     private final HistoryState historyState;
     private final HistoryManager historyManager;
@@ -98,7 +97,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.currentContent = content;
 
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
-        this.behaviorState = toolWindowSettings.getBehaviorState();
         this.visualState = toolWindowSettings.getVisualState();
         this.historyState = toolWindowSettings.getHistoryState();
         this.historyManager = HistoryManager.getInstance(project);

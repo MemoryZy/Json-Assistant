@@ -12,7 +12,7 @@ import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
+import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager;
 import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import cn.memoryzy.json.ui.dialog.JsonStructureDialog;

@@ -1,4 +1,4 @@
-package cn.memoryzy.json.service.persistent.state.v2;
+package cn.memoryzy.json.service.persistent.state;
 
 import cn.memoryzy.json.enums.TreeViewMode;
 import com.intellij.util.xmlb.annotations.Tag;

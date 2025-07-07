@@ -3,25 +3,51 @@ package cn.memoryzy.json.service.persistent.state;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 
 /**
+ * 历史记录设置项
+ *
  * @author Memory
  * @since 2024/11/29
  */
-@Deprecated
 public class HistoryState {
 
     /**
-     * 历史记录开关
+     * 是否启用历史记录功能
      */
-    public boolean switchHistory = true;
+    private boolean enableHistory = true;
 
     /**
      * 历史记录显示类型
      */
-    public HistoryDisplayMode historyViewType = HistoryDisplayMode.TREE;
+    private HistoryDisplayMode historyDisplayMode = HistoryDisplayMode.TREE;
 
     /**
      * 是否自动记录
      */
-    public boolean autoStore = false;
+    private boolean autoRecordHistory = false;
 
+
+    public void setEnableHistory(boolean enableHistory) {
+        this.enableHistory = enableHistory;
+    }
+
+    public void setHistoryDisplayMode(HistoryDisplayMode historyDisplayMode) {
+        this.historyDisplayMode = historyDisplayMode;
+    }
+
+    public void setAutoRecordHistory(boolean autoRecordHistory) {
+        this.autoRecordHistory = autoRecordHistory;
+    }
+
+
+    public boolean isEnableHistory() {
+        return enableHistory;
+    }
+
+    public HistoryDisplayMode getHistoryDisplayMode() {
+        return historyDisplayMode;
+    }
+
+    public boolean isAutoRecordHistory() {
+        return autoRecordHistory;
+    }
 }

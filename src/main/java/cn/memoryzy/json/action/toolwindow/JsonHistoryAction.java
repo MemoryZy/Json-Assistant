@@ -1,8 +1,8 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.*;

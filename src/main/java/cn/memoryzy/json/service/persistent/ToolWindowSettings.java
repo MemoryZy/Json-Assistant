@@ -1,10 +1,10 @@
-package cn.memoryzy.json.service.persistent.v2;
+package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
-import cn.memoryzy.json.service.persistent.state.v2.EditorVisualState;
-import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
-import cn.memoryzy.json.service.persistent.state.v2.QueryState;
+import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.state.EditorVisualState;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.QueryState;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;

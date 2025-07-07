@@ -1,4 +1,4 @@
-package cn.memoryzy.json.service.persistent.state.v2;
+package cn.memoryzy.json.service.persistent.state;
 
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.util.PlatformUtil;

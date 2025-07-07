@@ -12,7 +12,7 @@ import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.JsonConversionTarget;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.SwaggerAnnotations;
-import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
+import cn.memoryzy.json.service.persistent.state.SerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;

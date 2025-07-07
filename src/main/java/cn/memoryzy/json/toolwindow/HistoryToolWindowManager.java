@@ -5,7 +5,7 @@ import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.event.HistoryEnabledEvent;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import com.intellij.openapi.Disposable;

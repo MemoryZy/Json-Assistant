@@ -1,4 +1,4 @@
-package cn.memoryzy.json.service.persistent.state.v2;
+package cn.memoryzy.json.service.persistent.state;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.DataFormatType;

@@ -17,14 +17,14 @@ import cn.memoryzy.json.event.HistoryAddedEvent;
 import cn.memoryzy.json.event.HistoryViewChangedEvent;
 import cn.memoryzy.json.event.NavigateRecordEvent;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
-import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
-import cn.memoryzy.json.service.persistent.v2.HistoryManager;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.HistoryManager;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.JsonRecord;
 import cn.memoryzy.json.ui.listener.history.AddAction;
 import cn.memoryzy.json.ui.listener.history.CancelAction;
 import cn.memoryzy.json.ui.listener.history.UpdateAction;
-import cn.memoryzy.json.ui.node.HistoryTreeNode2;
+import cn.memoryzy.json.ui.node.HistoryTreeNode;
 import cn.memoryzy.json.ui.panel.AutoCompleteWrapper;
 import cn.memoryzy.json.ui.panel.EditWrapper;
 import cn.memoryzy.json.util.*;
@@ -214,7 +214,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     // 查找第一个可见节点（树）
     private TreePath findFirstVisiblePath() {
-        HistoryTreeNode2 root = (HistoryTreeNode2) showTree.getModel().getRoot();
+        HistoryTreeNode root = (HistoryTreeNode) showTree.getModel().getRoot();
 
         // 找到第一个可见的组节点
         TreeNode firstGroup = root.getChildAt(0);
@@ -316,7 +316,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         showTree.setCellRenderer(new ColoredTreeCellRenderer() {
             @Override
             public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-                HistoryTreeNode2 treeNode = (HistoryTreeNode2) value;
+                HistoryTreeNode treeNode = (HistoryTreeNode) value;
                 HistoryTreeNodeType nodeType = treeNode.getNodeType();
 
                 if (HistoryTreeNodeType.NODE.equals(nodeType)) {
@@ -345,7 +345,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             if (HistoryDisplayMode.TREE == historyState.getHistoryDisplayMode()) {
                 TreePath selectionPath = showTree.getSelectionPath();
                 if (selectionPath != null) {
-                    HistoryTreeNode2 treeNode = (HistoryTreeNode2) selectionPath.getLastPathComponent();
+                    HistoryTreeNode treeNode = (HistoryTreeNode) selectionPath.getLastPathComponent();
                     if (HistoryTreeNodeType.GROUP.equals(treeNode.getNodeType())) {
                         clearEditor();
                     } else {
@@ -366,7 +366,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private void filterTreeNode(String filterName) {
         DefaultTreeModel model = (DefaultTreeModel) showTree.getModel();
-        HistoryTreeNode2 rootNode = (HistoryTreeNode2) model.getRoot();
+        HistoryTreeNode rootNode = (HistoryTreeNode) model.getRoot();
 
         // 清空过滤：恢复完整树结构
         if (StrUtil.isBlank(filterName)) {
@@ -376,16 +376,16 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         }
 
         // 创建新根节点
-        HistoryTreeNode2 newRoot = new HistoryTreeNode2();
+        HistoryTreeNode newRoot = new HistoryTreeNode();
         Enumeration<TreeNode> groups = rootNode.children();
 
         while (groups.hasMoreElements()) {
-            HistoryTreeNode2 groupNode = (HistoryTreeNode2) groups.nextElement();
-            HistoryTreeNode2 filteredGroup = new HistoryTreeNode2(null, groupNode.toString(), 0, HistoryTreeNodeType.GROUP);
+            HistoryTreeNode groupNode = (HistoryTreeNode) groups.nextElement();
+            HistoryTreeNode filteredGroup = new HistoryTreeNode(null, groupNode.toString(), 0, HistoryTreeNodeType.GROUP);
             Enumeration<TreeNode> records = groupNode.children();
 
             while (records.hasMoreElements()) {
-                HistoryTreeNode2 recordNode = (HistoryTreeNode2) records.nextElement();
+                HistoryTreeNode recordNode = (HistoryTreeNode) records.nextElement();
                 JsonRecord record = recordNode.getValue();
 
                 // 匹配逻辑：名称或原始内容
@@ -394,7 +394,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
                 if (matches) {
                     // 复制匹配的节点
-                    HistoryTreeNode2 cloned = new HistoryTreeNode2(record, null, null, HistoryTreeNodeType.NODE);
+                    HistoryTreeNode cloned = new HistoryTreeNode(record, null, null, HistoryTreeNodeType.NODE);
                     filteredGroup.add(cloned);
                     filteredGroup.setSize(filteredGroup.getSize() + 1); // 更新组大小
                 }
@@ -455,7 +455,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private TreeNode combineRootTreeNode() {
-        HistoryTreeNode2 rootNode = new HistoryTreeNode2();
+        HistoryTreeNode rootNode = new HistoryTreeNode();
         Map<String, List<JsonRecord>> group = historyManager.groupByUpdateTime();
 
         // 将时间进行排序
@@ -477,12 +477,12 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             value.sort(Comparator.comparing(JsonRecord::getUpdateTime).reversed());
 
             // Map第一层是组节点
-            HistoryTreeNode2 groupNode = new HistoryTreeNode2(null, key, value.size(), HistoryTreeNodeType.GROUP);
+            HistoryTreeNode groupNode = new HistoryTreeNode(null, key, value.size(), HistoryTreeNodeType.GROUP);
 
             // 添加底层数据节点
             for (JsonRecord record : value) {
                 // Map第二层是具体数据节点
-                groupNode.add(new HistoryTreeNode2(record, null, null, HistoryTreeNodeType.NODE));
+                groupNode.add(new HistoryTreeNode(record, null, null, HistoryTreeNodeType.NODE));
             }
 
             rootNode.add(groupNode);
@@ -606,7 +606,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private void navigateInTree(Integer recordId, boolean shouldEdit) {
         DefaultTreeModel model = (DefaultTreeModel) showTree.getModel();
-        HistoryTreeNode2 root = (HistoryTreeNode2) model.getRoot();
+        HistoryTreeNode root = (HistoryTreeNode) model.getRoot();
 
         // 遍历树查找记录
         TreePath foundPath = findRecordPath(root, recordId);
@@ -633,12 +633,12 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         Enumeration<?> groups = root.children();
 
         while (groups.hasMoreElements()) {
-            HistoryTreeNode2 group = (HistoryTreeNode2) groups.nextElement();
+            HistoryTreeNode group = (HistoryTreeNode) groups.nextElement();
 
             // 检查组内的所有记录
             Enumeration<?> records = group.children();
             while (records.hasMoreElements()) {
-                HistoryTreeNode2 recordNode = (HistoryTreeNode2) records.nextElement();
+                HistoryTreeNode recordNode = (HistoryTreeNode) records.nextElement();
                 if (recordNode.getValue().getId().equals(recordId)) {
                     return new TreePath(recordNode.getPath());
                 }
@@ -690,7 +690,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         if (selectionPath != null) {
             savedInfo.isSelected = true;
-            HistoryTreeNode2 selectedNode = (HistoryTreeNode2) selectionPath.getLastPathComponent();
+            HistoryTreeNode selectedNode = (HistoryTreeNode) selectionPath.getLastPathComponent();
             if (null != selectedNode) {
                 TreeNode parentNode = selectedNode.getParent();
                 if (HistoryTreeNodeType.GROUP == selectedNode.getNodeType()) {
@@ -759,7 +759,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             if (targetGroup != null) {
                 // 在当前组内查找记录
                 for (int i = 0; i < targetGroup.getChildCount(); i++) {
-                    HistoryTreeNode2 recordNode = (HistoryTreeNode2) targetGroup.getChildAt(i);
+                    HistoryTreeNode recordNode = (HistoryTreeNode) targetGroup.getChildAt(i);
                     JsonRecord record = recordNode.getValue();
 
                     if (record.getId().equals(savedInfo.recordId)) {
@@ -828,7 +828,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                     String nodeString = treeNode.toString();
                     // 匹配名称
                     if (Objects.equals(groupName, nodeString)) {
-                        path = new TreePath(((HistoryTreeNode2) treeNode).getPath());
+                        path = new TreePath(((HistoryTreeNode) treeNode).getPath());
                         break;
                     }
                 }
@@ -844,7 +844,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     // 辅助方法：展开所有组节点
     private void expandAllGroups() {
-        HistoryTreeNode2 root = (HistoryTreeNode2) showTree.getModel().getRoot();
+        HistoryTreeNode root = (HistoryTreeNode) showTree.getModel().getRoot();
         Enumeration<TreeNode> groups = root.children();
 
         while (groups.hasMoreElements()) {
@@ -865,17 +865,17 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void expandSingleNode() {
-        HistoryTreeNode2 rootNode = (HistoryTreeNode2) showTree.getModel().getRoot();
+        HistoryTreeNode rootNode = (HistoryTreeNode) showTree.getModel().getRoot();
         List<TreeNode> children = JsonAssistantUtil.enumerationToList(rootNode.children());
         // 若只有一个节点
         if (children.size() == 1) {
-            HistoryTreeNode2 node = (HistoryTreeNode2) children.get(0);
+            HistoryTreeNode node = (HistoryTreeNode) children.get(0);
             // 展开
             showTree.expandPath(new TreePath(node.getPath()));
             // 选中该节点下的第一个元素
             List<TreeNode> nodeList = JsonAssistantUtil.enumerationToList(node.children());
             // 第一个节点元素
-            HistoryTreeNode2 child = (HistoryTreeNode2) nodeList.get(0);
+            HistoryTreeNode child = (HistoryTreeNode) nodeList.get(0);
             // 转为树路径
             TreePath path = new TreePath(child.getPath());
             // 选中节点
@@ -917,7 +917,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         } else {
             Optional.ofNullable(showTree.getSelectionPath())
                     .map(TreePath::getLastPathComponent)
-                    .map(el -> (HistoryTreeNode2) el)
+                    .map(el -> (HistoryTreeNode) el)
                     .ifPresent(node -> {
                         if (HistoryTreeNodeType.NODE == node.getNodeType()) {
                             ids.add(node.getValue().getId());
@@ -926,7 +926,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                             // 把子节点的id都添加进去
                             List<TreeNode> nodeList = JsonAssistantUtil.enumerationToList(node.children());
                             for (TreeNode treeNode : nodeList) {
-                                HistoryTreeNode2 childNode = (HistoryTreeNode2) treeNode;
+                                HistoryTreeNode childNode = (HistoryTreeNode) treeNode;
                                 ids.add(childNode.getValue().getId());
                             }
                         }
@@ -958,8 +958,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         } else {
             record = Optional.ofNullable(showTree.getSelectionPath())
                     .map(TreePath::getLastPathComponent)
-                    .map(el -> (HistoryTreeNode2) el)
-                    .map(HistoryTreeNode2::getValue)
+                    .map(el -> (HistoryTreeNode) el)
+                    .map(HistoryTreeNode::getValue)
                     .orElse(null);
         }
 

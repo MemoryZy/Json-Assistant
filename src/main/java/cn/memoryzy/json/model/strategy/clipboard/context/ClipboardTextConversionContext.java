@@ -3,8 +3,8 @@ package cn.memoryzy.json.model.strategy.clipboard.context;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.model.strategy.clipboard.*;
-import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import com.google.common.collect.Lists;
 
 import java.util.List;

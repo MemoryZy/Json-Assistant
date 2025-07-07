@@ -1,4 +1,4 @@
-package cn.memoryzy.json.service.persistent.v2;
+package cn.memoryzy.json.service.persistent;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
@@ -6,7 +6,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
+import cn.memoryzy.json.service.persistent.state.JsonRecord;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.Disposable;

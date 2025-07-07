@@ -9,7 +9,7 @@ import cn.memoryzy.json.action.deserializer.comment.SwaggerV3ToggleAction;
 import cn.memoryzy.json.action.deserializer.lombok.LombokGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
-import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import cn.memoryzy.json.util.JavaUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;

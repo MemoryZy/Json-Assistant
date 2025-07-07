@@ -1,42 +1,48 @@
 package cn.memoryzy.json.service.persistent.state;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.memoryzy.json.enums.DataFormatType;
+import com.intellij.util.xmlb.annotations.Tag;
+import com.intellij.util.xmlb.annotations.XCollection;
+
+import java.util.Set;
+
 /**
- * 编辑器外观
+ * 编辑器行为设置项
  *
  * @author Memory
- * @since 2024/11/18
+ * @since 2025/6/17
  */
-@Deprecated
+@Tag("editor-behavior")
 public class EditorBehaviorState {
 
     /**
-     * 自动识别并转换其他格式数据（总开关）
+     * 是否自动识别并转换剪贴板中的非标准格式数据（如XML、YAML等）（总开关）
      */
-    public boolean recognizeOtherFormats = true;
+    private boolean autoRecognizeFormats = true;
 
     /**
-     * 自动识别并转换 XML 格式为 JSON 数据
+     * 启用自动识别的数据格式列表（空列表表示禁用所有自动识别）
      */
-    public boolean recognizeXmlFormat = true;
+    private Set<DataFormatType> enabledFormats = CollUtil.newHashSet(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
 
-    /**
-     * 自动识别并转换 YAML 格式为 JSON 数据
-     */
-    public boolean recognizeYamlFormat = true;
 
-    /**
-     * 自动识别并转换 TOML 格式为 JSON 数据
-     */
-    public boolean recognizeTomlFormat = true;
+    public void setAutoRecognizeFormats(boolean autoRecognizeFormats) {
+        this.autoRecognizeFormats = autoRecognizeFormats;
+    }
 
-    /**
-     * 自动识别并转换 URL Param 格式为 JSON 数据
-     */
-    public boolean recognizeUrlParamFormat = true;
+    public void setEnabledFormats(Set<DataFormatType> enabledFormats) {
+        this.enabledFormats = enabledFormats;
+    }
 
-    /**
-     * 自动导入剪贴板数据前提示
-     */
-    public boolean promptBeforeImport = false;
+
+    public boolean isAutoRecognizeFormats() {
+        return autoRecognizeFormats;
+    }
+
+    @XCollection(propertyElementName = "formats", elementName = "item", style = XCollection.Style.v2)
+    public Set<DataFormatType> getEnabledFormats() {
+        return enabledFormats;
+    }
 
 }

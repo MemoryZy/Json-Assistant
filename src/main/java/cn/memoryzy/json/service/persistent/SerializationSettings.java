@@ -1,8 +1,8 @@
-package cn.memoryzy.json.service.persistent.v2;
+package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.service.persistent.state.v2.DeserializationState;
-import cn.memoryzy.json.service.persistent.state.v2.SerializationState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
+import cn.memoryzy.json.service.persistent.state.SerializationState;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;

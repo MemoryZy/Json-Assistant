@@ -11,11 +11,11 @@ import cn.memoryzy.json.enums.*;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.service.persistent.state.v2.*;
-import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
-import cn.memoryzy.json.service.persistent.v2.HistoryManager;
-import cn.memoryzy.json.service.persistent.v2.SerializationSettings;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.GeneralSettings;
+import cn.memoryzy.json.service.persistent.HistoryManager;
+import cn.memoryzy.json.service.persistent.SerializationSettings;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -27,6 +27,7 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.serialization.JDomSerializationUtil;
 
 import java.io.File;
@@ -115,21 +116,26 @@ public final class ConfigurationMerger {
 
             if (MapUtil.isNotEmpty(announcementStatsMap) && null != readAnnouncements) {
                 for (Map.Entry<String, Object> entry : announcementStatsMap.entrySet()) {
-                    Map<String, Object> value = (Map<String, Object>) entry.getValue();
-
-                    Integer displayCount = (Integer) value.get("displayCount");
-                    Long lastShownTime = (Long) value.get("lastShownTime");
-                    Boolean shouldShowAgain = (Boolean) value.get("shouldShowAgain");
-
-                    AnnouncementStats announcementStats = new AnnouncementStats();
-                    if (null != displayCount) announcementStats.setDisplayCount(displayCount);
-                    if (null != lastShownTime) announcementStats.setLastShownTime(lastShownTime);
-                    if (null != shouldShowAgain) announcementStats.setShouldShowAgain(shouldShowAgain);
-
+                    AnnouncementStats announcementStats = getAnnouncementStats(entry);
                     readAnnouncements.put(entry.getKey(), announcementStats);
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static @NotNull AnnouncementStats getAnnouncementStats(Map.Entry<String, Object> entry) {
+        Map<String, Object> value = (Map<String, Object>) entry.getValue();
+
+        Integer displayCount = (Integer) value.get("displayCount");
+        Long lastShownTime = (Long) value.get("lastShownTime");
+        Boolean shouldShowAgain = (Boolean) value.get("shouldShowAgain");
+
+        AnnouncementStats announcementStats = new AnnouncementStats();
+        if (null != displayCount) announcementStats.setDisplayCount(displayCount);
+        if (null != lastShownTime) announcementStats.setLastShownTime(lastShownTime);
+        if (null != shouldShowAgain) announcementStats.setShouldShowAgain(shouldShowAgain);
+        return announcementStats;
     }
 
     @SuppressWarnings("DataFlowIssue")
