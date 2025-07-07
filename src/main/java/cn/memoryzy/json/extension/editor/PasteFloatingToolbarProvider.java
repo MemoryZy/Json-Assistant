@@ -61,7 +61,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 存储所有已使用的剪贴板数据哈希值
      */
-    private static final Set<String> USED_HASHES = ConcurrentHashMap.newKeySet();
+    private final Set<String> usedHashes = ConcurrentHashMap.newKeySet();
 
     private final EditorBehaviorState behaviorState;
 
@@ -170,8 +170,8 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 全局哈希检查
      */
-    public static boolean isHashUsedGlobally(String hash) {
-        return USED_HASHES.contains(hash);
+    public boolean isHashUsedGlobally(String hash) {
+        return usedHashes.contains(hash);
     }
 
 
@@ -229,10 +229,10 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
      */
     private void registerGlobalUsage(Editor editor, String hash) {
         // 自动清理旧记录，保持集合大小可控
-        if (USED_HASHES.size() >= MAX_HASHES) {
-            USED_HASHES.clear();
+        if (usedHashes.size() >= MAX_HASHES) {
+            usedHashes.clear();
         }
-        USED_HASHES.add(hash);
+        usedHashes.add(hash);
 
         // 隐藏工具栏组件
         FloatingToolbarComponent component = findAndCleanFloatingToolbar(editor);
@@ -259,7 +259,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
 
     @Override
     public void dispose() {
-        USED_HASHES.clear();
+        usedHashes.clear();
         applicationConnection.disconnect();
     }
 

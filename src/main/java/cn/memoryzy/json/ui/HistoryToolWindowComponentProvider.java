@@ -43,6 +43,7 @@ import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
@@ -80,6 +81,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
      * 分割比例持久化
      */
     public static final String SPLITTER_PROPORTION_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".HistorySplitterProportionKey";
+
+    public static final Key<String> HISTORY_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".HISTORY_EDITOR_FLAG");
 
     private final Project project;
     private final HistoryManager historyManager;
@@ -512,6 +515,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         JComponent component = editor.getComponent();
         component.setFont(UIUtils.consolasFont(15));
 
+        // 标记
+        editor.putUserData(HISTORY_EDITOR_FLAG, JsonAssistantPlugin.PLUGIN_AUTHOR);
         return editor;
     }
 

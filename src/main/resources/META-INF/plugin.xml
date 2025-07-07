@@ -56,7 +56,8 @@
         <fileEditorProvider implementation="cn.memoryzy.json.extension.editor.JsonTreeFileEditorProvider"/>
         <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
-        
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
+
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"
                          bundle="messages.JsonAssistantBundle"
@@ -180,8 +181,12 @@
             <add-to-group group-id="HelpMenu" relative-to-action="WhatsNewAction" anchor="before"/>
         </group>
 
-        <group id="JsonAssistant.Group.EditorFloatGroup">
+        <group id="JsonAssistant.Group.PasteEditorFloatGroup">
             <action id="JsonAssistant.Action.PasteDataAction" class="cn.memoryzy.json.action.toolwindow.PasteDataAction"/>
+        </group>
+
+        <group id="JsonAssistant.Group.HistoryFloatGroup">
+            <action id="JsonAssistant.Action.OpenHistoryInEditorAction" class="cn.memoryzy.json.action.toolwindow.history.OpenHistoryInEditorAction"/>
         </group>
     </actions>
 
