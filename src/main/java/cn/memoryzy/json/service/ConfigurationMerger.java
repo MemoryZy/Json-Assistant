@@ -12,7 +12,10 @@ import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.state.v2.*;
-import cn.memoryzy.json.service.persistent.v2.*;
+import cn.memoryzy.json.service.persistent.v2.GeneralSettings;
+import cn.memoryzy.json.service.persistent.v2.HistoryManager;
+import cn.memoryzy.json.service.persistent.v2.SerializationSettings;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
@@ -46,7 +49,6 @@ public final class ConfigurationMerger {
     private static final Logger LOG = Logger.getInstance(ConfigurationMerger.class);
 
     private final Element settingsElement = getPluginSettingsElement();
-    private final Element blacklistPersistentDataElement = getBlacklistPersistentDataElement();
 
     public static ConfigurationMerger getInstance() {
         return ApplicationManager.getApplication().getService(ConfigurationMerger.class);
@@ -59,10 +61,8 @@ public final class ConfigurationMerger {
             mergeGeneralLegacySettings();
             mergeToolWindowLegacySettings();
             mergeSerializationLegacySettings();
-            mergeBlacklistLegacyData();
             // 删除旧配置文件
             deleteLegacyPluginSettingsFile();
-            deleteLegacyBlacklistPersistentFile();
         } catch (Exception e) {
             LOG.warn("[Json Assistant] An exception occurred when merging the old configuration", e);
         }
@@ -160,7 +160,6 @@ public final class ConfigurationMerger {
             Boolean recognizeYamlFormat = (Boolean) wrapper.get("recognizeYamlFormat");
             Boolean recognizeTomlFormat = (Boolean) wrapper.get("recognizeTomlFormat");
             Boolean recognizeUrlParamFormat = (Boolean) wrapper.get("recognizeUrlParamFormat");
-            Boolean promptBeforeImport = (Boolean) wrapper.get("promptBeforeImport");
 
             if (null != recognizeOtherFormats) behaviorState.setAutoRecognizeFormats(recognizeOtherFormats);
 
@@ -172,7 +171,6 @@ public final class ConfigurationMerger {
                 enabledFormats.add(DataFormatType.URL_PARAM);
 
             if (CollUtil.isNotEmpty(enabledFormats)) behaviorState.setEnabledFormats(enabledFormats);
-            if (null != promptBeforeImport) behaviorState.setShouldPromptBeforeImport(promptBeforeImport);
         }
 
         // ---------------------------------- JSON 查询配置
@@ -249,69 +247,6 @@ public final class ConfigurationMerger {
             if (null != setterLombokAnnotation) deserializationState.setEnableLombokSetter(setterLombokAnnotation);
             if (null != swaggerAnnotation) deserializationState.setEnableSwaggerAnnotation(swaggerAnnotation);
             if (null != swaggerV3Annotation) deserializationState.setEnableSwagger3Annotation(swaggerV3Annotation);
-        }
-    }
-
-    @SuppressWarnings("DuplicatedCode")
-    private void mergeBlacklistLegacyData() {
-        if (null == blacklistPersistentDataElement) return;
-        BlacklistManager manager = BlacklistManager.getInstance();
-        String blacklistStr = blacklistPersistentDataElement.getAttributeValue("blacklist");
-        if (StrUtil.isNotBlank(blacklistStr)) {
-            blacklistStr = StrUtil.str(Base64.decode(blacklistStr), StandardCharsets.UTF_8);
-            ArrayWrapper arrayWrapper = JsonUtil.isJson(blacklistStr)
-                    ? JsonUtil.parseArray(blacklistStr)
-                    : Json5Util.parseArray(blacklistStr);
-
-            if (arrayWrapper.isEmpty()) return;
-
-            for (Object el : arrayWrapper) {
-                ObjectWrapper element = (ObjectWrapper) el;
-                Integer id = (Integer) element.get("id");
-                String name = (String) element.get("name");
-                String shortText = (String) element.get("shortText");
-                String originalText = (String) element.get("originalText");
-                String originalDataTypeStr = (String) element.get("originalDataType");
-                DataFormatType originalDataType = DataFormatType.ofValue(originalDataTypeStr);
-                JsonWrapper jsonWrapper = (JsonWrapper) element.get("jsonWrapper");
-                Object insertTimeTmp = element.get("insertTime");
-
-                // 若id和原文都不存在
-                if (null == id || StrUtil.isBlank(originalText)) {
-                    continue;
-                }
-
-                JsonRecord record = new JsonRecord()
-                        .setId(id).setRawText(originalText);
-
-                if (null != name) record.setName(name);
-                if (null != shortText) record.setDisplayText(shortText);
-                if (null != originalDataType) record.setSourceType(originalDataType);
-                if (null != jsonWrapper) record.setWrapper(jsonWrapper);
-
-                Long insertTime = null;
-                if (null != insertTimeTmp) {
-                    // 可能是时间戳、可能是时间字符串
-                    String timeStr = insertTimeTmp + "";
-                    if (!JsonAssistantUtil.isValidTimestamp(timeStr)) {
-                        try {
-                            insertTime = DateUtil.parse(timeStr).getTime();
-                        } catch (Exception ignored) {
-                        }
-                    } else {
-                        insertTime = NumberUtil.parseLong(timeStr);
-                    }
-                }
-
-                // 如果没有时间，则给一个默认值
-                if (null == insertTime) {
-                    insertTime = System.currentTimeMillis();
-                }
-
-                record.setCreateTime(insertTime).setUpdateTime(insertTime);
-
-                manager.add(record);
-            }
         }
     }
 
@@ -396,26 +331,6 @@ public final class ConfigurationMerger {
 
     private void deleteLegacyPluginSettingsFile() {
         File file = PlatformUtil.getOptionsConfigFile("JsonAssistantPersistentState");
-        FileUtil.del(file);
-    }
-
-    private Element getBlacklistPersistentDataElement() {
-        try {
-            File file = PlatformUtil.getOptionsConfigFile("ClipboardDataBlacklistPersistentState");
-            if (file.exists()) {
-                Element root = JDomConvertingUtil.load(file.toPath());
-                if (null != root) {
-                    return JDomSerializationUtil.findComponent(root, "Json Assistant Clipboard Data Blacklist");
-                }
-            }
-        } catch (Exception ignored) {
-        }
-
-        return null;
-    }
-
-    private void deleteLegacyBlacklistPersistentFile() {
-        File file = PlatformUtil.getOptionsConfigFile("ClipboardDataBlacklistPersistentState");
         FileUtil.del(file);
     }
 

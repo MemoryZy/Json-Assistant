@@ -4,10 +4,10 @@ import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.event.HistoryToggleEvent;
+import cn.memoryzy.json.event.HistoryEnabledEvent;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
-import cn.memoryzy.json.util.ToolWindowUtil;
+import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.components.Service;
@@ -84,7 +84,7 @@ public final class HistoryToolWindowManager implements Disposable {
     }
 
     private void registerConfigurationUpdateEventHandlers() {
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryToggleEvent.TOPIC, (HistoryToggleEvent) this::setToolWindowAvailable);
+        JsonAssistantToolWindowComponentProvider.APPLICATION_CONNECTION.subscribe(HistoryEnabledEvent.TOPIC, (HistoryEnabledEvent) this::setToolWindowAvailable);
     }
 
     public void show() {
@@ -102,8 +102,11 @@ public final class HistoryToolWindowManager implements Disposable {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ContentManager contentManager = toolWindow.getContentManager();
 
+        Content content = contentFactory.createContent(null, "", true);
         HistoryToolWindowComponentProvider provider = new HistoryToolWindowComponentProvider(project);
-        Content content = contentFactory.createContent(provider.createComponent(), "", true);
+
+        content.setComponent(provider.createComponent());
+        content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
         content.setCloseable(false);
         content.setDisposer(provider);
         contentManager.addContent(content, 0);

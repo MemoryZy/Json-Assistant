@@ -27,7 +27,7 @@ public class AutoCompleteWrapper extends TransparentContainer {
 
     public AutoCompleteWrapper(Project project, Collection<String> variants, Supplier<String> propertyNameSupplier) {
         super(new BorderLayout());
-        this.completion = new ModernTextFieldWithAutoCompletion(project, variants);
+        this.completion = new ModernTextFieldWithAutoCompletion(project, variants, propertyNameSupplier);
         this.initComponents(propertyNameSupplier);
     }
 

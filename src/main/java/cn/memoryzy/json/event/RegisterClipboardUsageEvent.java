@@ -1,5 +1,6 @@
 package cn.memoryzy.json.event;
 
+import com.intellij.openapi.editor.Editor;
 import com.intellij.util.messages.Topic;
 
 /**
@@ -10,6 +11,6 @@ public interface RegisterClipboardUsageEvent {
 
     Topic<RegisterClipboardUsageEvent> TOPIC = Topic.create("Register Clipboard Usage", RegisterClipboardUsageEvent.class);
 
-    void accept(String hash);
+    void accept(Editor editor, String hash);
 
 }

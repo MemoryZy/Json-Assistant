@@ -3,7 +3,8 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.JsonQueryComponentProvider;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.actionSystem.*;
@@ -20,7 +21,6 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.Optional;
 
 /**
  * @author Memory
@@ -29,18 +29,21 @@ import java.util.Optional;
 public class JsonQueryAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
+    private final JsonQueryComponentProvider queryProvider;
 
-    public JsonQueryAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonQueryAction(EditorEx editor, CombineCardLayout cardLayout, JsonQueryComponentProvider queryProvider, SimpleToolWindowPanel windowPanel) {
         super();
-        this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.json.query.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.query.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.SEARCH);
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt Q"), simpleToolWindowPanel);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt Q"), windowPanel);
+
+        this.editor = editor;
+        this.cardLayout = cardLayout;
+        this.queryProvider = queryProvider;
     }
 
     @Override
@@ -65,17 +68,17 @@ public class JsonQueryAction extends DumbAwareAction implements CustomComponentA
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        Optional.ofNullable(simpleToolWindowPanel.getContent())
-                .ifPresent(el -> ((JsonAssistantToolWindowPanel) el)
-                        .switchToCard(null, null, UIUtils.JSON_QUERY_CARD_NAME));
+        // 切换到树视图
+        cardLayout.toggleCard(UIUtils.JSON_QUERY_CARD_NAME);
+        // 设置文本
+        queryProvider.setDocumentText(editor.getDocument().getText());
     }
 
     @Override
     public void update(@NotNull AnActionEvent event) {
         event.getPresentation().setEnabled(
                 GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
-                        && !editor.isViewer());
+                        && cardLayout.isEditorView());
     }
 
     private String getShortcut() {

@@ -8,6 +8,8 @@ import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
 import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
 import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
@@ -61,6 +63,11 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
      */
     private static final Set<String> USED_HASHES = ConcurrentHashMap.newKeySet();
 
+    private final EditorBehaviorState behaviorState;
+
+    public PasteFloatingToolbarProvider() {
+        this.behaviorState = ToolWindowSettings.getInstance().getBehaviorState();
+    }
 
     @NotNull
     public ActionGroup getActionGroup() {
@@ -79,17 +86,20 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         // 如果用这个方式提供剪贴板数据，那么任何标签页都可以存在此功能
         Editor editor = CommonDataKeys.EDITOR.getData(dataContext);
         if (editor == null || editor.isDisposed()) {
+            component.scheduleHide();
             return;
         }
 
         Project project = PlatformDataKeys.PROJECT.getData(dataContext);
         if (project == null || project.isDisposed()) {
+            component.scheduleHide();
             return;
         }
 
         // 是否为插件自定义的编辑器
         String userData = editor.getUserData(JsonAssistantToolWindowComponentProvider.PLUGIN_EDITOR_FLAG);
         if (StrUtil.isBlank(userData)) {
+            component.scheduleHide();
             return;
         }
 
@@ -102,6 +112,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         // 获取剪贴板数据
         String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
         if (StrUtil.isBlank(clipboard)) {
+            component.scheduleHide();
             return;
         }
 
@@ -109,6 +120,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         ClipboardTextConversionContext context = new ClipboardTextConversionContext();
         String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
         if (StrUtil.isBlank(processedText)) {
+            component.scheduleHide();
             return;
         }
 
@@ -118,6 +130,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
                 : JsonUtil.parse(processedText);
 
         if (null == wrapper || wrapper.noItems()) {
+            component.scheduleHide();
             return;
         }
 
@@ -126,6 +139,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
 
         // 检查全局使用状态
         if (isHashUsedGlobally(hash)) {
+            component.scheduleHide();
             return;
         }
 
@@ -165,21 +179,20 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
      * 更新工具栏组件状态
      */
     private void updateToolbarState(Editor editor, String clipboard) {
-        // 还有一种方式可以防止 在原floatingComponentMap在 Editor 未回收时丢失弱引用，就是在原Editor释放前，先一步remove此Editor所表示的键值对，
-        // 但是这样可能会和此方法冲突
+        FloatingToolbarComponent component = findAndCleanFloatingToolbar(editor);
+        if (null == component) return;
 
-        // 展示
-        FloatingToolbarComponent component = null;
-        for (Editor cached : new ArrayList<>(floatingComponentMap.keySet())) {
-            if (cached == null || cached.isDisposed()) {
-                // 清理无效引用
-                floatingComponentMap.remove(cached);
-            } else if (cached == editor) {
-                component = floatingComponentMap.get(cached);
-            }
+        // 配置允许了，并且当前编辑器内容为空
+        if (!behaviorState.isAutoRecognizeFormats() || StrUtil.isNotBlank(editor.getDocument().getText())) {
+            component.scheduleHide();
+            return;
         }
 
-        if (null == component) return;
+        // 判断剪贴板数据是否为空
+        if (StrUtil.isBlank(clipboard)) {
+            component.scheduleHide();
+            return;
+        }
 
         // 能否被转为 Json
         ClipboardTextConversionContext context = new ClipboardTextConversionContext();
@@ -214,12 +227,34 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 注册全局使用
      */
-    private void registerGlobalUsage(String hash) {
+    private void registerGlobalUsage(Editor editor, String hash) {
         // 自动清理旧记录，保持集合大小可控
         if (USED_HASHES.size() >= MAX_HASHES) {
             USED_HASHES.clear();
         }
         USED_HASHES.add(hash);
+
+        // 隐藏工具栏组件
+        FloatingToolbarComponent component = findAndCleanFloatingToolbar(editor);
+        if (null != component) component.scheduleHide();
+    }
+
+    private FloatingToolbarComponent findAndCleanFloatingToolbar(Editor editor) {
+        FloatingToolbarComponent component = null;
+        for (Editor cached : new ArrayList<>(floatingComponentMap.keySet())) {
+            if (cached == null || cached.isDisposed()) {
+                // 清理无效引用
+                floatingComponentMap.remove(cached);
+            } else if (cached == editor) {
+                component = floatingComponentMap.get(cached);
+            }
+        }
+
+        return component;
+    }
+
+    private void editorDisposed(Editor editor) {
+        floatingComponentMap.remove(editor);
     }
 
     @Override

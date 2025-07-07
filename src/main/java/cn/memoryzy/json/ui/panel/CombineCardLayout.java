@@ -37,21 +37,20 @@ public class CombineCardLayout extends JBCardLayout {
         show(cardName);
     }
 
-    public boolean isEditorCardDisplayed() {
+    public boolean isEditorView() {
         return UIUtils.JSON_EDITOR_CARD_NAME.equals(currentCardName);
     }
 
-    public boolean isTreeCardDisplayed() {
+    public boolean isTreeView() {
         return UIUtils.JSON_TREE_CARD_NAME.equals(currentCardName);
     }
 
-    public boolean isQueryCardDisplayed() {
+    public boolean isQueryView() {
         return UIUtils.JSON_QUERY_CARD_NAME.equals(currentCardName);
     }
 
-    public boolean isGridCardDisplayed() {
+    public boolean isGridView() {
         return UIUtils.JSON_GRID_CARD_NAME.equals(currentCardName);
     }
-
 
 }

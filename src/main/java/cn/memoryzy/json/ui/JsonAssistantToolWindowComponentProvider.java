@@ -22,12 +22,14 @@ import cn.memoryzy.json.ui.listener.EditorLineChangeMonitor;
 import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.*;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
 import com.intellij.openapi.editor.EditorSettings;
@@ -50,6 +52,7 @@ import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,37 +67,51 @@ import java.util.Objects;
  */
 public class JsonAssistantToolWindowComponentProvider implements Disposable, EditorColorsListener {
 
-    private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
     public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
     public static final String HISTORY_ADD_JUMP_KEY = "ADD";
     public static final String HISTORY_EXIST_JUMP_KEY = "EXIST";
 
+    /**
+     * 消息总线（应用级）
+     */
+    public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
+
     private final Project project;
+    private final Content currentContent;
     private final EditorBehaviorState behaviorState;
     private final EditorVisualState visualState;
     private final HistoryState historyState;
     private final HistoryManager historyManager;
 
-    /**
-     * 当前编辑器
-     */
+    private final SimpleToolWindowPanel toolWindowPanel;
+    private final CombineCardLayout cardLayout;
+    private final JPanel cardPanel;
     private final EditorEx currentEditor;
 
-    /**
-     * 当前内容页
-     */
-    private Content currentContent;
+    private final JsonStructureComponentProvider treeProvider;
+    private final JsonQueryComponentProvider queryProvider;
+    private final JsonGridComponentProvider gridProvider;
 
 
-    public JsonAssistantToolWindowComponentProvider(Project project, FileType fileType) {
+    public JsonAssistantToolWindowComponentProvider(Project project, Content content, FileType fileType) {
         this.project = project;
+        this.currentContent = content;
+
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         this.behaviorState = toolWindowSettings.getBehaviorState();
         this.visualState = toolWindowSettings.getVisualState();
         this.historyState = toolWindowSettings.getHistoryState();
         this.historyManager = HistoryManager.getInstance(project);
-        // 创建编辑器
+
+        this.toolWindowPanel = new SimpleToolWindowPanel(false, false);
+        this.cardLayout = new CombineCardLayout();
+        this.cardPanel = new JPanel(cardLayout);
         this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType, false, EditorKind.MAIN_EDITOR, "");
+
+        this.treeProvider = new JsonStructureComponentProvider(null, toolWindowPanel, getStructureSetting());
+        this.queryProvider = new JsonQueryComponentProvider(project);
+        this.gridProvider = new JsonGridComponentProvider(null);
+        Disposer.register(this, queryProvider);
     }
 
     public JComponent createComponent() {
@@ -108,25 +125,14 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         registerGlobalThemeChangedEventHandlers();
 
         // 主面板（携带工具栏）
-        SimpleToolWindowPanel toolWindowPanel = new SimpleToolWindowPanel(false, false);
-        // 卡片布局
-        CombineCardLayout cardLayout = new CombineCardLayout();
-        // 卡片面板
-        JPanel cardPanel = new JPanel(cardLayout);
-
-        toolWindowPanel.setContent(createRootPanel(toolWindowPanel, cardLayout, cardPanel));
-        toolWindowPanel.setToolbar(createToolbar(toolWindowPanel));
+        toolWindowPanel.setContent(createRootPanel(cardLayout, cardPanel));
+        toolWindowPanel.setToolbar(createToolbar());
         toolWindowPanel.setProvideQuickActions(true);
         return toolWindowPanel;
     }
 
 
-    private JsonAssistantToolWindowPanel createRootPanel(SimpleToolWindowPanel simpleToolWindowPanel, CombineCardLayout cardLayout, JPanel cardPanel) {
-        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, getStructureSetting());
-        JsonQueryComponentProvider queryProvider = new JsonQueryComponentProvider(project);
-        JsonGridComponentProvider gridProvider = new JsonGridComponentProvider(null);
-        Disposer.register(this, queryProvider);
-
+    private JsonAssistantToolWindowPanel createRootPanel(CombineCardLayout cardLayout, JPanel cardPanel) {
         JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout())
                 .setEditor(this.currentEditor)
                 .setTreeProvider(treeProvider)
@@ -206,7 +212,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     }
 
     private void configureEditorBehavior() {
-        MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(behaviorState, historyState, historyManager);
+        MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(historyState, historyManager);
         Disposer.register(this, focusMonitor);
 
         currentEditor.addFocusListener(focusMonitor);
@@ -228,29 +234,30 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
      */
     private void registerConfigurationUpdateEventHandlers() {
         // 切换行号展示
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
+        APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
+        APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
+        APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
     }
 
     private void registerGlobalThemeChangedEventHandlers() {
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) this);
+        APPLICATION_CONNECTION.subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) this);
     }
 
-    public JComponent createToolbar(SimpleToolWindowPanel toolWindowPanel) {
+
+    public JComponent createToolbar() {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonBeautifyToolWindowAction(currentEditor, toolWindowPanel));
-        actionGroup.add(new JsonMinifyToolWindowAction(currentEditor, toolWindowPanel));
+        actionGroup.add(new JsonBeautifyToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
+        actionGroup.add(new JsonMinifyToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new JsonStructureToolWindowAction(currentEditor, toolWindowPanel));
-        actionGroup.add(new JsonQueryAction(currentEditor, toolWindowPanel));
-        actionGroup.add(new JsonGridToolWindowAction(currentEditor, toolWindowPanel));
+        actionGroup.add(new JsonStructureToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
+        actionGroup.add(new JsonQueryAction(currentEditor, cardLayout, queryProvider, toolWindowPanel));
+        actionGroup.add(new JsonGridToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new ToggleUseSoftWrapsAction(currentEditor, toolWindowPanel));
-        actionGroup.add(new ScrollToTheEndAction(currentEditor, toolWindowPanel));
+        actionGroup.add(new ToggleUseSoftWrapsAction(currentEditor, cardLayout));
+        actionGroup.add(new ScrollToTheEndAction(currentEditor, cardLayout));
         actionGroup.add(Separator.create());
-        actionGroup.add(new SaveToDiskAction(currentEditor, toolWindowPanel));
-        actionGroup.add(new ClearEditorAction(currentEditor, toolWindowPanel));
+        actionGroup.add(new SaveToDiskAction(currentEditor, cardLayout));
+        actionGroup.add(new ClearEditorAction(currentEditor, cardLayout));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         toolbar.setTargetComponent(toolWindowPanel);
@@ -345,13 +352,12 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
             // 新增
             record = historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
             // 触发事件
-            ApplicationManager.getApplication().getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
+            project.getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
+
             message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_ADD_JUMP_KEY);
         } else {
             message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_EXIST_JUMP_KEY);
         }
-
-        NavigateRecordEvent navigateEvent = ApplicationManager.getApplication().getMessageBus().syncPublisher(NavigateRecordEvent.TOPIC);
 
         // 提示粘贴成功的消息
         JsonRecord finalRecord = record;
@@ -366,18 +372,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
                         HistoryToolWindowManager.getInstance(project).show();
                         boolean shouldEdit = Objects.equals(HISTORY_ADD_JUMP_KEY, url);
                         // 打开历史记录窗口，展示刚添加的记录，给名称编辑器指定焦点
-                        navigateEvent.navigate(finalRecord.getId(), shouldEdit);
+                        project.getMessageBus().syncPublisher(NavigateRecordEvent.TOPIC).navigate(finalRecord.getId(), shouldEdit);
                     }
                 });
-    }
-
-
-    public Content getCurrentContent() {
-        return currentContent;
-    }
-
-    public void setCurrentContent(Content currentContent) {
-        this.currentContent = currentContent;
     }
 
     private StructureSetting getStructureSetting() {

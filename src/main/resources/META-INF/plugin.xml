@@ -168,8 +168,8 @@
             <action id="JsonAssistant.Action.DonateAction" class="cn.memoryzy.json.action.notification.DonateAction"/>
 
 <!--        TODO 待删除    -->
-            <separator/>
-            <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatNewConfigAction"/>
+<!--            <separator/>-->
+            <!--<action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatNewConfigAction"/>-->
         </group>
 
         <group id="JsonAssistant.Group.JsonAssistantHelpMenu">

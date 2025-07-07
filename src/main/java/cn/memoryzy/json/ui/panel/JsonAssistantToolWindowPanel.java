@@ -7,13 +7,11 @@ import cn.memoryzy.json.ui.JsonQueryComponentProvider;
 import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author Memory
@@ -48,12 +46,6 @@ public class JsonAssistantToolWindowPanel extends JPanel {
         }
     }
 
-    public static boolean isEditorCardDisplayed(SimpleToolWindowPanel simpleToolWindowPanel) {
-        return Optional.ofNullable((JsonAssistantToolWindowPanel) simpleToolWindowPanel.getContent())
-                .map(JsonAssistantToolWindowPanel::getCardLayout)
-                .map(CombineCardLayout::isEditorCardDisplayed)
-                .orElse(false);
-    }
 
     // region Getter、Setter
     public JsonAssistantToolWindowPanel setEditor(EditorEx editor) {

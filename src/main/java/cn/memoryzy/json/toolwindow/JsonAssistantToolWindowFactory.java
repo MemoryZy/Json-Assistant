@@ -55,9 +55,6 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         ContentManager contentManager = toolWindow.getContentManager();
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
-        // 主界面
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON5);
-
         // 补充工具窗口的操作栏
         toolWindowEx.setTabActions(createTabActions(contentFactory, toolWindowEx));
         toolWindowEx.setTitleActions(createTitleActions(toolWindowEx));
@@ -65,7 +62,8 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
 
         // 创建初始内容页
         Content content = contentFactory.createContent(null, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, false);
-        window.setCurrentContent(content);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, FileTypeHolder.JSON5);
+
         content.setComponent(window.createComponent());
         content.setCloseable(false);
         content.setDisposer(window);
@@ -148,8 +146,6 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         group.add(new MoveToEditorAction(toolWindowEx));
         group.add(new FloatingWindowAction(toolWindowEx));
         group.add(new EditInNewWindowAction(toolWindowEx));
-        group.add(Separator.create());
-        group.add(new ManageClipboardDataBlacklistAction(toolWindowEx));
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         group.add(Separator.create());

@@ -51,10 +51,10 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
 
         boolean enabled = false;
         Presentation presentation = e.getPresentation();
-        if (cardLayout != null) {
-            boolean treeCardDisplayed = cardLayout.isTreeCardDisplayed();
-            boolean queryCardDisplayed = cardLayout.isQueryCardDisplayed();
-            boolean gridCardDisplayed = cardLayout.isGridCardDisplayed();
+        if (null != getEventProject(e) && cardLayout != null) {
+            boolean treeCardDisplayed = cardLayout.isTreeView();
+            boolean queryCardDisplayed = cardLayout.isQueryView();
+            boolean gridCardDisplayed = cardLayout.isGridView();
 
             if (treeCardDisplayed || queryCardDisplayed || gridCardDisplayed) {
                 enabled = true;

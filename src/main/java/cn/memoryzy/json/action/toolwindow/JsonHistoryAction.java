@@ -1,36 +1,25 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.HistoryDisplayMode;
-import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.state.HistoryLimitedList;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
-import cn.memoryzy.json.ui.dialog.JsonHistoryListChooser;
-import cn.memoryzy.json.ui.dialog.JsonHistoryTreeChooser;
-import cn.memoryzy.json.util.Notifications;
+import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import com.intellij.ide.HelpTooltip;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
 import com.intellij.openapi.actionSystem.impl.ActionButton;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.keymap.MacKeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.JDOMUtil;
 import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
-import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -38,14 +27,10 @@ import java.util.List;
  */
 public class JsonHistoryAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
-    private static final Logger LOG = Logger.getInstance(JsonHistoryAction.class);
-
-    private final ToolWindowEx toolWindow;
     private final HistoryState historyState;
 
     public JsonHistoryAction(ToolWindowEx toolWindow) {
         super();
-        this.toolWindow = toolWindow;
         this.historyState = ToolWindowSettings.getInstance().getHistoryState();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
@@ -77,11 +62,7 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        if (historyState.getHistoryDisplayMode() == HistoryDisplayMode.TREE) {
-            new JsonHistoryTreeChooser(project, toolWindow).show();
-        } else {
-            new JsonHistoryListChooser(project, toolWindow).show();
-        }
+        HistoryToolWindowManager.getInstance(Objects.requireNonNull(project)).show();
     }
 
     @Override
@@ -96,173 +77,6 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
         }
         return KeymapUtil.getShortcutsText(shortcuts);
     }
-
-
-    /**
-     * 兼容旧版本的历史记录数据
-     *
-     * @param project 项目
-     */
-    // public static void compatibilityHistory(Project project) {
-    //     HistoryState historyState = ToolWindowSettings.getInstance().getHistoryState();
-    //     if (historyState.isEnableHistory()) {
-    //         // 历史记录检测
-    //         ApplicationManager.getApplication().invokeLater(() -> {
-    //             ComponentManagerSettings projectDataManagerSettings = PlatformUtil.getProjectDataManagerSettings(project);
-    //             // 项目数据（.idea/misc.xml）
-    //             Path path = projectDataManagerSettings.getPath();
-    //             // 根节点
-    //             Element rootElement = projectDataManagerSettings.getRootElement();
-    //
-    //             // 获取之前版本历史记录的 State Key
-    //             Element historyElement = projectDataManagerSettings.getComponentElement("JsonAssistantJsonHistory");
-    //             // 获取属性值
-    //             String oriHistory = (historyElement == null) ? null : historyElement.getAttributeValue("historyList");
-    //
-    //             // 没有数据的话，退出
-    //             if (StrUtil.isBlank(oriHistory) && !JsonUtil.isJsonArray(oriHistory)) {
-    //                 return;
-    //             }
-    //
-    //             ArrayWrapper array = JsonUtil.parseArray(oriHistory);
-    //             if (array.isEmpty()) {
-    //                 return;
-    //             }
-    //
-    //             // 与当前版本存在的历史记录做匹配，看看是否有匹配项，有的话就不计入
-    //             List<JsonWrapper> oldHistory = new ArrayList<>();
-    //             HistoryLimitedList newHistory = JsonHistoryPersistentState.getInstance(project).history;
-    //             for (Object data : array) {
-    //                 JsonWrapper wrapper = null;
-    //                 String dataStr = (String) data;
-    //                 if (JsonUtil.isJson(dataStr)) {
-    //                     if (JsonUtil.isJsonObject(dataStr)) {
-    //                         wrapper = JsonUtil.parseObject(dataStr);
-    //                     } else {
-    //                         wrapper = JsonUtil.parseArray(dataStr);
-    //                     }
-    //                 } else if (Json5Util.isJson5(dataStr)) {
-    //                     if (Json5Util.isJson5Object(dataStr)) {
-    //                         wrapper = Json5Util.parseObject(dataStr);
-    //                     } else {
-    //                         wrapper = Json5Util.parseArray(dataStr);
-    //                     }
-    //                 }
-    //
-    //                 // 此Json是否存在
-    //                 if (Objects.isNull(wrapper) || newHistory.exists(wrapper)) {
-    //                     continue;
-    //                 }
-    //
-    //                 oldHistory.add(wrapper);
-    //             }
-    //
-    //             // 都存在于现在的历史记录的话，就结束
-    //             if (oldHistory.isEmpty()) {
-    //                 return;
-    //             }
-    //
-    //             NotificationAction importAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.recover.history.text"),
-    //                     () -> importRecords(project, oldHistory, newHistory, path, rootElement, historyElement));
-    //
-    //             NotificationAction ignoreAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.ignore.text"),
-    //                     () -> ignoreRecords(path, rootElement, historyElement));
-    //
-    //             ArrayList<NotificationAction> notificationActions = Lists.newArrayList(importAction, ignoreAction);
-    //
-    //             Notifications.showFullStickyNotification(
-    //                     "Json Assistant",
-    //                     JsonAssistantBundle.messageOnSystem("notification.recover.content", oldHistory.size()),
-    //                     NotificationType.INFORMATION,
-    //                     notificationActions,
-    //                     project);
-    //         });
-    //     }
-    // }
-
-    private static void importRecords(Project project, List<JsonWrapper> oldHistory, HistoryLimitedList newHistory,
-                                      Path path, Element rootElement, Element historyElement) {
-        for (JsonWrapper wrapper : oldHistory) {
-            newHistory.add(project, wrapper);
-        }
-
-        removeOldRecord(path, rootElement, historyElement);
-
-        try {
-            Thread.sleep(200);
-        } catch (InterruptedException e) {
-            LOG.error(e);
-        }
-
-        Notifications.showNotification(JsonAssistantBundle.messageOnSystem("notification.recover.success.content"), NotificationType.INFORMATION, project);
-    }
-
-    private static void ignoreRecords(Path path, Element rootElement, Element historyElement) {
-        // 标记
-        removeOldRecord(path, rootElement, historyElement);
-    }
-
-    /**
-     * 移除旧版本记录
-     */
-    private static void removeOldRecord(Path path, Element rootElement, Element historyElement) {
-        try {
-            boolean removed = rootElement.removeContent(historyElement);
-            if (removed) {
-                JDOMUtil.write(rootElement, path);
-            }
-        } catch (IOException e) {
-            LOG.error(e);
-        }
-    }
-
-
-
-    /*
-
-    TODO 操作Dom
-
-com.intellij.conversion.impl.ConversionContextImpl.findGlobalLibraryElement
-
-      private static @Nullable Element findGlobalLibraryElement(String name) throws CannotConvertException {
-    final File file = PathManager.getOptionsFile("applicationLibraries");
-    if (file.exists()) {
-      final Element root = JDomConvertingUtil.load(file.toPath());
-      final Element libraryTable = JDomSerializationUtil.findComponent(root, "libraryTable");
-      if (libraryTable != null) {
-        return findLibraryInTable(libraryTable, name);
-      }
-    }
-    return null;
-  }
-
-
-
-java.lang.ClassCastException: class java.lang.Integer cannot be cast to class java.lang.String (java.lang.Integer and java.lang.String are in module java.base of loader 'bootstrap')
-	at cn.memoryzy.json.model.JsonEntry.fromMap(JsonEntry.java:134)
-	at cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter.fromString(HistoryLimitedListConverter.java:41)
-	at cn.memoryzy.json.service.persistent.converter.HistoryLimitedListConverter.fromString(HistoryLimitedListConverter.java:22)
-	at com.intellij.util.xmlb.AttributeBinding.set(AttributeBinding.java:57)
-	at com.intellij.util.xmlb.BeanBinding.deserializeInto(BeanBinding.java:211)
-	at com.intellij.util.xmlb.BeanBinding.deserializeInto(BeanBinding.java:199)
-	at com.intellij.util.xmlb.BeanBinding.deserialize(BeanBinding.java:142)
-	at com.intellij.configurationStore.JdomSerializerImpl.deserialize(xmlSerializer.kt:93)
-	at com.intellij.configurationStore.DefaultStateSerializerKt.deserializeState(DefaultStateSerializer.kt:29)
-	at com.intellij.configurationStore.StateStorageBase.deserializeState(StateStorageBase.kt:32)
-	at com.intellij.configurationStore.StateGetterImpl.getState(StorageBaseEx.kt:56)
-	at com.intellij.configurationStore.ComponentStoreImpl.doInitComponent(ComponentStoreImpl.kt:470)
-	at com.intellij.configurationStore.ComponentStoreImpl.initComponent(ComponentStoreImpl.kt:415)
-	at com.intellij.configurationStore.ComponentStoreImpl.reloadState(ComponentStoreImpl.kt:633)
-	at com.intellij.configurationStore.ComponentStoreImpl.reinitComponents(ComponentStoreImpl.kt:676)
-	at com.intellij.configurationStore.ComponentStoreImpl.reload(ComponentStoreImpl.kt:663)
-	at com.intellij.configurationScript.providers.MyProjectStore.reload(ConfigurationScriptProjectStoreFactory.kt:86)
-	at com.intellij.configurationStore.StoreReloadManagerImplKt.reloadStore(StoreReloadManagerImpl.kt:266)
-	at com.intellij.configurationStore.StoreReloadManagerImpl.applyProjectChanges(StoreReloadManagerImpl.kt:131)
-	at com.intellij.configurationStore.StoreReloadManagerImpl.access$applyProjectChanges(StoreReloadManagerImpl.kt:41)
-	at com.intellij.configurationStore.StoreReloadManagerImpl$doReload$2.invokeSuspend(StoreReloadManagerImpl.kt:79)
-
-     */
-
 
 }
 

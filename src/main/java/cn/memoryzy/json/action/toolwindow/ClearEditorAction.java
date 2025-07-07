@@ -2,14 +2,13 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,12 +19,12 @@ import org.jetbrains.annotations.NotNull;
 public class ClearEditorAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public ClearEditorAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public ClearEditorAction(EditorEx editor, CombineCardLayout cardLayout) {
         super();
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.clear.editor.text"));
@@ -43,7 +42,6 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
         event.getPresentation().setEnabled(
                 getEventProject(event) != null
                         && StrUtil.isNotBlank(editor.getDocument().getText())
-                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
-                        && !editor.isViewer());
+                        && cardLayout.isEditorView());
     }
 }

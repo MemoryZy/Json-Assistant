@@ -53,6 +53,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
@@ -84,6 +85,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private final HistoryManager historyManager;
     private final HistoryState historyState;
 
+    /**
+     * 消息总线（项目级）
+     */
+    private final MessageBusConnection projectConnection;
+
     private final SimpleToolWindowPanel windowPanel;
 
     // ----------------------- left
@@ -110,6 +116,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         this.project = project;
         this.historyManager = HistoryManager.getInstance(project);
         this.historyState = ToolWindowSettings.getInstance().getHistoryState();
+        this.projectConnection = project.getMessageBus().connect(historyManager);
 
         this.windowPanel = new SimpleToolWindowPanel(false, false);
         // ----------------------- left
@@ -350,6 +357,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return UIUtils.wrapScrollPane(showTree);
     }
 
+    public JComponent getPreferredFocusedComponent() {
+        return HistoryDisplayMode.TREE == historyState.getHistoryDisplayMode() ? showTree : showList;
+    }
+
     private void filterTreeNode(String filterName) {
         DefaultTreeModel model = (DefaultTreeModel) showTree.getModel();
         HistoryTreeNode2 rootNode = (HistoryTreeNode2) model.getRoot();
@@ -520,15 +531,15 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
 
     private void registerConfigurationUpdateEventHandlers() {
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
+        JsonAssistantToolWindowComponentProvider.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
     }
 
     private void registerHistoryAddedEventHandlers() {
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(HistoryAddedEvent.TOPIC, (HistoryAddedEvent) this::refreshHistoryComponent);
+        projectConnection.subscribe(HistoryAddedEvent.TOPIC, (HistoryAddedEvent) this::refreshHistoryComponent);
     }
 
     private void registerNavigateRecordEventHandlers() {
-        ToolWindowUtil.APPLICATION_CONNECTION.subscribe(NavigateRecordEvent.TOPIC, (NavigateRecordEvent) this::navigateRecord);
+        projectConnection.subscribe(NavigateRecordEvent.TOPIC, (NavigateRecordEvent) this::navigateRecord);
     }
 
     private void applyViewMode(HistoryDisplayMode mode) {

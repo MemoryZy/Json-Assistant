@@ -9,6 +9,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.components.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.Attribute;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Service(Service.Level.PROJECT)
 @State(name = "Json History", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_HISTORY_FILE, roamingType = RoamingType.DISABLED)})
-public final class HistoryManager implements PersistentStateComponent<HistoryManager> {
+public final class HistoryManager implements PersistentStateComponent<HistoryManager>, Disposable {
 
     /**
      * 最大保留记录数
@@ -206,5 +207,10 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
 
     public void setHistories(Deque<JsonRecord> histories) {
         this.histories = histories;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 }

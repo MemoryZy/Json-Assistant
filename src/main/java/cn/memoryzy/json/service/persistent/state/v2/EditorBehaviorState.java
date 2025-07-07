@@ -26,11 +26,6 @@ public class EditorBehaviorState {
      */
     private Set<DataFormatType> enabledFormats = CollUtil.newHashSet(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
 
-    /**
-     * 从剪贴板自动导入数据时是否显示确认对话框
-     */
-    private boolean shouldPromptBeforeImport = false;
-
 
     public void setAutoRecognizeFormats(boolean autoRecognizeFormats) {
         this.autoRecognizeFormats = autoRecognizeFormats;
@@ -38,10 +33,6 @@ public class EditorBehaviorState {
 
     public void setEnabledFormats(Set<DataFormatType> enabledFormats) {
         this.enabledFormats = enabledFormats;
-    }
-
-    public void setShouldPromptBeforeImport(boolean shouldPromptBeforeImport) {
-        this.shouldPromptBeforeImport = shouldPromptBeforeImport;
     }
 
 
@@ -52,10 +43,6 @@ public class EditorBehaviorState {
     @XCollection(propertyElementName = "formats", elementName = "item", style = XCollection.Style.v2)
     public Set<DataFormatType> getEnabledFormats() {
         return enabledFormats;
-    }
-
-    public boolean isShouldPromptBeforeImport() {
-        return shouldPromptBeforeImport;
     }
 
 }

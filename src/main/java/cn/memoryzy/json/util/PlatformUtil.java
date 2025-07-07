@@ -322,6 +322,7 @@ public class PlatformUtil {
      * @param text 文本
      */
     public static void setDocumentText(Document document, String text) {
+        // StringUtil.convertLineSeparators(text)
         text = JsonAssistantUtil.normalizeLineEndings(text);
         if (text == null) return;
         document.setText(text);

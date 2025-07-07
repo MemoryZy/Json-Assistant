@@ -5,7 +5,6 @@ import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.HistoryAddedEvent;
 import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.state.v2.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.v2.HistoryState;
 import cn.memoryzy.json.service.persistent.state.v2.JsonRecord;
 import cn.memoryzy.json.service.persistent.v2.HistoryManager;
@@ -20,6 +19,8 @@ import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -37,13 +38,11 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
      */
     private static final int SAVE_DELAY = 5000;
 
-    private final EditorBehaviorState behaviorState;
     private final HistoryState historyState;
     private final HistoryManager historyManager;
     private final Alarm alarm;
 
-    public MainWindowFocusMonitor(EditorBehaviorState behaviorState, HistoryState historyState, HistoryManager historyManager) {
-        this.behaviorState = behaviorState;
+    public MainWindowFocusMonitor(HistoryState historyState, HistoryManager historyManager) {
         this.historyState = historyState;
         this.historyManager = historyManager;
         this.alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
@@ -56,12 +55,8 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
             cancelPendingSave();
         }
 
-        // ----------- 处理剪贴板数据
-        // 配置允许了，并且当前编辑器内容为空
-        if (behaviorState.isAutoRecognizeFormats() && StrUtil.isBlank(editor.getDocument().getText())) {
-            // 处理剪贴板数据
-            processClipboardContent(editor);
-        }
+        // ----------- 处理剪贴板数据（这些判断必须在内层，因为要保证符合条件后展示出来，后又因不符合条件而无法消失）
+        processClipboardContent(editor);
     }
 
     @Override
@@ -75,24 +70,21 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
 
     private void processClipboardContent(Editor editor) {
         String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
-        if (StrUtil.isNotBlank(clipboard)) {
-            if (clipboard.length() > THRESHOLD) {
-                // 异步处理大文本
-                ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    processClipboardContent(editor, clipboard);
-                });
-            } else {
+        if (Objects.nonNull(clipboard) && clipboard.length() > THRESHOLD) {
+            // 异步处理大文本
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 processClipboardContent(editor, clipboard);
-            }
+            });
+        } else {
+            processClipboardContent(editor, clipboard);
         }
     }
 
     private void processClipboardContent(Editor editor, String clipboard) {
-        // 检查编辑器是否仍然有效
-        if (editor.isDisposed()) return;
         MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
         messageBus.syncPublisher(RefreshFloatToolbarEvent.TOPIC).accept(editor, clipboard);
     }
+
 
     private void scheduleDelayedSave(@NotNull Editor editor) {
         // 取消之前所有的保存请求
@@ -132,7 +124,7 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
         // 自动保存的话，无需指定名称
         historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
         // 触发事件
-        ApplicationManager.getApplication().getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
+        Objects.requireNonNull(editor.getProject()).getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
     }
 
     /**

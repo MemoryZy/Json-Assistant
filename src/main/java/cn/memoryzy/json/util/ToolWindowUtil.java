@@ -2,13 +2,11 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.service.persistent.v2.ToolWindowSettings;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
@@ -23,7 +21,6 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
 import com.intellij.util.ObjectUtils;
-import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -34,11 +31,6 @@ import java.util.Objects;
  * @since 2024/11/4
  */
 public class ToolWindowUtil {
-
-    /**
-     * 消息总线（应用级）
-     */
-    public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
 
     /**
      * 根据需要添加新内容或更新编辑器内容<br/>
@@ -150,12 +142,13 @@ public class ToolWindowUtil {
         int contentCount = contentManager.getContentCount();
         String displayName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, editorFileType);
-        Content content = contentFactory.createContent(window.createComponent(), displayName, false);
+        Content content = contentFactory.createContent(null, displayName, false);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, editorFileType);
+
+        content.setComponent(window.createComponent());
         content.setDisposer(window);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
-        window.setCurrentContent(content);
         return content;
     }
 

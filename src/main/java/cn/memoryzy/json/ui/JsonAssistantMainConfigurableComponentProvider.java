@@ -79,8 +79,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel treeViewModeLabel;
     private JBLabel treeViewModeDesc;
     private ComboBox<TreeViewMode> treeViewModeComboBox;
-    private JBCheckBox shouldPromptBeforeImportCheckBox;
-    private JBLabel shouldPromptBeforeImportDesc;
     private JBLabel autoRecordHistoryLabel;
     private JBRadioButton autoRecordHistoryRadioBtn;
     private JBRadioButton manualRecordHistoryRadioBtn;
@@ -158,23 +156,17 @@ public class JsonAssistantMainConfigurableComponentProvider {
         int left = UIUtil.getCheckBoxTextHorizontalOffset(autoRecognizeFormatsCheckBox);
         formatsCheckBoxPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
 
-        // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
-        shouldPromptBeforeImportCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
-        UIUtils.setCommentLabel(shouldPromptBeforeImportDesc, shouldPromptBeforeImportCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
-
         autoRecognizeFormatsCheckBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
-                UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                 UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
-                UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, false);
             }
         });
     }
@@ -195,7 +187,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
             UIUtils.setHelpLabel(backgroundDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
 
-            backgroundComboBox.setRenderer(new SimpleListCellRenderer<ColorScheme>() {
+            backgroundComboBox.setRenderer(new SimpleListCellRenderer<>() {
                 @Override
                 public void customize(@NotNull JList<? extends ColorScheme> list, ColorScheme value, int index, boolean selected, boolean hasFocus) {
                     setText(JsonAssistantBundle.messageOnSystem(value.getKey()));
@@ -288,7 +280,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         boolean autoRecognizeFormats = editorBehaviorState.isAutoRecognizeFormats();
         autoRecognizeFormatsCheckBox.setSelected(autoRecognizeFormats);
-        shouldPromptBeforeImportCheckBox.setSelected(editorBehaviorState.isShouldPromptBeforeImport());
 
         Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
         enableXmlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.XML));
@@ -338,13 +329,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
             UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
-            UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, true);
         } else {
             UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
-            UIUtils.controlEnableCheckBox(shouldPromptBeforeImportCheckBox, false);
         }
 
         // 常规
@@ -363,7 +352,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
         boolean oldAutoRecognizeFormats = editorBehaviorState.isAutoRecognizeFormats();
-        boolean oldShouldPromptBeforeImport = editorBehaviorState.isShouldPromptBeforeImport();
 
         Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
         boolean oldEnableXmlFormat = enabledFormats.contains(DataFormatType.XML);
@@ -402,7 +390,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         // ----------------------------------- 行为
         boolean newAutoRecognizeFormats = autoRecognizeFormatsCheckBox.isSelected();
-        boolean newShouldPromptBeforeImport = shouldPromptBeforeImportCheckBox.isSelected();
         boolean newEnableXmlFormat = enableXmlFormatsCheckBox.isSelected();
         boolean newEnableYamlFormat = enableYamlFormatsCheckBox.isSelected();
         boolean newEnableTomlFormat = enableTomlFormatsCheckBox.isSelected();
@@ -432,7 +419,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldEnableYamlFormat, newEnableYamlFormat)
                 || !Objects.equals(oldEnableTomlFormat, newEnableTomlFormat)
                 || !Objects.equals(oldEnableUrlParamFormat, newEnableUrlParamFormat)
-                || !Objects.equals(oldShouldPromptBeforeImport, newShouldPromptBeforeImport)
                 || !Objects.equals(oldEnableHistory, newEnableHistory)
                 || !Objects.equals(oldAutoRecordHistory, newAutoRecordHistory)
                 || !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode)
@@ -452,7 +438,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
         editorBehaviorState.setAutoRecognizeFormats(autoRecognizeFormatsCheckBox.isSelected());
-        editorBehaviorState.setShouldPromptBeforeImport(shouldPromptBeforeImportCheckBox.isSelected());
         Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
         if (enableXmlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.XML);
         if (enableYamlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.YAML);
@@ -527,7 +512,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
             }
 
             if (enableHistoryUpdate) {
-                messageBus.syncPublisher(HistoryToggleEvent.TOPIC).toggle(newEnableHistory);
+                messageBus.syncPublisher(HistoryEnabledEvent.TOPIC).enable(newEnableHistory);
             }
 
             if (historyDisplayModeUpdate) {
