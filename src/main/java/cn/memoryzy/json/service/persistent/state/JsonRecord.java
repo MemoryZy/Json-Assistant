@@ -3,7 +3,8 @@ package cn.memoryzy.json.service.persistent.state;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.converter.JsonBase64Converter;
+import cn.memoryzy.json.service.persistent.converter.Base64Converter;
+import cn.memoryzy.json.service.persistent.converter.CompressConverter;
 import cn.memoryzy.json.service.persistent.converter.JsonWrapperConverter;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Tag;
@@ -120,16 +121,17 @@ public class JsonRecord {
         return id;
     }
 
+    @OptionTag(converter = Base64Converter.class)
     public String getName() {
         return name;
     }
 
-    @OptionTag(converter = JsonBase64Converter.class)
+    @OptionTag(converter = CompressConverter.class)
     public String getDisplayText() {
         return displayText;
     }
 
-    @OptionTag(converter = JsonBase64Converter.class)
+    @OptionTag(converter = CompressConverter.class)
     public String getRawText() {
         return rawText;
     }

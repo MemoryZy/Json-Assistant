@@ -31,7 +31,7 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
     /**
      * 最大字符数量
      */
-    public static final int THRESHOLD = 3000;
+    public static final int THRESHOLD = 50000;
 
     /**
      * 5秒延迟保存
@@ -72,9 +72,8 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
         String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
         if (Objects.nonNull(clipboard) && clipboard.length() > THRESHOLD) {
             // 异步处理大文本
-            ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                processClipboardContent(editor, clipboard);
-            });
+            ApplicationManager.getApplication().executeOnPooledThread(
+                    () -> processClipboardContent(editor, clipboard));
         } else {
             processClipboardContent(editor, clipboard);
         }

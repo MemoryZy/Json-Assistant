@@ -1,26 +1,36 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.*;
+import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author Memory
  * @since 2024/8/3
  */
 public class JsonAssistantUtil {
+
+    private static final Logger LOG = Logger.getInstance(JsonAssistantUtil.class);
 
     private static final long MIN_VALID_TIMESTAMP_SECONDS = 0L; // 1970-01-01T00:00:00Z
     private static final long MAX_VALID_TIMESTAMP_SECONDS = 4102444800L; // 2099-12-31T23:59:59Z
@@ -185,7 +195,6 @@ public class JsonAssistantUtil {
 
         return null;
     }
-
 
 
     public static String unicodeToString(String unicodeString) {
@@ -363,11 +372,81 @@ public class JsonAssistantUtil {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(content.getBytes());
-            return Base64.getEncoder().encodeToString(hash);
+            return Base64.encode(hash);
         } catch (Exception e) {
             // 退回到hashCode
             return String.valueOf(content.hashCode());
         }
     }
 
+
+    public static String compressAndEncode(String text) {
+        if (StrUtil.isBlank(text)) return null;
+
+        // 小文本直接返回（避免压缩膨胀，用Base64防止出现XML非法字符串）
+        if (text.length() < 200) return Base64.encode(text);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzip = new GZIPOutputStream(bos)) {
+            gzip.write(text.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            LOG.error("[Json Assistant] Failed to compress the text.", e);
+            return text;
+        }
+
+        // 添加压缩格式标识头
+        return "GZIP:" + Base64.encode(bos.toByteArray());
+    }
+
+    public static String decodeAndDecompress(String data) {
+        if (StrUtil.isBlank(data)) return "";
+
+        // 检查压缩标识头
+        if (data.startsWith("GZIP:")) {
+            byte[] decoded = Base64.decode(data.substring(5));
+
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
+                 GZIPInputStream gzip = new GZIPInputStream(bis);
+                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+
+                // 使用缓冲区流式读取（支持任意大文件）
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = gzip.read(buffer)) > 0) {
+                    bos.write(buffer, 0, len);
+                }
+                return bos.toString(StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                LOG.error("[Json Assistant] Failed to extract the text.", e);
+            }
+        } else if (Base64.isBase64(data)) {
+            return StrUtil.str(Base64.decode(data), StandardCharsets.UTF_8);
+        }
+
+        // 未压缩的原始文本
+        return data;
+    }
+
+    /**
+     * 去除文本开头所有连续的前缀
+     *
+     * @param text 输入文本
+     * @return 去除所有前缀后的文本
+     */
+    public static String removePrefixes(String text, String prefix) {
+        if (text == null) {
+            return null;
+        }
+
+        int prefixLength = prefix.length();
+        String trimmed = text.trim();
+
+        // 循环去除所有连续的前缀
+        while (trimmed.length() >= prefixLength &&
+                trimmed.substring(0, prefixLength).equals(prefix)) {
+            trimmed = trimmed.substring(prefixLength).trim();
+        }
+
+        return trimmed;
+    }
 }

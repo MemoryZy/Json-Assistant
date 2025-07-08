@@ -238,6 +238,14 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private void configureUpdatePanel() {
         nameEditorWrapper.setPlaceholder("Name");
         nameEditorWrapper.setShowPlaceholderWhenFocused(true);
+        nameEditorWrapper.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE && updatePanel.isVisible()) {
+                    dismissEditView();
+                }
+            }
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -276,7 +284,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 String name = value.getName();
                 append((index + 1) + "  ", SimpleTextAttributes.GRAY_ATTRIBUTES, false);
                 append((StrUtil.isNotBlank(name) ? name : value.getDisplayText()), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
-                // setIcon(AllIcons.FileTypes.Json);
+                setIcon(AllIcons.FileTypes.Json);
 
                 if (!list.isEnabled()) {
                     setEnabled(false);
@@ -515,6 +523,16 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         JComponent component = editor.getComponent();
         component.setFont(UIUtils.consolasFont(15));
 
+        // 添加ESC键监听
+        editor.getContentComponent().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE && updatePanel.isVisible()) {
+                    dismissEditView();
+                }
+            }
+        });
+
         // 标记
         editor.putUserData(HISTORY_EDITOR_FLAG, JsonAssistantPlugin.PLUGIN_AUTHOR);
         return editor;
@@ -649,20 +667,39 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void refreshListComponent() {
-        JsonRecord selectedValue = showList.getSelectedValue();
-        List<JsonRecord> recentHistories = historyManager.getRecentHistories();
+        // 获取当前选中的索引（删除前的索引）
+        int selectedIndex = showList.getSelectedIndex();
 
+        List<JsonRecord> recentHistories = historyManager.getRecentHistories();
         DefaultListModel<JsonRecord> model = (DefaultListModel<JsonRecord>) showList.getModel();
         model.removeAllElements();
         model.addAll(recentHistories);
 
-        if (null != selectedValue && CollUtil.isNotEmpty(recentHistories)) {
-            // 依旧选中刚才选择的元素
-            showList.setSelectedIndex(recentHistories.indexOf(selectedValue));
-        } else {
-            // 确保列表始终存在有效的选中项
-            ScrollingUtil.ensureSelectionExists(showList);
+        // 计算新的选中索引
+        int newIndex = -1;
+        if (CollUtil.isNotEmpty(recentHistories)) {
+            // 如果原索引有效且小于列表大小，保持原位置
+            if (selectedIndex >= 0 && selectedIndex < model.getSize()) {
+                newIndex = selectedIndex;
+            }
+            // 如果原索引超出范围，选择最后一条记录
+            else if (selectedIndex >= model.getSize()) {
+                newIndex = model.getSize() - 1;
+            }
+            // 如果原索引无效（如-1），选择第一条记录
+            else if (selectedIndex == -1 && !recentHistories.isEmpty()) {
+                newIndex = 0;
+            }
         }
+
+        // 设置新的选中项
+        if (newIndex >= 0) {
+            showList.setSelectedIndex(newIndex);
+            showList.scrollRectToVisible(showList.getCellBounds(newIndex, newIndex));
+        }
+
+        // 确保列表始终存在有效的选中项
+        ScrollingUtil.ensureSelectionExists(showList);
     }
 
     private void refreshTreeComponent() {
@@ -966,10 +1003,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return record;
     }
 
-    // TODO 当用户选择 “指定名称” 时，打开此工具窗，打开更新页面，定位到指定记录，并且把焦点放在名称编辑器上
-
-    // TODO 还差一个导入按钮，或者不要也可以
-
     // ----------------------------------- 逻辑 -----------------------------------
 
     private void addRecord() {
@@ -1006,12 +1039,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 3.保存
         record.setRawText(result.content)
                 .setSourceType(result.formatType)
+                .setName(result.recordName)
                 .setUpdateTime(System.currentTimeMillis())
                 .setWrapper(result.wrapper)
                 .setDisplayText(HistoryManager.getShortText(result.wrapper));
-
-        String recordName = result.recordName;
-        if (StrUtil.isNotBlank(recordName)) record.setName(recordName);
 
         // 4.退出编辑模式
         dismissEditView();

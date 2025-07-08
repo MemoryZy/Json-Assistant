@@ -34,19 +34,28 @@ public class PasteDataAction extends DumbAwareAction implements UpdateInBackgrou
     public void actionPerformed(@NotNull AnActionEvent e) {
         Editor editor = PlatformUtil.getEditor(e.getDataContext());
 
-        // TODO 还得把数据转为 Json 格式才行，不然没法粘贴
         String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
         ClipboardTextConversionContext context = new ClipboardTextConversionContext();
         String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
         if (StrUtil.isBlank(processedText)) return;
 
-        JsonWrapper wrapper = context.getStrategy() instanceof Json5ConversionStrategy
-                ? Json5Util.parse(processedText)
-                : JsonUtil.parse(processedText);
+        JsonWrapper wrapper;
+        if (context.getStrategy() instanceof Json5ConversionStrategy) {
+            wrapper = Json5Util.parse(clipboard);
+            processedText = Json5Util.formatJson5WithComment(clipboard);
+        } else {
+            wrapper = JsonUtil.parse(processedText);
+            processedText = JsonUtil.formatJson(processedText);
+        }
 
+        // 空数据不处理
         if (null == wrapper || wrapper.noItems()) return;
 
-        WriteCommandAction.runWriteCommandAction(getEventProject(e), () -> PlatformUtil.setDocumentText(editor.getDocument(), wrapper.toJsonString()));
+        String finalProcessedText = processedText;
+        WriteCommandAction.runWriteCommandAction(getEventProject(e),
+                () -> PlatformUtil.setDocumentText(editor.getDocument(), finalProcessedText));
+
+        // 注册剪贴板使用记录
         String hash = JsonAssistantUtil.calculateSHA256(clipboard);
         ApplicationManager.getApplication().getMessageBus().syncPublisher(RegisterClipboardUsageEvent.TOPIC).accept(editor, hash);
     }

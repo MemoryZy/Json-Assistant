@@ -68,7 +68,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel backgroundLabel;
     private ComboBox<ColorScheme> backgroundComboBox;
     private JPanel backgroundPanel;
-    private JBLabel backgroundDesc;
 
     private TitledSeparator historyTitle;
     private JBCheckBox enableHistoryCheckBox;
@@ -184,8 +183,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
             for (ColorScheme value : ColorScheme.values()) {
                 backgroundComboBox.addItem(value);
             }
-
-            UIUtils.setHelpLabel(backgroundDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
 
             backgroundComboBox.setRenderer(new SimpleListCellRenderer<>() {
                 @Override

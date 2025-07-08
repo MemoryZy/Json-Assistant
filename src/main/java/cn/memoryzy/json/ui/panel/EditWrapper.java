@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyListener;
 import java.util.Optional;
 
 /**
@@ -34,6 +35,8 @@ public class EditWrapper extends TransparentContainer {
     }
 
     private void initComponents(String editActionName) {
+        editTextField.addNotify();
+
         AnAction action = new AnAction(editActionName, null, JsonAssistantIcons.ToolWindow.EDIT) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -75,6 +78,10 @@ public class EditWrapper extends TransparentContainer {
         return editTextField.getEditor();
     }
 
+    public void addKeyListener(KeyListener listener) {
+        editTextField.addKeyListener(listener);
+    }
+
     public void moveToOffset(int offset) {
         Optional.ofNullable(editTextField.getEditor())
                 .map(Editor::getCaretModel)
@@ -93,6 +100,12 @@ public class EditWrapper extends TransparentContainer {
             JComponent component = editorEx.getComponent();
             component.setBorder(JBUI.Borders.empty(5, 0, 3, 6));
             return editorEx;
+        }
+
+        public void addKeyListener(KeyListener listener) {
+            Optional.ofNullable(getEditor())
+                    .map(Editor::getContentComponent)
+                    .ifPresent(component -> component.addKeyListener(listener));
         }
     }
 }

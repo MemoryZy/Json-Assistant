@@ -29,7 +29,7 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
     /**
      * 最大保留记录数
      */
-    private static final int MAX_HISTORY_ITEMS = 30;
+    private static final int MAX_HISTORY_ITEMS = 50;
 
     public static HistoryManager getInstance(Project project) {
         return project.getService(HistoryManager.class);
