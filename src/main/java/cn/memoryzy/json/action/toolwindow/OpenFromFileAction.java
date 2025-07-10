@@ -1,7 +1,6 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.ArrayUtil;
-import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
@@ -51,7 +50,7 @@ public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackg
         FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, true, false);
         descriptor.withTitle(JsonAssistantBundle.messageOnSystem("dialog.chooser.jsonFile.title"));
         // 过滤文件类型，只允许选择 JSON/JSON5 文件（选择其他文件不方便同时处理自动保存和高亮语法支持）
-        descriptor.withFileFilter(file -> StrUtil.equalsIgnoreCase("json", file.getExtension()) || StrUtil.equalsIgnoreCase("json5", file.getExtension()));
+        // descriptor.withFileFilter(file -> StrUtil.equalsIgnoreCase("json", file.getExtension()) || StrUtil.equalsIgnoreCase("json5", file.getExtension()));
 
         FileChooserDialog fileChooser = FileChooserFactory.getInstance().createFileChooser(descriptor, project, null);
         VirtualFile[] files = fileChooser.choose(project, (VirtualFile) null);
@@ -74,7 +73,7 @@ public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackg
         } catch (IOException ignored) {
         }
 
-        // selectFile.putUserData(EXTERNAL_FILE_MARKER, true);
+        selectFile.putUserData(EXTERNAL_FILE_MARKER, true);
 
         // 获取当前选择的窗口页，判断其是否存在内容，若存在，则新开标签页
         openSelectedTabIfContentExists(project, selectFile);
