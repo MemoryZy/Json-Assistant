@@ -8,7 +8,6 @@ import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -56,9 +55,7 @@ public class OpenHistoryInEditorAction extends DumbAwareAction implements Update
 
         Optional.ofNullable(panelOnContent)
                 .map(JsonAssistantToolWindowPanel::getEditor)
-                .ifPresent(editor ->
-                        WriteCommandAction.runWriteCommandAction(project,
-                                () -> PlatformUtil.setDocumentText(editor.getDocument(), recordText)));
+                .ifPresent(editor -> PlatformUtil.safeSetDocumentText(project, editor.getDocument(), recordText));
 
         // 打开窗口
         toolWindow.show();

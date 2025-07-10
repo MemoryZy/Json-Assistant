@@ -128,7 +128,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
         if (StructureActionSource.OUTSIDE.equals(source)) {
             // 如果是其他地方的，那么判断当前标签页是否存在文本，存在则用此标签页，不存在则新开标签页
-            Boolean hasText = Optional.ofNullable(panelOnContent)
+            boolean hasText = Optional.ofNullable(panelOnContent)
                     .map(JsonAssistantToolWindowPanel::getEditor)
                     .map(EditorEx::getDocument)
                     .map(document -> StrUtil.isNotBlank(document.getText()))

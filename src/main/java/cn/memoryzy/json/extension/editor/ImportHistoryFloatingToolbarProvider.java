@@ -23,6 +23,8 @@ import java.awt.*;
  */
 public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProvider, Disposable {
 
+    // TODO FloatingToolbarProvider 的实现类不能被混淆，因为没有标注@Override，所以这里不混淆
+
     public int getPriority() {
         return 0;
     }

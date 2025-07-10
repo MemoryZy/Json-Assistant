@@ -28,7 +28,8 @@
         "softWrap.svg": "icons/toolwindow/softWrap.svg",
         "switch.svg": "icons/toolwindow/switch.svg",
         "text.svg": "icons/toolwindow/text.svg",
-        "grid.svg": "icons/toolwindow/grid.svg"
+        "grid.svg": "icons/toolwindow/grid.svg",
+        "import.svg": "icons/toolwindow/import.svg"
       },
       "structure": {
         "compare_structure.svg": "icons/structure/compare_structure.svg"

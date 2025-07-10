@@ -7,11 +7,11 @@ import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowManager;
@@ -48,11 +48,12 @@ public class ToolWindowUtil {
         EditorEx editor = getEditorOnContent(mainContent);
 
         if (StrUtil.isBlank(Objects.requireNonNull(editor).getDocument().getText())) {
-            WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(editor.getDocument(), processedText));
+            PlatformUtil.safeSetDocumentText(project, editor.getDocument(), processedText);
+
         } else {
             Content content = addNewContent(project, toolWindow, contentFactory, editorFileType);
             EditorEx editorEx = getEditorOnContent(content);
-            WriteCommandAction.runWriteCommandAction(project, () -> PlatformUtil.setDocumentText(Objects.requireNonNull(editorEx).getDocument(), processedText));
+            PlatformUtil.safeSetDocumentText(project, Objects.requireNonNull(editorEx).getDocument(), processedText);
         }
 
         toolWindow.show();
@@ -144,6 +145,30 @@ public class ToolWindowUtil {
 
         Content content = contentFactory.createContent(null, displayName, false);
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, editorFileType);
+
+        content.setComponent(window.createComponent());
+        content.setDisposer(window);
+        contentManager.addContent(content, contentCount);
+        contentManager.setSelectedContent(content, true);
+        return content;
+    }
+
+    /**
+     * 向指定的工具窗口中添加新选项卡
+     *
+     * @param project        当前的项目实例，用于创建窗口组件提供者
+     * @param toolWindow     工具窗口实例，用于获取选项卡管理器
+     * @param contentFactory 选项卡工厂实例，用于创建新选项卡
+     * @param sourceFile     原文件
+     * @return 返回创建并添加到工具窗口的新选项卡
+     */
+    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, VirtualFile sourceFile) {
+        ContentManager contentManager = toolWindow.getContentManager();
+        int contentCount = contentManager.getContentCount();
+        String displayName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
+
+        Content content = contentFactory.createContent(null, displayName, false);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, sourceFile);
 
         content.setComponent(window.createComponent());
         content.setDisposer(window);

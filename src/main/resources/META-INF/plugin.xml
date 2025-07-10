@@ -54,7 +54,8 @@
         <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.ImportHistoryFloatingToolbarProvider"/>
-
+        <!--<nonProjectFileWritingAccessExtension implementation="cn.memoryzy.json.extension.file.ExternalFileAccessProvider"/>-->
+        
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"
                          bundle="messages.JsonAssistantBundle"

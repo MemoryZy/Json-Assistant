@@ -3,10 +3,12 @@
 ## [Unreleased]
 
 - 更新历史记录展示形式。
-- 切换识别剪贴板数据的方式。
+- 切换识别并粘贴剪贴板数据的方式。
+- 增加从文件导入 JSON 数据功能。
 - 优化插件性能。
 - Update the display format of the history record.
-- Switch the way of recognizing clipboard data.
+- Switch the method of recognizing and pasting clipboard data.
+- Add the function of importing JSON data from files.
 - Optimize the performance of the plugin.
 
 ## [1.8.2] - 2025-06-16

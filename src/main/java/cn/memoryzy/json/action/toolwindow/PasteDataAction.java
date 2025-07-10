@@ -15,7 +15,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
@@ -51,10 +50,8 @@ public class PasteDataAction extends DumbAwareAction implements UpdateInBackgrou
         // 空数据不处理
         if (null == wrapper || wrapper.noItems()) return;
 
-        String finalProcessedText = processedText;
-        WriteCommandAction.runWriteCommandAction(getEventProject(e),
-                () -> PlatformUtil.setDocumentText(editor.getDocument(), finalProcessedText));
-
+        // 设置文本
+        PlatformUtil.safeSetDocumentText(getEventProject(e), editor.getDocument(), processedText);
         // 注册剪贴板使用记录
         String hash = JsonAssistantUtil.calculateSHA256(clipboard);
         ApplicationManager.getApplication().getMessageBus().syncPublisher(RegisterClipboardUsageEvent.TOPIC).accept(editor, hash);

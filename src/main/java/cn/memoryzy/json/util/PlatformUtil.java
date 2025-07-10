@@ -44,6 +44,7 @@ import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.project.ProjectKt;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -61,6 +62,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -328,6 +330,9 @@ public class PlatformUtil {
         document.setText(text);
     }
 
+    public static void safeSetDocumentText(Project project, Document document, String text) {
+        WriteCommandAction.runWriteCommandAction(project, () -> setDocumentText(document, text));
+    }
 
     public static void openOnlineDoc(Project project, boolean useHtmlEditor) {
         String url = Urls.OVERVIEW;
@@ -497,6 +502,21 @@ public class PlatformUtil {
         return EditorFactory.getInstance().createEditor(document, project, sourceVirtualFile, isViewer, kind);
     }
 
+    public static Editor createEditor(Project project, VirtualFile virtualFile, boolean isViewer, EditorKind kind) {
+        PsiFile sourceFile = PsiManager.getInstance(project).findFile(virtualFile);
+
+        assert sourceFile != null;
+        Document document = PsiDocumentManager.getInstance(project).getDocument(sourceFile);
+
+        assert document != null;
+        return EditorFactory.getInstance().createEditor(document, project, virtualFile, isViewer, kind);
+    }
+
+    public static VirtualFile createLightVirtualFile(String fileName, FileType fileType) {
+        fileName = fileName + "." + fileType.getDefaultExtension();
+        return new LightVirtualFile(fileName, fileType, "");
+    }
+
     public static String getFullProductName() {
         return ApplicationNamesInfo.getInstance().getFullProductName();
     }
@@ -638,4 +658,21 @@ public class PlatformUtil {
         return editorContext.setPsiFile(psiFile).setFile(psiFile.getVirtualFile());
     }
 
+
+    /**
+     * 判断当前编辑器是否为新窗口打开的
+     *
+     * @param project 项目
+     * @param file    虚拟文件
+     * @return 是否为新窗口打开的
+     */
+    public static boolean isNewWindow(Project project, VirtualFile file) {
+        Window mainWindow = WindowManager.getInstance().getFrame(project);
+        Window editorWindow = Optional.ofNullable(FileEditorManager.getInstance(project).getSelectedEditor(file))
+                .map(FileEditor::getComponent)
+                .map(SwingUtilities::getWindowAncestor)
+                .orElse(null);
+
+        return editorWindow != null && !editorWindow.equals(mainWindow);
+    }
 }

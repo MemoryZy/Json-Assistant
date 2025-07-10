@@ -46,6 +46,7 @@ import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
@@ -93,6 +94,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
 
     public JsonAssistantToolWindowComponentProvider(Project project, Content content, FileType fileType) {
+        this(project, content, PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType));
+    }
+
+    public JsonAssistantToolWindowComponentProvider(Project project, Content content, VirtualFile sourceFile) {
         this.project = project;
         this.currentContent = content;
 
@@ -104,7 +109,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.toolWindowPanel = new SimpleToolWindowPanel(false, false);
         this.cardLayout = new CombineCardLayout();
         this.cardPanel = new JPanel(cardLayout);
-        this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType, false, EditorKind.MAIN_EDITOR, "");
+        this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, sourceFile, false, EditorKind.MAIN_EDITOR);
 
         this.treeProvider = new JsonStructureComponentProvider(null, toolWindowPanel, getStructureSetting());
         this.queryProvider = new JsonQueryComponentProvider(project);
@@ -254,6 +259,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         actionGroup.add(new ToggleUseSoftWrapsAction(currentEditor, cardLayout));
         actionGroup.add(new ScrollToTheEndAction(currentEditor, cardLayout));
         actionGroup.add(Separator.create());
+        actionGroup.add(new OpenFromFileAction());
         actionGroup.add(new SaveToDiskAction(currentEditor, cardLayout));
         actionGroup.add(new ClearEditorAction(currentEditor, cardLayout));
 
