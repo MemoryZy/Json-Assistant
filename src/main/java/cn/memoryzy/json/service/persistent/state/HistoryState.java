@@ -1,6 +1,7 @@
 package cn.memoryzy.json.service.persistent.state;
 
 import cn.memoryzy.json.enums.HistoryDisplayMode;
+import com.intellij.util.xmlb.annotations.Tag;
 
 /**
  * 历史记录设置项
@@ -8,6 +9,7 @@ import cn.memoryzy.json.enums.HistoryDisplayMode;
  * @author Memory
  * @since 2024/11/29
  */
+@Tag("history")
 public class HistoryState {
 
     /**

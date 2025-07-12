@@ -259,7 +259,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         actionGroup.add(new ToggleUseSoftWrapsAction(currentEditor, cardLayout));
         actionGroup.add(new ScrollToTheEndAction(currentEditor, cardLayout));
         actionGroup.add(Separator.create());
-        actionGroup.add(new OpenFromFileAction());
+        actionGroup.add(new OpenFromFileAction(cardLayout));
         actionGroup.add(new SaveToDiskAction(currentEditor, cardLayout));
         actionGroup.add(new ClearEditorAction(currentEditor, cardLayout));
 

@@ -52,6 +52,6 @@ public class ToYamlAction extends DumbAwareAction implements UpdateInBackground 
             return;
         }
 
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), yamlStr, FileTypeHolder.YAML);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), yamlStr, FileTypeHolder.YAML, "YAML");
     }
 }

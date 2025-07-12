@@ -99,7 +99,7 @@ public class RuntimeObjectToJsonAction extends AnAction implements UpdateInBackg
                             handleRecursionWarning(project, result);
                         }
 
-                        application.invokeLater(() -> ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, jsonConverter.apply(resultValue), FileTypeHolder.JSON5));
+                        application.invokeLater(() -> ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, jsonConverter.apply(resultValue), FileTypeHolder.JSON5, null));
                     }
 
                     indicator.setText(JsonAssistantBundle.messageOnSystem("progress.convert.to.json.finished.text"));

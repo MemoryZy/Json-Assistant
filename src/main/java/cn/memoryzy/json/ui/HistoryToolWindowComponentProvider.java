@@ -13,9 +13,7 @@ import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
-import cn.memoryzy.json.event.HistoryAddedEvent;
-import cn.memoryzy.json.event.HistoryViewChangedEvent;
-import cn.memoryzy.json.event.NavigateRecordEvent;
+import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.HistoryManager;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
@@ -34,6 +32,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.event.DocumentEvent;
@@ -54,6 +53,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -92,6 +92,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
      * 消息总线（项目级）
      */
     private final MessageBusConnection projectConnection;
+
+    private final MessageBus applicationMessageBus = ApplicationManager.getApplication().getMessageBus();
 
     private final SimpleToolWindowPanel windowPanel;
 
@@ -1139,6 +1141,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         showList.repaint();
         showTree.repaint();
+
+        applicationMessageBus.syncPublisher(HistoryWindowEditEvent.TOPIC).handle(recordEditor);
     }
 
     private void dismissEditView() {
@@ -1161,6 +1165,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         showList.repaint();
         showTree.repaint();
+
+        applicationMessageBus.syncPublisher(HistoryWindowExitEditEvent.TOPIC).handle(recordEditor);
     }
 
     private void requestFocusOnCurrentViewComponent() {

@@ -45,7 +45,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        String docText = editor.getDocument().getText();
+        String docText = StrUtil.trim(editor.getDocument().getText());
         String extension = JsonUtil.canResolveToJson(docText) ? "json" : "json5";
         FileChooserFactory chooserFactory = FileChooserFactory.getInstance();
         FileSaverDescriptor saverDescriptor = new FileSaverDescriptor(JsonAssistantBundle.messageOnSystem("dialog.save.json.title"), "", extension);
@@ -53,11 +53,8 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
         VirtualFileWrapper virtualFileWrapper = saverDialog.save("export." + extension);
 
         if (Objects.nonNull(virtualFileWrapper)) {
-            String text = StrUtil.trim(editor.getDocument().getText());
-            String jsonStr = JsonUtil.ensureJson(text);
-
             File file = virtualFileWrapper.getFile();
-            FileUtil.writeUtf8String(jsonStr, file);
+            FileUtil.writeUtf8String(docText, file);
         }
     }
 

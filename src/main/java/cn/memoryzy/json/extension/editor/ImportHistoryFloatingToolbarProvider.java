@@ -2,6 +2,8 @@ package cn.memoryzy.json.extension.editor;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.constant.ActionHolder;
+import cn.memoryzy.json.event.HistoryWindowEditEvent;
+import cn.memoryzy.json.event.HistoryWindowExitEditEvent;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
@@ -9,13 +11,18 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * @author Memory
@@ -23,8 +30,18 @@ import java.awt.*;
  */
 public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProvider, Disposable {
 
-    // TODO FloatingToolbarProvider 的实现类不能被混淆，因为没有标注@Override，所以这里不混淆
+    /**
+     * 浮动工具栏组件
+     */
+    private final Map<Editor, FloatingToolbarComponent> floatingComponentMap = new WeakHashMap<>();
 
+    /**
+     * 消息总线（应用级）
+     */
+    private MessageBusConnection applicationConnection;
+
+
+    @SuppressWarnings("UnstableApiUsage")
     public int getPriority() {
         return 0;
     }
@@ -58,6 +75,16 @@ public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProv
             return;
         }
 
+        if (null == applicationConnection) {
+            // 只添加一次事件订阅
+            applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
+            // 给自定义的编辑器添加事件订阅
+            registerEventHandlers();
+        }
+
+        // 缓存浮动工具栏（每个项目只会有一个编辑器）
+        floatingComponentMap.put(editor, component);
+
         // 默认都予展示
         component.scheduleShow();
     }
@@ -71,7 +98,37 @@ public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProv
         register(dataContext, component, disposable);
     }
 
-    public void dispose() {
+    private void registerEventHandlers() {
+        applicationConnection.subscribe(HistoryWindowEditEvent.TOPIC, (HistoryWindowEditEvent) this::hideToolbar);
+        applicationConnection.subscribe(HistoryWindowExitEditEvent.TOPIC, (HistoryWindowExitEditEvent) this::showToolbar);
+    }
 
+    private void hideToolbar(Editor editor) {
+        FloatingToolbarComponent component = findAndCleanFloatingToolbar(editor);
+        if (null != component) component.scheduleHide();
+    }
+
+    private void showToolbar(Editor editor) {
+        FloatingToolbarComponent component = findAndCleanFloatingToolbar(editor);
+        if (null != component) component.scheduleShow();
+    }
+
+    private FloatingToolbarComponent findAndCleanFloatingToolbar(Editor editor) {
+        FloatingToolbarComponent component = null;
+        for (Editor cached : new ArrayList<>(floatingComponentMap.keySet())) {
+            if (cached == null || cached.isDisposed()) {
+                // 清理无效引用
+                floatingComponentMap.remove(cached);
+            } else if (cached == editor) {
+                component = floatingComponentMap.get(cached);
+            }
+        }
+
+        return component;
+    }
+
+    public void dispose() {
+        floatingComponentMap.clear();
+        applicationConnection.disconnect();
     }
 }

@@ -24,7 +24,10 @@ import com.intellij.util.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Memory
@@ -40,8 +43,9 @@ public class ToolWindowUtil {
      * @param project        当前项目实例，用于获取工具窗口和执行写入操作
      * @param processedText  要添加或更新的文本内容
      * @param editorFileType 编辑器文件类型，用于创建新内容时指定文件类型
+     * @param tabName
      */
-    public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType) {
+    public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType, String tabName) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ToolWindowEx toolWindow = (ToolWindowEx) getJsonAssistantToolWindow(project);
         Content mainContent = getInitialContent(toolWindow);
@@ -51,7 +55,7 @@ public class ToolWindowUtil {
             PlatformUtil.safeSetDocumentText(project, editor.getDocument(), processedText);
 
         } else {
-            Content content = addNewContent(project, toolWindow, contentFactory, editorFileType);
+            Content content = addNewContent(project, toolWindow, contentFactory, editorFileType, tabName);
             EditorEx editorEx = getEditorOnContent(content);
             PlatformUtil.safeSetDocumentText(project, Objects.requireNonNull(editorEx).getDocument(), processedText);
         }
@@ -138,11 +142,12 @@ public class ToolWindowUtil {
      * @param editorFileType 编辑器文件类型，用于创建窗口组件提供者
      * @return 返回创建并添加到工具窗口的新选项卡
      */
-    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType) {
+    public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, FileType editorFileType, String tabName) {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
-        String displayName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
+        String presetName = StrUtil.isNotBlank(tabName) ? tabName : PluginConstant.MAIN_WINDOW_DISPLAY_NAME;
+        String displayName = generateTagName(contentManager, presetName);
         Content content = contentFactory.createContent(null, displayName, false);
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, editorFileType);
 
@@ -165,8 +170,8 @@ public class ToolWindowUtil {
     public static Content addNewContent(Project project, ToolWindowEx toolWindow, ContentFactory contentFactory, VirtualFile sourceFile) {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
-        String displayName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + " " + (contentCount + 1);
 
+        String displayName = generateTagName(contentManager, PluginConstant.MAIN_WINDOW_DISPLAY_NAME);
         Content content = contentFactory.createContent(null, displayName, false);
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, sourceFile);
 
@@ -260,6 +265,62 @@ public class ToolWindowUtil {
                 ToolWindowUtil.moveWindowToRightBottom(ToolWindowUtil.getJsonAssistantToolWindow(project));
             }
         };
+    }
+
+
+    /**
+     * 生成新的标签名
+     *
+     * @param contentManager 内容管理
+     * @param presetName     预设的标签名
+     * @return 新生成的标签名
+     */
+    public static String generateTagName(ContentManager contentManager, String presetName) {
+        List<String> tagList = Arrays.stream(contentManager.getContents())
+                .map(Content::getDisplayName)
+                .collect(Collectors.toList());
+        return generateTagName(tagList, presetName);
+    }
+
+
+    /**
+     * 生成新的标签名
+     *
+     * @param tagList    现有的标签名称列表
+     * @param presetName 预设的标签名
+     * @return 新生成的标签名
+     */
+    public static String generateTagName(List<String> tagList, String presetName) {
+        // 检查预设名是否存在于标签列表中
+        if (!tagList.contains(presetName)) {
+            return presetName;
+        }
+
+        // 如果存在，找出所有以预设名开头且后面跟着数字的标签
+        int maxNum = 0;
+        String prefix = presetName + " ";
+        int prefixLength = prefix.length();
+        boolean hasNumberedTags = false;
+
+        for (String tag : tagList) {
+            if (tag.startsWith(prefix)) {
+                // 提取数字部分
+                String numPart = tag.substring(prefixLength);
+                try {
+                    int num = Integer.parseInt(numPart);
+                    hasNumberedTags = true;
+                    if (num > maxNum) {
+                        maxNum = num;
+                    }
+                } catch (NumberFormatException e) {
+                    // 如果不是数字，忽略这个标签
+                }
+            }
+        }
+
+        // 如果没有找到带数字的标签，返回"预设名 1"
+        // 否则返回"预设名 (maxNum + 1)"
+        return hasNumberedTags ? presetName + " " + (maxNum + 1) : presetName + " 1";
     }
 
 }

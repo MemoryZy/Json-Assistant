@@ -321,7 +321,7 @@ public class JsonValueHandler {
         // 是否可写
         boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, newAllowedFileTypeQualifiedNames);
         // 处理
-        TextTransformUtil.applyProcessedTextToDocument(project, editor, jsonString, processor, canWrite);
+        TextTransformUtil.applyProcessedTextToDocument(project, editor, jsonString, processor, canWrite, null);
     }
 
     /**

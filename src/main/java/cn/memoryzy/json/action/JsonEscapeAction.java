@@ -37,7 +37,7 @@ public class JsonEscapeAction extends DumbAwareAction implements UpdateInBackgro
         // 不对换行符进行转义，保留原本格式
         String recoverEscapeJson = escapeJson.replace("\\n", "\n");
         TextTransformUtil.copyToClipboardAndShowNotification(getEventProject(event), escapeJson);
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), recoverEscapeJson, PlainTextFileType.INSTANCE);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), recoverEscapeJson, PlainTextFileType.INSTANCE, "Escape");
     }
 
 }

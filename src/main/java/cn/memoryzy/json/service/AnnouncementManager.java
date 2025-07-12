@@ -9,7 +9,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
-import cn.memoryzy.json.model.Announcement;
+import cn.memoryzy.json.model.deserializer.Announcement;
 import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.AnnouncementStats;
 import cn.memoryzy.json.util.*;

@@ -98,22 +98,13 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         ContentManager contentManager = toolWindow.getContentManager();
         int count = contentManager.getContentCount();
 
-        Content content = contentFactory.createContent(component, getDisplayName(count), false);
+        String displayName = ToolWindowUtil.generateTagName(contentManager, PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME);
+        Content content = contentFactory.createContent(component, displayName, false);
         content.setCloseable(true);
         content.setDisposer(ToolWindowUtil.createAuxWindowContentDisposer(project, toolWindow));
         contentManager.addContent(content, count);
         contentManager.setSelectedContent(content, true);
     }
-
-    private String getDisplayName(int contentCount) {
-        String concatStr = "";
-        if (contentCount > 0) {
-            concatStr += " " + (contentCount + 1);
-        }
-
-        return PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME + concatStr;
-    }
-
 
     private void show() {
         if (!toolWindow.isAvailable()) {

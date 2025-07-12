@@ -36,7 +36,8 @@ public class ToJsonAction extends DumbAwareAction implements UpdateInBackground 
                 PlatformUtil.getEditor(dataContext),
                 Json5Util::convertJson5ToJson,
                 JsonAssistantBundle.messageOnSystem("hint.selection.json5.to.json"),
-                JsonAssistantBundle.messageOnSystem("hint.global.json5.to.json"));
+                JsonAssistantBundle.messageOnSystem("hint.global.json5.to.json"),
+                "JSON");
     }
 
     @Override

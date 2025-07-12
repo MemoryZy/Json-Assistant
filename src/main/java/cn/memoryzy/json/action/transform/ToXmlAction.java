@@ -53,7 +53,7 @@ public class ToXmlAction extends DumbAwareAction implements UpdateInBackground {
             return;
         }
 
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), xmlStr, FileTypeHolder.XML);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), xmlStr, FileTypeHolder.XML, "XML");
     }
 
 }

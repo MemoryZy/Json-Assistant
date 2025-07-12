@@ -37,7 +37,7 @@ public class ToPropertiesAction extends DumbAwareAction implements UpdateInBackg
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
         String propertiesStr = DataConverter.jsonToProperties(json, JsonUtil.isJson(json));
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), propertiesStr, FileTypeHolder.PROPERTIES);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), propertiesStr, FileTypeHolder.PROPERTIES, "Properties");
     }
 
     @Override

@@ -1,6 +1,6 @@
 package cn.memoryzy.json;
 
-import cn.memoryzy.json.model.PluginUpdateDetail;
+import cn.memoryzy.json.model.deserializer.PluginUpdateDetail;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;

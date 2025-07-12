@@ -49,7 +49,7 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
             return;
         }
 
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), tomlStr, FileTypeHolder.TOML);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), tomlStr, FileTypeHolder.TOML, "TOML");
     }
 
 

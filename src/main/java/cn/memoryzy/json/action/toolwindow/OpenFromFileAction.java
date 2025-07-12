@@ -5,6 +5,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -37,8 +38,11 @@ public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackg
     public static final Key<Boolean> EXTERNAL_FILE_MARKER =
             Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EXTERNAL_FILE_WRITE_ACCESS");
 
-    public OpenFromFileAction() {
+    private final CombineCardLayout cardLayout;
+
+    public OpenFromFileAction(CombineCardLayout cardLayout) {
         super(JsonAssistantBundle.messageOnSystem("action.openFromFile.text"), JsonAssistantBundle.messageOnSystem("action.openFromFile.description"), JsonAssistantIcons.ToolWindow.IMPORT);
+        this.cardLayout = cardLayout;
     }
 
     @Override
@@ -79,10 +83,15 @@ public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackg
         openSelectedTabIfContentExists(project, selectFile);
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent event) {
+        event.getPresentation().setEnabled(cardLayout.isEditorView());
+    }
+
     private void openSelectedTabIfContentExists(Project project, VirtualFile selectFile) {
         ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantToolWindow(project);
         // 用包装类代替 VirtualFile
         Content content = ToolWindowUtil.addNewContent(project, toolWindow, ContentFactory.SERVICE.getInstance(), new ExternalFileWrapper(selectFile));
-        content.setDisplayName(JsonAssistantBundle.messageOnSystem("toolwindow.tab.import.name"));
+        content.setDisplayName(ToolWindowUtil.generateTagName(toolWindow.getContentManager(), PlatformUtil.isChineseLocale() ? "导入数据" : "Imported Data"));
     }
 }

@@ -43,8 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("DuplicatedCode")
 public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Disposable {
 
-    // TODO FloatingToolbarProvider 的实现类不能被混淆，因为没有标注@Override，所以这里不混淆
-
     /**
      * 最大存储量
      */
@@ -53,7 +51,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     /**
      * 消息总线（应用级）
      */
-    private final MessageBusConnection applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
+    private MessageBusConnection applicationConnection;
 
     /**
      * 浮动工具栏组件
@@ -80,6 +78,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         return false;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     public int getPriority() {
         return 0;
     }
@@ -105,8 +104,12 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
             return;
         }
 
-        // 给自定义的编辑器添加事件订阅
-        registerEventHandlers();
+        if (null == applicationConnection) {
+            // 只添加一次事件订阅
+            applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
+            // 给自定义的编辑器添加事件订阅
+            registerEventHandlers();
+        }
 
         // 缓存浮动工具栏
         floatingComponentMap.put(editor, component);
@@ -262,6 +265,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     @Override
     public void dispose() {
         usedHashes.clear();
+        floatingComponentMap.clear();
         applicationConnection.disconnect();
     }
 

@@ -136,7 +136,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
 
             // 有文本，新开标签页
             if (hasText) {
-                content = ToolWindowUtil.addNewContent(project, toolWindow, ContentFactory.SERVICE.getInstance(), FileTypeHolder.JSON5);
+                content = ToolWindowUtil.addNewContent(project, toolWindow, ContentFactory.SERVICE.getInstance(), FileTypeHolder.JSON5, null);
                 panelOnContent = ToolWindowUtil.getPanelOnContent(content);
             }
         }

@@ -53,7 +53,7 @@ public class GlobalJsonConverter {
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();
             boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, allowedFileTypeQualifiedNames);
-            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite);
+            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite, null);
         }
     }
 
@@ -71,7 +71,7 @@ public class GlobalJsonConverter {
      * @param selectionMessage 选中文本转换成功的消息
      * @param globalMessage    全局文本转换成功的消息
      */
-    public static void convertBetweenJsonAndJson5(DataContext dataContext, Editor editor, Function<String, String> converter, String selectionMessage, String globalMessage) {
+    public static void convertBetweenJsonAndJson5(DataContext dataContext, Editor editor, Function<String, String> converter, String selectionMessage, String globalMessage, String tabName) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String processedText = converter.apply(parseJson(context, editor));
@@ -83,7 +83,7 @@ public class GlobalJsonConverter {
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();
             boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, allowedFileTypeQualifiedNames);
-            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite);
+            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite, tabName);
         }
     }
 

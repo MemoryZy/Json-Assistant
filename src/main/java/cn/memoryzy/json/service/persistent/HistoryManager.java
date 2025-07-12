@@ -130,6 +130,16 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
     }
 
     /**
+     * 查找相同结构的记录
+     *
+     * @param rawText 原文
+     * @return 记录
+     */
+    public JsonRecord find(String rawText) {
+        return histories.stream().filter(record -> Objects.equals(rawText, record.getRawText())).findFirst().orElse(null);
+    }
+
+    /**
      * 查找相同名称的记录
      *
      * @param name 名称

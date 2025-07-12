@@ -3,7 +3,7 @@ package cn.memoryzy.json.service;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.model.PluginUpdateDetail;
+import cn.memoryzy.json.model.deserializer.PluginUpdateDetail;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.VersionComparator;

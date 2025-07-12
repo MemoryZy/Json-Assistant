@@ -12,21 +12,64 @@ import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
 
 /**
  * @author Memory
  * @since 2025/6/23
  */
-public class PasteDataAction extends DumbAwareAction implements UpdateInBackground {
+public class PasteDataAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     public PasteDataAction() {
-        super(JsonAssistantBundle.messageOnSystem("action.paste.data.text"), JsonAssistantBundle.messageOnSystem("action.paste.data.description"), AllIcons.Actions.MenuPaste);
+        super(JsonAssistantBundle.messageOnSystem("action.paste.data.text"), null, AllIcons.Actions.MenuPaste);
+    }
+
+    @Override
+    public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+
+
+
+        ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
+            @Override
+            protected void updateToolTipText() {
+                HelpTooltip.dispose(this);
+
+                // TODO 搞个预览  bundle tooltip.paste.data.text
+
+                // noinspection DialogTitleCapitalization
+                new HelpTooltip()
+                        .setTitle(getTemplatePresentation().getText())
+                        .setDescription("<p>转换并粘贴</p>\n" +
+                                "<pre><code>{\n" +
+                                "  // 登机口性质：D纯国内，I纯国际，B国内和国际\n" +
+                                "  \"gateType\": \"I\",\n" +
+                                "  // 国内值机人数\n" +
+                                "  \"checkinCountD\": null,\n" +
+                                "  // 国内登机人数\n" +
+                                "  \"boardingCountD\": null,\n" +
+                                "  // 国际值机人数\n" +
+                                "  \"checkinCountI\": \"--\",\n" +
+                                "  // 国际登机人数\n" +
+                                "  \"boardingCountI\": \"300\",</code></pre>")
+                        .installOn(this);
+            }
+        };
+
+        button.setBorder(JBUI.Borders.empty(1, 2));
+        return button;
     }
 
     @Override
