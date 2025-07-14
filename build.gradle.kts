@@ -182,11 +182,39 @@ tasks {
         // 保留指定的重要类属性（如注解、行号表等调试/反射必需信息）
         keepattributes("Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod")
 
-        // 保留实现特定接口的类（确保插件持久化状态组件不被混淆）
-        keep("""
-            class * implements com.intellij.openapi.components.PersistentStateComponent {*;}
-             """.trimIndent()
-        )
+        // 保留所有字段名及所有Getter/Setter（用于状态序列化），
+        keepclassmembers("""
+            class * implements com.intellij.openapi.components.PersistentStateComponent {
+                <fields>;
+                *** get*();
+                void set*(***);
+                *** set*(***);
+                boolean is*();
+                void load*(***);
+            }
+        """.trimIndent())
+
+        // State 存储对象的字段不能被混淆，不然它们在xml中的key就会变成 a b c 这样的，并且每次都不同
+        keepclassmembers("""
+            class cn.memoryzy.json.service.persistent.state.** {
+                <fields>;
+                *** get*();
+                void set*(***);
+                *** set*(***);
+                boolean is*();
+            }
+        """.trimIndent())
+
+        // 涉及到反序列化的类也不能被混淆
+        keepclassmembers("""
+            class cn.memoryzy.json.model.deserializer.** {
+                <fields>;
+                *** get*();
+                void set*(***);
+                *** set*(***);
+                boolean is*();
+            }
+        """.trimIndent())
 
         // 保留类的静态实例成员（单例模式保护）
         keepclassmembers("""
@@ -202,11 +230,8 @@ tasks {
         keep("class icons.*")
 
         // Inspection 和 Intention 不能混淆，因为要关联 resources 目录下的描述
-        keep("class * extends com.intellij.codeInspection.LocalInspectionTool")
-        keep("class * implements com.intellij.codeInsight.intention.IntentionAction")
-
-        // State 存储对象的字段不能被混淆，不然它们在xml中的key就会变成 a b c 这样的，并且每次都不同
-        keep("class cn.memoryzy.json.service.persistent.state.** {*;}")
+        keepnames("class * extends com.intellij.codeInspection.LocalInspectionTool")
+        keepnames("class * implements com.intellij.codeInsight.intention.IntentionAction")
 
         // 不混淆枚举类，因为 JSON 反序列化时会根据枚举常量名来进行，如果混淆了这个，就会出现找不到的问题
         keepclassmembers("enum * {*;}")
@@ -215,7 +240,7 @@ tasks {
         keepdirectories()
 
         // 反射调用相关的方法、字段，也不能被混淆 (例如 BlacklistEntry.toJson()，序列化时，JSON5处理器默认会调用此方法)
-
+        keepclassmembers("class * implements com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider {<methods>;}")
 
 
     }

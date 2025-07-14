@@ -39,31 +39,35 @@ public class PasteDataAction extends DumbAwareAction implements CustomComponentA
 
     @Override
     public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
-
-
-
         ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
             @Override
             protected void updateToolTipText() {
                 HelpTooltip.dispose(this);
 
-                // TODO 搞个预览  bundle tooltip.paste.data.text
+                // String previewText = PlatformUtil.isChineseLocale() ? "预览：" : "Preview:";
+                // String description = JsonAssistantBundle.messageOnSystem("tooltip.paste.data.text");
+                // String jsonText = truncateJsonPreview(StrUtil.trim(PlatformUtil.getClipboard()));
+                // // String jsonText = "";
+                //
+                // // 创建带视觉分隔的JSON预览
+                // String jsonPreview = MessageFormat.format("<html><p>{0}</p>" +
+                //         "<div style='border-top:1px solid #e0e0e0; margin:10px 0; padding-top:10px;'>" +
+                //         "<div style='color:#707070; font-size:0.9em; margin-bottom:4px;'>{1}</div>" +
+                //         // "<div style='margin:10px 0; border-top:1px dashed #cccccc;'>" +
+                //         // "<div style='color:#787878; font-weight:bold; margin-bottom:6px; margin-top:9px;'>{1}</div>" +
+                //         "<pre style='background:#f8f9fa; padding:8px; border-radius:4px; margin:0; max-height:200px; overflow:hidden;'>" +
+                //         "{2}"+
+                //         "</pre>" +
+                //         "</div>" +
+                //         "</html>", description, previewText, jsonText);
+
+                // TODO 后续可以将此Tooltip改为自定义组件，鼠标放在按钮上时显示，鼠标离开时消失
 
                 // noinspection DialogTitleCapitalization
                 new HelpTooltip()
                         .setTitle(getTemplatePresentation().getText())
-                        .setDescription("<p>转换并粘贴</p>\n" +
-                                "<pre><code>{\n" +
-                                "  // 登机口性质：D纯国内，I纯国际，B国内和国际\n" +
-                                "  \"gateType\": \"I\",\n" +
-                                "  // 国内值机人数\n" +
-                                "  \"checkinCountD\": null,\n" +
-                                "  // 国内登机人数\n" +
-                                "  \"boardingCountD\": null,\n" +
-                                "  // 国际值机人数\n" +
-                                "  \"checkinCountI\": \"--\",\n" +
-                                "  // 国际登机人数\n" +
-                                "  \"boardingCountI\": \"300\",</code></pre>")
+                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.paste.data.text"))
+                        // .setPreviewText(StrUtil.trim(PlatformUtil.getClipboard()))
                         .installOn(this);
             }
         };
@@ -98,5 +102,42 @@ public class PasteDataAction extends DumbAwareAction implements CustomComponentA
         // 注册剪贴板使用记录
         String hash = JsonAssistantUtil.calculateSHA256(clipboard);
         ApplicationManager.getApplication().getMessageBus().syncPublisher(RegisterClipboardUsageEvent.TOPIC).accept(editor, hash);
+    }
+
+
+    // 截取预览的逻辑
+    private String truncateJsonPreview(String fullJson) {
+        int MAX_LINES = 18;          // 关键行数限制
+        int MAX_CHARS_PER_LINE = 60; // 单行最大字符数
+        int TOTAL_CHARS = 500;       // 字符总数限制
+
+        // 行数截断优先级 > 总字符截断
+        String[] lines = fullJson.split("\\r?\\n");
+        if (lines.length > MAX_LINES) {
+            StringBuilder sb = new StringBuilder();
+            int charCount = 0;
+
+            // 优先保留前 N 行完整内容
+            for (int i = 0; i < MAX_LINES && charCount < TOTAL_CHARS; i++) {
+                String line = lines[i];
+                if (line.length() > MAX_CHARS_PER_LINE) {
+                    line = line.substring(0, MAX_CHARS_PER_LINE) + "...";
+                }
+                sb.append(line).append("\n");
+                charCount += line.length();
+            }
+
+            // 添加截断提示
+            sb.append("\n    ....... ");
+
+            return sb.toString();
+        }
+
+        // 字符数截断兜底
+        if (fullJson.length() > TOTAL_CHARS) {
+            return fullJson.substring(0, TOTAL_CHARS) + "  ......";
+        }
+
+        return fullJson;
     }
 }
