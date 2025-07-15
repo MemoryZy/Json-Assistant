@@ -168,7 +168,7 @@
 
 <!--        TODO 待删除    -->
 <!--            <separator/>-->
-            <!--<action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatNewConfigAction"/>-->
+            <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatNewConfigAction"/>
         </group>
 
         <group id="JsonAssistant.Group.JsonAssistantHelpMenu">

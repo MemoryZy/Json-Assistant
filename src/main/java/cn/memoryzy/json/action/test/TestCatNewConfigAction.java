@@ -1,10 +1,20 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
+import com.intellij.json.json5.Json5FileType;
+import com.intellij.json.psi.*;
+import com.intellij.json.psi.impl.JsonRecursiveElementVisitor;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 /**
  * @author Memory
@@ -47,10 +57,8 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //
         // colorSchemeChangedEvent.change(ColorScheme.Classic);
 
-        HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
-        manager.show();
-
-
+        // HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(getEventProject(e));
+        // manager.show();
 
 
         // List<String> list = List.of("航班监控", "航班设置", "航班注释", "Search");
@@ -65,13 +73,75 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         // );
 
 
-
         // BorderLayoutPanel panel = new BorderLayoutPanel().addToCenter(completion);
         //
         // new DialogBuilder()
         //         .centerPanel(panel)
         //                 .show();
 
-        System.out.println();
+        Project project = getEventProject(e);
+        PsiFile tempPsiFile = PsiFileFactory.getInstance(project)
+                .createFileFromText("temp." + Json5FileType.INSTANCE.getDefaultExtension(), Json5FileType.INSTANCE, "{\n" +
+                        "            \"label\": \"Learn More\",\n" +
+                        "            \"url\": \"https://en.example.com/notice\",\n" +
+                        "            \"command\": \"\"\n" +
+                        "          }");
+
+        PsiElement[] children = tempPsiFile.getChildren();
+
+
+        tempPsiFile.accept(new JsonRecursiveElementVisitor() {
+            @Override
+            public void visitObject(@NotNull JsonObject o) {
+                super.visitObject(o);
+                List<JsonProperty> propertyList = o.getPropertyList();
+                for (JsonProperty property : propertyList) {
+                    JsonValue jsonValue = property.getValue();
+                    // handleElement(project, jsonValue, handleType);
+                    String name = property.getName();
+
+
+                    System.out.println();
+                }
+            }
+
+            @Override
+            public void visitArray(@NotNull JsonArray o) {
+                super.visitArray(o);
+                List<JsonValue> valueList = o.getValueList();
+                for (JsonValue jsonValue : valueList) {
+
+
+                    // handleElement(project, jsonValue, handleType);
+                }
+            }
+        });
+
+
+        System.out.println(tempPsiFile.getText());
+
+        JsonObject jsonObject = (JsonObject) tempPsiFile.getChildren()[0];
+
+        JsonProperty label = jsonObject.findProperty("label");
+
+        JsonValue value = label.getValue();
+
+
+        JsonElementGenerator generator = new JsonElementGenerator(project);
+        JsonValue jsonValue = generator.createValue("\"hahahaha\"");
+
+        value.replace(jsonValue);
+
+        WriteCommandAction.runWriteCommandAction(
+                project,
+                () -> CodeStyleManager.getInstance(project).reformatText(tempPsiFile, 0, tempPsiFile.getText().length()));
+
+
+        System.out.println(tempPsiFile.getText());
+
+
+        //
+
+
     }
 }

@@ -264,7 +264,6 @@ public final class ConfigurationMerger {
         HistoryManager manager = HistoryManager.getInstance(project);
         String historyStr = dataElement.getAttributeValue("history");
         if (StrUtil.isNotBlank(historyStr)) {
-            // TODO 看看要不要兼容更早期的版本
             if (Base64.isBase64(historyStr)) {
                 historyStr = StrUtil.str(Base64.decode(historyStr), StandardCharsets.UTF_8);
             }

@@ -29,7 +29,6 @@ public class OnlineDocAction extends DumbAwareAction implements UpdateInBackgrou
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        // TODO 需要注意的位置
          PlatformUtil.openOnlineDoc(event.getProject(), true);
     }
 

@@ -70,6 +70,12 @@ public class JsonStructureComponentProvider {
     //             .createFileFromText("temp.json", JsonFileType.INSTANCE, jsonText);
     //
 
+
+    // TODO 如果已经是JsonFile类型，则使用弱引用在节点中维护 Psi元素；如果只是文本，就构建一个临时的
+
+    // TODO 可以在修改里加一个复选框：由用户选择是否将修改作用于源文件
+
+
     /**
      * 构造器
      *
