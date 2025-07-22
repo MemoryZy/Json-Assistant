@@ -2,6 +2,7 @@ package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.ui.node.JsonTreeNode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.notification.impl.NotificationsManagerImpl;
@@ -22,7 +23,10 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.*;
+import com.intellij.ui.components.JBScrollBar;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.components.fields.ExpandableSupport;
+import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.Function;
@@ -42,6 +46,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.*;
 
@@ -553,4 +559,58 @@ public class UIUtils {
         scrollPane.setViewportBorder(JBUI.Borders.empty());
         return scrollPane;
     }
+
+
+    public static void setupExtension(@NotNull EditorEx editor,
+                                      Color background,
+                                      ExtendableTextComponent.Extension extension) {
+        JLabel label = ExpandableSupport.createLabel(extension);
+        label.setBorder(JBUI.Borders.emptyLeft(2));
+        editor.getScrollPane().setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        editor.getScrollPane().setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+        editor.getScrollPane().getVerticalScrollBar().setBackground(background);
+        editor.getScrollPane().getVerticalScrollBar().add(JBScrollBar.LEADING, label);
+        editor.getScrollPane().getVerticalScrollBar().setOpaque(true);
+    }
+
+    @NotNull
+    public static JLabel createLabel(@NotNull ExtendableTextComponent.Extension extension) {
+        return new JLabel(extension.getIcon(false)) {{
+            setToolTipText(extension.getTooltip());
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent event) {
+                    setIcon(extension.getIcon(true));
+                }
+
+                @Override
+                public void mouseExited(MouseEvent event) {
+                    setIcon(extension.getIcon(false));
+                }
+
+                @Override
+                public void mouseClicked(MouseEvent event) {
+                    Runnable action = extension.getActionOnClick();
+                    if (action != null) action.run();
+                }
+            });
+        }};
+    }
+
+
+    @Nullable
+    public static Object getSelectedNode(Tree tree) {
+        TreePath selectionPath = tree.getSelectionPath();
+        if (selectionPath != null) {
+            Object lastComponent = selectionPath.getLastPathComponent();
+            if (lastComponent instanceof JsonTreeNode) {
+                return lastComponent;
+            }
+        }
+        return null;
+    }
+
+
+
 }

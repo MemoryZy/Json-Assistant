@@ -1,20 +1,15 @@
 package cn.memoryzy.json.action.test;
 
-import com.intellij.json.json5.Json5FileType;
-import com.intellij.json.psi.*;
-import com.intellij.json.psi.impl.JsonRecursiveElementVisitor;
+import cn.memoryzy.json.ui.ExpandableEditorProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * @author Memory
@@ -79,69 +74,85 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //         .centerPanel(panel)
         //                 .show();
 
-        Project project = getEventProject(e);
-        PsiFile tempPsiFile = PsiFileFactory.getInstance(project)
-                .createFileFromText("temp." + Json5FileType.INSTANCE.getDefaultExtension(), Json5FileType.INSTANCE, "{\n" +
-                        "            \"label\": \"Learn More\",\n" +
-                        "            \"url\": \"https://en.example.com/notice\",\n" +
-                        "            \"command\": \"\"\n" +
-                        "          }");
-
-        PsiElement[] children = tempPsiFile.getChildren();
-
-
-        tempPsiFile.accept(new JsonRecursiveElementVisitor() {
-            @Override
-            public void visitObject(@NotNull JsonObject o) {
-                super.visitObject(o);
-                List<JsonProperty> propertyList = o.getPropertyList();
-                for (JsonProperty property : propertyList) {
-                    JsonValue jsonValue = property.getValue();
-                    // handleElement(project, jsonValue, handleType);
-                    String name = property.getName();
-
-
-                    System.out.println();
-                }
-            }
-
-            @Override
-            public void visitArray(@NotNull JsonArray o) {
-                super.visitArray(o);
-                List<JsonValue> valueList = o.getValueList();
-                for (JsonValue jsonValue : valueList) {
-
-
-                    // handleElement(project, jsonValue, handleType);
-                }
-            }
-        });
-
-
-        System.out.println(tempPsiFile.getText());
-
-        JsonObject jsonObject = (JsonObject) tempPsiFile.getChildren()[0];
-
-        JsonProperty label = jsonObject.findProperty("label");
-
-        JsonValue value = label.getValue();
-
-
-        JsonElementGenerator generator = new JsonElementGenerator(project);
-        JsonValue jsonValue = generator.createValue("\"hahahaha\"");
-
-        value.replace(jsonValue);
-
-        WriteCommandAction.runWriteCommandAction(
-                project,
-                () -> CodeStyleManager.getInstance(project).reformatText(tempPsiFile, 0, tempPsiFile.getText().length()));
-
-
-        System.out.println(tempPsiFile.getText());
+        // Project project = getEventProject(e);
+        // PsiFile tempPsiFile = PsiFileFactory.getInstance(project)
+        //         .createFileFromText("temp." + Json5FileType.INSTANCE.getDefaultExtension(), Json5FileType.INSTANCE, "{\n" +
+        //                 "            \"label\": \"Learn More\",\n" +
+        //                 "            \"url\": \"https://en.example.com/notice\",\n" +
+        //                 "            \"command\": \"\"\n" +
+        //                 "          }");
+        //
+        // PsiElement[] children = tempPsiFile.getChildren();
+        //
+        //
+        // tempPsiFile.accept(new JsonRecursiveElementVisitor() {
+        //     @Override
+        //     public void visitObject(@NotNull JsonObject o) {
+        //         super.visitObject(o);
+        //         List<JsonProperty> propertyList = o.getPropertyList();
+        //         for (JsonProperty property : propertyList) {
+        //             JsonValue jsonValue = property.getValue();
+        //             // handleElement(project, jsonValue, handleType);
+        //             String name = property.getName();
+        //
+        //
+        //             System.out.println();
+        //         }
+        //     }
+        //
+        //     @Override
+        //     public void visitArray(@NotNull JsonArray o) {
+        //         super.visitArray(o);
+        //         List<JsonValue> valueList = o.getValueList();
+        //         for (JsonValue jsonValue : valueList) {
+        //
+        //
+        //             // handleElement(project, jsonValue, handleType);
+        //         }
+        //     }
+        // });
+        //
+        //
+        // System.out.println(tempPsiFile.getText());
+        //
+        // JsonObject jsonObject = (JsonObject) tempPsiFile.getChildren()[0];
+        //
+        // JsonProperty label = jsonObject.findProperty("label");
+        //
+        // JsonValue value = label.getValue();
+        //
+        //
+        // JsonElementGenerator generator = new JsonElementGenerator(project);
+        // JsonValue jsonValue = generator.createValue("\"hahahaha\"");
+        //
+        // value.replace(jsonValue);
+        //
+        // WriteCommandAction.runWriteCommandAction(
+        //         project,
+        //         () -> CodeStyleManager.getInstance(project).reformatText(tempPsiFile, 0, tempPsiFile.getText().length()));
+        //
+        //
+        // System.out.println(tempPsiFile.getText());
 
 
         //
 
+        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // 右对齐FlowLayout
+        JCheckBox checkBox = new JCheckBox("同意条款");
+        flowPanel.add(checkBox);
+
+        // ExpandableEditorTextField editorTextField = new ExpandableEditorTextField(JsonLanguage.INSTANCE);
+
+        ExpandableEditorProvider expandableEditorProvider = new ExpandableEditorProvider(e.getProject());
+
+        BorderLayoutPanel panel = new BorderLayoutPanel()
+                .addToCenter(expandableEditorProvider.createComponent())
+                .addToBottom(flowPanel);
+
+
+        new DialogBuilder()
+                .centerPanel(panel)
+                .show();
 
     }
 }

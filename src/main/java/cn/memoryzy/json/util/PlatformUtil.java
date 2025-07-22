@@ -30,6 +30,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
@@ -458,17 +459,26 @@ public class PlatformUtil {
         return PathManager.getOptionsFile(configFileName);
     }
 
-
-    public static String getFileContent(VirtualFile file) {
-        String content = null;
+    /**
+     * 从虚拟文件获取内容（带异常处理）
+     */
+    public static String getContentFromVirtualFile(VirtualFile virtualFile) {
         try {
-            content = StrUtil.str(file.contentsToByteArray(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            LOG.error("[Json Assistant] Failed to get text", e);
-        }
+            // 尝试通过文件文档管理器获取（保留行结束符）
+            FileDocumentManager docManager = FileDocumentManager.getInstance();
+            Document document = docManager.getDocument(virtualFile);
+            if (document != null) {
+                return document.getText();
+            }
 
-        return content;
+            // 直接加载文件内容
+            return new String(virtualFile.contentsToByteArray(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            // 处理所有可能的异常（文件不存在、权限问题等）
+            return null;
+        }
     }
+
 
     public static String getFileRealContent(Project project, VirtualFile file) {
         try {
@@ -573,6 +583,12 @@ public class PlatformUtil {
         return project != null && languageClz != null && classClz != null;
     }
 
+    public static boolean hasJsonEnvironment(Project project) {
+        Class<?> fileClz = JsonAssistantUtil.getClassByName("com.intellij.json.psi.JsonFile");
+        Class<?> typeClz = JsonAssistantUtil.getClassByName("com.intellij.json.JsonFileType");
+        return project != null && fileClz != null && typeClz != null;
+    }
+
 
     public static PluginDetail getPluginDetail() {
         try {
@@ -674,5 +690,19 @@ public class PlatformUtil {
                 .orElse(null);
 
         return editorWindow != null && !editorWindow.equals(mainWindow);
+    }
+
+    public static boolean isJsonFile(PsiFile psiFile) {
+        if (psiFile == null) {
+            return false;
+        }
+
+        Class<?> clazz = psiFile.getClass();
+        for (Class<?> iface : clazz.getInterfaces()) {
+            if ("com.intellij.json.psi.JsonFile".equals(iface.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

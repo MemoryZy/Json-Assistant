@@ -63,7 +63,7 @@ public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackg
         VirtualFile selectFile = files[0];
 
         // 验证此文件内容是否为 JSON 格式
-        String content = PlatformUtil.getFileContent(selectFile);
+        String content = PlatformUtil.getContentFromVirtualFile(selectFile);
         if (!JsonUtil.isJson(content) && !Json5Util.isJson5(content)) {
             ToolWindowManager.getInstance(project).notifyByBalloon(
                     PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,

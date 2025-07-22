@@ -22,6 +22,11 @@ public class TreeStructureState {
      */
     private boolean displayNodePath = true;
 
+    /**
+     * 是否将修改作用于源文件
+     */
+    private boolean shouldApplyToSource = false;
+
 
     public void setTreeViewMode(TreeViewMode treeViewMode) {
         this.treeViewMode = treeViewMode;
@@ -37,5 +42,13 @@ public class TreeStructureState {
 
     public boolean isDisplayNodePath() {
         return displayNodePath;
+    }
+
+    public boolean isShouldApplyToSource() {
+        return shouldApplyToSource;
+    }
+
+    public void setShouldApplyToSource(boolean shouldApplyToSource) {
+        this.shouldApplyToSource = shouldApplyToSource;
     }
 }

@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.model.EditorContext;
@@ -15,11 +16,16 @@ import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.node.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.*;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
@@ -36,6 +42,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
@@ -55,26 +62,16 @@ public class JsonStructureComponentProvider {
     private boolean initializationDone;
 
     /**
-     * 上下文或上下文内的内容都可能是null
+     * 上下文或上下文内的内容
+     * <br/>
+     * <br/>
+     * <b>注意：</b>
+     * <p>因为在初始化此类时，ModifyNodeValueAction 就已经被构建了，而它取到的EditorContext是一开始创建此类时的默认实例，不包含任何信息。</p>
+     * <p>后续使用此ModifyNodeValueAction类操作时，其 EditorContext 永远是默认的那个实例，所以需要将其改为函数式获取，或者用一个引用包裹。</p>
      */
-    private @Nullable EditorContext editorContext;
+    private final AtomicReference<EditorContext> editorContextReference = new AtomicReference<>();
 
     // TODO 尝试按需解析，初始只解析到第2层级，展开节点时动态加载子树（类似IDE的大文件处理）
-
-    // TODO 如果关联文件是 JsonFile，可以获取PsiElement，那就把修改后的element整体替换；如果是普通文本，那就整体替换吧
-
-    // TODO 把PsiElement与节点绑定，接着再进行修改、替换，会更方便（要用软引用）
-
-    // TODO 如果是文本类型，也可以用临时psifile进行绑定，例如：      // 创建临时JSON文件
-    //         PsiFile tempPsiFile = PsiFileFactory.getInstance(originalPsiFile.getProject())
-    //             .createFileFromText("temp.json", JsonFileType.INSTANCE, jsonText);
-    //
-
-
-    // TODO 如果已经是JsonFile类型，则使用弱引用在节点中维护 Psi元素；如果只是文本，就构建一个临时的
-
-    // TODO 可以在修改里加一个复选框：由用户选择是否将修改作用于源文件
-
 
     /**
      * 构造器
@@ -86,14 +83,16 @@ public class JsonStructureComponentProvider {
     public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
         this.structureState = GeneralSettings.getInstance().getState().getTreeStructureState();
         this.setting = setting;
-        this.editorContext = setting.getEditorContext();
-        this.tree = new Tree(new DefaultTreeModel(new JsonTreeNode("root")));
+        this.editorContextReference.set(setting.getEditorContext());
+        this.tree = new Tree(new DefaultTreeModel(new JsonTreeNode("root").setJsonPath("$")));
         this.treeComponent = new JPanel(new BorderLayout());
 
         if (!setting.isLazyLoad()) {
             component = null == component ? treeComponent : component;
             init(wrapper, component, setting);
         }
+
+        replenishTempPsiFile();
     }
 
     /**
@@ -107,7 +106,7 @@ public class JsonStructureComponentProvider {
         JsonTreeNode rootNode = (JsonTreeNode) tree.getModel().getRoot();
         // 允许在后面再进行树的构建
         if (wrapper != null) {
-            convertToTreeNode(wrapper, rootNode);
+            convertToTreeNode(wrapper, rootNode, "$");
         }
 
         // 构建树
@@ -156,16 +155,17 @@ public class JsonStructureComponentProvider {
     }
 
     public void rebuildTree(JsonWrapper wrapper, int expandLevel, EditorContext editorContext) {
-        this.editorContext = editorContext;
+        this.editorContextReference.set(editorContext);
+        replenishTempPsiFile();
         this.setting.setExpandLevel(expandLevel);
 
         // 之前因为懒加载没有执行样式加载，这里进行
         if (!initializationDone && setting.isLazyLoad()) {
             init(wrapper, treeComponent, setting);
         } else {
-            JsonTreeNode rootNode = new JsonTreeNode("root");
+            JsonTreeNode rootNode = new JsonTreeNode("root").setJsonPath("$");
             if (wrapper != null) {
-                convertToTreeNode(wrapper, rootNode);
+                convertToTreeNode(wrapper, rootNode, "$");
             }
 
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
@@ -178,19 +178,19 @@ public class JsonStructureComponentProvider {
         }
     }
 
-    private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {
+    private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode parentNode, String parentPath) {
         if (jsonWrapper instanceof ObjectWrapper) {
             ObjectWrapper jsonObject = (ObjectWrapper) jsonWrapper;
             // 为了确定图标
-            if (Objects.isNull(node.getNodeType())) {
-                node.setNodeType(JsonTreeNodeType.JSONObject);
+            if (Objects.isNull(parentNode.getNodeType())) {
+                parentNode.setNodeType(JsonTreeNodeType.JSONObject);
             }
 
-            if (Objects.isNull(node.getValue())) {
-                node.setValue(jsonObject);
+            if (Objects.isNull(parentNode.getValue())) {
+                parentNode.setValue(jsonObject);
             }
 
-            node.setSize(jsonObject.size());
+            parentNode.setSize(jsonObject.size());
 
             // 提取注释Map
             Map<?, ?> commentsMap = Json5Util.getCommentsMap(jsonObject);
@@ -205,17 +205,28 @@ public class JsonStructureComponentProvider {
                 Object value = entry.getValue();
                 // 获取注释
                 String comment = Json5Util.getComment(commentsMap, key);
-                JsonTreeNode childNode = new JsonTreeNode(key).setComment(comment);
+
+                // 构建当前节点路径
+                String currentPath = buildCurrentPath(parentPath, key);
+
+                // 构建子节点
+                JsonTreeNode childNode = new JsonTreeNode(key)
+                        .setComment(comment)
+                        .setJsonPath(currentPath);
 
                 if (value instanceof ObjectWrapper) {
                     ObjectWrapper nestedJsonObject = (ObjectWrapper) value;
-                    childNode.setValue(value).setNodeType(JsonTreeNodeType.JSONObject).setSize(nestedJsonObject.size());
-                    convertToTreeNode(nestedJsonObject, childNode);
+                    childNode.setValue(value)
+                            .setNodeType(JsonTreeNodeType.JSONObject)
+                            .setSize(nestedJsonObject.size());
+                    convertToTreeNode(nestedJsonObject, childNode, currentPath);
 
                 } else if (value instanceof ArrayWrapper) {
                     ArrayWrapper jsonArray = (ArrayWrapper) value;
-                    childNode.setValue(value).setNodeType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
-                    handleJsonArray(childNode, jsonArray);
+                    childNode.setValue(value)
+                            .setNodeType(JsonTreeNodeType.JSONArray)
+                            .setSize(jsonArray.size());
+                    handleJsonArray(childNode, jsonArray, currentPath);
 
                 } else {
                     // 若不是对象或数组，则不添加子集，直接同层级
@@ -224,54 +235,87 @@ public class JsonStructureComponentProvider {
                             .setUserObject(key);
                 }
 
-                node.add(childNode);
+                parentNode.add(childNode);
             }
         } else if (jsonWrapper instanceof ArrayWrapper) {
             ArrayWrapper jsonArray = (ArrayWrapper) jsonWrapper;
             // 为了确定图标
-            if (Objects.isNull(node.getNodeType())) {
-                node.setNodeType(JsonTreeNodeType.JSONArray);
+            if (Objects.isNull(parentNode.getNodeType())) {
+                parentNode.setNodeType(JsonTreeNodeType.JSONArray);
             }
 
-            if (Objects.isNull(node.getSize())) {
-                node.setSize(jsonArray.size());
+            if (Objects.isNull(parentNode.getSize())) {
+                parentNode.setSize(jsonArray.size());
             }
 
-            if (Objects.isNull(node.getValue())) {
-                node.setValue(jsonArray);
+            if (Objects.isNull(parentNode.getValue())) {
+                parentNode.setValue(jsonArray);
             }
 
-            handleJsonArray(node, jsonArray);
+            handleJsonArray(parentNode, jsonArray, parentPath);
         }
     }
 
-    private void handleJsonArray(JsonTreeNode childNode, ArrayWrapper jsonArray) {
+    private void handleJsonArray(JsonTreeNode parentNode, ArrayWrapper jsonArray, String parentPath) {
         for (int i = 0; i < jsonArray.size(); i++) {
-            Object el = jsonArray.get(i);
-            if (el instanceof ObjectWrapper) {
-                ObjectWrapper jsonObjectElement = (ObjectWrapper) el;
-                JsonTreeNode childNodeElement = new JsonTreeNode(
-                        "item" + i, el, JsonTreeNodeType.JSONObjectElement, jsonObjectElement.size());
+            Object element = jsonArray.get(i);
 
-                convertToTreeNode(jsonObjectElement, childNodeElement);
-                childNode.add(childNodeElement);
-            } else if (el instanceof ArrayWrapper) {
-                ArrayWrapper jsonArrayElement = (ArrayWrapper) el;
-                JsonTreeNode childNodeElement = new JsonTreeNode(
-                        "item" + i, el, JsonTreeNodeType.JSONArrayElementArray, jsonArrayElement.size());
+            // 构建当前节点路径
+            String currentPath = buildArrayElementPath(parentPath, i);
 
-                convertToTreeNode(jsonArrayElement, childNodeElement);
-                childNode.add(childNodeElement);
+            if (element instanceof ObjectWrapper) {
+                ObjectWrapper jsonObjectElement = (ObjectWrapper) element;
+                JsonTreeNode childNode = new JsonTreeNode("item" + i)
+                        .setValue(element)
+                        .setNodeType(JsonTreeNodeType.JSONObjectElement)
+                        .setSize(jsonObjectElement.size())
+                        .setJsonPath(currentPath);
+
+                convertToTreeNode(jsonObjectElement, childNode, currentPath);
+                parentNode.add(childNode);
+
+            } else if (element instanceof ArrayWrapper) {
+                ArrayWrapper jsonArrayElement = (ArrayWrapper) element;
+                JsonTreeNode childNodeElement = new JsonTreeNode("item" + i)
+                        .setValue(element)
+                        .setNodeType(JsonTreeNodeType.JSONArrayElementArray)
+                        .setSize(jsonArrayElement.size())
+                        .setJsonPath(currentPath);
+
+                convertToTreeNode(jsonArrayElement, childNodeElement, currentPath);
+                parentNode.add(childNodeElement);
             } else {
-                Object obj = el;
-                if (el instanceof String) {
-                    String str = (String) el;
+                Object obj = element;
+                if (element instanceof String) {
+                    String str = (String) element;
                     obj = "\"" + str + "\"";
                 }
 
-                childNode.add(new JsonTreeNode(obj).setValue(el).setNodeType(JsonTreeNodeType.JSONArrayElement));
+                JsonTreeNode childNode = new JsonTreeNode(obj)
+                        .setValue(element)
+                        .setNodeType(JsonTreeNodeType.JSONArrayElement)
+                        .setJsonPath(currentPath);
+
+                parentNode.add(childNode);
             }
         }
+    }
+
+    /**
+     * 为对象属性构建路径
+     */
+    public static String buildCurrentPath(String parentPath, String key) {
+        if (parentPath.isEmpty() || "$".equals(parentPath)) {
+            return "$." + key;
+        }
+        return parentPath + "." + key;
+    }
+
+    /**
+     * 为数组元素构建路径
+     */
+    public static String buildArrayElementPath(String parentPath, int index) {
+        return parentPath + "[" + index + "]";
     }
 
     private JPopupMenu buildRightMousePopupMenu() {
@@ -286,8 +330,8 @@ public class JsonStructureComponentProvider {
         group.add(new CopyNodePathAction(tree));
         group.addSeparator();
         group.add(new CopyNodeCommentAction(tree));
-        // group.addSeparator();
-        // group.add(new ModifyNodeValueAction(tree));
+        group.addSeparator();
+        group.add(new ModifyNodeValueAction(tree, editorContextReference));
         group.addSeparator();
         group.add(new ShowAsTableAction(tree));
         group.addSeparator();
@@ -298,6 +342,26 @@ public class JsonStructureComponentProvider {
         group.add(new RemoveTreeNodeAction(tree));
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
         return actionPopupMenu.getComponent();
+    }
+
+    private void replenishTempPsiFile() {
+        EditorContext editorContext = editorContextReference.get();
+        PsiFile psiFile = editorContext.getPsiFile();
+        // 如果源PSI文件为null，说明我们连一个可用的PSI文件都没有，此时创建临时文件也没有意义
+        if (psiFile == null) return;
+
+        String content = editorContext.getContentText();
+        if (!JsonUtil.isJson(content) && !Json5Util.isJson5(content)) return;
+
+        editorContext.setOriginalContent(content);
+
+        // 如果不是JSON文件，则创建临时PSI文件
+        if (PlatformUtil.isJsonFile(psiFile)) return;
+        FileType fileType = FileTypeHolder.JSON5;
+        PsiFile tempFile = PsiFileFactory.getInstance(psiFile.getProject())
+                .createFileFromText("temp." + fileType.getDefaultExtension(), fileType, content);
+
+        editorContext.setTempPsiFile(tempFile);
     }
 
     public Tree getTree() {
@@ -499,22 +563,7 @@ public class JsonStructureComponentProvider {
                 // 不显示根节点与第二层的节点路径
                 if (pathElements.length > 2) {
                     // 悬停时显示完整路径
-                    StringBuilder pathString = new StringBuilder();
-
-                    for (int i = 0; i < pathElements.length; i++) {
-                        JsonTreeNode node = (JsonTreeNode) pathElements[i];
-                        JsonTreeNodeType parentNodeType = node.getNodeType();
-
-                        if (JsonTreeNodeType.JSONArrayElement == parentNodeType
-                                || JsonTreeNodeType.JSONArrayElementArray == parentNodeType
-                                || JsonTreeNodeType.JSONObjectElement == parentNodeType) {
-                            appendArrayElementPath(node, pathString);
-                        } else {
-                            appendObjectElementPath(node, pathString, i, pathElements.length);
-                        }
-                    }
-
-                    String pathResult = pathString.toString();
+                    String pathResult = jsonTreeNode.getJsonPath();
                     // 同时显示工具提示
                     setToolTipText(pathResult);
 
@@ -527,20 +576,6 @@ public class JsonStructureComponentProvider {
 
             setIcon(icon);
         }
-    }
-
-    public static void appendArrayElementPath(JsonTreeNode node, StringBuilder pathString) {
-        TreeNode parent = node.getParent();
-        int index = parent.getIndex(node);
-        pathString.append("[").append(index).append("]");
-    }
-
-    private static void appendObjectElementPath(JsonTreeNode node, StringBuilder pathString, int currentIndex, int totalLength) {
-        boolean isLastElement = currentIndex == totalLength - 1;
-        String separator = (pathString.length() > 0 && !isLastElement) ? "." : "";
-        String elementValue = isLastElement ? "" : String.valueOf(node.getUserObject());
-
-        pathString.append(separator).append(elementValue);
     }
 
 }
