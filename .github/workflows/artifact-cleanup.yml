@@ -1,0 +1,28 @@
+name: Cleanup Old Artifacts
+
+on:
+  schedule:
+    # 每天凌晨1点自动运行（UTC时间）
+    - cron: '0 1 * * *'
+  workflow_dispatch: # 支持手动触发
+
+jobs:
+  remove-old-artifacts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    # 必须添加的权限设置
+    permissions:
+      actions: write  # 允许删除artifacts
+
+    steps:
+      - name: Remove old artifacts
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          # 删除超过30天的artifacts
+          age: '1 month'
+
+          # 可选配置（根据需求调整）：
+          # skip-tags: true    # 保留与git标签关联的artifacts
+          # skip-recent: 5     # 保留最近的5个artifacts（无论时间）
+          # exclude-names: 'production-*,release-*' # 排除特定名称的artifacts

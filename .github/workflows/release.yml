@@ -112,6 +112,7 @@ jobs:
         with:
           name: Obfuscation-Mapping
           path: ./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}
+          retention-days: 60  # 60天后自动删除
 
       - name: Upload WebDAV
         uses: bxb100/action-upload-webdav@v0.0.6
