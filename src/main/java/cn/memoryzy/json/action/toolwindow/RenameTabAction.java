@@ -55,10 +55,10 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         BaseLabel tabLabel = contextComponent instanceof BaseLabel ? (BaseLabel) contextComponent : event.getData(ToolWindowContentUi.SELECTED_CONTENT_TAB_LABEL);
         if (tabLabel == null) return;
         Content content = tabLabel.getContent();
-        showContentRenamePopup(getEventProject(event), tabLabel, Objects.requireNonNull(content));
+        showContentRenamePopup(tabLabel, Objects.requireNonNull(content));
     }
 
-    private void showContentRenamePopup(Project project, BaseLabel baseLabel, Content content) {
+    private void showContentRenamePopup(BaseLabel baseLabel, Content content) {
         JBTextField textField = new JBTextField(content.getDisplayName());
         textField.selectAll();
 
