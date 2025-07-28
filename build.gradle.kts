@@ -251,9 +251,11 @@ tasks {
         val isCiMode = environment("CI_MODE").map(String::toBoolean).getOrElse(false)
         // 检查本地是否启用了混淆（通过 enableProGuard 属性控制）
         val useProGuard = properties("enableProGuard").map(String::toBoolean).getOrElse(false)
+        // 是否为发布环境
+        val isReleaseMode = environment("RELEASE_MODE").map(String::toBoolean).getOrElse(false)
 
         // 只有不处于 ci 环境中，且启用了混淆才开始执行
-        if (!isCiMode && useProGuard) {
+        if (isReleaseMode || (!isCiMode && useProGuard)) {
             // 使沙箱任务依赖 proguard 任务
             dependsOn("proguard")
             // 使用混淆后的 JAR 作为插件主文件
