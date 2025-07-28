@@ -109,7 +109,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
     }
 
     private JComponent createComponent(Project project, JsonTreeNode node) {
-        this.expandableTextField = new ExpandableEditorTextField(Json5Language.INSTANCE);
+        this.expandableTextField = new ExpandableEditorTextField(project, Json5Language.INSTANCE);
         this.expandableTextField.setText(String.valueOf(node.getValue()));
         this.expandableTextField.selectAll();
 

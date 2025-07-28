@@ -3,6 +3,7 @@ package cn.memoryzy.json.util;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.action.toolwindow.OpenFromFileAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
@@ -527,6 +528,11 @@ public class PlatformUtil {
         return new LightVirtualFile(fileName, fileType, "");
     }
 
+    public static VirtualFile createLightVirtualFile(String fileName, FileType fileType, String text) {
+        fileName = fileName + "." + fileType.getDefaultExtension();
+        return new LightVirtualFile(fileName, fileType, text);
+    }
+
     public static String getFullProductName() {
         return ApplicationNamesInfo.getInstance().getFullProductName();
     }
@@ -704,5 +710,15 @@ public class PlatformUtil {
             }
         }
         return false;
+    }
+
+    public static void markVirtualFileWritable(VirtualFile file) {
+        // 包装文件，允许修改
+        try {
+            file.setWritable(true);
+        } catch (IOException ignored) {
+        }
+
+        file.putUserData(OpenFromFileAction.EXTERNAL_FILE_MARKER, true);
     }
 }

@@ -9,24 +9,24 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Memory
- * @since 2024/12/26
+ * @since 2025/7/25
  */
-public class KeepCamelToggleAction extends ToggleAction implements UpdateInBackground {
+public class InferTypeToggleAction extends ToggleAction implements UpdateInBackground {
 
     private final DeserializationState deserializationState;
 
-    public KeepCamelToggleAction(DeserializationState deserializationState) {
-        super(JsonAssistantBundle.messageOnSystem("action.deserialize.keepCamel.text"), null, null);
+    public InferTypeToggleAction(DeserializationState deserializationState) {
+        super(JsonAssistantBundle.messageOnSystem("action.deserialize.inferType.text"), null, null);
         this.deserializationState = deserializationState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializationState.isKeepFieldCamelCase();
+        return deserializationState.isUseInferType();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializationState.setKeepFieldCamelCase(state);
+        deserializationState.setUseInferType(state);
     }
 }

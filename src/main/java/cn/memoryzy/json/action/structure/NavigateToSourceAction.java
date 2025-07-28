@@ -11,9 +11,11 @@ import com.intellij.json.psi.JsonValue;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +55,9 @@ public class NavigateToSourceAction extends DumbAwareAction implements UpdateInB
         }
 
         // 打开编辑器 TODO 无法打开并焦点对应的编辑器组件
+        Editor editor = editorContext.getEditor();
+        IdeFocusManager.findInstance().requestFocus(editor.getContentComponent(), true);
+
 
     }
 

@@ -89,10 +89,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     public static final String DESERIALIZER_EXAMPLE_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".DESERIALIZER_EXAMPLE_GUIDE";
 
-    private JBTextField classNameTextField;
-    private EditorTextField jsonTextField;
-    private TextEditorErrorPopupDecorator classNameErrorDecorator;
-    private TextEditorErrorPopupDecorator jsonErrorDecorator;
+    private final JBTextField classNameTextField;
+    private final EditorTextField jsonTextField;
+    private final TextEditorErrorPopupDecorator classNameErrorDecorator;
+    private final TextEditorErrorPopupDecorator jsonErrorDecorator;
 
     private final Project project;
     private final PsiDirectory directory;
@@ -109,6 +109,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.propertiesComponent = PropertiesComponent.getInstance();
         this.deserializationState = SerializationSettings.getInstance().getDeserializationState();
 
+        this.classNameTextField = new JBTextField();
+        this.jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
+        this.classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
+        this.jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
+
         if (this.deserializationState == null) {
             LOG.error("[Json Assistant] Deserialized configuration object is empty!");
             throw new IllegalArgumentException("Deserialized configuration object is empty!");
@@ -123,9 +128,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        classNameTextField = new JBTextField();
-        registerFocusListener();
-
         JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.deserialize.label.class.name"));
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
@@ -138,19 +140,16 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         optionPanel.add(Box.createRigidArea(new Dimension(3, 0)));
         optionPanel.add(createOptionsButton());
 
-        new ClickTrigger().init(titledSeparator, el -> resetGuideFlag());
-
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(optionPanel);
 
-        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
         jsonTextField.setFont(UIUtils.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
         jsonTextField.addNotify();
 
-        classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
-        jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
+        registerFocusListener();
+        new ClickTrigger().init(titledSeparator, el -> resetGuideFlag());
 
         JBSplitter splitter = new JBSplitter(true, 0.06f);
         splitter.setFirstComponent(borderLayoutPanel);
@@ -410,7 +409,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             } else {
                 // ------------- 非对象，则直接添加字段
                 // 获取字段类型
-                String propertyType = JavaUtil.getStrType(value);
+                String propertyType = JavaUtil.getStrType(value, deserializationState.isUseInferType());
 
                 if (Objects.equals(propertyType, Date.class.getSimpleName())) {
                     importList.add(Date.class.getName());
@@ -633,7 +632,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             } else {
                 // ------------- 非对象，则直接添加字段
                 // 获取字段类型
-                String propertyType = JavaUtil.getStrType(value);
+                String propertyType = JavaUtil.getStrType(value, deserializationState.isUseInferType());
                 // 定义字段文本
                 String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, propertyType, processedKey);
 

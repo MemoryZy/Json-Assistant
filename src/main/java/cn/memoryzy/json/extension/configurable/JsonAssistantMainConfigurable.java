@@ -17,6 +17,8 @@ public class JsonAssistantMainConfigurable implements Configurable {
 
     private JsonAssistantMainConfigurableComponentProvider componentProvider;
 
+    public static final String ID = "JsonAssistant.Configurable.JsonAssistantMainConfigurable";
+
     @Override
     public String getDisplayName() {
         return JsonAssistantBundle.message("setting.display.name");

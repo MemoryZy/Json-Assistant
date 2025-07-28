@@ -1,9 +1,6 @@
 package cn.memoryzy.json.action.group;
 
-import cn.memoryzy.json.action.deserializer.FastJson2ToggleAction;
-import cn.memoryzy.json.action.deserializer.FastJsonToggleAction;
-import cn.memoryzy.json.action.deserializer.JacksonToggleAction;
-import cn.memoryzy.json.action.deserializer.KeepCamelToggleAction;
+import cn.memoryzy.json.action.deserializer.*;
 import cn.memoryzy.json.action.deserializer.comment.SwaggerToggleAction;
 import cn.memoryzy.json.action.deserializer.comment.SwaggerV3ToggleAction;
 import cn.memoryzy.json.action.deserializer.lombok.LombokGroup;
@@ -102,6 +99,7 @@ public class OptionsGroup extends DefaultActionGroup implements UpdateInBackgrou
         }
 
         actions.add(Separator.create());
+        actions.add(new InferTypeToggleAction(deserializationState));
         actions.add(new KeepCamelToggleAction(deserializationState));
         return actions.toArray(new AnAction[0]);
     }

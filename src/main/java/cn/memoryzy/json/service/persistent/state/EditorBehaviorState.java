@@ -26,6 +26,10 @@ public class EditorBehaviorState {
      */
     private Set<DataFormatType> enabledFormats = CollUtil.newHashSet(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
 
+    /**
+     * 是否将修改作用于源文件（外部 JSON 文件）
+     */
+    private boolean shouldApplyToSource = false;
 
     public void setAutoRecognizeFormats(boolean autoRecognizeFormats) {
         this.autoRecognizeFormats = autoRecognizeFormats;
@@ -33,6 +37,10 @@ public class EditorBehaviorState {
 
     public void setEnabledFormats(Set<DataFormatType> enabledFormats) {
         this.enabledFormats = enabledFormats;
+    }
+
+    public void setShouldApplyToSource(boolean shouldApplyToSource) {
+        this.shouldApplyToSource = shouldApplyToSource;
     }
 
 
@@ -43,6 +51,10 @@ public class EditorBehaviorState {
     @XCollection(propertyElementName = "formats", elementName = "item", style = XCollection.Style.v2)
     public Set<DataFormatType> getEnabledFormats() {
         return enabledFormats;
+    }
+
+    public boolean isShouldApplyToSource() {
+        return shouldApplyToSource;
     }
 
 }

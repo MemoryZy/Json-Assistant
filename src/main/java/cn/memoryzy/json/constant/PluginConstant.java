@@ -87,6 +87,8 @@ public interface PluginConstant {
 
     String MANUAL_SAVE_HISTORY_REMINDER = JsonAssistantPlugin.PLUGIN_ID_NAME + ".MANUAL_SAVE_HISTORY_REMINDER";
 
+    String EXTERNAL_FILE_REMINDER = JsonAssistantPlugin.PLUGIN_ID_NAME + ".EXTERNAL_FILE_REMINDER";
+
 
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),

@@ -333,6 +333,8 @@ public class JsonStructureComponentProvider {
         group.addSeparator();
         group.add(new ModifyNodeValueAction(tree, editorContextReference));
         group.addSeparator();
+        // group.add(new NavigateToSourceAction(tree, editorContextReference));
+        // group.addSeparator();
         group.add(new ShowAsTableAction(tree));
         group.addSeparator();
         group.add(new ExpandMultiAction(tree));

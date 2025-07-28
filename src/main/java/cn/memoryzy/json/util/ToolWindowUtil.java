@@ -149,7 +149,7 @@ public class ToolWindowUtil {
         String presetName = StrUtil.isNotBlank(tabName) ? tabName : PluginConstant.MAIN_WINDOW_DISPLAY_NAME;
         String displayName = generateTagName(contentManager, presetName);
         Content content = contentFactory.createContent(null, displayName, false);
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, editorFileType);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, toolWindow, content, editorFileType);
 
         content.setComponent(window.createComponent());
         content.setDisposer(window);
@@ -173,7 +173,7 @@ public class ToolWindowUtil {
 
         String displayName = generateTagName(contentManager, PluginConstant.MAIN_WINDOW_DISPLAY_NAME);
         Content content = contentFactory.createContent(null, displayName, false);
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, sourceFile);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, toolWindow, content, sourceFile);
 
         content.setComponent(window.createComponent());
         content.setDisposer(window);
@@ -321,6 +321,22 @@ public class ToolWindowUtil {
         // 如果没有找到带数字的标签，返回"预设名 1"
         // 否则返回"预设名 (maxNum + 1)"
         return hasNumberedTags ? presetName + " " + (maxNum + 1) : presetName + " 1";
+    }
+
+    /**
+     * 检查输入的字符串是否符合"View"后跟数字的格式
+     *
+     * @param input 要检查的字符串
+     * @return 如果符合格式返回true，否则返回false
+     */
+    public static boolean isDefaultTabName(String input) {
+        if (StrUtil.isBlank(input)) {
+            return false;
+        }
+
+        // 使用正则表达式匹配"View"后跟一个或多个数字的模式
+        // ^表示字符串开始，$表示字符串结束，\\s+表示一个或多个空白字符，\\d+表示一个或多个数字
+        return input.matches("^View\\s+\\d+$");
     }
 
 }

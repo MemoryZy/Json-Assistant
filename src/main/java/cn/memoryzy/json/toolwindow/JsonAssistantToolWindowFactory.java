@@ -62,7 +62,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
 
         // 创建初始内容页
         Content content = contentFactory.createContent(null, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, false);
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, content, FileTypeHolder.JSON5);
+        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, toolWindowEx, content, FileTypeHolder.JSON5);
 
         content.setComponent(window.createComponent());
         content.setCloseable(false);
@@ -143,8 +143,9 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
         group.add(new RenameTabAction());
-        group.add(new MoveToEditorAction(toolWindowEx));
+        group.add(Separator.create());
         group.add(new FloatingWindowAction(toolWindowEx));
+        group.add(new MoveToEditorAction(toolWindowEx));
         group.add(new EditInNewWindowAction(toolWindowEx));
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));

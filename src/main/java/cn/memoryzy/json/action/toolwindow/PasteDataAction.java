@@ -34,7 +34,7 @@ import javax.swing.*;
 public class PasteDataAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     public PasteDataAction() {
-        super(JsonAssistantBundle.messageOnSystem("action.paste.data.text"), null, AllIcons.Actions.MenuPaste);
+        super(JsonAssistantBundle.messageOnSystem("action.paste.data.text"), JsonAssistantBundle.messageOnSystem("action.paste.data.description"), AllIcons.Actions.MenuPaste);
     }
 
     @Override

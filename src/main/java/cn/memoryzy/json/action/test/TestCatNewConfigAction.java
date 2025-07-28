@@ -1,15 +1,12 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.ui.ExpandableEditorProvider;
+import cn.memoryzy.json.extension.configurable.JsonAssistantMainConfigurable;
+import com.intellij.ide.actions.ShowSettingsUtilImpl;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.ui.DialogBuilder;
-import com.intellij.util.ui.components.BorderLayoutPanel;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * @author Memory
@@ -23,6 +20,9 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        Project project = e.getProject();
+
+
 //        BlacklistManager blacklistManager = BlacklistManager.getInstance();
 //
 //        GeneralSettings generalSettings = GeneralSettings.getInstance();
@@ -137,22 +137,76 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
 
         //
 
-        JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // 右对齐FlowLayout
-        JCheckBox checkBox = new JCheckBox("同意条款");
-        flowPanel.add(checkBox);
+        // JPanel flowPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // 右对齐FlowLayout
+        // JCheckBox checkBox = new JCheckBox("同意条款");
+        // flowPanel.add(checkBox);
+        //
+        // // ExpandableEditorTextField editorTextField = new ExpandableEditorTextField(JsonLanguage.INSTANCE);
+        //
+        // // ExpandableEditorProvider expandableEditorProvider = new ExpandableEditorProvider(e.getProject());
+        //
+        // // ExpandableLanguageTextField expandableLanguageTextField = new ExpandableLanguageTextField(project, Json5Language.INSTANCE, "");
+        //
+        // // EmbeddedButtonLanguageTextField embeddedButtonLanguageTextField = new EmbeddedButtonLanguageTextField(project, PlainTextLanguage.INSTANCE, "");
+        //
+        // BorderLayoutPanel panel = new BorderLayoutPanel()
+        //         // .addToCenter(expandableLanguageTextField)
+        //         // .addToCenter(expandableEditorProvider.createComponent())
+        //         // .addToCenter(embeddedButtonLanguageTextField)
+        //         .addToBottom(flowPanel);
+        //
+        //
+        // new DialogBuilder()
+        //         .centerPanel(panel)
+        //         .show();
 
-        // ExpandableEditorTextField editorTextField = new ExpandableEditorTextField(JsonLanguage.INSTANCE);
-
-        ExpandableEditorProvider expandableEditorProvider = new ExpandableEditorProvider(e.getProject());
-
-        BorderLayoutPanel panel = new BorderLayoutPanel()
-                .addToCenter(expandableEditorProvider.createComponent())
-                .addToBottom(flowPanel);
 
 
-        new DialogBuilder()
-                .centerPanel(panel)
-                .show();
+
+
+        // boolean ask = MessageDialogBuilder.okCancel(JsonAssistantBundle.messageOnSystem("dialog.clear.editor.title"), JsonAssistantBundle.messageOnSystem("dialog.clear.editor.content"))
+        //         .icon(Messages.getWarningIcon())
+        //         .doNotAsk(new DoNotAskOption.Adapter() {
+        //             @Override
+        //             public void rememberChoice(boolean isSelected, int exitCode) {
+        //                 // 点击确定
+        //                 if (MessageConstants.YES == exitCode && isSelected) {
+        //
+        //                 }
+        //
+        //
+        //                 System.out.println();
+        //             }
+        //
+        //             @Override
+        //             public @NotNull String getDoNotShowMessage() {
+        //                 return JsonAssistantBundle.messageOnSystem("dialog.options.do.not.ask");
+        //             }
+        //         })
+        //
+        //         .ask(project);
+
+
+        ShowSettingsUtilImpl.showSettingsDialog(project, JsonAssistantMainConfigurable.ID, null);
+
+        // ShowStructureSettingsAction
+
+        // ShowSettingsUtilImpl.showSettingsDialog(e.getProject(), PluginManagerConfigurable.ID, JsonAssistantPlugin.PLUGIN_NAME);
+
+        // SettingsDialogFactory.getInstance().create(
+        //         currentOrDefaultProject(project),
+        //         Collections.singletonList(group),
+        //         configurableToSelect,
+        //         filter
+        // ).show();
+
+
+        // ShowSettingsUtil.getInstance().showSettingsDialog(project,
+        //         configurable -> configurable instanceof JsonAssistantMainConfigurable,
+        //         configurable -> {
+        //
+        //             System.out.println();
+        //         });
 
     }
 }

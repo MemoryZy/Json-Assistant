@@ -47,11 +47,11 @@ public class JavaUtil {
     /**
      * 递归将属性转成Map元素
      *
-     * @param psiClass        class
-     * @param jsonMap         Map
-     * @param ignoreMap       忽略元素列表
-     * @param commentMap      最外层的注释Map
-     * @param resolveComment  是否解析注释
+     * @param psiClass           class
+     * @param jsonMap            Map
+     * @param ignoreMap          忽略元素列表
+     * @param commentMap         最外层的注释Map
+     * @param resolveComment     是否解析注释
      * @param serializationState 持久化配置
      */
     public static void recursionAddProperty(Project project,
@@ -309,7 +309,7 @@ public class JavaUtil {
     /**
      * 获取Json注解中的键名称
      *
-     * @param psiField        字段属性
+     * @param psiField           字段属性
      * @param serializationState 持久化配置
      * @return 键名（如果是{@link JsonAssistantPlugin#PLUGIN_ID_NAME}）则表示忽略该字段
      */
@@ -773,17 +773,23 @@ public class JavaUtil {
     /**
      * 根据对象获取其类型字符串
      *
-     * @param obj 对象
+     * @param obj          对象
+     * @param useInferType 是否使用推断类型
      * @return 类型名
      */
     @SuppressWarnings("rawtypes")
-    public static String getStrType(Object obj) {
+    public static String getStrType(Object obj, boolean useInferType) {
         String type = Object.class.getSimpleName();
         if ((obj instanceof Double) || (obj instanceof Integer) || (obj instanceof Boolean)) {
             type = obj.getClass().getSimpleName();
 
         } else if (obj instanceof String) {
             String str = (String) obj;
+            // 不启用类型推断，只判断时间
+            if (!useInferType) {
+                return isDateType(str);
+            }
+
             // 判断纯数字类型
             String numberType = NumberUtil.isNumber(str) ? Long.class.getSimpleName() : null;
             // 时间类型判断
@@ -798,7 +804,7 @@ public class JavaUtil {
             if (list.isEmpty()) {
                 type = List.class.getSimpleName();
             } else {
-                String genericsType = getStrType(list.get(0));
+                String genericsType = getStrType(list.get(0), useInferType);
                 type = StrUtil.format("{}<{}>", List.class.getSimpleName(), genericsType);
             }
         }
@@ -818,6 +824,7 @@ public class JavaUtil {
         try {
             DateTime time = DateUtil.parse(str);
             if (Objects.nonNull(time)) {
+                // TODO 是否要换成JDK8的LocalDateTime
                 type = Date.class.getSimpleName();
             }
         } catch (DateException ignored) {

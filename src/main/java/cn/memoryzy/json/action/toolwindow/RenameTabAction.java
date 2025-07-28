@@ -45,7 +45,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.rename.tab.text"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.rename.tab.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.rename.tab.description"));
     }
 

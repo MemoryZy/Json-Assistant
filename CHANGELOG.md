@@ -5,10 +5,16 @@
 - 更新历史记录展示形式。
 - 切换识别并粘贴剪贴板数据的方式。
 - 增加从文件导入 JSON 数据功能。
+- 优化 JSON 转义功能的格式问题。
+- 增加反序列化类型自动推导开关控制。
+- 为 JSON 树结构增加编辑功能，并支持将变更同步至源文件。
 - 优化插件性能。
 - Update the display format of the history record.
 - Switch the method of recognizing and pasting clipboard data.
 - Add the function of importing JSON data from files.
+- Optimize the format issues of the JSON escape function.
+- Added switch control for automatic type inference during deserialization.
+- Enhanced JSON tree structure with editing capabilities and source file synchronization support.
 - Optimize the performance of the plugin.
 
 ## [1.8.2] - 2025-06-16

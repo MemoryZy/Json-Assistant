@@ -4,10 +4,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.*;
+import cn.memoryzy.json.extension.file.ExternalFileWrapper;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.HistoryManager;
@@ -48,6 +50,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
@@ -77,8 +80,10 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
 
     private final Project project;
+    private final ToolWindowEx toolWindow;
     @SuppressWarnings("FieldCanBeLocal")
     private final Content currentContent;
+    private final VirtualFile sourceFile;
     private final EditorVisualState visualState;
     private final HistoryState historyState;
     private final HistoryManager historyManager;
@@ -93,13 +98,15 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     private final JsonGridComponentProvider gridProvider;
 
 
-    public JsonAssistantToolWindowComponentProvider(Project project, Content content, FileType fileType) {
-        this(project, content, PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType));
+    public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, FileType fileType) {
+        this(project, toolWindow, content, PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType));
     }
 
-    public JsonAssistantToolWindowComponentProvider(Project project, Content content, VirtualFile sourceFile) {
+    public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, VirtualFile sourceFile) {
         this.project = project;
+        this.toolWindow = toolWindow;
         this.currentContent = content;
+        this.sourceFile = sourceFile;
 
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         this.visualState = toolWindowSettings.getVisualState();
@@ -240,6 +247,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
         APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
         APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
+        APPLICATION_CONNECTION.subscribe(ApplyToSourceToggleEvent.TOPIC, (ApplyToSourceToggleEvent) this::applyExternalFileMode);
     }
 
     private void registerGlobalThemeChangedEventHandlers() {
@@ -261,7 +269,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         actionGroup.add(Separator.create());
         actionGroup.add(new OpenFromFileAction(cardLayout));
         actionGroup.add(new SaveToDiskAction(currentEditor, cardLayout));
-        actionGroup.add(new ClearEditorAction(currentEditor, cardLayout));
+        actionGroup.add(new ClearEditorAction(currentEditor, currentContent, toolWindow, cardLayout, sourceFile));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
         toolbar.setTargetComponent(toolWindowPanel);
@@ -320,6 +328,39 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
             if (Objects.nonNull(newColor) && !Objects.equals(oriColor, newColor)) {
                 currentEditor.setColorsScheme(new EditorBackgroundScheme(defaultColorsScheme, newColor));
             }
+        }
+    }
+
+    private void applyExternalFileMode(boolean apply) {
+        // 使编辑器切换到 源文件/安全 模式
+        String text = currentEditor.getDocument().getText();
+
+        if (apply) {
+            // 从虚拟文件切换为实体文件
+            ExternalFileWrapper fileWrapper = currentEditor.getUserData(OpenFromFileAction.EXTERNAL_FILE_CACHED);
+            // 判断是否存在包装过的文件
+            if (null == fileWrapper) return;
+            // 标记为可写（允许修改）
+            PlatformUtil.markVirtualFileWritable(fileWrapper);
+            // 新开标签页，再关闭旧标签页
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // 切换到真实文件
+                OpenFromFileAction.openSelectedTabIfContentExists(project, toolWindow, fileWrapper, null, text, true);
+                toolWindow.getContentManager().removeContent(currentContent, true);
+            });
+
+        } else {
+            // 从实体文件切换回虚拟文件
+            // 判断是否是包装过的文件
+            if (!(sourceFile instanceof ExternalFileWrapper)) return;
+            // 定义虚拟文件
+            VirtualFile file = PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, text);
+            // 新开标签页，再关闭旧标签页
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // 切换到真实文件
+                OpenFromFileAction.openSelectedTabIfContentExists(project, toolWindow, file, (ExternalFileWrapper) sourceFile, text, false);
+                toolWindow.getContentManager().removeContent(currentContent, true);
+            });
         }
     }
 

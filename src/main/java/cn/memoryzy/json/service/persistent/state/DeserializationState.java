@@ -61,6 +61,11 @@ public class DeserializationState {
      */
     private boolean enableSwagger3Annotation = false;
 
+    /**
+     * 是否启用属性类型推断
+     */
+    private boolean useInferType = true;
+
 
     public void setEnableFastJsonAnnotation(boolean enableFastJsonAnnotation) {
         this.enableFastJsonAnnotation = enableFastJsonAnnotation;
@@ -102,6 +107,10 @@ public class DeserializationState {
         this.enableSwagger3Annotation = enableSwagger3Annotation;
     }
 
+    public void setUseInferType(boolean useInferType) {
+        this.useInferType = useInferType;
+    }
+
 
     public boolean isEnableFastJsonAnnotation() {
         return enableFastJsonAnnotation;
@@ -141,5 +150,9 @@ public class DeserializationState {
 
     public boolean isEnableSwagger3Annotation() {
         return enableSwagger3Annotation;
+    }
+
+    public boolean isUseInferType() {
+        return useInferType;
     }
 }

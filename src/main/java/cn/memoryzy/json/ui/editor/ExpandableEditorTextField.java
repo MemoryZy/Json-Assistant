@@ -30,6 +30,10 @@ public class ExpandableEditorTextField extends LanguageTextField implements Expa
         this("", null, language);
     }
 
+    public ExpandableEditorTextField(Project project, Language language) {
+        this("", project, language);
+    }
+
     /**
      * Creates an expandable text field with the default line parser/joiner,
      * that uses a whitespaces to split a string to several lines.

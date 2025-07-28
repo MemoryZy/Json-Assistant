@@ -84,6 +84,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel autoRecordHistoryDesc;
 
     private ActionLink donateLink;
+    private JBCheckBox applyToSourceCheckBox;
+    private JBLabel applyToSourceDesc;
     // endregion
 
 
@@ -168,6 +170,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
             }
         });
+
+        applyToSourceCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.apply.to.source.text"));
+        UIUtils.setCommentLabel(applyToSourceDesc, applyToSourceCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.apply.to.source.desc"));
     }
 
     /**
@@ -284,6 +289,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
         enableTomlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TOML));
         enableUrlParamFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.URL_PARAM));
 
+        applyToSourceCheckBox.setSelected(editorBehaviorState.isShouldApplyToSource());
+
         // ----------------------------------- 外观
         EditorVisualState visualState = toolWindowSettings.getVisualState();
         showLineNumbersCheckBox.setSelected(visualState.isShowLineNumbers());
@@ -356,6 +363,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean oldEnableTomlFormat = enabledFormats.contains(DataFormatType.TOML);
         boolean oldEnableUrlParamFormat = enabledFormats.contains(DataFormatType.URL_PARAM);
 
+        boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
+
         // ----------------------------------- 外观
         EditorVisualState visualState = toolWindowSettings.getVisualState();
         boolean oldShowLineNumbers = visualState.isShowLineNumbers();
@@ -391,6 +400,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newEnableYamlFormat = enableYamlFormatsCheckBox.isSelected();
         boolean newEnableTomlFormat = enableTomlFormatsCheckBox.isSelected();
         boolean newEnableUrlParamFormat = enableUrlParamFormatsCheckBox.isSelected();
+        boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
 
         // ----------------------------------- 历史记录
         boolean newEnableHistory = enableHistoryCheckBox.isSelected();
@@ -416,6 +426,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldEnableYamlFormat, newEnableYamlFormat)
                 || !Objects.equals(oldEnableTomlFormat, newEnableTomlFormat)
                 || !Objects.equals(oldEnableUrlParamFormat, newEnableUrlParamFormat)
+                || !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource)
+
                 || !Objects.equals(oldEnableHistory, newEnableHistory)
                 || !Objects.equals(oldAutoRecordHistory, newAutoRecordHistory)
                 || !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode)
@@ -441,6 +453,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
         if (enableTomlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TOML);
         if (enableUrlParamFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.URL_PARAM);
 
+        boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
+        editorBehaviorState.setShouldApplyToSource(applyToSourceCheckBox.isSelected());
+
         // ----------------------------------- 历史记录
         HistoryState historyState = toolWindowSettings.getHistoryState();
         boolean oldEnableHistory = historyState.isEnableHistory();
@@ -465,7 +480,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         treeStructureState.setTreeViewMode(treeViewModeComboBox.getItem());
 
         // 发布配置更新事件
-        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme, oldEnableHistory, oldHistoryDisplayMode);
+        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme, oldEnableHistory, oldHistoryDisplayMode, oldShouldApplyToSource);
     }
 
     /**
@@ -475,22 +490,32 @@ public class JsonAssistantMainConfigurableComponentProvider {
                                               boolean oldShowFoldingOutline,
                                               ColorScheme oldColorScheme,
                                               boolean oldEnableHistory,
-                                              HistoryDisplayMode oldHistoryDisplayMode) {
+                                              HistoryDisplayMode oldHistoryDisplayMode,
+                                              boolean oldShouldApplyToSource) {
 
         boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
         boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
         ColorScheme newColorScheme = backgroundComboBox.getItem();
         boolean newEnableHistory = enableHistoryCheckBox.isSelected();
         HistoryDisplayMode newHistoryDisplayMode = historyStyleComboBox.getItem();
+        boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
 
         boolean showLineNumbersUpdate = !Objects.equals(oldShowLineNumbers, newShowLineNumbers);
         boolean showFoldingOutlineUpdate = !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline);
         boolean colorSchemeUpdate = !Objects.equals(oldColorScheme, newColorScheme);
         boolean enableHistoryUpdate = !Objects.equals(oldEnableHistory, newEnableHistory);
         boolean historyDisplayModeUpdate = !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode);
+        boolean shouldApplyToSourceUpdate = !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource);
+
 
         // 对比新旧配置，针对性的进行事件发布
-        if (showLineNumbersUpdate || showFoldingOutlineUpdate || (isIdea && colorSchemeUpdate) || enableHistoryUpdate || historyDisplayModeUpdate) {
+        if (showLineNumbersUpdate
+                || showFoldingOutlineUpdate
+                || (isIdea && colorSchemeUpdate)
+                || enableHistoryUpdate
+                || historyDisplayModeUpdate
+                || shouldApplyToSourceUpdate) {
+
             MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
 
             // 切换展示行号事件
@@ -514,6 +539,11 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
             if (historyDisplayModeUpdate) {
                 messageBus.syncPublisher(HistoryViewChangedEvent.TOPIC).change(newHistoryDisplayMode);
+            }
+
+            if (shouldApplyToSourceUpdate) {
+                // 使编辑器切换到 源文件/安全 模式
+                messageBus.syncPublisher(ApplyToSourceToggleEvent.TOPIC).apply(newShouldApplyToSource);
             }
         }
     }
