@@ -9,6 +9,8 @@
 - 增加反序列化类型自动推导开关控制。
 - 为 JSON 树结构增加编辑功能，并支持将变更同步至源文件。
 - 优化插件性能。
+- 用户体验优化与改进。
+- 兼容性优化。
 - Update the display format of the history record.
 - Switch the method of recognizing and pasting clipboard data.
 - Add the function of importing JSON data from files.
@@ -16,6 +18,8 @@
 - Added switch control for automatic type inference during deserialization.
 - Enhanced JSON tree structure with editing capabilities and source file synchronization support.
 - Optimize the performance of the plugin.
+- User experience optimization and improvement.
+- Compatibility optimization.
 
 ## [1.8.2] - 2025-06-16
 
