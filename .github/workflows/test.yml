@@ -62,7 +62,7 @@ jobs:
 
           RAW_CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
           echo "raw_changelog:"
-          echo "$CHANGELOG"
+          echo "$RAW_CHANGELOG"
         
           CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/d' -e '/^\[Unreleased\]:.*/d')
           
