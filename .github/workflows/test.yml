@@ -60,22 +60,11 @@ jobs:
 
 
 
-          CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
-          echo "changelog:"
+          RAW_CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
+          echo "raw_changelog:"
           echo "$CHANGELOG"
         
+          CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/d' -e '/^\[Unreleased\]:.*/d')
           
-          CHANGELOGA="$(./gradlew getChangelog --unreleased --no-header --no-links --console=plain -q)"
-          echo "changelog2:"
-          echo "$CHANGELOGA"
-          
-          
-          CHANGELOGB="$(./gradlew getChangelog --unreleased --no-header --no-links --no-summary --console=plain -q)"
-          echo "changelog3:"
-          echo "$CHANGELOGB"
-          
-          
-          CHANGELOGC="$(./gradlew getChangelog --no-header --no-links --no-summary --console=plain -q)"
-          echo "changelog4:"
-          echo "$CHANGELOGC"
-          
+          echo "changelog:"
+          echo "$CHANGELOG"
