@@ -63,14 +63,19 @@ jobs:
           CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
           echo "changelog:"
           echo "$CHANGELOG"
+        
           
-          
-          CHANGELOG2="$(./gradlew getChangelog --unreleased --no-header --no-links --console=plain -q)"
+          CHANGELOGA="$(./gradlew getChangelog --unreleased --no-header --no-links --console=plain -q)"
           echo "changelog2:"
-          echo "$CHANGELOG2"
+          echo "$CHANGELOGA"
           
           
-          CHANGELOG3="$(./gradlew getChangelog --unreleased --no-header --no-links --no-summary --console=plain -q)"
+          CHANGELOGB="$(./gradlew getChangelog --unreleased --no-header --no-links --no-summary --console=plain -q)"
           echo "changelog3:"
-          echo "$CHANGELOG3"
+          echo "$CHANGELOGB"
+          
+          
+          CHANGELOGC="$(./gradlew getChangelog --no-header --no-links --no-summary --console=plain -q)"
+          echo "changelog4:"
+          echo "$CHANGELOGC"
           
