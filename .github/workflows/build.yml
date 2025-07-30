@@ -87,9 +87,14 @@ jobs:
         run: |
           PROPERTIES="$(./gradlew properties --console=plain -q)"
           VERSION="$(echo "$PROPERTIES" | grep "^version:" | cut -f2- -d ' ')"
-          CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
+          RAW_CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
 
           echo "version: $VERSION"
+          echo "raw_changelog:"
+          echo "$RAW_CHANGELOG"
+
+          CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/d' -e '/^\[Unreleased\]:.*/d')
+          
           echo "changelog:"
           echo "$CHANGELOG"
           
