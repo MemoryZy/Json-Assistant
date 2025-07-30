@@ -93,8 +93,8 @@ jobs:
           echo "raw_changelog:"
           echo "$RAW_CHANGELOG"
 
-          CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/d' -e '/^\[Unreleased\]:.*/d')
-          
+          # 删除 [Unreleased] 标题行、链接行及其后的空行
+          CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/{N;d;}' -e '/^\[Unreleased\]:.*/d' -e '/^$/d')
           echo "changelog:"
           echo "$CHANGELOG"
           
