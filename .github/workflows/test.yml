@@ -58,3 +58,13 @@ jobs:
           
           echo "Mapping: $PROGUARD_MAPPING_FILE_NAME"
 
+
+
+          RAW_CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
+          echo "raw_changelog:"
+          echo "$RAW_CHANGELOG"
+        
+          CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/d' -e '/^\[Unreleased\]:.*/d')
+          
+          echo "changelog:"
+          echo "$CHANGELOG"
