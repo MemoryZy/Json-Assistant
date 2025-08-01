@@ -16,10 +16,16 @@ import cn.memoryzy.json.service.persistent.state.SerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.JavaSdk;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.OrderEnumerator;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.util.Ref;
@@ -34,6 +40,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.psi.util.PsiTypesUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -43,6 +50,8 @@ import java.util.*;
  * @since 2024/7/3
  */
 public class JavaUtil {
+
+    private static final Logger LOG = Logger.getInstance(JavaUtil.class);
 
     /**
      * 递归将属性转成Map元素
@@ -986,6 +995,65 @@ public class JavaUtil {
 
         list.removeIf(StrUtil::isBlank);
         return StrUtil.join("\n", list);
+    }
+
+    /**
+     * 检查当前项目是否存在Java/Kotlin开发环境
+     * @param project 当前项目对象
+     * @return true表示存在有效环境，false表示不存在
+     */
+    public static boolean hasJavaOrKotlinEnvironment(@NotNull Project project) {
+        // 1. 检查项目模块配置
+        for (Module module : ModuleManager.getInstance(project).getModules()) {
+            ModuleRootManager rootManager = ModuleRootManager.getInstance(module);
+            Sdk sdk = rootManager.getSdk();
+
+            // 2. 检查SDK类型
+            if (sdk != null && sdk.getSdkType() instanceof JavaSdk) {
+                return true;
+            }
+        }
+
+        // 3. 检查Kotlin插件存在性（备选检查）
+        try {
+            Class.forName("org.jetbrains.kotlin.idea.KotlinFileType");
+            LOG.info("Kotlin plugin detected");
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOG.debug("Kotlin plugin not found");
+        }
+
+        return false;
+    }
+
+    /**
+     * 检查IDE环境是否支持Java/Kotlin开发
+     * @return true表示支持，false表示不支持
+     */
+    public static boolean hasJavaOrKotlinEnvironment() {
+        // 检查是否是默认支持Java的IDE发行版
+        if (isJavaBasedIDE()) {
+            return true;
+        }
+
+        // 检查Java插件是否安装启用
+        if (PlatformUtil.isPluginEnabled("com.intellij.java")) {
+            return true;
+        }
+
+        // 检查Kotlin插件是否安装启用
+        return PlatformUtil.isPluginEnabled("org.jetbrains.kotlin");
+    }
+
+    /**
+     * 检测是否为Java/Kotlin基础发行的IDE
+     */
+    private static boolean isJavaBasedIDE() {
+        String ideName = ApplicationInfo.getInstance().getVersionName();
+        // IDEA 全系列、Android Studio、Kotlin IDE 都视为默认支持
+        return ideName.contains("IntelliJ IDEA") ||
+                ideName.contains("Android Studio") ||
+                ideName.contains("Kotlin");
     }
 
 }
