@@ -5,6 +5,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
+import cn.memoryzy.json.ui.dialog.OkCancelDialog;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import com.intellij.ide.util.PropertiesComponent;
@@ -15,9 +16,7 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DoNotAskOption;
-import com.intellij.openapi.ui.MessageConstants;
-import com.intellij.openapi.ui.MessageDialogBuilder;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -64,22 +63,16 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
                 clearText(project);
 
             } else {
-                if (MessageDialogBuilder.okCancel(JsonAssistantBundle.messageOnSystem("dialog.clear.editor.title"), JsonAssistantBundle.messageOnSystem("dialog.clear.editor.content"))
-                        .icon(Messages.getWarningIcon())
-                        .doNotAsk(new DoNotAskOption.Adapter() {
-                            @Override
-                            public void rememberChoice(boolean isSelected, int exitCode) {
-                                // 点击确定，且选中了复选框
-                                if (MessageConstants.YES == exitCode && isSelected) {
-                                    component.setValue(DO_NOT_ASK_KEY, true);
-                                }
+                if (new OkCancelDialog(
+                        JsonAssistantBundle.messageOnSystem("dialog.clear.editor.title"),
+                        JsonAssistantBundle.messageOnSystem("dialog.clear.editor.content"),
+                        Messages.getWarningIcon())
+                        .doNotAsk((isSelected, exitCode) -> {
+                            // 点击确定，且选中了复选框
+                            if (DialogWrapper.OK_EXIT_CODE == exitCode && isSelected) {
+                                component.setValue(DO_NOT_ASK_KEY, true);
                             }
-
-                            @Override
-                            public @NotNull String getDoNotShowMessage() {
-                                return JsonAssistantBundle.messageOnSystem("dialog.options.do.not.ask");
-                            }
-                        }).ask(project)) {
+                        }).ask()) {
 
                     clearText(project);
                 }

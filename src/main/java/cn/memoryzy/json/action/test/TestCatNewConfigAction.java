@@ -1,11 +1,12 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.extension.configurable.JsonAssistantMainConfigurable;
-import com.intellij.ide.actions.ShowSettingsUtilImpl;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.ui.dialog.OkCancelDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -187,7 +188,7 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //         .ask(project);
 
 
-        ShowSettingsUtilImpl.showSettingsDialog(project, JsonAssistantMainConfigurable.ID, null);
+        // ShowSettingsUtilImpl.showSettingsDialog(project, JsonAssistantMainConfigurable.ID, null);
 
         // ShowStructureSettingsAction
 
@@ -207,6 +208,23 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //
         //             System.out.println();
         //         });
+
+                // ParallelLabelDialog dialog = new ParallelLabelDialog(
+                //     "确认操作",
+                //     "您确定要执行此操作吗？此操作不可逆。",
+                //     Messages.getQuestionIcon()
+                // );
+
+                // dialog.setUndecorated(true);
+
+        OkCancelDialog dialog = new OkCancelDialog(
+                JsonAssistantBundle.messageOnSystem("dialog.clear.editor.title"),
+                JsonAssistantBundle.messageOnSystem("dialog.clear.editor.content"),
+                    Messages.getWarningIcon());
+
+        if (dialog.showAndGet()) {
+
+        }
 
     }
 }

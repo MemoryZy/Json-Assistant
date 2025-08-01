@@ -158,6 +158,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     public void register(@NotNull FloatingToolbarComponent component, @NotNull Disposable disposable) {
         DataManager manager = DataManager.getInstance();
         DataContext dataContext = manager.getDataContext((Component) component);
+        // TODO 之后改进，此处存在问题，因为无法获取到编辑器的 userData
         register(dataContext, component, disposable);
     }
 
