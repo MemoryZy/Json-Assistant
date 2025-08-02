@@ -26,7 +26,7 @@
     "type": "info",
     "priority": 100,
     "effectiveDate": "2025-05-27",
-    "expirationDate": null,
+    "expirationDate": "2025-08-02",
     "versionConstraints": ">=1.8.0",
     "display": 1,
     "autoHide": false,
