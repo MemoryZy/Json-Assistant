@@ -52,11 +52,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBLabel detectFastJsonAnnotationsDesc;
     private JBCheckBox detectJacksonAnnotationsCheckBox;
     private JBLabel detectJacksonAnnotationsDesc;
-    // private JPanel serializationTitlePanel;
-    // private JPanel serializeRandomValuesPanel;
-    // private JPanel detectFastJsonAnnotationsPanel;
-    // private JPanel detectJacksonAnnotationsPanel;
-
 
     private TitledSeparator editorBehaviorTitle;
     private JBCheckBox showLineNumbersCheckBox;
@@ -143,14 +138,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
         detectJacksonAnnotationsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
         UIUtils.setCommentLabel(detectJacksonAnnotationsDesc, detectJacksonAnnotationsCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
-
-        // 如果IDE没有Java/Kotlin环境，那么把属性序列化的设置项去除
-        // if (!JavaUtil.hasJavaOrKotlinEnvironment()) {
-        //     serializationTitlePanel.setVisible(false);
-        //     serializeRandomValuesPanel.setVisible(false);
-        //     detectFastJsonAnnotationsPanel.setVisible(false);
-        //     detectJacksonAnnotationsPanel.setVisible(false);
-        // }
     }
 
     /**

@@ -1,13 +1,12 @@
 package cn.memoryzy.json.action.test;
 
-import cn.memoryzy.json.util.JavaUtil;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.ui.dialog.OkCancelDialog;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -218,25 +217,14 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
 
                 // dialog.setUndecorated(true);
 
-        // OkCancelDialog dialog = new OkCancelDialog(
-        //         JsonAssistantBundle.messageOnSystem("dialog.clear.editor.title"),
-        //         JsonAssistantBundle.messageOnSystem("dialog.clear.editor.content"),
-        //             Messages.getWarningIcon());
-        //
-        // if (dialog.showAndGet()) {
-        //
-        // }
+        OkCancelDialog dialog = new OkCancelDialog(
+                JsonAssistantBundle.messageOnSystem("dialog.clear.editor.title"),
+                JsonAssistantBundle.messageOnSystem("dialog.clear.editor.content"),
+                    Messages.getWarningIcon());
 
-
-        IdeaPluginDescriptor[] plugins = PluginManager.getPlugins();
-
-        for (IdeaPluginDescriptor plugin : plugins) {
-            PluginId pluginId = plugin.getPluginId();
-            System.out.println(pluginId);
+        if (dialog.showAndGet()) {
 
         }
-
-        JavaUtil.hasJavaOrKotlinEnvironment();
 
     }
 }

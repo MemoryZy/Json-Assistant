@@ -17,8 +17,6 @@ import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeBundle;
-import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
@@ -33,7 +31,6 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
-import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -723,14 +720,5 @@ public class PlatformUtil {
         }
 
         file.putUserData(OpenFromFileAction.EXTERNAL_FILE_MARKER, true);
-    }
-
-    /**
-     * 检查指定插件是否已安装并启用
-     * @param pluginId 插件ID
-     */
-    public static boolean isPluginEnabled(String pluginId) {
-        IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(PluginId.getId(pluginId));
-        return plugin != null && plugin.isEnabled();
     }
 }
