@@ -39,6 +39,7 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
+import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
@@ -83,6 +84,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     public static final String SPLITTER_PROPORTION_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".HistorySplitterProportionKey";
 
     public static final Key<String> HISTORY_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".HISTORY_EDITOR_FLAG");
+    public static final Key<Boolean> EDIT_MODE_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EDIT_MODE_FLAG");
 
     private final Project project;
     private final HistoryManager historyManager;
@@ -502,7 +504,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private Editor createJsonEditor() {
-        EditorEx editor = (EditorEx) PlatformUtil.createEditor(project, "record", FileTypeHolder.JSON5, true, EditorKind.MAIN_EDITOR, "");
+        EditorEx editor = (EditorEx) PlatformUtil.createEditor(project, PluginConstant.HISTORY_EDITOR_NAME, FileTypeHolder.JSON5, true, EditorKind.MAIN_EDITOR, "");
         EditorSettings settings = editor.getSettings();
         // 行号显示
         settings.setLineNumbersShown(true);
@@ -525,6 +527,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         JComponent component = editor.getComponent();
         component.setFont(UIUtils.consolasFont(15));
 
+        // 标记
+        editor.putUserData(HISTORY_EDITOR_FLAG, JsonAssistantPlugin.PLUGIN_AUTHOR);
+        // 添加标记表示不处于编辑模式
+        editor.putUserData(EDIT_MODE_FLAG, Boolean.FALSE);
+
         // 添加ESC键监听
         editor.getContentComponent().addKeyListener(new KeyAdapter() {
             @Override
@@ -535,8 +542,16 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             }
         });
 
-        // 标记
-        editor.putUserData(HISTORY_EDITOR_FLAG, JsonAssistantPlugin.PLUGIN_AUTHOR);
+        // 触发工具栏的展示（203版本）
+        if (JsonAssistantPlugin.LEGACY_FLOATING_TOOLBAR_PROVIDER) {
+            editor.addFocusListener(new FocusChangeListener() {
+                @Override
+                public void focusGained(@NotNull Editor editor) {
+                    applicationMessageBus.syncPublisher(HistoryEditorFocusGainedEvent.TOPIC).focusGained(editor);
+                }
+            });
+        }
+
         return editor;
     }
 
@@ -1142,6 +1157,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         showList.repaint();
         showTree.repaint();
 
+        // 添加标记表示处于编辑模式
+        recordEditor.putUserData(EDIT_MODE_FLAG, Boolean.TRUE);
+
         applicationMessageBus.syncPublisher(HistoryWindowEditEvent.TOPIC).handle(recordEditor);
     }
 
@@ -1165,6 +1183,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
         showList.repaint();
         showTree.repaint();
+
+        // 添加标记表示不处于编辑模式
+        recordEditor.putUserData(EDIT_MODE_FLAG, Boolean.FALSE);
 
         applicationMessageBus.syncPublisher(HistoryWindowExitEditEvent.TOPIC).handle(recordEditor);
     }

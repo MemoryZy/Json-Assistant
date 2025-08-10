@@ -69,6 +69,8 @@ public interface PluginConstant {
     String MAIN_WINDOW_DISPLAY_NAME = "View";
     String AUXILIARY_TREE_WINDOW_DISPLAY_NAME = "Tab";
 
+    String HISTORY_EDITOR_NAME = "record";
+
     String OUTLINE_PROPERTY = "JComponent.outline";
     String ERROR_VALUE = "error";
     String UNKNOWN = "unknown";

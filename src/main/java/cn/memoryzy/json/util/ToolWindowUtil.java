@@ -336,7 +336,7 @@ public class ToolWindowUtil {
 
         // 使用正则表达式匹配"View"后跟一个或多个数字的模式
         // ^表示字符串开始，$表示字符串结束，\\s+表示一个或多个空白字符，\\d+表示一个或多个数字
-        return input.matches("^View\\s+\\d+$");
+        return PluginConstant.MAIN_WINDOW_DISPLAY_NAME.equals(input) || input.matches("^View\\s+\\d+$");
     }
 
 }

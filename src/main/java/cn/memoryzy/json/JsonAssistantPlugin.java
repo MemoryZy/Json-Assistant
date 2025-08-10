@@ -1,6 +1,7 @@
 package cn.memoryzy.json;
 
 import cn.memoryzy.json.model.deserializer.PluginUpdateDetail;
+import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.extensions.PluginId;
@@ -22,10 +23,10 @@ public class JsonAssistantPlugin {
     public static final String PLUGIN_VERSION = PLUGIN_ID + ".version";
 
     public static final String STORAGE_MAIN_FILE = "json_assistant_settings.xml";
-    public static final String STORAGE_BLACKLIST_FILE = "json_assistant_blacklist.xml";
     public static final String STORAGE_HISTORY_FILE = "json_assistant_history.xml";
 
     public static final Integer CONFIG_VERSION = 1;
+    public static final boolean LEGACY_FLOATING_TOOLBAR_PROVIDER = PlatformUtil.isLegacyFloatingToolbarProvider();
 
     /**
      * 使用一个原子引用持有不可变的状态对象

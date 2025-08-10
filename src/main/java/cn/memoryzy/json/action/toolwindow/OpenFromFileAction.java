@@ -14,9 +14,14 @@ import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
+import com.intellij.ide.HelpTooltip;
 import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
+import com.intellij.openapi.actionSystem.ex.CustomComponentAction;
+import com.intellij.openapi.actionSystem.impl.ActionButton;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDialog;
@@ -31,16 +36,18 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 
 /**
  * @author Memory
  * @since 2025/7/10
  */
-public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackground {
+public class OpenFromFileAction extends DumbAwareAction implements CustomComponentAction, UpdateInBackground {
 
     public static final Key<Boolean> EXTERNAL_FILE_MARKER =
             Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".EXTERNAL_FILE_WRITE_ACCESS");
@@ -55,6 +62,24 @@ public class OpenFromFileAction extends DumbAwareAction implements UpdateInBackg
         super(JsonAssistantBundle.messageOnSystem("action.openFromFile.text"), JsonAssistantBundle.messageOnSystem("action.openFromFile.description"), JsonAssistantIcons.ToolWindow.IMPORT);
         this.cardLayout = cardLayout;
         this.editorBehaviorState = ToolWindowSettings.getInstance().getBehaviorState();
+    }
+
+    @Override
+    public @NotNull JComponent createCustomComponent(@NotNull Presentation presentation, @NotNull String place) {
+        ActionButton button = new ActionButton(this, presentation, place, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE) {
+            @Override
+            protected void updateToolTipText() {
+                HelpTooltip.dispose(this);
+                // noinspection DialogTitleCapitalization
+                new HelpTooltip()
+                        .setTitle(getTemplatePresentation().getText())
+                        .setDescription(JsonAssistantBundle.messageOnSystem("tooltip.open.file.text"))
+                        .installOn(this);
+            }
+        };
+
+        button.setBorder(JBUI.Borders.empty(1, 2));
+        return button;
     }
 
     @Override

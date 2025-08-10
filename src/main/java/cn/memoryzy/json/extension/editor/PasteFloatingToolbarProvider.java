@@ -1,7 +1,9 @@
 package cn.memoryzy.json.extension.editor;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.ActionHolder;
+import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
 import cn.memoryzy.json.event.RegisterClipboardUsageEvent;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
@@ -22,18 +24,19 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
+import com.intellij.openapi.fileEditor.impl.FileDocumentManagerBase;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -153,13 +156,55 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
     }
 
     /**
-     * 兼容203版本
+     * 兼容203版本（在203版本 IDE 中，register方法执行的时机早于给编辑器赋予自定义标记的时机，所以先记录下可能是自定义编辑器的那些，随后再进行判断）
      */
+    @SuppressWarnings("unchecked")
     public void register(@NotNull FloatingToolbarComponent component, @NotNull Disposable disposable) {
         DataManager manager = DataManager.getInstance();
         DataContext dataContext = manager.getDataContext((Component) component);
-        // TODO 之后改进，此处存在问题，因为无法获取到编辑器的 userData
-        register(dataContext, component, disposable);
+
+        // 如果用这个方式提供剪贴板数据，那么任何标签页都可以存在此功能
+        Editor editor = CommonDataKeys.EDITOR.getData(dataContext);
+        if (editor == null || editor.isDisposed()) {
+            component.scheduleHide();
+            return;
+        }
+
+        Project project = PlatformDataKeys.PROJECT.getData(dataContext);
+        if (project != null && project.isDisposed()) {
+            component.scheduleHide();
+            return;
+        }
+
+        Key<VirtualFile> fileKey = (Key<VirtualFile>) JsonAssistantUtil.readStaticFinalFieldValue(FileDocumentManagerBase.class, "FILE_KEY");
+        if (null == fileKey) {
+            component.scheduleHide();
+            return;
+        }
+
+        Document document = editor.getDocument();
+        VirtualFile virtualFile = document.getUserData(fileKey);
+        if (null == virtualFile) {
+            component.scheduleHide();
+            return;
+        }
+
+        // 暂时将这种名字的编辑器当作是自定义编辑器
+        String fileName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + ".json5";
+        if (!Objects.equals(fileName, virtualFile.getName())) {
+            component.scheduleHide();
+            return;
+        }
+
+        if (null == applicationConnection) {
+            // 只添加一次事件订阅
+            applicationConnection = ApplicationManager.getApplication().getMessageBus().connect(this);
+            // 给自定义的编辑器添加事件订阅
+            registerEventHandlers();
+        }
+
+        // 缓存浮动工具栏（因为不一定都是自定义编辑器，所以在此不显示 toolbar）
+        floatingComponentMap.put(editor, component);
     }
 
 
@@ -252,15 +297,23 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
                 // 清理无效引用
                 floatingComponentMap.remove(cached);
             } else if (cached == editor) {
-                component = floatingComponentMap.get(cached);
+                // 如果是旧版本的 FloatingToolbarProvider，那么还需要判断是否为自定义的编辑器
+                if (JsonAssistantPlugin.LEGACY_FLOATING_TOOLBAR_PROVIDER) {
+                    String userData = editor.getUserData(JsonAssistantToolWindowComponentProvider.PLUGIN_EDITOR_FLAG);
+                    if (StrUtil.isBlank(userData)) {
+                        // 清除非自定义的编辑器
+                        floatingComponentMap.remove(cached);
+                    } else {
+                        component = floatingComponentMap.get(cached);
+                    }
+
+                } else {
+                    component = floatingComponentMap.get(cached);
+                }
             }
         }
 
         return component;
-    }
-
-    private void editorDisposed(Editor editor) {
-        floatingComponentMap.remove(editor);
     }
 
     @Override

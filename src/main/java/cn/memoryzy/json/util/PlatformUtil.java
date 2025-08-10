@@ -1,5 +1,6 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
@@ -17,6 +18,8 @@ import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.ide.IdeBundle;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
@@ -31,6 +34,8 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -71,6 +76,7 @@ import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -720,5 +726,29 @@ public class PlatformUtil {
         }
 
         file.putUserData(OpenFromFileAction.EXTERNAL_FILE_MARKER, true);
+    }
+
+    /**
+     * 检查指定插件是否已安装并启用
+     * @param pluginId 插件ID
+     */
+    public static boolean isPluginEnabled(String pluginId) {
+        IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(PluginId.getId(pluginId));
+        return plugin != null && plugin.isEnabled();
+    }
+
+    public static boolean isLegacyFloatingToolbarProvider() {
+        // 获取所有名为 "register" 的方法
+        Method[] registerMethods = ReflectUtil.getMethods(FloatingToolbarProvider.class, method -> "register".equals(method.getName()));
+        // 检查是否只有一个 register 方法
+        if (registerMethods.length != 1) return false;
+
+        Method registerMethod = registerMethods[0];
+        Class<?>[] parameterTypes = registerMethod.getParameterTypes();
+
+        // 检查参数数量和类型
+        return parameterTypes.length == 2
+                && "com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent".equals(parameterTypes[0].getName())
+                && "com.intellij.openapi.Disposable".equals(parameterTypes[1].getName());
     }
 }
