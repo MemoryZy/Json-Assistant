@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.8.5] - 2025-08-10
+
 - 更新历史记录展示形式。
 - 切换识别并粘贴剪贴板数据的方式。
 - 增加从文件导入 JSON 数据功能。
@@ -355,7 +357,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.2...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.5...HEAD
+[1.8.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.2...v1.8.5
 [1.8.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.0...v1.8.2
 [1.8.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.8...v1.8.0
 [1.7.8]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.7...v1.7.8
