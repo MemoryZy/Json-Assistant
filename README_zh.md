@@ -178,6 +178,7 @@
 | JiaoJunWei |  |  | 5.00 CNY |
 | **权 |  |  | 1.00 CNY |
 | **成 |  |  | 1.00 CNY |
+| *伟 |  |  | 1.00 CNY |
 
 <!-- DONORS_TABLE_ZH_END -->
 
