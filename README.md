@@ -158,6 +158,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | **音 |  |  | 20.00 CNY |
 | **程 |  |  | 10.00 CNY |
 | ◎♪TEL |  |  | 10.00 CNY |
+| Danny |  | 支持✊ | 10.00 CNY |
 | AC |  |  | 8.88 CNY |
 | 爱心人士 |  | 很好用，加油 | 8.88 CNY |
 | ت |  | Json插件很好用，加油 | 6.66 CNY |
