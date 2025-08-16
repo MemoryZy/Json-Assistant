@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui.panel;
 import cn.memoryzy.json.action.query.ShowHistoryAction;
 import cn.memoryzy.json.ui.component.EditorButton;
 import cn.memoryzy.json.ui.editor.ModernTextFieldWithAutoCompletion;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.project.Project;
@@ -23,10 +24,12 @@ import java.util.function.Supplier;
  */
 public class AutoCompleteWrapper extends TransparentContainer {
 
+    private final Project project;
     private final ModernTextFieldWithAutoCompletion completion;
 
     public AutoCompleteWrapper(Project project, Collection<String> variants, Supplier<String> propertyNameSupplier) {
         super(new BorderLayout());
+        this.project = project;
         this.completion = new ModernTextFieldWithAutoCompletion(project, variants, propertyNameSupplier);
         this.initComponents(propertyNameSupplier);
     }
@@ -60,7 +63,7 @@ public class AutoCompleteWrapper extends TransparentContainer {
     }
 
     public void setText(String text) {
-        completion.setText(text);
+         WriteCommandAction.runWriteCommandAction(project, () -> completion.setText(text));
     }
 
     public void setVariants(Collection<String> variants) {
