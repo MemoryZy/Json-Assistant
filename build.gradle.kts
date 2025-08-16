@@ -37,9 +37,9 @@ dependencies {
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
-kotlin {
-    jvmToolchain(11)
-}
+// kotlin {
+//    jvmToolchain(11)
+//}
 
 // Configure Gradle IntelliJ Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
 intellij {
@@ -122,19 +122,24 @@ tasks {
         systemProperty("jb.consents.confirmation.enabled", "false")
     }
 
-    listProductsReleases {
-        sinceVersion = properties("productsReleasesSinceBuild")
-
-    }
-
     runPluginVerifier {
-        // ideVersions = properties("verifierIdeVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) }
+        // 验证问题类型
         failureLevel.set(listOf(
             RunPluginVerifierTask.FailureLevel.COMPATIBILITY_PROBLEMS,
             RunPluginVerifierTask.FailureLevel.INTERNAL_API_USAGES,
             RunPluginVerifierTask.FailureLevel.INVALID_PLUGIN,
             RunPluginVerifierTask.FailureLevel.MISSING_DEPENDENCIES,
             RunPluginVerifierTask.FailureLevel.OVERRIDE_ONLY_API_USAGES
+        ))
+
+        // 验证平台列表
+        ideVersions.set(properties("pluginVerifierVersions").map { it.split(',').map(String::trim).filter(String::isNotEmpty) })
+
+        // 验证结果输出格式 -> https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html#tasks-runpluginverifier
+        verificationReportsFormats.set(listOf(
+            RunPluginVerifierTask.VerificationReportsFormats.PLAIN,
+            RunPluginVerifierTask.VerificationReportsFormats.HTML,
+            RunPluginVerifierTask.VerificationReportsFormats.MARKDOWN,
         ))
     }
 
