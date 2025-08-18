@@ -96,10 +96,10 @@ jobs:
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-          ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
+     #     ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
 
-      - name: Cat Products Releases
-        run: cat build/listProductsReleases.txt
+     # - name: Cat Products Releases
+      #  run: cat build/listProductsReleases.txt
 
       # Build plugin
       - name: Build plugin
