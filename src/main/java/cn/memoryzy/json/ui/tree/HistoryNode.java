@@ -1,17 +1,18 @@
-package cn.memoryzy.json.ui.node;
+package cn.memoryzy.json.ui.tree;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.service.persistent.state.JsonRecord;
 
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
  * @author Memory
- * @since 2025/6/30
+ * @since 2025/8/20
  */
-public class HistoryTreeNode extends DefaultMutableTreeNode {
+public class HistoryNode {
 
     /**
      * 节点值（只有{@link HistoryTreeNodeType#NODE}类型才有值）
@@ -33,54 +34,73 @@ public class HistoryTreeNode extends DefaultMutableTreeNode {
      */
     private HistoryTreeNodeType nodeType;
 
-    // region 构造器和Getter、Setter
-    public HistoryTreeNode() {
+    /**
+     * 子节点
+     */
+    private final List<HistoryNode> children = new ArrayList<>();
+
+
+    public HistoryNode() {
     }
 
-    public HistoryTreeNode(JsonRecord value, String groupTime, Integer size, HistoryTreeNodeType nodeType) {
+    public HistoryNode(JsonRecord value, String groupTime, Integer size, HistoryTreeNodeType nodeType) {
         this.value = value;
         this.groupTime = groupTime;
         this.size = size;
         this.nodeType = nodeType;
+    }
+
+    public void add(HistoryNode node) {
+        children.add(node);
+    }
+
+    public void clear() {
+        children.clear();
     }
 
     public JsonRecord getValue() {
         return value;
     }
 
+    public HistoryNode setValue(JsonRecord value) {
+        this.value = value;
+        return this;
+    }
+
     public String getGroupTime() {
         return groupTime;
+    }
+
+    public HistoryNode setGroupTime(String groupTime) {
+        this.groupTime = groupTime;
+        return this;
     }
 
     public Integer getSize() {
         return size;
     }
 
+    public HistoryNode setSize(Integer size) {
+        this.size = size;
+        return this;
+    }
+
     public HistoryTreeNodeType getNodeType() {
         return nodeType;
     }
 
-    public void setValue(JsonRecord value) {
-        this.value = value;
-    }
-
-    public void setGroupTime(String groupTime) {
-        this.groupTime = groupTime;
-    }
-
-    public void setSize(Integer size) {
-        this.size = size;
-    }
-
-    public void setNodeType(HistoryTreeNodeType nodeType) {
+    public HistoryNode setNodeType(HistoryTreeNodeType nodeType) {
         this.nodeType = nodeType;
+        return this;
     }
 
-    // endregion
+    public List<HistoryNode> getChildren() {
+        return children;
+    }
 
     @Override
     public String toString() {
-        if (Objects.nonNull(nodeType)) {
+        if (Objects.nonNull(nodeType) && HistoryTreeNodeType.ROOT != nodeType) {
             if (HistoryTreeNodeType.GROUP == nodeType) {
                 return groupTime;
             } else {
@@ -89,7 +109,7 @@ public class HistoryTreeNode extends DefaultMutableTreeNode {
             }
         }
 
-        return null;
+        return "";
     }
 
 }

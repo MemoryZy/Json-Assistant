@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;

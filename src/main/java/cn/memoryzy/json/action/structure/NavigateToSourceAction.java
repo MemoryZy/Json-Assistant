@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.EditorContext;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import cn.memoryzy.json.util.JsonPsiLocator;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.UIUtils;

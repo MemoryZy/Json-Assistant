@@ -6,7 +6,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;

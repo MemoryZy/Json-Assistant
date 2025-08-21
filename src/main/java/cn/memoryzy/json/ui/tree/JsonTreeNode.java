@@ -1,4 +1,4 @@
-package cn.memoryzy.json.ui.node;
+package cn.memoryzy.json.ui.tree;
 
 
 import cn.memoryzy.json.enums.JsonTreeNodeType;

@@ -2,7 +2,7 @@ package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.notification.impl.NotificationsManagerImpl;

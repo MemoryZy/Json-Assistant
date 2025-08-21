@@ -11,7 +11,7 @@ import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.ExpandableEditorTextField;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.highlighting.HighlightManager;
 import com.intellij.json.json5.Json5Language;

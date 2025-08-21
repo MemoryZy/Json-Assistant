@@ -1,9 +1,14 @@
 package cn.memoryzy.json.action.test;
 
+import cn.memoryzy.json.ui.editor.EditExtension;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -233,6 +238,20 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         // }
         //
         // JavaUtil.hasJavaOrKotlinEnvironment();
+
+
+        ExtendableTextField extendableTextField = new ExtendableTextField(15);
+        extendableTextField.setExtensions(new EditExtension());
+
+        extendableTextField.setOpaque(false);
+        extendableTextField.setBorder(JBUI.Borders.empty());
+
+
+        BorderLayoutPanel panel = new BorderLayoutPanel().addToCenter(extendableTextField);
+
+        new DialogBuilder()
+                .centerPanel(panel)
+                .show();
 
     }
 }

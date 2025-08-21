@@ -14,7 +14,7 @@ import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
