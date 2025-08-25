@@ -59,7 +59,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         showTextField.setFont(UIUtils.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
-        showList.setFont(UIUtils.jetBrainsMonoFont(13));
+        showList.setFont(UIUtils.getFontForCurrentUi(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());

@@ -58,6 +58,19 @@ public class HistoryNode {
         children.clear();
     }
 
+    public boolean isRoot() {
+        return HistoryTreeNodeType.ROOT == nodeType;
+    }
+
+    public boolean isGroup() {
+        return HistoryTreeNodeType.GROUP == nodeType;
+    }
+
+    public boolean isNode() {
+        return HistoryTreeNodeType.NODE == nodeType;
+    }
+
+
     public JsonRecord getValue() {
         return value;
     }

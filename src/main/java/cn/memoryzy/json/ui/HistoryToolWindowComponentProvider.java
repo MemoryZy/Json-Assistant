@@ -10,6 +10,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.DataFormatType;
+import cn.memoryzy.json.enums.HistoryAffectType;
 import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.HistoryTreeNodeType;
 import cn.memoryzy.json.event.*;
@@ -26,7 +27,10 @@ import cn.memoryzy.json.ui.listener.history.CancelAction;
 import cn.memoryzy.json.ui.listener.history.UpdateAction;
 import cn.memoryzy.json.ui.tree.HistoryFilterableTree;
 import cn.memoryzy.json.ui.tree.HistoryNode;
-import cn.memoryzy.json.util.*;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
@@ -67,12 +71,16 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author Memory
@@ -164,14 +172,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         splitter.setFirstComponent(createFirstComponent());
         splitter.setSecondComponent(createSecondComponent());
 
-        this.nameDecorator = new TextEditorErrorPopupDecorator(windowPanel.getRootPane(), nameTextField);
-
-        // 注册配置更新事件
-        registerConfigurationUpdateEventHandlers();
-        // 注册历史记录添加事件
-        registerHistoryAddedEventHandlers();
-        // 注册精确找到记录事件
-        registerNavigateRecordEventHandlers();
+        // 注册事件处理器
+        registerEventHandlers();
 
         windowPanel.setToolbar(createToolbar(windowPanel));
         windowPanel.setContent(splitter);
@@ -192,9 +194,18 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return cardPanel;
     }
 
+    private JComponent createSecondComponent() {
+        configureUpdatePanel();
+
+        return new BorderLayoutPanel()
+                .addToCenter(recordEditor.getComponent())
+                .addToBottom(updatePanel);
+    }
+
+
     private JPanel createListPanel() {
         // 上方编辑器，下方列表
-        showList.setFont(UIUtil.getLabelFont(UIUtil.FontSize.NORMAL));
+        showList.setFont(UIUtils.getFontForCurrentUi(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
@@ -244,8 +255,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         showTree.setDragEnabled(true);
         showTree.setExpandableItemsEnabled(true);
         showTree.setRootVisible(false);
+        // 设置单击展开节点
+        showTree.setToggleClickCount(1);
         showTree.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
-        showTree.setFont(UIUtil.getLabelFont(UIUtil.FontSize.NORMAL));
+        showTree.setFont(UIUtils.getFontForCurrentUi(13));
         showTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         showTree.setCellRenderer(new ColoredTreeCellRenderer() {
             @Override
@@ -280,8 +293,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
             if (HistoryDisplayMode.TREE == historyState.getHistoryDisplayMode()) {
                 TreePath selectionPath = showTree.getSelectionPath();
                 if (selectionPath != null) {
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
-                    HistoryNode historyNode = (HistoryNode) node.getUserObject();
+                    HistoryNode historyNode = filterableTree.getUserObject(selectionPath);
                     if (HistoryTreeNodeType.GROUP.equals(historyNode.getNodeType())) {
                         clearEditor();
                     } else {
@@ -315,15 +327,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return toolbar.getComponent();
     }
 
-
-    private JComponent createSecondComponent() {
-        configureUpdatePanel();
-
-        return new BorderLayoutPanel()
-                .addToCenter(recordEditor.getComponent())
-                .addToBottom(updatePanel);
-    }
-
     private ExtendableTextField createNameTextField() {
         ExtendableTextField extendableTextField = new ExtendableTextField(15);
         extendableTextField.setExtensions(new EditExtension());
@@ -331,6 +334,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void configureUpdatePanel() {
+        nameDecorator = new TextEditorErrorPopupDecorator(windowPanel.getRootPane(), nameTextField);
+
         StatusText emptyText = nameTextField.getEmptyText();
         emptyText.setText("Name");
         nameTextField.addKeyListener(new KeyAdapter() {
@@ -368,11 +373,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         updatePanel.setVisible(false);
         addButton.setVisible(false);
         updateButton.setVisible(false);
-    }
-
-
-    public JComponent getPreferredFocusedComponent() {
-        return HistoryDisplayMode.TREE == historyState.getHistoryDisplayMode() ? showTree : showList;
     }
 
     private DefaultListModel<JsonRecord> createListModel() {
@@ -432,32 +432,45 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return editor;
     }
 
+    public JComponent getPreferredFocusedComponent() {
+        return HistoryDisplayMode.TREE == historyState.getHistoryDisplayMode() ? showTree : showList;
+    }
 
-    private void registerConfigurationUpdateEventHandlers() {
+
+    /**
+     * 注册事件处理器
+     */
+    private void registerEventHandlers() {
+        // 注册配置更新事件
         JsonAssistantToolWindowComponentProvider.APPLICATION_CONNECTION.subscribe(HistoryViewChangedEvent.TOPIC, (HistoryViewChangedEvent) this::applyViewMode);
-    }
-
-    private void registerHistoryAddedEventHandlers() {
-        projectConnection.subscribe(HistoryAddedEvent.TOPIC, (HistoryAddedEvent) this::refreshHistoryComponent);
-    }
-
-    private void registerNavigateRecordEventHandlers() {
+        // 注册历史记录添加事件
+        projectConnection.subscribe(HistoryAddedEvent.TOPIC, (HistoryAddedEvent) () -> refreshHistoryComponent(HistoryAffectType.ADD));
+        // 注册精确找到记录事件
         projectConnection.subscribe(NavigateRecordEvent.TOPIC, (NavigateRecordEvent) this::navigateRecord);
     }
 
+    /**
+     * 切换显示模式
+     *
+     * @param mode 新模式
+     */
     private void applyViewMode(HistoryDisplayMode mode) {
+        // 把先前的文本设置给后面的编辑器
+        if (HistoryDisplayMode.TREE == mode) {
+            treeFilterField.setText(listFilterField.getText());
+        } else {
+            listFilterField.setText(treeFilterField.getText());
+        }
+
         cardLayout.show(cardPanel, mode.name());
     }
 
-    private void refreshHistoryComponent() {
-        // 去除过滤文本
-        listFilterField.setText(null);
-        treeFilterField.setText(null);
-
-        refreshListComponent();
-        refreshTreeComponent();
-    }
-
+    /**
+     * 定位到具体的记录
+     *
+     * @param recordId   记录ID
+     * @param shouldEdit 是否编辑
+     */
     private void navigateRecord(Integer recordId, boolean shouldEdit) {
         // 请退出编辑模式后再进行查看
         if (!showList.isEnabled()) {
@@ -486,6 +499,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                     executeEditAction();
                     // 名称编辑器获得焦点
                     IdeFocusManager.findInstance().requestFocus(nameTextField, true);
+                } else {
+                    // 直接给记录组件请求焦点
+                    requestFocusOnStructureComponent();
                 }
 
                 break;
@@ -494,23 +510,24 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void navigateInTree(Integer recordId, boolean shouldEdit) {
-        DefaultTreeModel model = (DefaultTreeModel) showTree.getModel();
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-
         // 遍历树查找记录
-        TreePath foundPath = findRecordPath(root, recordId);
+        DefaultMutableTreeNode recordNode = findRecordNode(recordId);
 
-        if (foundPath != null) {
+        if (recordNode != null) {
             // 确保路径可见并选中
-            showTree.expandPath(foundPath.getParentPath());
-            showTree.setSelectionPath(foundPath);
-            showTree.scrollPathToVisible(foundPath);
+            TreePath recordPath = new TreePath(recordNode.getPath());
+            showTree.expandPath(recordPath.getParentPath());
+            showTree.setSelectionPath(recordPath);
+            showTree.scrollPathToVisible(recordPath);
 
             // 如果需要编辑
             if (shouldEdit) {
                 executeEditAction();
                 // 名称编辑器获得焦点
                 IdeFocusManager.findInstance().requestFocus(nameTextField, true);
+            } else {
+                // 直接给记录组件请求焦点
+                requestFocusOnStructureComponent();
             }
         } else {
             // 未找到记录
@@ -518,29 +535,27 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         }
     }
 
-    private TreePath findRecordPath(TreeNode root, Integer recordId) {
-        Enumeration<?> groups = root.children();
+    /**
+     * 刷新历史记录组件
+     *
+     * @param affectType 记录影响类型
+     */
+    public void refreshHistoryComponent(HistoryAffectType affectType) {
+        // 去除过滤文本
+        listFilterField.setText(null);
+        treeFilterField.setText(null);
 
-        while (groups.hasMoreElements()) {
-            DefaultMutableTreeNode group = (DefaultMutableTreeNode) groups.nextElement();
-
-            // 检查组内的所有记录
-            Enumeration<?> records = group.children();
-            while (records.hasMoreElements()) {
-                DefaultMutableTreeNode recordNode = (DefaultMutableTreeNode) records.nextElement();
-                HistoryNode node = (HistoryNode) recordNode.getUserObject();
-
-                if (node.getValue().getId().equals(recordId)) {
-                    return new TreePath(recordNode.getPath());
-                }
-            }
-        }
-
-        return null;
+        refreshListComponent(affectType);
+        refreshTreeComponent(affectType);
     }
 
-    private void refreshListComponent() {
-        // 获取当前选中的索引（删除前的索引）
+    /**
+     * 刷新列表组件
+     *
+     * @param affectType 记录影响类型
+     */
+    private void refreshListComponent(HistoryAffectType affectType) {
+        // 获取当前选中的索引（操作前的索引）
         int selectedIndex = showList.getSelectedIndex();
         // 替换数据
         List<JsonRecord> recentHistories = historyManager.getRecentHistories();
@@ -550,22 +565,45 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 计算新的选中索引
         int newIndex = -1;
         if (CollUtil.isNotEmpty(recentHistories)) {
-            // 如果原索引有效且小于列表大小，保持原位置
-            if (selectedIndex >= 0 && selectedIndex < model.getSize()) {
-                newIndex = selectedIndex;
+            switch (affectType) {
+                case ADD:
+                    // 如果是添加，索引需要往后挪一位，保持原来的选中
+                    if (selectedIndex >= 0) {
+                        newIndex = selectedIndex + 1;
+                    } else {
+                        // 如果没有选中项，默认选中第一个
+                        newIndex = 0;
+                    }
+                    break;
+                case REMOVE:
+                    // 如果是删除，则选中原先的下一位元素
+                    if (selectedIndex >= 0) {
+                        // 如果删除的不是最后一项，选中下一项；否则选中前一项
+                        newIndex = (selectedIndex < model.getSize()) ? selectedIndex : selectedIndex - 1;
+                    } else {
+                        // 如果没有选中项，默认选中第一个
+                        newIndex = 0;
+                    }
+                    break;
+                case UPDATE:
+                default:
+                    // 更新操作保持原选中位置
+                    if (selectedIndex >= 0 && selectedIndex < model.getSize()) {
+                        newIndex = selectedIndex;
+                    } else if (selectedIndex >= model.getSize()) {
+                        newIndex = model.getSize() - 1;
+                    } else {
+                        newIndex = 0;
+                    }
+                    break;
             }
-            // 如果原索引超出范围，选择最后一条记录
-            else if (selectedIndex >= model.getSize()) {
-                newIndex = model.getSize() - 1;
-            }
-            // 如果原索引无效（如-1），选择第一条记录
-            else if (selectedIndex == -1 && !recentHistories.isEmpty()) {
-                newIndex = 0;
-            }
+
+            // 确保索引在有效范围内
+            newIndex = Math.max(0, Math.min(newIndex, model.getSize() - 1));
         }
 
         // 设置新的选中项
-        if (newIndex >= 0) {
+        if (newIndex >= 0 && newIndex < model.getSize()) {
             showList.setSelectedIndex(newIndex);
             showList.scrollRectToVisible(showList.getCellBounds(newIndex, newIndex));
         } else {
@@ -574,16 +612,167 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         }
     }
 
-    private void refreshTreeComponent() {
-        // List<TreePath> selectedPaths = TreeUtil.collectSelectedPaths(showTree);
+
+    /**
+     * 刷新树组件
+     *
+     * @param affectType 记录影响类型
+     */
+    private void refreshTreeComponent(HistoryAffectType affectType) {
+        // 保存当前选中节点和展开状态（基于内容而非节点对象）
         List<TreePath> expandedPaths = TreeUtil.collectExpandedPaths(showTree);
+        // 收集当前展开的分组节点日期（能展开的只有组）
+        List<String> expandedGroupDates = new ArrayList<>();
+        for (TreePath expandedPath : expandedPaths) {
+            HistoryNode node = filterableTree.getUserObject(expandedPath);
+            if (!node.isGroup()) continue;
+            expandedGroupDates.add(node.toString());
+        }
+
+        // 保存选中节点的信息以便后续定位
+        String selectedGroupDate = null;
+        Integer selectedRecordId = null;
+        int selectedChildIndex = -1;
+        boolean wasGroupSelected = false;
+
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) showTree.getLastSelectedPathComponent();
+        if (selectedNode != null) {
+            HistoryNode selectedHistoryNode = (HistoryNode) selectedNode.getUserObject();
+
+            if (selectedHistoryNode.getNodeType() == HistoryTreeNodeType.GROUP) {
+                // 选中的是分组节点
+                selectedGroupDate = selectedHistoryNode.toString();
+                wasGroupSelected = true;
+            } else {
+                // 选中的是记录节点
+                DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) selectedNode.getParent();
+                if (parentNode != null) {
+                    HistoryNode parentHistoryNode = (HistoryNode) parentNode.getUserObject();
+                    selectedGroupDate = parentHistoryNode.toString(); // 分组日期
+
+                    // 获取选中节点在父节点中的索引
+                    selectedChildIndex = parentNode.getIndex(selectedNode);
+
+                    // 假设HistoryNode有一个获取记录ID的方法
+                    // 如果没有，可以使用其他唯一标识符
+                    selectedRecordId = selectedHistoryNode.getValue().getId();
+                }
+            }
+        }
 
         // 重新构建节点
         filterableTree.update();
 
-        TreeUtil.restoreExpandedPaths(showTree, expandedPaths);
+        // 恢复展开状态 - 基于之前收集的分组日期
+        DefaultMutableTreeNode root = filterableTree.getRoot();
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode groupNode = (DefaultMutableTreeNode) root.getChildAt(i);
+            HistoryNode groupHistoryNode = (HistoryNode) groupNode.getUserObject();
 
+            if (expandedGroupDates.contains(groupHistoryNode.toString())) {
+                showTree.expandPath(new TreePath(groupNode.getPath()));
+            }
+        }
 
+        // 根据操作类型处理选中状态
+        DefaultMutableTreeNode newSelectedNode = null;
+        switch (affectType) {
+            case ADD:
+                // 添加操作：尝试恢复原来的选中节点
+                if (wasGroupSelected && selectedGroupDate != null) {
+                    // 原来是选中分组节点
+                    newSelectedNode = findGroupNode(selectedGroupDate);
+                } else if (selectedRecordId != null) {
+                    // 原来是选中记录节点
+                    newSelectedNode = findRecordNode(selectedRecordId);
+                }
+                break;
+
+            case REMOVE:
+                // 删除操作：选中同组的下一个节点或上一个节点
+                if (selectedGroupDate != null && selectedChildIndex >= 0) {
+                    // 查找分组节点
+                    DefaultMutableTreeNode groupNode = findGroupNode(selectedGroupDate);
+                    if (groupNode != null && groupNode.getChildCount() > 0) {
+                        // 计算新的选中索引
+                        int newIndex = selectedChildIndex;
+                        if (newIndex >= groupNode.getChildCount()) {
+                            newIndex = groupNode.getChildCount() - 1;
+                        }
+
+                        // 选中新的节点
+                        if (newIndex >= 0) {
+                            newSelectedNode = (DefaultMutableTreeNode) groupNode.getChildAt(newIndex);
+                        }
+                    }
+                }
+                break;
+
+            case UPDATE:
+            default:
+                // 更新操作：尝试恢复原来的选中节点
+                if (wasGroupSelected && selectedGroupDate != null) {
+                    newSelectedNode = findGroupNode(selectedGroupDate);
+                } else if (selectedRecordId != null) {
+                    newSelectedNode = findRecordNode(selectedRecordId);
+                }
+                break;
+        }
+
+        // 设置新的选中项
+        if (newSelectedNode != null) {
+            TreePath newPath = new TreePath(newSelectedNode.getPath());
+            showTree.setSelectionPath(newPath);
+            showTree.scrollPathToVisible(newPath);
+        } else {
+            // 确保树始终存在有效的选中项
+            TreeUtil.ensureSelection(showTree);
+        }
+    }
+
+    /**
+     * 根据日期查找分组节点
+     */
+    private DefaultMutableTreeNode findGroupNode(String groupDate) {
+        DefaultMutableTreeNode root = filterableTree.getRoot();
+
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode groupNode = (DefaultMutableTreeNode) root.getChildAt(i);
+            HistoryNode groupHistoryNode = (HistoryNode) groupNode.getUserObject();
+
+            if (groupDate.equals(groupHistoryNode.toString())) {
+                return groupNode;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * 根据记录ID查找记录节点
+     *
+     * @param recordId 记录ID
+     * @return 记录节点
+     */
+    private DefaultMutableTreeNode findRecordNode(Integer recordId) {
+        DefaultMutableTreeNode root = filterableTree.getRoot();
+
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode groupNode = (DefaultMutableTreeNode) root.getChildAt(i);
+
+            for (int j = 0; j < groupNode.getChildCount(); j++) {
+                DefaultMutableTreeNode recordNode = (DefaultMutableTreeNode) groupNode.getChildAt(j);
+                HistoryNode recordHistoryNode = (HistoryNode) recordNode.getUserObject();
+
+                // 假设HistoryNode有一个获取记录ID的方法
+                // 如果没有，可以使用其他唯一标识符进行比较
+                if (recordId.equals(recordHistoryNode.getValue().getId())) {
+                    return recordNode;
+                }
+            }
+        }
+
+        return null;
     }
 
 
@@ -596,61 +785,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 展示编辑窗口
         displayEditView(true);
     }
-
-    public boolean editActionUpdate() {
-        JsonRecord record = getCurrentSelectionValue();
-        return showTree.isEnabled() && Objects.nonNull(record);
-    }
-
-
-    public void executeAddAction() {
-        // 展示编辑窗口
-        displayEditView(false);
-    }
-
-    public boolean addActionUpdate() {
-        return showTree.isEnabled();
-    }
-
-    public void executeRemoveAction() {
-        List<Integer> ids = new ArrayList<>();
-        if (HistoryDisplayMode.LIST == historyState.getHistoryDisplayMode()) {
-            ids.add(showList.getSelectedValue().getId());
-
-        } else {
-            Optional.ofNullable(showTree.getSelectionPath())
-                    .map(TreePath::getLastPathComponent)
-                    .map(el -> (DefaultMutableTreeNode) el)
-                    .ifPresent(node -> {
-                        HistoryNode historyNode = (HistoryNode) node.getUserObject();
-
-                        if (HistoryTreeNodeType.NODE == historyNode.getNodeType()) {
-                            ids.add(historyNode.getValue().getId());
-
-                        } else {
-                            // 把子节点的id都添加进去
-                            List<TreeNode> nodeList = JsonAssistantUtil.enumerationToList(node.children());
-                            for (TreeNode treeNode : nodeList) {
-                                DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) treeNode;
-                                HistoryNode childHistoryNode = (HistoryNode) childNode.getUserObject();
-                                ids.add(childHistoryNode.getValue().getId());
-                            }
-                        }
-                    });
-        }
-
-        historyManager.batchRemove(ids);
-        // 刷新
-        refreshHistoryComponent();
-    }
-
-    public boolean removeActionUpdate() {
-        return showTree.isEnabled()
-                && (HistoryDisplayMode.LIST == historyState.getHistoryDisplayMode()
-                ? null != showList.getSelectedValue()
-                : showTree.getSelectionCount() > 0);
-    }
-
 
     public JsonRecord getCurrentSelectionValue() {
         // 获取当前显示的样式
@@ -690,10 +824,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         dismissEditView();
 
         // 刷新列表/树
-        refreshHistoryComponent();
+        refreshHistoryComponent(HistoryAffectType.ADD);
 
         // 获取焦点
-        requestFocusOnCurrentViewComponent();
+        requestFocusOnStructureComponent();
     }
 
     private void updateRecord(JsonRecord record) {
@@ -712,10 +846,10 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         dismissEditView();
 
         // 5.刷新列表/树
-        refreshHistoryComponent();
+        refreshHistoryComponent(HistoryAffectType.UPDATE);
 
         // 6.获取焦点
-        requestFocusOnCurrentViewComponent();
+        requestFocusOnStructureComponent();
     }
 
     private JsonParseResult parseAndValidateContent() {
@@ -761,7 +895,6 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         return new JsonParseResult(content, name, formatType, wrapper);
     }
 
-
     private void moveToErrorElementOffset(Editor editor) {
         Document document = editor.getDocument();
         PsiFile psiFile = PlatformUtil.getPsiFile(project, document);
@@ -773,7 +906,12 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         }
     }
 
-    private void displayEditView(boolean isUpdate) {
+    /**
+     * 切换为编辑模式
+     *
+     * @param isUpdate 是否为更新
+     */
+    public void displayEditView(boolean isUpdate) {
         // 可编辑
         ((EditorEx) recordEditor).setViewer(false);
         // 展示编辑框和按钮
@@ -782,13 +920,13 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         if (isUpdate) {
             updateButton.setVisible(true);
             updatePanel.getRootPane().setDefaultButton(updateButton);
-            IdeFocusManager.findInstance().requestFocus(nameTextField, true);
+            IdeFocusManager.findInstance().requestFocus(recordEditor.getContentComponent(), true);
         } else {
             addButton.setVisible(true);
             updatePanel.getRootPane().setDefaultButton(addButton);
             // 清空编辑器
             clearEditor();
-            IdeFocusManager.findInstance().requestFocus(recordEditor.getComponent(), true);
+            IdeFocusManager.findInstance().requestFocus(recordEditor.getContentComponent(), true);
         }
 
         showList.setEnabled(false);
@@ -803,6 +941,9 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         applicationMessageBus.syncPublisher(HistoryWindowEditEvent.TOPIC).handle(recordEditor);
     }
 
+    /**
+     * 关闭编辑模式
+     */
     private void dismissEditView() {
         // 不可编辑
         ((EditorEx) recordEditor).setViewer(true);
@@ -830,7 +971,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         applicationMessageBus.syncPublisher(HistoryWindowExitEditEvent.TOPIC).handle(recordEditor);
     }
 
-    private void requestFocusOnCurrentViewComponent() {
+    public void requestFocusOnStructureComponent() {
         // 获取焦点
         JComponent component = HistoryDisplayMode.LIST == historyState.getHistoryDisplayMode() ? showList : showTree;
         IdeFocusManager.findInstance().requestFocus(component, true);
@@ -867,6 +1008,33 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     public void dispose() {
         EditorFactory.getInstance().releaseEditor(recordEditor);
         Disposer.dispose(this);
+    }
+
+
+    // ------------------------- GETTER ------------------------- //
+
+    public ExtendableTextField getNameTextField() {
+        return nameTextField;
+    }
+
+    public JButton getUpdateButton() {
+        return updateButton;
+    }
+
+    public Tree getTree() {
+        return showTree;
+    }
+
+    public JBList<JsonRecord> getList() {
+        return showList;
+    }
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
+
+    public HistoryState getHistoryState() {
+        return historyState;
     }
 
     static class JsonParseResult {

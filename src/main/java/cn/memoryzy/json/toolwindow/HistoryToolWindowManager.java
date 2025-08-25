@@ -32,6 +32,7 @@ public final class HistoryToolWindowManager implements Disposable {
 
     private final Project project;
     private final ToolWindow toolWindow;
+    private HistoryToolWindowComponentProvider provider;
 
     public HistoryToolWindowManager(Project project) {
         this.project = project;
@@ -102,11 +103,11 @@ public final class HistoryToolWindowManager implements Disposable {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
         ContentManager contentManager = toolWindow.getContentManager();
 
+        // 因为一开始就创建了组件，所以用 content.setPreferredFocusableComponent 并无意义
         Content content = contentFactory.createContent(null, "", true);
-        HistoryToolWindowComponentProvider provider = new HistoryToolWindowComponentProvider(project);
+        this.provider = new HistoryToolWindowComponentProvider(project);
 
         content.setComponent(provider.createComponent());
-        content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
         content.setCloseable(false);
         content.setDisposer(provider);
         contentManager.addContent(content, 0);
@@ -115,6 +116,10 @@ public final class HistoryToolWindowManager implements Disposable {
 
     public void setToolWindowAvailable(boolean value) {
         toolWindow.setAvailable(value);
+    }
+
+    public HistoryToolWindowComponentProvider getProvider() {
+        return provider;
     }
 
     @Override

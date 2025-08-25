@@ -55,7 +55,8 @@
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.ImportHistoryFloatingToolbarProvider"/>
         <nonProjectFileWritingAccessExtension implementation="cn.memoryzy.json.extension.file.ExternalFileAccessProvider"/>
-        
+        <statusBarWidgetFactory id="JsonAssistant.CountCharWidget" order="before positionWidget" implementation="cn.memoryzy.json.extension.widget.CountCharWidgetFactory"/>
+
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"
                          bundle="messages.JsonAssistantBundle"

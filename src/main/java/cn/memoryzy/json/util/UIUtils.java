@@ -568,6 +568,17 @@ public class UIUtils {
         return null;
     }
 
+    /**
+     * 根据 IDE 的 UI 类型决定使用什么字体（在旧 UI 中的 List和 Tree 的高亮中，如果使用 JetBrainsMono 字体，会乱码）
+     *
+     * @return 字体
+     */
+    public static Font getFontForCurrentUi(int size) {
+        // 支持中文的字体：
+        // DialogInput、Monospaced、SansSerif、SimHei、SimSun、Microsoft JhengHei
 
+        // return PlatformUtil.isNewUi() ? jetBrainsMonoFont(size) : UIUtil.getTreeFont().deriveFont((float) size);
+        return JBUI.Fonts.create("Microsoft JhengHei", size);
+    }
 
 }

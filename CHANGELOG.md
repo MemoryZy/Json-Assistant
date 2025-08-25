@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- 优化历史记录窗口。
+- Optimize the history window.
+
 ## [1.8.5] - 2025-08-10
 
 - 更新历史记录展示形式。

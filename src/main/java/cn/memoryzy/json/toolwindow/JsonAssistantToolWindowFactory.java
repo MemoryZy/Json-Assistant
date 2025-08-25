@@ -62,11 +62,12 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
 
         // 创建初始内容页
         Content content = contentFactory.createContent(null, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, false);
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, toolWindowEx, content, FileTypeHolder.JSON5);
+        JsonAssistantToolWindowComponentProvider provider = new JsonAssistantToolWindowComponentProvider(project, toolWindowEx, content, FileTypeHolder.JSON5);
 
-        content.setComponent(window.createComponent());
+        content.setComponent(provider.createComponent());
+        content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
         content.setCloseable(false);
-        content.setDisposer(window);
+        content.setDisposer(provider);
         contentManager.addContent(content, 0);
 
         ApplicationManager.getApplication().invokeLater(() -> {

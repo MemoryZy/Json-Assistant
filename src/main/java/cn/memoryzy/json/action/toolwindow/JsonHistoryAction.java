@@ -19,7 +19,6 @@ import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.util.Objects;
 
 /**
  * @author Memory
@@ -62,7 +61,12 @@ public class JsonHistoryAction extends DumbAwareAction implements CustomComponen
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        HistoryToolWindowManager.getInstance(Objects.requireNonNull(project)).show();
+        if (null == project) return;
+        HistoryToolWindowManager manager = HistoryToolWindowManager.getInstance(project);
+        // 展示窗口
+        manager.show();
+        // 请求焦点给历史记录组件
+        manager.getProvider().requestFocusOnStructureComponent();
     }
 
     @Override

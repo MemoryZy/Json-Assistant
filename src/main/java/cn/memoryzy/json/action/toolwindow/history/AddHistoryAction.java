@@ -26,11 +26,12 @@ public class AddHistoryAction extends DumbAwareAction implements UpdateInBackgro
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        provider.executeAddAction();
+        // 展示编辑窗口
+        provider.displayEditView(false);
     }
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(provider.addActionUpdate());
+        e.getPresentation().setEnabled(provider.getTree().isEnabled());
     }
 }

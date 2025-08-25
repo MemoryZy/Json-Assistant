@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.toolwindow.history;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.service.persistent.state.JsonRecord;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
@@ -9,6 +10,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.util.IconUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 /**
  * @author Memory
@@ -31,6 +34,8 @@ public class EditHistoryAction extends DumbAwareAction implements UpdateInBackgr
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(provider.editActionUpdate());
+        // 确保此时不处于编辑模式，并且选中了元素
+        JsonRecord record = provider.getCurrentSelectionValue();
+        e.getPresentation().setEnabled(provider.getTree().isEnabled() && Objects.nonNull(record));
     }
 }

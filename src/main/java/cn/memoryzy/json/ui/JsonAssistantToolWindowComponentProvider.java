@@ -10,8 +10,10 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
+import cn.memoryzy.json.extension.widget.CountCharStatusBarWidget;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.ProjectEditorManager;
 import cn.memoryzy.json.service.persistent.HistoryManager;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.EditorVisualState;
@@ -49,7 +51,9 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
@@ -80,6 +84,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
 
     private final Project project;
+    private final ProjectEditorManager editorManager;
     private final ToolWindowEx toolWindow;
     @SuppressWarnings("FieldCanBeLocal")
     private final Content currentContent;
@@ -107,6 +112,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.toolWindow = toolWindow;
         this.currentContent = content;
         this.sourceFile = sourceFile;
+        this.editorManager = ProjectEditorManager.getInstance(project);
 
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         this.visualState = toolWindowSettings.getVisualState();
@@ -117,11 +123,22 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.cardLayout = new CombineCardLayout();
         this.cardPanel = new JPanel(cardLayout);
         this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, sourceFile, false, EditorKind.MAIN_EDITOR);
+        this.editorManager.addEditor(currentEditor);
+        this.addStatusBarListener();
 
         this.treeProvider = new JsonStructureComponentProvider(null, toolWindowPanel, getStructureSetting());
         this.queryProvider = new JsonQueryComponentProvider(project);
         this.gridProvider = new JsonGridComponentProvider(null);
         Disposer.register(this, queryProvider);
+    }
+
+    private void addStatusBarListener() {
+        StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
+        CountCharStatusBarWidget widget = (CountCharStatusBarWidget) statusBar.getWidget(CountCharStatusBarWidget.ID);
+        if (null != widget) {
+            currentEditor.getSelectionModel().addSelectionListener(widget);
+            currentEditor.getDocument().addDocumentListener(widget);
+        }
     }
 
     public JComponent createComponent() {
@@ -364,6 +381,9 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         }
     }
 
+    public JComponent getPreferredFocusedComponent() {
+        return currentEditor.getContentComponent();
+    }
 
     private void saveHistoryManually() {
         // 获取编辑器内容
@@ -434,5 +454,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     @Override
     public void dispose() {
         EditorFactory.getInstance().releaseEditor(currentEditor);
+        editorManager.removeEditor(currentEditor);
     }
 }

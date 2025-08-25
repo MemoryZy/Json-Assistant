@@ -682,4 +682,10 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
     public final U getUserObject(@Nullable TreeNode node) {
         return node == null || !getNodeClass().isAssignableFrom(node.getClass()) ? null : (U) ((T) node).getUserObject();
     }
+
+    public U getUserObject(@Nullable TreePath path) {
+        if (null == path) return null;
+        TreeNode node = (TreeNode) path.getLastPathComponent();
+        return getUserObject(node);
+    }
 }
