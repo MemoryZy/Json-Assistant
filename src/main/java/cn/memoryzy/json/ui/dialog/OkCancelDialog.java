@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBCheckBox;
@@ -38,7 +38,7 @@ public class OkCancelDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         JBLabel iconLabel = new JBLabel(icon);
-        JBLabel contentLabel = new JBLabel(HtmlConstant.wrapHtml(content));
+        JBLabel contentLabel = new JBLabel(JsonAssistantUtil.wrapHtml(content));
         contentLabel.setBorder(JBUI.Borders.emptyLeft(20));
         JPanel panel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, iconLabel, contentLabel);
         panel.setPreferredSize(new Dimension(JBUIScale.scale(350), JBUIScale.scale(50)));

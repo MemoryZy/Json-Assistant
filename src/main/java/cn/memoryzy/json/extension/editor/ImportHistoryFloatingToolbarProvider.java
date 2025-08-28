@@ -8,7 +8,6 @@ import cn.memoryzy.json.event.HistoryEditorFocusGainedEvent;
 import cn.memoryzy.json.event.HistoryWindowEditEvent;
 import cn.memoryzy.json.event.HistoryWindowExitEditEvent;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
-import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.ide.DataManager;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -16,13 +15,11 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
-import com.intellij.openapi.fileEditor.impl.FileDocumentManagerBase;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.messages.MessageBusConnection;
@@ -118,22 +115,15 @@ public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProv
             return;
         }
 
-        Key<VirtualFile> fileKey = (Key<VirtualFile>) JsonAssistantUtil.readStaticFinalFieldValue(FileDocumentManagerBase.class, "FILE_KEY");
-        if (null == fileKey) {
-            component.scheduleHide();
-            return;
-        }
-
-        Document document = editor.getDocument();
-        VirtualFile virtualFile = document.getUserData(fileKey);
-        if (null == virtualFile) {
+        VirtualFile file = FileDocumentManager.getInstance().getFile(editor.getDocument());
+        if (null == file) {
             component.scheduleHide();
             return;
         }
 
         // 暂时将这种名字的编辑器当作是自定义编辑器
         String fileName = PluginConstant.HISTORY_EDITOR_NAME + ".json5";
-        if (!Objects.equals(fileName, virtualFile.getName())) {
+        if (!Objects.equals(fileName, file.getName())) {
             component.scheduleHide();
             return;
         }

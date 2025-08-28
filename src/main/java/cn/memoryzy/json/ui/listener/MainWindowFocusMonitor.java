@@ -45,7 +45,8 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
     public MainWindowFocusMonitor(HistoryState historyState, HistoryManager historyManager) {
         this.historyState = historyState;
         this.historyManager = historyManager;
-        this.alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
+        // 这里要刷新历史记录树，不能用后台线程，需要用EDT线程
+        this.alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.SWING_THREAD, this);
     }
 
     @Override
@@ -119,6 +120,9 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
         }
 
         if (null == wrapper || wrapper.noItems()) return;
+
+        // 如果在记录中存在的话，无需保存
+        if (historyManager.exists(wrapper)) return;
 
         // 自动保存的话，无需指定名称
         historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));

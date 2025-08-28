@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class CopyKeyAction extends DumbAwareAction implements UpdateInBackground {
+
     private final Tree tree;
 
     public CopyKeyAction(Tree tree) {
@@ -26,13 +27,15 @@ public class CopyKeyAction extends DumbAwareAction implements UpdateInBackground
         this.tree = tree;
     }
 
-
     @Override
-    public void actionPerformed(@NotNull AnActionEvent anActionEvent) {
+    public void actionPerformed(@NotNull AnActionEvent event) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             List<String> keyList = new ArrayList<>();
             for (TreePath path : paths) {
+
+
+
                 JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
                 // 有key
                 if (!JsonTreeNodeType.JSONArrayElement.equals(node.getNodeType())) {

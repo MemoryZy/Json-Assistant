@@ -1,7 +1,6 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
@@ -59,7 +58,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         showTextField.setFont(UIUtils.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
-        showList.setFont(UIUtils.getFontForCurrentUi(13));
+        showList.setFont(UIUtils.getChineseBoldFonts(14));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());
@@ -76,7 +75,7 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
         JBLabel label = new JBLabel();
         label.setFont(JBFont.label().deriveFont(13F));
-        label.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint")));
+        label.setText(JsonAssistantUtil.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint")));
         label.setBorder(JBUI.Borders.emptyBottom(10));
 
         JComponent wrapComponent = UIUtils.wrapListWithFilter(showList, YamlDocEntry::getShortText, true);

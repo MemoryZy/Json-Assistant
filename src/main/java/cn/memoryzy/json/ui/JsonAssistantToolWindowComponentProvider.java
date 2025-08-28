@@ -10,7 +10,6 @@ import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
-import cn.memoryzy.json.extension.widget.CountCharStatusBarWidget;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.ProjectEditorManager;
@@ -21,7 +20,7 @@ import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.service.persistent.state.JsonRecord;
 import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
-import cn.memoryzy.json.ui.listener.EditorLineChangeMonitor;
+import cn.memoryzy.json.ui.listener.EditorDocumentMonitor;
 import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
@@ -51,9 +50,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.wm.StatusBar;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.openapi.wm.WindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
@@ -83,6 +80,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
      */
     public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
 
+
     private final Project project;
     private final ProjectEditorManager editorManager;
     private final ToolWindowEx toolWindow;
@@ -101,7 +99,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     private final JsonStructureComponentProvider treeProvider;
     private final JsonQueryComponentProvider queryProvider;
     private final JsonGridComponentProvider gridProvider;
-
 
     public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, FileType fileType) {
         this(project, toolWindow, content, PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType));
@@ -124,21 +121,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.cardPanel = new JPanel(cardLayout);
         this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, sourceFile, false, EditorKind.MAIN_EDITOR);
         this.editorManager.addEditor(currentEditor);
-        this.addStatusBarListener();
 
         this.treeProvider = new JsonStructureComponentProvider(null, toolWindowPanel, getStructureSetting());
         this.queryProvider = new JsonQueryComponentProvider(project);
         this.gridProvider = new JsonGridComponentProvider(null);
         Disposer.register(this, queryProvider);
-    }
-
-    private void addStatusBarListener() {
-        StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
-        CountCharStatusBarWidget widget = (CountCharStatusBarWidget) statusBar.getWidget(CountCharStatusBarWidget.ID);
-        if (null != widget) {
-            currentEditor.getSelectionModel().addSelectionListener(widget);
-            currentEditor.getDocument().addDocumentListener(widget);
-        }
     }
 
     public JComponent createComponent() {
@@ -241,9 +228,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     private void configureEditorBehavior() {
         MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(historyState, historyManager);
         Disposer.register(this, focusMonitor);
-
         currentEditor.addFocusListener(focusMonitor);
-        currentEditor.getDocument().addDocumentListener(new EditorLineChangeMonitor(currentEditor));
+        currentEditor.getDocument().addDocumentListener(new EditorDocumentMonitor(project, currentEditor, sourceFile));
 
         DumbAwareAction.create(event -> {
             if (historyState.isEnableHistory() && !historyState.isAutoRecordHistory()) {

@@ -1,7 +1,7 @@
 package cn.memoryzy.json.extension.widget;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import com.intellij.openapi.project.DumbAware;
+import com.intellij.ide.lightEdit.LightEditCompatible;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.StatusBar;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/8/25
  */
-public class CountCharWidgetFactory extends StatusBarEditorBasedWidgetFactory implements DumbAware {
+public class CountCharWidgetFactory extends StatusBarEditorBasedWidgetFactory implements LightEditCompatible {
 
     @Override
     public @NonNls @NotNull String getId() {

@@ -1,13 +1,33 @@
 package cn.memoryzy.json.action.test;
 
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
+import cn.memoryzy.json.enums.HistoryTreeNodeType;
+import cn.memoryzy.json.ui.tree.HistoryFilterableTree;
+import cn.memoryzy.json.ui.tree.HistoryNode;
+import cn.memoryzy.json.util.UIUtils;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.wm.StatusBar;
-import com.intellij.openapi.wm.StatusBarWidget;
-import com.intellij.openapi.wm.WindowManager;
+import com.intellij.openapi.ui.DialogBuilder;
+import com.intellij.ui.ColoredTreeCellRenderer;
+import com.intellij.ui.Gray;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.border.CustomLineBorder;
+import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.ui.scale.JBUIScale;
+import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.components.BorderLayoutPanel;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.*;
 
 /**
  * @author Memory
@@ -252,10 +272,145 @@ public class TestCatNewConfigAction extends DumbAwareAction implements UpdateInB
         //         .show();
 
 
-        StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
-        StatusBarWidget widget = statusBar.getWidget("Position");
+        // StatusBar statusBar = WindowManager.getInstance().getStatusBar(project);
+        // StatusBarWidget widget = statusBar.getWidget("Position");
 
+        HistoryFilterableTree filterableTree = new HistoryFilterableTree(project, new HistoryNode().setNodeType(HistoryTreeNodeType.ROOT));
+        Tree tree = filterableTree.getTree();
+        filterableTree.installSimple();
+
+        tree.setRootVisible(false);
+
+        tree.setCellRenderer(new ColoredTreeCellRenderer() {
+            @Override
+            public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+                DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+                HistoryNode historyNode = (HistoryNode) node.getUserObject();
+                HistoryTreeNodeType nodeType = historyNode.getNodeType();
+
+                if (HistoryTreeNodeType.NODE.equals(nodeType)) {
+                    setIcon(AllIcons.FileTypes.Json);
+                    append(historyNode.toString());
+                } else {
+                    // setIcon(JsonAssistantIcons.GROUP);
+                    setIcon(JsonAssistantIcons.ToolWindow.MODULE);
+                    append(historyNode + " (" + historyNode.getSize() + ")");
+                }
+
+                if (!tree.isEnabled()) {
+                    setEnabled(false);
+                    tree.setForeground(JBColor.GRAY);
+                    tree.setToolTipText(JsonAssistantBundle.messageOnSystem("tooltip.history.tree.disabled.text"));
+                } else {
+                    if (!isEnabled()) setEnabled(true);
+                    tree.setForeground(UIUtil.getTreeForeground());
+                    tree.setToolTipText(null);
+                }
+            }
+        });
+
+        JScrollPane scrollPane = UIUtils.wrapScrollPane(tree);
+
+
+        // new TreeSpeedSearch(tree).setClearSearchOnNavigateNoMatch(true);
+
+
+
+
+        BorderLayoutPanel panel = new BorderLayoutPanel().addToCenter(scrollPane);
+
+        new DialogBuilder()
+                .centerPanel(panel)
+                .show();
+
+        
         System.out.println();
 
     }
+
+
+
+
+    protected static final Border BORDER = new CustomLineBorder(JBColor.namedColor("SpeedSearch.borderColor", JBColor.LIGHT_GRAY), JBUI.insets(1));
+    protected static final Color FOREGROUND_COLOR = JBColor.namedColor("SpeedSearch.foreground", UIUtil.getToolTipForeground());
+    protected static final Color BACKGROUND_COLOR = JBColor.namedColor("SpeedSearch.background", new JBColor(Gray.xFF, Gray._111));
+    protected static final Color ERROR_FOREGROUND_COLOR = JBColor.namedColor("SpeedSearch.errorForeground", JBColor.RED);
+
+    protected class SearchPopup extends JPanel {
+        protected final SearchField mySearchField;
+        private String myLastPattern = "";
+
+        protected SearchPopup(String initialString) {
+            mySearchField = new SearchField();
+
+            mySearchField.setBorder(null);
+            mySearchField.setBackground(BACKGROUND_COLOR);
+            mySearchField.setForeground(FOREGROUND_COLOR);
+            //
+            // mySearchField.setDocument(new PlainDocument() {
+            //     @Override
+            //     public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
+            //         String oldText;
+            //         try {
+            //             oldText = getText(0, getLength());
+            //         }
+            //         catch (BadLocationException e1) {
+            //             oldText = "";
+            //         }
+            //
+            //         String newText = oldText.substring(0, offs) + str + oldText.substring(offs);
+            //         super.insertString(offs, str, a);
+            //         handleInsert(newText);
+            //     }
+            // });
+
+            setBorder(BORDER);
+            setBackground(BACKGROUND_COLOR);
+            setLayout(new BorderLayout());
+            add(mySearchField, BorderLayout.CENTER);
+            mySearchField.setText(initialString);
+
+        }
+    }
+
+
+    protected class SearchField extends ExtendableTextField {
+        SearchField() {
+            // setFocusable(false);
+            ExtendableTextField.Extension leftExtension = new Extension() {
+                @Override
+                public Icon getIcon(boolean hovered) {
+                    return AllIcons.Actions.Search;
+                }
+
+                @Override
+                public boolean isIconBeforeText() {
+                    return true;
+                }
+
+                @Override
+                public int getIconGap() {
+                    return JBUIScale.scale(10);
+                }
+            };
+
+            addExtension(leftExtension);
+        }
+
+        @Override
+        public void setForeground(Color color) {
+            super.setForeground(color);
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            Dimension dim = super.getPreferredSize();
+            Insets m = getMargin();
+            dim.width = getFontMetrics(getFont()).stringWidth(getText()) + 10 + m.left + m.right;
+            return dim;
+        }
+
+
+    }
+
 }

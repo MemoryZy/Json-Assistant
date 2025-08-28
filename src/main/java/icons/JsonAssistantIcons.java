@@ -90,6 +90,7 @@ public class JsonAssistantIcons {
         public static final Icon HISTORY_LOGO = load("/icons/toolwindow/history_logo.svg");
         public static final Icon SEND = load("/icons/toolwindow/send.svg");
         public static final Icon IMPORT = load("/icons/toolwindow/import.svg");
+        public static final Icon MODULE = load("/icons/toolwindow/module.svg");
 
     }
 

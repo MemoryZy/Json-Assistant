@@ -8,6 +8,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.*;
 import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.text.HtmlChunk;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
@@ -449,4 +450,32 @@ public class JsonAssistantUtil {
 
         return trimmed;
     }
+
+    public static String wrapHtml(String text) {
+        return HtmlChunk.raw(text)
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    public static String wrapBody(String text) {
+        return HtmlChunk.raw(text)
+                .wrapWith(HtmlChunk.body())
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    public static String wrapBoldHtml(String text) {
+        return HtmlChunk.raw(text)
+                .bold()
+                .wrapWith(HtmlChunk.body())
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    public static String wrapBold(String text) {
+        return HtmlChunk.raw(text)
+                .bold()
+                .toString();
+    }
+
 }

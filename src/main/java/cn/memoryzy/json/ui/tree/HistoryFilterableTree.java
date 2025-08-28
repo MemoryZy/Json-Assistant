@@ -52,7 +52,7 @@ public class HistoryFilterableTree extends FilterableTree<DefaultMutableTreeNode
 
     @Override
     protected void rebuildTree() {
-        HistoryNode rootNode = getUserObject(getRoot());
+        HistoryNode rootNode = getRootUserObject();
         if (null == rootNode) return;
         rootNode.clear();
 

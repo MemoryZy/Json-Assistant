@@ -2,7 +2,6 @@ package cn.memoryzy.json.ui.tree;
 
 
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.ui.JsonStructureComponentProvider;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.ArrayList;
@@ -138,7 +137,7 @@ public class JsonTreeNode extends DefaultMutableTreeNode {
             JsonTreeNode child = (JsonTreeNode) getChildAt(i);
 
             // 为子节点构建新的路径
-            String newPath = JsonStructureComponentProvider.buildArrayElementPath(getJsonPath(), i);
+            String newPath = JsonFilterableTree.buildArrayElementPath(getJsonPath(), i);
             child.setJsonPath(newPath);
 
             // 递归更新子节点的路径（如果子节点包含数组元素）
@@ -171,7 +170,7 @@ public class JsonTreeNode extends DefaultMutableTreeNode {
         String newPath;
 
         // 父节点是数组，使用索引路径
-        newPath = JsonStructureComponentProvider.buildArrayElementPath(parentPath, indexInParent);
+        newPath = JsonFilterableTree.buildArrayElementPath(parentPath, indexInParent);
         // 更新节点路径
         child.setJsonPath(newPath);
     }

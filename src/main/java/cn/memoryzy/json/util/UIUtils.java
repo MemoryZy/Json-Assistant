@@ -569,16 +569,29 @@ public class UIUtils {
     }
 
     /**
-     * 根据 IDE 的 UI 类型决定使用什么字体（在旧 UI 中的 List和 Tree 的高亮中，如果使用 JetBrainsMono 字体，会乱码）
+     * 获取支持中文的字体（在旧 UI 中的 List和 Tree 的高亮中，如果使用 JetBrainsMono 字体，会乱码）
      *
      * @return 字体
      */
-    public static Font getFontForCurrentUi(int size) {
+    public static Font getChineseFonts(float size) {
         // 支持中文的字体：
-        // DialogInput、Monospaced、SansSerif、SimHei、SimSun、Microsoft JhengHei
+        // DialogInput、Monospaced、SansSerif、SimHei、SimSun、Microsoft JhengHei、Microsoft JhengHei UI
+        // Microsoft YaHei UI、Source Han Sans SC Medium、Serif
 
         // return PlatformUtil.isNewUi() ? jetBrainsMonoFont(size) : UIUtil.getTreeFont().deriveFont((float) size);
-        return JBUI.Fonts.create("Microsoft JhengHei", size);
+        // return JBUI.Fonts.create("Serif", size).asBold();
+        return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
+        // return UIUtil.getListFont().deriveFont(size);
+    }
+
+    /**
+     * 获取支持中文的字体（在旧 UI 中的 List和 Tree 的高亮中，如果使用 JetBrainsMono 字体，会乱码）
+     *
+     * @return 字体
+     */
+    public static Font getChineseBoldFonts(float size) {
+        return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size).deriveFont(Font.BOLD);
+        // return UIUtil.getListFont().deriveFont(size).deriveFont(Font.BOLD);
     }
 
 }

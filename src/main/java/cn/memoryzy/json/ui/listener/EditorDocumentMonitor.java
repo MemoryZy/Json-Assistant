@@ -1,6 +1,8 @@
 package cn.memoryzy.json.ui.listener;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.event.EditorCharChangedEvent;
+import cn.memoryzy.json.model.event.EditorCountCharEvent;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.EditorSettings;
@@ -8,6 +10,9 @@ import com.intellij.openapi.editor.event.DocumentEvent;
 import com.intellij.openapi.editor.event.DocumentListener;
 import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.messages.MessageBus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -16,19 +21,30 @@ import org.jetbrains.annotations.NotNull;
  * @author Memory
  * @since 2025/6/25
  */
-public class EditorLineChangeMonitor implements DocumentListener {
-    private static final Logger LOG = Logger.getInstance(EditorLineChangeMonitor.class);
+public class EditorDocumentMonitor implements DocumentListener {
+    private static final Logger LOG = Logger.getInstance(EditorDocumentMonitor.class);
 
     private final EditorEx editor;
+    private final Project project;
+    private final VirtualFile sourceFile;
+    private final MessageBus projectMessageBus;
     private int lastLineCount = 0;
 
-    public EditorLineChangeMonitor(EditorEx editor) {
+    public EditorDocumentMonitor(Project project, EditorEx editor, VirtualFile sourceFile) {
         this.editor = editor;
+        this.project = project;
+        this.sourceFile = sourceFile;
+        this.projectMessageBus = project.getMessageBus();
     }
 
     @Override
     public void documentChanged(@NotNull DocumentEvent event) {
         try {
+            DocumentEx document = editor.getDocument();
+            // 发布文本改变事件
+            int textLength = document.getTextLength();
+            projectMessageBus.syncPublisher(EditorCharChangedEvent.TOPIC).change(new EditorCountCharEvent(project, editor, sourceFile, textLength));
+
             // -------------- 开启/关闭光标行
             EditorSettings settings = editor.getSettings();
             // 编辑器原来为空，新增不为空，表示新增
@@ -44,7 +60,6 @@ public class EditorLineChangeMonitor implements DocumentListener {
             }
 
             // -------------- 重新绘制
-            DocumentEx document = editor.getDocument();
             int newLineCount = document.getLineCount();
             if (lastLineCount != newLineCount) {
                 lastLineCount = newLineCount;

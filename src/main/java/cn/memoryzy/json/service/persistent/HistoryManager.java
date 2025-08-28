@@ -130,6 +130,23 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
     }
 
     /**
+     * 查找相同结构的记录（排除某个元素）
+     *
+     * @param wrapper         结构
+     * @param excludedWrapper 排除结构
+     * @return 记录
+     */
+    public JsonRecord findAndExcluding(JsonWrapper wrapper, JsonWrapper excludedWrapper) {
+        return histories.stream()
+                // 匹配相同结构
+                .filter(record -> Objects.equals(record.getWrapper(), wrapper))
+                // 排除指定结构
+                .filter(record -> !Objects.equals(record.getWrapper(), excludedWrapper))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
      * 查找相同结构的记录
      *
      * @param rawText 原文

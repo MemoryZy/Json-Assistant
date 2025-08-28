@@ -6,7 +6,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.model.deserializer.Announcement;
@@ -118,7 +117,7 @@ public final class AnnouncementManager implements Disposable {
     private Notification getFullContentNotification(@NotNull Project project, Announcement announcement, Announcement.LocaleContent localizedNotice) {
         String title = localizedNotice.getTitle();
         String content = localizedNotice.getContent();
-        content = HtmlConstant.wrapBody(content);
+        content = JsonAssistantUtil.wrapBody(content);
         Boolean autoHide = announcement.getAutoHide();
 
         String displayId = Boolean.FALSE.equals(autoHide)

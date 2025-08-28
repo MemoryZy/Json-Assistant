@@ -149,10 +149,11 @@ public class ToolWindowUtil {
         String presetName = StrUtil.isNotBlank(tabName) ? tabName : PluginConstant.MAIN_WINDOW_DISPLAY_NAME;
         String displayName = generateTagName(contentManager, presetName);
         Content content = contentFactory.createContent(null, displayName, false);
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, toolWindow, content, editorFileType);
+        JsonAssistantToolWindowComponentProvider provider = new JsonAssistantToolWindowComponentProvider(project, toolWindow, content, editorFileType);
 
-        content.setComponent(window.createComponent());
-        content.setDisposer(window);
+        content.setComponent(provider.createComponent());
+        content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
+        content.setDisposer(provider);
         contentManager.addContent(content, contentCount);
         contentManager.setSelectedContent(content, true);
         return content;

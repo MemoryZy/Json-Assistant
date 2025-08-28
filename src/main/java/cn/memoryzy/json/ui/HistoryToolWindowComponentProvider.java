@@ -1,6 +1,8 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.history.AddHistoryAction;
@@ -27,10 +29,7 @@ import cn.memoryzy.json.ui.listener.history.CancelAction;
 import cn.memoryzy.json.ui.listener.history.UpdateAction;
 import cn.memoryzy.json.ui.tree.HistoryFilterableTree;
 import cn.memoryzy.json.ui.tree.HistoryNode;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIUtils;
+import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
@@ -77,10 +76,8 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Memory
@@ -205,7 +202,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     private JPanel createListPanel() {
         // 上方编辑器，下方列表
-        showList.setFont(UIUtils.getFontForCurrentUi(13));
+        showList.setFont(UIUtils.getChineseFonts(13));
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
@@ -258,7 +255,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 设置单击展开节点
         showTree.setToggleClickCount(1);
         showTree.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
-        showTree.setFont(UIUtils.getFontForCurrentUi(13));
+        showTree.setFont(UIUtils.getChineseFonts(13));
         showTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         showTree.setCellRenderer(new ColoredTreeCellRenderer() {
             @Override
@@ -271,7 +268,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                     setIcon(AllIcons.FileTypes.Json);
                     append(historyNode.toString());
                 } else {
-                    setIcon(JsonAssistantIcons.GROUP);
+                    // setIcon(JsonAssistantIcons.GROUP);
+                    setIcon(JsonAssistantIcons.ToolWindow.MODULE);
                     append(historyNode + " (" + historyNode.getSize() + ")");
                 }
 
@@ -807,7 +805,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     // ----------------------------------- 逻辑 -----------------------------------
 
     private void addRecord() {
-        JsonParseResult result = parseAndValidateContent();
+        JsonParseResult result = parseAndValidateContent(true);
         if (null == result) return;
 
         JsonRecord record = new JsonRecord()
@@ -831,7 +829,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void updateRecord(JsonRecord record) {
-        JsonParseResult result = parseAndValidateContent();
+        JsonParseResult result = parseAndValidateContent(false);
         if (null == result) return;
 
         // 3.保存
@@ -852,7 +850,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         requestFocusOnStructureComponent();
     }
 
-    private JsonParseResult parseAndValidateContent() {
+    private JsonParseResult parseAndValidateContent(boolean isAdd) {
         // 1.判断Json编辑器内是否是正确文本
         String content = StrUtil.trim(recordEditor.getDocument().getText());
         // 检查内容有效性
@@ -877,6 +875,33 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         if (null == wrapper || wrapper.noItems()) {
             moveToErrorElementOffset(recordEditor);
             HintManager.getInstance().showErrorHint(recordEditor, JsonAssistantBundle.messageOnSystem("error.invalid.json"));
+            return null;
+        }
+
+        String message;
+        JsonRecord originalRecord = isAdd
+                // 如果是已存在的记录，则需要提示
+                ? historyManager.find(wrapper)
+                // 排除当前选中的那条
+                : historyManager.findAndExcluding(wrapper, getCurrentSelectionValue().getWrapper());
+
+        if (null != originalRecord) {
+            String originalName = originalRecord.getName();
+            if (HistoryDisplayMode.LIST == historyState.getHistoryDisplayMode()) {
+                message = StrUtil.isBlank(originalName)
+                        ? JsonAssistantBundle.messageOnSystem("hint.history.same.record.list")
+                        : JsonAssistantBundle.messageOnSystem("hint.history.same.record.list.hasName", JsonAssistantUtil.wrapBold(originalName));
+
+            } else {
+                String group = "/" + DateUtil.format(new Date(originalRecord.getUpdateTime()), DatePattern.NORM_DATE_FORMATTER);
+                if (StrUtil.isNotBlank(originalName)) {
+                    group += "/" + originalName;
+                }
+
+                message = JsonAssistantBundle.messageOnSystem("hint.history.same.record.tree.hasName", JsonAssistantUtil.wrapBold(group));
+            }
+
+            HintManager.getInstance().showErrorHint(recordEditor, message);
             return null;
         }
 
