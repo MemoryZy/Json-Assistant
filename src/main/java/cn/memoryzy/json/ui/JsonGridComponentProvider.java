@@ -8,6 +8,7 @@ import cn.memoryzy.json.ui.component.ModernTable;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.JBUI;
@@ -174,5 +175,9 @@ public class JsonGridComponentProvider {
 
     public JPanel getTableComponent() {
         return tableComponent;
+    }
+
+    public void requestFocusOnComponent() {
+        IdeFocusManager.findInstance().requestFocus(table, true);
     }
 }

@@ -58,7 +58,7 @@ public class ImportHistoryFloatingToolbarProvider implements FloatingToolbarProv
     }
 
     public @NotNull ActionGroup getActionGroup() {
-        return (ActionGroup) ActionHolder.HISTORY_FLOAT_GROUP;
+        return (ActionGroup) ActionHolder.Float.HISTORY_FLOAT_GROUP;
     }
 
 

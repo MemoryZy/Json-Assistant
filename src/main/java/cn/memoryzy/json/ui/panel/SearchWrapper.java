@@ -45,6 +45,8 @@ public class SearchWrapper extends TransparentContainer {
         searchTextField2.setText("");
     }
 
-
+    public SearchTextField2 getSearchTextField() {
+        return searchTextField2;
+    }
 
 }

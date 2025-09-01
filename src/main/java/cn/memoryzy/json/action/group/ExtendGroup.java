@@ -35,10 +35,10 @@ public class ExtendGroup extends DefaultActionGroup implements DumbAware, Update
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         List<AnAction> actions = new ArrayList<>();
-        actions.add(ActionHolder.EXPAND_ALL_NESTED_JSON_ACTION);
+        actions.add(ActionHolder.Extend.EXPAND_ALL_NESTED_JSON_ACTION);
         actions.add(Separator.create());
-        actions.add(ActionHolder.CONVERT_ALL_READABLE_TIME_ACTION);
-        actions.add(ActionHolder.CONVERT_ALL_TIMESTAMP_ACTION);
+        actions.add(ActionHolder.Extend.CONVERT_ALL_READABLE_TIME_ACTION);
+        actions.add(ActionHolder.Extend.CONVERT_ALL_TIMESTAMP_ACTION);
 
         if (PlatformUtil.hasJavaEnvironment(getEventProject(e))) {
             // actions.add(Separator.create());

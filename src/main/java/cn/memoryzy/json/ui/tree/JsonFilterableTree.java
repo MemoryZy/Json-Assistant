@@ -11,8 +11,12 @@ import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Objects;
 
@@ -20,7 +24,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2025/8/27
  */
-public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, JsonTreeNode2>{
+public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, JsonTreeNode2> {
 
     private JsonWrapper wrapper;
 
@@ -58,7 +62,7 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
         // 清空根节点子内容
         rootNode.clear();
         // 组合根节点
-        combineRootNode(wrapper, rootNode, "$");
+        processJsonNode(wrapper, rootNode, "$");
     }
 
     @Override
@@ -67,7 +71,13 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
         getSearchModel().updateStructure();
     }
 
-    private void combineRootNode(JsonWrapper jsonWrapper, JsonTreeNode2 parentNode, String parentPath) {
+    @Override
+    public void updateStructure() {
+        super.updateStructure();
+        expandMarkedNodes(getTree(), getRoot());
+    }
+
+    private void processJsonNode(JsonWrapper jsonWrapper, JsonTreeNode2 parentNode, String parentPath) {
         if (jsonWrapper instanceof ObjectWrapper) {
             ObjectWrapper jsonObject = (ObjectWrapper) jsonWrapper;
             // 为了确定图标
@@ -101,21 +111,22 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
                 // 构建子节点
                 JsonTreeNode2 childNode = new JsonTreeNode2(key)
                         .setComment(comment)
-                        .setJsonPath(currentPath);
+                        .setJsonPath(currentPath)
+                        .setParent(parentNode);
 
                 if (value instanceof ObjectWrapper) {
                     ObjectWrapper nestedJsonObject = (ObjectWrapper) value;
                     childNode.setValue(value)
                             .setNodeType(JsonTreeNodeType.JSONObject)
                             .setSize(nestedJsonObject.size());
-                    combineRootNode(nestedJsonObject, childNode, currentPath);
+                    processJsonNode(nestedJsonObject, childNode, currentPath);
 
                 } else if (value instanceof ArrayWrapper) {
                     ArrayWrapper jsonArray = (ArrayWrapper) value;
                     childNode.setValue(value)
                             .setNodeType(JsonTreeNodeType.JSONArray)
                             .setSize(jsonArray.size());
-                    combineArrayNode(childNode, jsonArray, currentPath);
+                    processArrayChildren(childNode, jsonArray, currentPath);
 
                 } else {
                     // 若不是对象或数组，则不添加子集，直接同层级
@@ -140,11 +151,11 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
                 parentNode.setValue(jsonArray);
             }
 
-            combineArrayNode(parentNode, jsonArray, parentPath);
+            processArrayChildren(parentNode, jsonArray, parentPath);
         }
     }
 
-    private void combineArrayNode(JsonTreeNode2 parentNode, ArrayWrapper jsonArray, String parentPath) {
+    private void processArrayChildren(JsonTreeNode2 parentNode, ArrayWrapper jsonArray, String parentPath) {
         for (int i = 0; i < jsonArray.size(); i++) {
             Object element = jsonArray.get(i);
 
@@ -157,9 +168,10 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
                         .setValue(element)
                         .setNodeType(JsonTreeNodeType.JSONObjectElement)
                         .setSize(jsonObjectElement.size())
-                        .setJsonPath(currentPath);
+                        .setJsonPath(currentPath)
+                        .setParent(parentNode);
 
-                combineRootNode(jsonObjectElement, childNode, currentPath);
+                processJsonNode(jsonObjectElement, childNode, currentPath);
                 parentNode.add(childNode);
 
             } else if (element instanceof ArrayWrapper) {
@@ -168,9 +180,10 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
                         .setValue(element)
                         .setNodeType(JsonTreeNodeType.JSONArrayElementArray)
                         .setSize(jsonArrayElement.size())
-                        .setJsonPath(currentPath);
+                        .setJsonPath(currentPath)
+                        .setParent(parentNode);
 
-                combineRootNode(jsonArrayElement, childNodeElement, currentPath);
+                processJsonNode(jsonArrayElement, childNodeElement, currentPath);
                 parentNode.add(childNodeElement);
             } else {
                 Object obj = element;
@@ -182,7 +195,8 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
                 JsonTreeNode2 childNode = new JsonTreeNode2(obj)
                         .setValue(element)
                         .setNodeType(JsonTreeNodeType.JSONArrayElement)
-                        .setJsonPath(currentPath);
+                        .setJsonPath(currentPath)
+                        .setParent(parentNode);
 
                 parentNode.add(childNode);
             }
@@ -206,7 +220,31 @@ public class JsonFilterableTree extends FilterableTree<DefaultMutableTreeNode, J
         return parentPath + "[" + index + "]";
     }
 
+    public static JsonTreeNode2 getNode(TreePath path) {
+        if (null == path) return null;
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        return (JsonTreeNode2) node.getUserObject();
+    }
 
+    /**
+     * 递归展开标记为需要展开的节点
+     */
+    public static void expandMarkedNodes(JTree tree, DefaultMutableTreeNode root) {
+        Enumeration<TreeNode> nodes = root.depthFirstEnumeration();
+        while (nodes.hasMoreElements()) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) nodes.nextElement();
+
+            // 只处理非叶子节点
+            if (!node.isLeaf()) {
+                JsonTreeNode2 data = (JsonTreeNode2) node.getUserObject();
+
+                if (data.isExpanded()) {
+                    TreePath path = new TreePath(node.getPath());
+                    tree.expandPath(path);
+                }
+            }
+        }
+    }
 
     public JsonFilterableTree setWrapper(JsonWrapper wrapper) {
         this.wrapper = wrapper;

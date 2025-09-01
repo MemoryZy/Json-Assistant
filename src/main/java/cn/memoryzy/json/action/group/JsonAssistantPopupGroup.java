@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
 
-    private final boolean actionEventPopup;
+    private final boolean fromPopup;
 
     @SuppressWarnings("unused")
     public JsonAssistantPopupGroup() {
@@ -34,11 +34,11 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         presentation.setText(JsonAssistantBundle.message("action.main.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.main.description"));
         presentation.setIcon(JsonAssistantIcons.BOX);
-        this.actionEventPopup = false;
+        this.fromPopup = false;
     }
 
-    public JsonAssistantPopupGroup(boolean actionEventPopup) {
-        this.actionEventPopup = actionEventPopup;
+    public JsonAssistantPopupGroup(boolean fromPopup) {
+        this.fromPopup = fromPopup;
     }
 
     @Override
@@ -55,32 +55,42 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
 
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
+        boolean showSeparatorText = fromPopup || PlatformUtil.isNewUi();
+
         List<AnAction> actions = new ArrayList<>();
-        actions.add(ActionHolder.JSON_BEAUTIFY_ACTION);
-        actions.add(ActionHolder.JSON_MINIFY_ACTION);
-        actions.add(ActionHolder.JSON_STRUCTURE_ACTION);
+        actions.add(ActionHolder.Main.JSON_BEAUTIFY_ACTION);
+        actions.add(ActionHolder.Main.JSON_MINIFY_ACTION);
+        actions.add(ActionHolder.Main.JSON_STRUCTURE_ACTION);
         actions.add(Separator.create());
-        actions.add(ActionHolder.JSON_GRID_ACTION);
+        actions.add(ActionHolder.Main.JSON_GRID_ACTION);
         actions.add(Separator.create());
-        actions.add(ActionHolder.JSON_ESCAPE_ACTION);
+
+        if (showSeparatorText) {
+            actions.add(new SortGroup(true));
+        } else {
+            actions.add(ActionHolder.Sort.SORT_GROUP);
+        }
+
         actions.add(Separator.create());
-        actions.add(ActionHolder.JSON_TEXT_DIFF_ACTION);
+        actions.add(ActionHolder.Main.JSON_TEXT_DIFF_ACTION);
         // ------- 分隔符
         actions.add(Separator.create());
-        if (actionEventPopup || PlatformUtil.isNewUi()) {
+        if (showSeparatorText) {
             actions.add(Separator.create(JsonAssistantBundle.message("separator.transform")));
         }
 
-        actions.add(ActionHolder.CONVERT_OTHER_FORMATS_GROUP);
+        actions.add(ActionHolder.Main.JSON_ESCAPE_ACTION);
+        actions.add(Separator.create());
+        actions.add(ActionHolder.Convert.CONVERT_OTHER_FORMATS_GROUP);
         // ------- 分隔符
         actions.add(Separator.create());
-        if (actionEventPopup || PlatformUtil.isNewUi()) {
+        if (showSeparatorText) {
             actions.add(Separator.create(JsonAssistantBundle.message("separator.extend")));
         }
 
-        actions.add(ActionHolder.EXTEND_GROUP);
+        actions.add(ActionHolder.Extend.EXTEND_GROUP);
         actions.add(Separator.create());
-        actions.add(ActionHolder.SHORTCUT_ACTION);
+        actions.add(ActionHolder.Main.SHORTCUT_ACTION);
         actions.add(Separator.create());
         actions.add(new OnlineDocAction(JsonAssistantBundle.message("action.online.doc.override.text"), AllIcons.Actions.Help));
 

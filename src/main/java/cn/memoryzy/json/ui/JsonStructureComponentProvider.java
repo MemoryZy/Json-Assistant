@@ -22,10 +22,10 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.*;
-import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -198,7 +198,7 @@ public class JsonStructureComponentProvider {
         group.addSeparator();
         group.add(new CopyNodeCommentAction(tree));
         group.addSeparator();
-        group.add(new ModifyNodeValueAction(tree, editorContextReference));
+        group.add(new ModifyNodeValueAction(tree, editorContextReference, filterableTree));
         group.addSeparator();
         // group.add(new NavigateToSourceAction(tree, editorContextReference));
         // group.addSeparator();
@@ -208,7 +208,7 @@ public class JsonStructureComponentProvider {
         group.addSeparator();
         group.add(new CollapseMultiAction(tree));
         group.addSeparator();
-        group.add(new RemoveTreeNodeAction(tree));
+        group.add(new RemoveTreeNodeAction(tree, filterableTree));
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
         return actionPopupMenu.getComponent();
     }
@@ -241,6 +241,9 @@ public class JsonStructureComponentProvider {
         return treeComponent;
     }
 
+    public void requestFocusOnStructureComponent() {
+        IdeFocusManager.findInstance().requestFocus(tree, true);
+    }
 
     private class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
         @Override
@@ -259,7 +262,7 @@ public class JsonStructureComponentProvider {
             if (nodeType != JsonTreeNodeType.JSONArrayElement) {
                 String text = String.valueOf(jsonNode.getKey());
                 String prefix = (nodeType == JsonTreeNodeType.JSONObjectProperty) ? text + ": " : text;
-                append(prefix, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                append(prefix, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
             }
 
             // 3. 渲染类型标识符（如 [object]）
@@ -289,7 +292,7 @@ public class JsonStructureComponentProvider {
                     }
                 }
 
-                append(renderData.formattedValue, valueAttrs, nodeType == JsonTreeNodeType.JSONArrayElement);
+                append(renderData.formattedValue, valueAttrs, true);
             }
 
             // 5. 渲染注释
@@ -297,8 +300,6 @@ public class JsonStructureComponentProvider {
 
             // 6. 渲染路径提示
             renderPathHint(jsonNode, node);
-
-            SpeedSearchUtil.applySpeedSearchHighlighting(tree, this, true, selected);
         }
 
 
@@ -376,16 +377,7 @@ public class JsonStructureComponentProvider {
             data.valueType = value == null ? "null" : value.getClass().getName();
             data.icon = (node.getNodeType() == JsonTreeNodeType.JSONArrayElement)
                     ? JsonAssistantIcons.Structure.JSON_ITEM
-                    : JsonAssistantIcons.Structure.JSON_OBJECT_ITEM;
-        }
-
-        private String formatNodeValue(Object value) {
-            if (value == null) return "null";
-            if (value instanceof String) {
-                String str = (String) value;
-                return str.isEmpty() ? "\"\"" : "\"" + str + "\"";
-            }
-            return String.valueOf(value);
+                    : JsonAssistantIcons.Structure.JSON_KEY;
         }
 
         private void appendComment(String comment) {
@@ -423,6 +415,15 @@ public class JsonStructureComponentProvider {
             }
         }
 
+    }
+
+    public static String formatNodeValue(Object value) {
+        if (value == null) return "null";
+        if (value instanceof String) {
+            String str = (String) value;
+            return str.isEmpty() ? "\"\"" : "\"" + str + "\"";
+        }
+        return String.valueOf(value);
     }
 
 

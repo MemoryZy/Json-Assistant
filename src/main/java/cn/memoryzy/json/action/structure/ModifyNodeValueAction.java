@@ -11,7 +11,8 @@ import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
 import cn.memoryzy.json.ui.editor.ExpandableEditorTextField;
-import cn.memoryzy.json.ui.tree.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonTreeNode2;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.highlighting.HighlightManager;
 import com.intellij.json.json5.Json5Language;
@@ -37,18 +38,20 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,6 +64,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
     private static final Logger log = LoggerFactory.getLogger(ModifyNodeValueAction.class);
     private final Tree tree;
+    private final JsonFilterableTree filterableTree;
     private final AtomicReference<EditorContext> editorContextReference;
     private final TreeStructureState structureState;
 
@@ -70,9 +74,10 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
     private JBCheckBox sourceFileCheckBox;
     private JButton saveButton;
 
-    public ModifyNodeValueAction(Tree tree, AtomicReference<EditorContext> editorContextReference) {
+    public ModifyNodeValueAction(Tree tree, AtomicReference<EditorContext> editorContextReference, JsonFilterableTree filterableTree) {
         super(JsonAssistantBundle.messageOnSystem("action.modifyNodeValue.text"), JsonAssistantBundle.messageOnSystem("action.modifyNodeValue.description"), null);
         this.tree = tree;
+        this.filterableTree = filterableTree;
         this.editorContextReference = editorContextReference;
         this.structureState = GeneralSettings.getInstance().getState().getTreeStructureState();
     }
@@ -84,11 +89,13 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
     public void actionPerformed(@NotNull AnActionEvent e) {
         Project project = e.getProject();
         // 获取选中的树节点
-        JsonTreeNode node = getSelectedNode();
+        DefaultMutableTreeNode selectedNode = getSelectedNode();
+        JsonTreeNode2 node = (JsonTreeNode2) selectedNode.getUserObject();
+
         // 构建面板
         JComponent component = createComponent(project, node);
         // 获取节点在屏幕上的位置
-        RelativePoint point = getNodeScreenPosition(node);
+        RelativePoint point = getNodeScreenPosition(selectedNode);
         // 构建气球
         this.currentBalloon = JBPopupFactory.getInstance().createDialogBalloonBuilder(component, null)
                 .setShowCallout(true)
@@ -108,7 +115,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
         this.decorator = new TextEditorErrorPopupDecorator(rootPane, expandableTextField);
     }
 
-    private JComponent createComponent(Project project, JsonTreeNode node) {
+    private JComponent createComponent(Project project, JsonTreeNode2 node) {
         this.expandableTextField = new ExpandableEditorTextField(project, Json5Language.INSTANCE);
         this.expandableTextField.setText(String.valueOf(node.getValue()));
         this.expandableTextField.selectAll();
@@ -151,7 +158,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
         return panel;
     }
 
-    private void executeSaveAction(Project project, JsonTreeNode node) {
+    private void executeSaveAction(Project project, JsonTreeNode2 node) {
         EditorContext editorContext = editorContextReference.get();
         // 1.输入内容判断及处理（如果不为数值、布尔、null，则都为字符串。如果用户手动加了字符串，那都以字符串为准）
         String inputText = StrUtil.trim(expandableTextField.getText());
@@ -255,26 +262,32 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        JsonTreeNode selectedNode = getSelectedNode();
-        EditorContext editorContext = editorContextReference.get();
-        PsiFile effectivePsiFile = editorContext.getEffectivePsiFile();
+        boolean isEnabled = false;
+        DefaultMutableTreeNode selectedNode = getSelectedNode();
+        if (null != selectedNode) {
+            JsonTreeNode2 node = (JsonTreeNode2) selectedNode.getUserObject();
+            EditorContext editorContext = editorContextReference.get();
+            PsiFile effectivePsiFile = editorContext.getEffectivePsiFile();
+            // TODO 目前只支持修改叶子节点
 
-        // 1.必须单选  2.必须存在 Json 插件环境
-        e.getPresentation().setEnabledAndVisible(
-                // TODO 目前只支持修改叶子节点
-                (null != selectedNode && JsonTreeNodeType.isLeafNode(selectedNode.getNodeType()))
-                        && PlatformUtil.hasJsonEnvironment(e.getProject())
-                        && (effectivePsiFile instanceof JsonFile && effectivePsiFile.isValid())
-        );
+            // 叶子节点
+            isEnabled = JsonTreeNodeType.isLeafNode(node.getNodeType())
+                    // 存在JSON环境
+                    && PlatformUtil.hasJsonEnvironment(e.getProject())
+                    // 存在有效源文件
+                    && (effectivePsiFile instanceof JsonFile && effectivePsiFile.isValid());
+        }
+
+        e.getPresentation().setEnabledAndVisible(isEnabled);
     }
 
 
     @Nullable
-    private JsonTreeNode getSelectedNode() {
-        return (JsonTreeNode) UIUtils.getSelectedNode(tree);
+    private DefaultMutableTreeNode getSelectedNode() {
+        return (DefaultMutableTreeNode) UIUtils.getSelectedNode(tree);
     }
 
-    private RelativePoint getNodeScreenPosition(JsonTreeNode node) {
+    private RelativePoint getNodeScreenPosition(DefaultMutableTreeNode node) {
         // 获取节点在树中的路径
         TreePath path = new TreePath(node.getPath());
 
@@ -334,17 +347,23 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
         return inputText;
     }
 
-    private void repaintTree(Object inputValue, JsonTreeNode node) {
-        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+    private void repaintTree(Object inputValue, JsonTreeNode2 node) {
+        // 存储展开节点
+        List<TreePath> expandedPaths = TreeUtil.collectExpandedPaths(tree);
+        expandedPaths.stream()
+                .map(path -> (DefaultMutableTreeNode) path.getLastPathComponent())
+                .map(treeNode -> (JsonTreeNode2) treeNode.getUserObject())
+                .forEach(el -> el.setExpanded(true));
+
         // 更新树结构
         if (inputValue instanceof JsonWrapper) {
-            createSubtreeForNode(node, model, inputValue);
-
+            createSubtreeForNode(node, inputValue);
         } else {
             node.setValue(inputValue);
-            // 4. 通知树模型
-            model.nodeChanged(node);
         }
+
+        // 更新树结构
+        filterableTree.updateStructure();
 
         UIUtils.repaintComponent(tree);
     }
@@ -352,7 +371,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
     /**
      * 创建子树结构
      */
-    private void createSubtreeForNode(JsonTreeNode parentNode, DefaultTreeModel model, Object jsonValue) {
+    private void createSubtreeForNode(JsonTreeNode2 parentNode, Object jsonValue) {
         // 1. 移除现有子节点
         parentNode.removeAllChildren();
 
@@ -368,7 +387,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
             // 创建子节点
             for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
-                JsonTreeNode childNode = createChildNode(parentNode, entry.getKey(), entry.getValue());
+                JsonTreeNode2 childNode = createChildNode(parentNode, entry.getKey(), entry.getValue());
                 parentNode.add(childNode);
             }
 
@@ -380,23 +399,21 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
             // 创建子节点
             for (int i = 0; i < jsonArray.size(); i++) {
-                JsonTreeNode childNode = createChildNode(parentNode, "item" + i, jsonArray.get(i));
+                JsonTreeNode2 childNode = createChildNode(parentNode, "item" + i, jsonArray.get(i));
                 parentNode.add(childNode);
             }
         }
 
-        // 4. 更新树结构
-        model.nodeStructureChanged(parentNode);
         // 5. 展开此节点
-        UIUtils.expandNode(tree, parentNode);
+        parentNode.setExpanded(true);
     }
 
     /**
      * 创建子节点
      */
-    private JsonTreeNode createChildNode(JsonTreeNode parent, String key, Object value) {
-        JsonTreeNode childNode = new JsonTreeNode(key);
-        childNode.setJsonPath(parent.getJsonPath() + "." + key);
+    private JsonTreeNode2 createChildNode(JsonTreeNode2 parent, String key, Object value) {
+        JsonTreeNode2 childNode = new JsonTreeNode2(key);
+        childNode.setJsonPath(parent.getJsonPath() + "." + key).setParent(parent);
 
         // 父节点类型是否为数组类型
         boolean isParentNodeArrayType = JsonTreeNodeType.JSONArray == parent.getNodeType();
@@ -409,7 +426,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
             // 递归创建子树
             for (Map.Entry<String, Object> entry : ((ObjectWrapper) value).entrySet()) {
-                JsonTreeNode grandChild = createChildNode(childNode, entry.getKey(), entry.getValue());
+                JsonTreeNode2 grandChild = createChildNode(childNode, entry.getKey(), entry.getValue());
                 childNode.add(grandChild);
             }
 
@@ -422,7 +439,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
             // 递归创建子树
             ArrayWrapper jsonArray = (ArrayWrapper) value;
             for (int i = 0; i < jsonArray.size(); i++) {
-                JsonTreeNode grandChild = createChildNode(childNode, "item" + i, jsonArray.get(i));
+                JsonTreeNode2 grandChild = createChildNode(childNode, "item" + i, jsonArray.get(i));
                 childNode.add(grandChild);
             }
 

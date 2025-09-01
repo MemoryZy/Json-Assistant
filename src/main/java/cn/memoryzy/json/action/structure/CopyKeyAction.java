@@ -3,7 +3,8 @@ package cn.memoryzy.json.action.structure;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.ui.tree.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonTreeNode2;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -33,14 +34,11 @@ public class CopyKeyAction extends DumbAwareAction implements UpdateInBackground
         if (paths != null) {
             List<String> keyList = new ArrayList<>();
             for (TreePath path : paths) {
-
-
-
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
                 // 有key
                 if (!JsonTreeNodeType.JSONArrayElement.equals(node.getNodeType())) {
                     // key
-                    keyList.add(node.getUserObject().toString());
+                    keyList.add(String.valueOf(node.getKey()));
                 }
             }
 
@@ -58,7 +56,7 @@ public class CopyKeyAction extends DumbAwareAction implements UpdateInBackground
         TreePath[] paths = tree.getSelectionPaths();
         if (Objects.nonNull(paths) && paths.length == 1) {
             TreePath path = paths[0];
-            JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+            JsonTreeNode2 node = JsonFilterableTree.getNode(path);
             JsonTreeNodeType nodeType = node.getNodeType();
             return !Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType);
         }

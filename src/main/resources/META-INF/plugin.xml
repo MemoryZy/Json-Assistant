@@ -88,17 +88,24 @@
     </applicationListeners>
 
     <actions>
+        <!-- Main -->
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.action.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.action.JsonMinifyAction"/>
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
         <action id="JsonAssistant.Action.JsonGridAction" class="cn.memoryzy.json.action.JsonGridAction"/>
         <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.action.JsonTextDiffAction"/>
-        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
         <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
+        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
+
+        <!-- Extend -->
+        <group id="JsonAssistant.Group.ExtendGroup" class="cn.memoryzy.json.action.group.ExtendGroup"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>
         <action id="JsonAssistant.Action.ExpandAllNestedJsonAction" class="cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction"/>
         <action id="JsonAssistant.Action.ConvertAllReadableTimeAction" class="cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction"/>
 
+        <!-- Convert -->
+        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
         <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
@@ -107,8 +114,16 @@
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
 
+        <!-- Diff组 -->
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
         <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
+
+        <!-- Sort -->
+        <group id="JsonAssistant.Group.SortGroup" class="cn.memoryzy.json.action.group.SortGroup"/>
+        <action id="JsonAssistant.Action.CaseSensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseSensitiveAZAction"/>
+        <action id="JsonAssistant.Action.CaseSensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseSensitiveZAAction"/>
+        <action id="JsonAssistant.Action.CaseInsensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveAZAction"/>
+        <action id="JsonAssistant.Action.CaseInsensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveZAAction"/>
 
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
@@ -125,10 +140,6 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
-
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
-        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
-        <group id="JsonAssistant.Group.ExtendGroup" class="cn.memoryzy.json.action.group.ExtendGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>

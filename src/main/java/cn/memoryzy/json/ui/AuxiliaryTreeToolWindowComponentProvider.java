@@ -17,20 +17,18 @@ import java.awt.*;
  */
 public class AuxiliaryTreeToolWindowComponentProvider {
 
-    private final JsonWrapper wrapper;
+    private final JsonStructureComponentProvider provider;
 
     /**
      * 构造器
      *
      * @param wrapper JSON对象
      */
-    public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper) {
-        this.wrapper = wrapper;
+    public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper, @NotNull JComponent component, EditorContext editorContext) {
+        provider = new JsonStructureComponentProvider(wrapper, component, getStructureSetting(editorContext));
     }
 
-    public JComponent createComponent(@NotNull JComponent component, EditorContext editorContext) {
-        // 创建树结构
-        JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component, getStructureSetting(editorContext));
+    public JComponent createComponent() {
         // 获取树
         JPanel treeComponent = provider.getTreeComponent();
         Tree tree = provider.getTree();
@@ -49,7 +47,12 @@ public class AuxiliaryTreeToolWindowComponentProvider {
         return simpleToolWindowPanel;
     }
 
+    public JComponent getPreferredFocusedComponent() {
+        return provider.getTree();
+    }
+
     private StructureSetting getStructureSetting(EditorContext editorContext) {
         return new StructureSetting().setNeedBorder(false).setNeedToolbar(true).setExpandLevel(3).setEditorContext(editorContext);
     }
+
 }

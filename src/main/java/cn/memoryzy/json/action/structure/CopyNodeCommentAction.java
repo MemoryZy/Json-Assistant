@@ -2,7 +2,8 @@ package cn.memoryzy.json.action.structure;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.tree.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonTreeNode2;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -36,7 +37,7 @@ public class CopyNodeCommentAction extends DumbAwareAction implements UpdateInBa
             List<String> commentList = new ArrayList<>();
 
             for (TreePath path : paths) {
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
                 String comment = node.getComment();
                 if (StrUtil.isNotBlank(comment)) {
                     commentList.add(comment);
@@ -54,7 +55,7 @@ public class CopyNodeCommentAction extends DumbAwareAction implements UpdateInBa
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
                 String comment = node.getComment();
                 if (StrUtil.isNotBlank(comment)) {
                     enabled = true;

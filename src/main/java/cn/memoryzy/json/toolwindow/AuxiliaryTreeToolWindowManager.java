@@ -24,8 +24,6 @@ import com.intellij.ui.content.ContentManager;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
-
 /**
  * 管理树结构工具窗口的行为
  *
@@ -49,9 +47,21 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
 
     public void convertAndShow(JsonWrapper jsonWrapper, EditorContext editorContext) {
         // 为其分配一个标签页，用于展示
-        AuxiliaryTreeToolWindowComponentProvider provider = new AuxiliaryTreeToolWindowComponentProvider(jsonWrapper);
+        AuxiliaryTreeToolWindowComponentProvider provider = new AuxiliaryTreeToolWindowComponentProvider(jsonWrapper, toolWindow.getComponent(), editorContext);
+
         // 创建标签页
-        createToolWindowContent(provider.createComponent(toolWindow.getComponent(), editorContext));
+        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        ContentManager contentManager = toolWindow.getContentManager();
+        int count = contentManager.getContentCount();
+
+        String displayName = ToolWindowUtil.generateTagName(contentManager, PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME);
+        Content content = contentFactory.createContent(provider.createComponent(), displayName, false);
+        content.setCloseable(true);
+        content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
+        content.setDisposer(ToolWindowUtil.createAuxWindowContentDisposer(project, toolWindow));
+        contentManager.addContent(content, count);
+        contentManager.setSelectedContent(content, true);
+
         // 展示
         show();
     }
@@ -90,20 +100,6 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         group.add(Separator.create());
         toolWindow.setAdditionalGearActions(group);
-    }
-
-
-    private void createToolWindowContent(JComponent component) {
-        ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        ContentManager contentManager = toolWindow.getContentManager();
-        int count = contentManager.getContentCount();
-
-        String displayName = ToolWindowUtil.generateTagName(contentManager, PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME);
-        Content content = contentFactory.createContent(component, displayName, false);
-        content.setCloseable(true);
-        content.setDisposer(ToolWindowUtil.createAuxWindowContentDisposer(project, toolWindow));
-        contentManager.addContent(content, count);
-        contentManager.setSelectedContent(content, true);
     }
 
     private void show() {

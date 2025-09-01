@@ -72,7 +72,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
 
     @NotNull
     public ActionGroup getActionGroup() {
-        return (ActionGroup) ActionHolder.EDITOR_FLOAT_GROUP;
+        return (ActionGroup) ActionHolder.Float.EDITOR_FLOAT_GROUP;
     }
 
     public boolean getAutoHideable() {

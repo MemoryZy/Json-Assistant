@@ -2,7 +2,6 @@ package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.ui.tree.JsonTreeNode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.notification.impl.NotificationsManagerImpl;
@@ -561,7 +560,7 @@ public class UIUtils {
         TreePath selectionPath = tree.getSelectionPath();
         if (selectionPath != null) {
             Object lastComponent = selectionPath.getLastPathComponent();
-            if (lastComponent instanceof JsonTreeNode) {
+            if (lastComponent instanceof DefaultMutableTreeNode) {
                 return lastComponent;
             }
         }

@@ -1,12 +1,14 @@
 package cn.memoryzy.json.action.structure;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.action.JsonStructureAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.tree.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonTreeNode2;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -33,7 +35,7 @@ public class ShowAsTableAction extends DumbAwareAction implements UpdateInBackgr
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         TreePath[] paths = tree.getSelectionPaths();
-        JsonTreeNode node = (JsonTreeNode) Objects.requireNonNull(paths)[0].getLastPathComponent();
+        JsonTreeNode2 node = JsonFilterableTree.getNode(Objects.requireNonNull(paths)[0]);
         JsonWrapper value = (JsonWrapper) node.getValue();
         JsonStructureAction.showInOriginalToolWindow(e.getProject(), null, value, StructureActionSource.OUTSIDE, UIUtils.JSON_GRID_CARD_NAME);
     }
@@ -45,11 +47,11 @@ public class ShowAsTableAction extends DumbAwareAction implements UpdateInBackgr
         // 必须为单选
         if (Objects.nonNull(e.getProject()) && ArrayUtil.isNotEmpty(paths) && paths.length == 1) {
             // 必须为对象、数组类型节点
-            JsonTreeNode node = (JsonTreeNode) paths[0].getLastPathComponent();
+            JsonTreeNode2 node = JsonFilterableTree.getNode(paths[0]);
             JsonTreeNodeType nodeType = node.getNodeType();
             if (JsonTreeNodeType.isParentNode(nodeType)) {
                 // 且必须存在子节点
-                enabled = node.getChildCount() > 0;
+                enabled = CollUtil.isNotEmpty(node.getChildren());
             }
         }
 

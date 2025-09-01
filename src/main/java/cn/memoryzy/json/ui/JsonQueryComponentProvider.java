@@ -33,6 +33,7 @@ import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Key;
+import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.tools.SimpleActionGroup;
@@ -295,5 +296,9 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
     @Override
     public void globalSchemeChange(@Nullable EditorColorsScheme scheme) {
 
+    }
+
+    public void requestFocusOnComponent() {
+        IdeFocusManager.findInstance().requestFocus(searchWrapper.getSearchTextField(), true);
     }
 }

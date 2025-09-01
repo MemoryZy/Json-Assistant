@@ -1,11 +1,10 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.ActionHolder;
+import cn.memoryzy.json.constant.ActionIdHolder;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.keymap.impl.ui.EditKeymapsDialog;
 import com.intellij.openapi.project.DumbAwareAction;
 import icons.JsonAssistantIcons;
@@ -28,8 +27,7 @@ public class ShortcutAction extends DumbAwareAction implements UpdateInBackgroun
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        EditKeymapsDialog dialog = new EditKeymapsDialog(null, ActionHolder.MAIN_ACTION_ID);
-        ApplicationManager.getApplication().invokeLater(dialog::show);
+        new EditKeymapsDialog(null, ActionIdHolder.MAIN_ACTION_ID).show();
     }
 
 }

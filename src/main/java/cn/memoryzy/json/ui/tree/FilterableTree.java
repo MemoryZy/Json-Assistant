@@ -86,9 +86,9 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
         }
     };
 
-    private final T myRoot;
-    private final Tree myTree;
-    private final Project project;
+    protected final T myRoot;
+    protected final Tree myTree;
+    protected final Project project;
 
     public FilterableTree(@Nullable Project project, @NotNull Tree tree, @NotNull T root) {
         myRoot = root;
@@ -289,6 +289,15 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
 
     public void update() {
         rebuildTree();
+        myTree.revalidate();
+        myTree.repaint();
+    }
+
+    /**
+     * 用于已经通过外部修改了根节点的情况
+     */
+    public void updateStructure() {
+        getSearchModel().updateStructure();
         myTree.revalidate();
         myTree.repaint();
     }
