@@ -46,6 +46,13 @@ public interface ActionHolder {
         AnAction CASE_SENSITIVE_ZA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_SENSITIVE_ZA_ACTION_ID);
         AnAction CASE_INSENSITIVE_AZ_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_INSENSITIVE_AZ_ACTION_ID);
         AnAction CASE_INSENSITIVE_ZA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_INSENSITIVE_ZA_ACTION_ID);
+        AnAction NATURAL_AZ_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.NATURAL_AZ_ACTION_ID);
+        AnAction NATURAL_ZA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.NATURAL_ZA_ACTION_ID);
+        AnAction HEXA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.HEXA_ACTION_ID);
+        AnAction REVERSE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.REVERSE_ACTION_ID);
+        AnAction SHUFFLE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.SHUFFLE_ACTION_ID);
+        AnAction LENGTH_ASC_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.LENGTH_ASC_ACTION_ID);
+        AnAction LENGTH_DESC_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.LENGTH_DESC_ACTION_ID);
 
     }
 

@@ -98,17 +98,17 @@ public class CountCharStatusBarWidget extends EditorBasedWidget
     @Override
     public void afterDocumentChange(@NotNull Document document) {
         EditorFactory.getInstance().editors(document)
-                .filter(this::isFocusedEditor)
+                .filter(this::isFocusedEditor2)
                 .findFirst()
                 .ifPresent(this::updateText);
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        updateText(getFocusedEditor());
+        updateText(getFocusedEditor2());
     }
 
-    private boolean isFocusedEditor(Editor editor) {
+    private boolean isFocusedEditor2(Editor editor) {
         Component focusOwner = getFocusedComponent2();
         return focusOwner == editor.getContentComponent();
     }
@@ -149,7 +149,7 @@ public class CountCharStatusBarWidget extends EditorBasedWidget
     private void update(EditorCountCharEvent event) {
         // 判断是否是带焦点的编辑器
         Editor editor = event.getEditor();
-        if (isFocusedEditor(editor)) {
+        if (isFocusedEditor2(editor)) {
             updateText(event.getEditor(), event.getFile(), event.getTotalChars());
         }
     }
@@ -166,7 +166,7 @@ public class CountCharStatusBarWidget extends EditorBasedWidget
         return focusOwner;
     }
 
-    public @Nullable Editor getFocusedEditor() {
+    public @Nullable Editor getFocusedEditor2() {
         Component component = getFocusedComponent2();
         Editor editor = component instanceof EditorComponentImpl ? ((EditorComponentImpl)component).getEditor() : getEditor();
         return editor != null && !editor.isDisposed() ? editor : null;

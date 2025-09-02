@@ -12,9 +12,9 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/8/3
  */
-public class ConvertOtherFormatsGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
+public class ConvertGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
 
-    public ConvertOtherFormatsGroup() {
+    public ConvertGroup() {
         super();
         setPopup(true);
         setEnabledInModalContext(true);

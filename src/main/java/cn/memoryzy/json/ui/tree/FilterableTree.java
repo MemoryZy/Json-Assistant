@@ -160,9 +160,7 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
                 // 窗口可见
                 return (mySearchPopup != null && mySearchPopup.isVisible()
                         // 并且编辑器文本不为空
-                        && null != searchField && StringUtil.isNotEmpty(searchField.getText()))
-                        // 固定搜索弹窗并且文本不为空
-                        || (isStickySearch() && StringUtil.isNotEmpty(ClientProperty.get(myComponent, Objects.requireNonNull(SEARCH_TEXT_KEY))));
+                        && null != searchField && StringUtil.isNotEmpty(searchField.getText()));
             }
         };
         getSearchModel().setSpeedSearch(supply);

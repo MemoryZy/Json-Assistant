@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action;
 
-import cn.memoryzy.json.action.group.JsonAssistantPopupGroup;
+import cn.memoryzy.json.action.group.MainGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -29,7 +29,7 @@ public class JsonAssistantAction extends DumbAwareAction implements UpdateInBack
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        new JsonAssistantPopupGroup(true).showPopupMenu(event.getDataContext());
+        new MainGroup(true).showPopupMenu(event.getDataContext());
     }
 
     @Override

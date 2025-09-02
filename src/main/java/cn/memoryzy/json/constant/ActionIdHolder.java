@@ -19,7 +19,7 @@ public interface ActionIdHolder {
     }
 
     interface Convert {
-        String CONVERT_OTHER_FORMATS_GROUP_ID = "JsonAssistant.Group.ConvertOtherFormatsGroup";
+        String CONVERT_OTHER_FORMATS_GROUP_ID = "JsonAssistant.Group.Convert";
         String TO_XML_ACTION_ID = "JsonAssistant.Action.ToXmlAction";
         String TO_YAML_ACTION_ID = "JsonAssistant.Action.ToYamlAction";
         String TO_TOML_ACTION_ID = "JsonAssistant.Action.ToTomlAction";
@@ -30,7 +30,7 @@ public interface ActionIdHolder {
     }
 
     interface Extend {
-        String EXTEND_GROUP_ID = "JsonAssistant.Group.ExtendGroup";
+        String EXTEND_GROUP_ID = "JsonAssistant.Group.Extend";
         String CONVERT_ALL_TIMESTAMP_ACTION_ID = "JsonAssistant.Action.ConvertAllTimestampAction";
         String EXPAND_ALL_NESTED_JSON_ACTION_ID = "JsonAssistant.Action.ExpandAllNestedJsonAction";
         String CONVERT_ALL_READABLE_TIME_ACTION_ID = "JsonAssistant.Action.ConvertAllReadableTimeAction";
@@ -39,12 +39,19 @@ public interface ActionIdHolder {
     }
 
     interface Sort {
-        String SORT_GROUP_ID = "JsonAssistant.Group.SortGroup";
+        String SORT_GROUP_ID = "JsonAssistant.Group.Sort";
 
         String CASE_SENSITIVE_AZ_ACTION_ID = "JsonAssistant.Action.CaseSensitiveAZAction";
         String CASE_SENSITIVE_ZA_ACTION_ID = "JsonAssistant.Action.CaseSensitiveZAAction";
         String CASE_INSENSITIVE_AZ_ACTION_ID = "JsonAssistant.Action.CaseInsensitiveAZAction";
         String CASE_INSENSITIVE_ZA_ACTION_ID = "JsonAssistant.Action.CaseInsensitiveZAAction";
+        String NATURAL_AZ_ACTION_ID = "JsonAssistant.Action.NaturalAZAction";
+        String NATURAL_ZA_ACTION_ID = "JsonAssistant.Action.NaturalZAAction";
+        String HEXA_ACTION_ID = "JsonAssistant.Action.HexaAction";
+        String REVERSE_ACTION_ID = "JsonAssistant.Action.ReverseAction";
+        String SHUFFLE_ACTION_ID = "JsonAssistant.Action.ShuffleAction";
+        String LENGTH_ASC_ACTION_ID = "JsonAssistant.Action.LengthAscAction";
+        String LENGTH_DESC_ACTION_ID = "JsonAssistant.Action.LengthDescAction";
 
     }
 

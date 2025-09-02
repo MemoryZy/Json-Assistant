@@ -21,12 +21,12 @@ import java.util.List;
  * @author Memory
  * @since 2024/7/2
  */
-public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
+public class MainGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
 
     private final boolean fromPopup;
 
     @SuppressWarnings("unused")
-    public JsonAssistantPopupGroup() {
+    public MainGroup() {
         super();
         setPopup(true);
         setEnabledInModalContext(true);
@@ -37,7 +37,7 @@ public class JsonAssistantPopupGroup extends DefaultActionGroup implements DumbA
         this.fromPopup = false;
     }
 
-    public JsonAssistantPopupGroup(boolean fromPopup) {
+    public MainGroup(boolean fromPopup) {
         this.fromPopup = fromPopup;
     }
 

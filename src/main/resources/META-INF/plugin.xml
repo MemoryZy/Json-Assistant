@@ -89,7 +89,7 @@
 
     <actions>
         <!-- Main -->
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.MainGroup"/>
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.action.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.action.JsonMinifyAction"/>
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
@@ -99,13 +99,13 @@
         <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
 
         <!-- Extend -->
-        <group id="JsonAssistant.Group.ExtendGroup" class="cn.memoryzy.json.action.group.ExtendGroup"/>
+        <group id="JsonAssistant.Group.Extend" class="cn.memoryzy.json.action.group.ExtendGroup"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>
         <action id="JsonAssistant.Action.ExpandAllNestedJsonAction" class="cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction"/>
         <action id="JsonAssistant.Action.ConvertAllReadableTimeAction" class="cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction"/>
 
         <!-- Convert -->
-        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
+        <group id="JsonAssistant.Group.Convert" class="cn.memoryzy.json.action.group.ConvertGroup"/>
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
         <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
@@ -119,11 +119,18 @@
         <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
 
         <!-- Sort -->
-        <group id="JsonAssistant.Group.SortGroup" class="cn.memoryzy.json.action.group.SortGroup"/>
+        <group id="JsonAssistant.Group.Sort" class="cn.memoryzy.json.action.group.SortGroup"/>
         <action id="JsonAssistant.Action.CaseSensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseSensitiveAZAction"/>
         <action id="JsonAssistant.Action.CaseSensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseSensitiveZAAction"/>
         <action id="JsonAssistant.Action.CaseInsensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveAZAction"/>
         <action id="JsonAssistant.Action.CaseInsensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveZAAction"/>
+        <action id="JsonAssistant.Action.NaturalAZAction" class="cn.memoryzy.json.action.sort.NaturalAZAction"/>
+        <action id="JsonAssistant.Action.NaturalZAAction" class="cn.memoryzy.json.action.sort.NaturalZAAction"/>
+        <action id="JsonAssistant.Action.HexaAction" class="cn.memoryzy.json.action.sort.HexaAction"/>
+        <action id="JsonAssistant.Action.ReverseAction" class="cn.memoryzy.json.action.sort.ReverseAction"/>
+        <action id="JsonAssistant.Action.ShuffleAction" class="cn.memoryzy.json.action.sort.ShuffleAction"/>
+        <action id="JsonAssistant.Action.LengthAscAction" class="cn.memoryzy.json.action.sort.LengthAscAction"/>
+        <action id="JsonAssistant.Action.LengthDescAction" class="cn.memoryzy.json.action.sort.LengthDescAction"/>
 
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
