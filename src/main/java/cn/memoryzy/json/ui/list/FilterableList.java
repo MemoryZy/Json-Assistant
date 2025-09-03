@@ -1,5 +1,7 @@
 package cn.memoryzy.json.ui.list;
 
+import cn.memoryzy.json.ui.tree.BaseNode;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.IdeFocusManager;
@@ -13,7 +15,6 @@ import com.intellij.util.Function;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -23,19 +24,19 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 /**
- * 自定义可过滤元素的处理类
+ * 自定义可过滤元素的处理类（搜索框与List分离）
  *
  * @author Memory
  * @since 2025/8/20
  */
-public class FilterableList<T> {
+public class FilterableList<T extends BaseNode> {
 
     private final JList<T> list;
     private final SearchTextField filterField;
     private final NameFilteringListModel<T> model;
     private final ListFilterSpeedSearch speedSearch;
 
-    public FilterableList(@NotNull JList<T> list, @Nullable Function<? super T, String> nameFunction, boolean highlightAllOccurrences) {
+    public FilterableList(@NotNull JList<T> list, @NotNull Function<? super T, String> nameFunction, boolean highlightAllOccurrences) {
         // 想要实现被搜索的元素高亮的话，需要在外部 setCellRenderer(new ColoredListCellRenderer<>())
         // 并且使用 SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected) 来实现
         this.list = list;
@@ -56,7 +57,7 @@ public class FilterableList<T> {
         };
 
         speedSearch = new ListFilterSpeedSearch(highlightAllOccurrences);
-        speedSearch.setEnabled(nameFunction != null);
+        speedSearch.setEnabled(true);
 
         this.list.addKeyListener(speedSearch);
         int selectedIndex = this.list.getSelectedIndex();
@@ -143,7 +144,9 @@ public class FilterableList<T> {
     private void onSpeedSearchPatternChanged() {
         T prevSelection = list.getSelectedValue(); // save to restore the selection on filter drop
         model.refilter();
-        if (model.getSize() > 0) {
+        // 不管文本新增还是搜索框清空，都会进入此方法
+        int size = model.getSize();
+        if (size > 0) {
             int fullMatchIndex = speedSearch.isHoldingFilter() ? model.getClosestMatchIndex() : model.getElementIndex(prevSelection);
             if (fullMatchIndex != -1) {
                 list.setSelectedIndex(fullMatchIndex);
@@ -152,6 +155,20 @@ public class FilterableList<T> {
             if (model.getSize() <= list.getSelectedIndex() || !model.contains(list.getSelectedValue())) {
                 list.setSelectedIndex(0);
             }
+
+            // 只要新的 size 小于原 size，表示是匹配成功的节点
+            ListModel<T> originalModel = model.getOriginalModel();
+            int originalSize = originalModel.getSize();
+            boolean matched = size < originalSize;
+
+            // 为 匹配成功的 / 所有的节点（根据 matched 变量）都设置匹配成功，并且刷新树
+            for (int i = 0; i < size; i++) {
+                T element = model.getElementAt(i);
+                element.setMatched(matched);
+            }
+
+            UIUtils.repaintComponent(list);
+
         } else {
             // 如果没有匹配到值，就显示红背景色
             speedSearch.noHits();

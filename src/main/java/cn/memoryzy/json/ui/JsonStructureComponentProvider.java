@@ -12,7 +12,7 @@ import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
-import cn.memoryzy.json.ui.tree.JsonTreeNode2;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -26,6 +26,7 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.*;
+import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -91,7 +92,7 @@ public class JsonStructureComponentProvider {
         this.setting = setting;
         this.editorContextReference.set(setting.getEditorContext());
 
-        this.filterableTree = new JsonFilterableTree(null, new JsonTreeNode2("root").setJsonPath("$"), wrapper);
+        this.filterableTree = new JsonFilterableTree(null, new JsonNode("root").setJsonPath("$"), wrapper);
         this.tree = filterableTree.getTree();
         this.treeComponent = new JPanel(new BorderLayout());
 
@@ -246,10 +247,19 @@ public class JsonStructureComponentProvider {
     }
 
     private class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
+
+        private final Font chineseFont;
+        private final Font baseFont;
+
+        public StyleTreeCellRenderer() {
+            this.chineseFont = UIUtils.getChineseFont(14);
+            this.baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        }
+
         @Override
         public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-            JsonTreeNode2 jsonNode = (JsonTreeNode2) node.getUserObject();
+            JsonNode jsonNode = (JsonNode) node.getUserObject();
             JsonTreeNodeType nodeType = jsonNode.getNodeType();
 
             if (nodeType == null) return;
@@ -300,12 +310,19 @@ public class JsonStructureComponentProvider {
 
             // 6. 渲染路径提示
             renderPathHint(jsonNode, node);
+
+            // 7.根据匹配切换字体
+            if (jsonNode.isMatched()) {
+                setFont(chineseFont);
+            } else {
+                setFont(baseFont);
+            }
         }
 
 
         // --------------------------- 重构的辅助方法 --------------------------- //
 
-        private NodeRenderData resolveNodeRenderData(JsonTreeNodeType nodeType, JsonTreeNode2 node) {
+        private NodeRenderData resolveNodeRenderData(JsonTreeNodeType nodeType, JsonNode node) {
             NodeRenderData data = new NodeRenderData();
             switch (nodeType) {
                 case JSONObject: {
@@ -335,7 +352,7 @@ public class JsonStructureComponentProvider {
         }
 
 
-        private void configureObjectNode(NodeRenderData data, JsonTreeNode2 node) {
+        private void configureObjectNode(NodeRenderData data, JsonNode node) {
             data.icon = JsonAssistantIcons.Structure.JSON_OBJECT;
             data.typePrefix = " [";
             data.typeLabel = "object";
@@ -344,7 +361,7 @@ public class JsonStructureComponentProvider {
             wrapSizeString(data);
         }
 
-        private void configureArrayNode(NodeRenderData data, JsonTreeNode2 node) {
+        private void configureArrayNode(NodeRenderData data, JsonNode node) {
             data.icon = JsonAssistantIcons.Structure.JSON_ARRAY;
             data.typePrefix = " [";
             data.typeLabel = "array";
@@ -353,7 +370,7 @@ public class JsonStructureComponentProvider {
             wrapSizeString(data);
         }
 
-        private void configureObjectElement(NodeRenderData data, JsonTreeNode2 node) {
+        private void configureObjectElement(NodeRenderData data, JsonNode node) {
             data.icon = JsonAssistantIcons.Structure.JSON_OBJECT_ITEM;
             data.typePrefix = " [";
             data.typeLabel = "array_object";
@@ -362,7 +379,7 @@ public class JsonStructureComponentProvider {
             wrapSizeString(data);
         }
 
-        private void configureArrayElementArray(NodeRenderData data, JsonTreeNode2 node) {
+        private void configureArrayElementArray(NodeRenderData data, JsonNode node) {
             data.icon = JsonAssistantIcons.Structure.JSON_ARRAY;
             data.typePrefix = " [";
             data.typeLabel = "array_array";
@@ -371,7 +388,7 @@ public class JsonStructureComponentProvider {
             wrapSizeString(data);
         }
 
-        private void configureValueNode(NodeRenderData data, JsonTreeNode2 node) {
+        private void configureValueNode(NodeRenderData data, JsonNode node) {
             Object value = node.getValue();
             data.formattedValue = formatNodeValue(value);
             data.valueType = value == null ? "null" : value.getClass().getName();
@@ -386,7 +403,7 @@ public class JsonStructureComponentProvider {
             }
         }
 
-        private void renderPathHint(JsonTreeNode2 node, DefaultMutableTreeNode treeNode) {
+        private void renderPathHint(JsonNode node, DefaultMutableTreeNode treeNode) {
             if (!structureState.isDisplayNodePath() || !treeNode.equals(hoverNode)) {
                 setToolTipText(null);
                 return;

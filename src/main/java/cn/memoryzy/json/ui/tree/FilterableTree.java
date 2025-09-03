@@ -3,6 +3,7 @@ package cn.memoryzy.json.ui.tree;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.util.JsonAssistantUtil;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.ide.ui.UISettings;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
@@ -51,7 +52,7 @@ import java.util.*;
  * @author Memory
  * @since 2025/8/20
  */
-public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
+public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends BaseNode> {
 
     @SuppressWarnings("unchecked")
     private static final Key<String> SEARCH_TEXT_KEY =
@@ -265,6 +266,7 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
     }
 
     protected void onSpeedSearchUpdateComplete(@Nullable String pattern) {
+        UIUtils.repaintComponent(myTree);
     }
 
     protected boolean useIdentityHashing() {
@@ -300,7 +302,7 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
         myTree.repaint();
     }
 
-    public static class SearchTreeModel<N extends DefaultMutableTreeNode, U> extends DefaultTreeModel {
+    public static class SearchTreeModel<N extends DefaultMutableTreeNode, U extends BaseNode> extends DefaultTreeModel {
         public interface Listener<U> extends EventListener {
             void beforeNodeChanged(U x);
 
@@ -447,7 +449,7 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
 
         @NotNull
         protected N createNode(@NotNull U object) {
-            assert !(object instanceof DefaultMutableTreeNode);
+            // assert !(object instanceof DefaultMutableTreeNode);
             return myFactory.fun(object);
         }
 
@@ -465,6 +467,8 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
             } else {
                 // 如果 SpeedSearch 没有过滤条件，那么恢复所有的节点
                 filterChildren(myRootObject, x -> true);
+                // 重置所有的匹配状态
+                clearMatchedStatusRecursively(myRootObject);
             }
         }
 
@@ -507,6 +511,9 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
             // 判断当前节点是否应该显示
             String name = myNamer.fun(object);
             isAccepted |= object == myRootObject || name != null && accept(name);
+
+            // 设置匹配状态
+            object.setMatched(isAccepted);
 
             // 如果当前节点被接受
             if (isAccepted) {
@@ -667,6 +674,19 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U> {
         protected boolean accept(@Nullable String name) {
             if (name == null) return true;
             return mySpeedSearch.matchingFragments(name) != null;
+        }
+
+        /**
+         * 递归遍历树节点，重置 matched 状态
+         *
+         * @param object 当前遍历的节点
+         */
+        private void clearMatchedStatusRecursively(U object) {
+            object.setMatched(false);
+            // 递归处理所有子节点
+            for (U child : getChildren(object)) {
+                clearMatchedStatusRecursively(child);
+            }
         }
 
         @Override

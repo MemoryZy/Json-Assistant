@@ -4,7 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
-import cn.memoryzy.json.ui.tree.JsonTreeNode2;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -47,7 +47,7 @@ public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackgr
         TreePath[] paths = tree.getSelectionPaths();
         if (ArrayUtil.isNotEmpty(paths)) {
             for (TreePath path : paths) {
-                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
+                JsonNode node = JsonFilterableTree.getNode(path);
                 JsonTreeNodeType nodeType = node.getNodeType();
                 if (Objects.equals(nodeType, JsonTreeNodeType.JSONObject)
                         || Objects.equals(nodeType, JsonTreeNodeType.JSONArray)

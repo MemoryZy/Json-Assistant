@@ -4,7 +4,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
-import cn.memoryzy.json.ui.tree.JsonTreeNode2;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -37,7 +37,7 @@ public class CopyNodePathAction extends DumbAwareAction implements UpdateInBackg
         if (ArrayUtil.isNotEmpty(selectPaths)) {
             List<String> pathList = new ArrayList<>();
             for (TreePath path : selectPaths) {
-                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
+                JsonNode node = JsonFilterableTree.getNode(path);
                 pathList.add(node.getJsonPath());
             }
 

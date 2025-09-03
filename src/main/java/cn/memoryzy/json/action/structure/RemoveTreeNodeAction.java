@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
-import cn.memoryzy.json.ui.tree.JsonTreeNode2;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -34,8 +34,8 @@ public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBac
             Map<TreePath, Boolean> expandedStates = UIUtils.recordExpandedStates(tree);
 
             for (TreePath path : paths) {
-                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
-                JsonTreeNode2 parent = node.getParent();
+                JsonNode node = JsonFilterableTree.getNode(path);
+                JsonNode parent = node.getParent();
                 if (parent != null) {
                     parent.removeAndUpdateSize(node);
                 }

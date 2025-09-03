@@ -3,7 +3,19 @@
 ## [Unreleased]
 
 - 优化历史记录窗口。
+- 增加 JSON 排序功能。
+- 增加字符统计功能。
+- 优化 JSON 树的过滤功能。
+- 修复表格化错误的问题。
+- 用户体验优化与改进。
+- 兼容性优化。
 - Optimize the history window.
+- Add JSON sorting functionality.
+- Add character counting functionality.
+- Optimize the filtering functionality of the JSON tree.
+- Fix tabulation error issues.
+- User experience optimization and improvement.
+- Compatibility optimization.
 
 ## [1.8.5] - 2025-08-10
 

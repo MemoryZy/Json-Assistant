@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.tree.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.Tree;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -90,7 +91,7 @@ public class JsonTreeEditorComponentProvider {
         }
 
         Tree tree = componentProvider.getTree();
-        JsonTreeNode rootNode = (JsonTreeNode) tree.getModel().getRoot();
+        DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
         int childCount = rootNode.getChildCount();
         if (childCount == 0) {
             // 初次加载
@@ -98,7 +99,8 @@ public class JsonTreeEditorComponentProvider {
 
         } else {
             // 结构相同无需操作，不同则重建树
-            JsonWrapper oldWrapper = (JsonWrapper) rootNode.getValue();
+            JsonNode node = (JsonNode) rootNode.getUserObject();
+            JsonWrapper oldWrapper = (JsonWrapper) node.getValue();
 
             // 结构不同，重构树
             if (!Objects.equals(oldWrapper, newWrapper)) {

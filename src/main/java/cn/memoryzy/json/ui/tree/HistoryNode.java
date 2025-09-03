@@ -12,7 +12,7 @@ import java.util.Objects;
  * @author Memory
  * @since 2025/8/20
  */
-public class HistoryNode {
+public class HistoryNode extends BaseNode {
 
     /**
      * 节点值（只有{@link HistoryTreeNodeType#NODE}类型才有值）

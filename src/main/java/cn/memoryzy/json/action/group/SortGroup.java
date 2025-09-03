@@ -38,14 +38,6 @@ public class SortGroup extends DefaultActionGroup implements DumbAware, UpdateIn
         boolean showSeparatorText = fromPopup || PlatformUtil.isNewUi();
 
         List<AnAction> actions = new ArrayList<>();
-        actions.add(ActionHolder.Sort.REVERSE_ACTION);
-        actions.add(ActionHolder.Sort.SHUFFLE_ACTION);
-        actions.add(ActionHolder.Sort.HEXA_ACTION);
-        actions.add(Separator.create());
-        actions.add(ActionHolder.Sort.LENGTH_ASC_ACTION);
-        actions.add(ActionHolder.Sort.LENGTH_DESC_ACTION);
-        actions.add(Separator.create());
-
         // Basic Sorts
         if (showSeparatorText) {
             actions.add(Separator.create(JsonAssistantBundle.message("separator.basic.sorts")));
@@ -67,9 +59,17 @@ public class SortGroup extends DefaultActionGroup implements DumbAware, UpdateIn
         actions.add(Separator.create());
 
         // Special Sorts
-        // if (showSeparatorText) {
-        //     actions.add(Separator.create(JsonAssistantBundle.message("separator.special.sorts")));
-        // }
+        if (showSeparatorText) {
+            actions.add(Separator.create(JsonAssistantBundle.message("separator.special.sorts")));
+        }
+
+        actions.add(ActionHolder.Sort.LENGTH_ASC_ACTION);
+        actions.add(ActionHolder.Sort.LENGTH_DESC_ACTION);
+        actions.add(Separator.create());
+
+        actions.add(ActionHolder.Sort.HEXA_ACTION);
+        actions.add(ActionHolder.Sort.REVERSE_ACTION);
+        actions.add(ActionHolder.Sort.SHUFFLE_ACTION);
 
         return actions.toArray(new AnAction[0]);
     }

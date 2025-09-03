@@ -21,6 +21,11 @@ public class JsonSorter {
         return null == wrapper ? null : (JsonWrapper) sort(wrapper, strategy);
     }
 
+    public static JsonWrapper sortJson(String json, boolean isJson, SortStrategy strategy) {
+        JsonWrapper wrapper = isJson ? JsonUtil.parse(json) : Json5Util.parse(json);
+        return null == wrapper ? null : (JsonWrapper) sort(wrapper, strategy);
+    }
+
     /**
      * 对数据进行排序
      *
@@ -47,8 +52,7 @@ public class JsonSorter {
     private static ObjectWrapper sortObject(ObjectWrapper wrapper, SortStrategy strategy) {
         List<KeyValuePair> pairs = new ArrayList<>();
         for (Map.Entry<String, Object> entry : wrapper.entrySet()) {
-            ObjectWrapper value = (ObjectWrapper) entry.getValue();
-            pairs.add(new KeyValuePair(entry.getKey(), sort(value, strategy)));
+            pairs.add(new KeyValuePair(entry.getKey(), sort(entry.getValue(), strategy)));
         }
 
         List<KeyValuePair> sortedPairs = strategy.sortPairs(pairs);

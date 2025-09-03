@@ -10,7 +10,7 @@ import java.util.List;
  * @author Memory
  * @since 2025/8/27
  */
-public class JsonTreeNode2 {
+public class JsonNode extends BaseNode {
 
     /**
      * 节点名称（用于过滤节点）
@@ -51,15 +51,15 @@ public class JsonTreeNode2 {
     /**
      * 父节点
      */
-    private JsonTreeNode2 parent;
+    private JsonNode parent;
 
     /**
      * 子节点
      */
-    private final List<JsonTreeNode2> children = new ArrayList<>();
+    private final List<JsonNode> children = new ArrayList<>();
 
 
-    public JsonTreeNode2(Object key) {
+    public JsonNode(Object key) {
         this.key = key;
     }
 
@@ -71,7 +71,7 @@ public class JsonTreeNode2 {
         return JsonTreeNodeType.isLeafNode(nodeType);
     }
 
-    public void add(JsonTreeNode2 node) {
+    public void add(JsonNode node) {
         children.add(node);
     }
 
@@ -79,7 +79,7 @@ public class JsonTreeNode2 {
         children.clear();
     }
 
-    public int getIndex(JsonTreeNode2 node) {
+    public int getIndex(JsonNode node) {
         return children.indexOf(node);
     }
 
@@ -87,7 +87,7 @@ public class JsonTreeNode2 {
         return children.size();
     }
 
-    public JsonTreeNode2 getChildAt(int index) {
+    public JsonNode getChildAt(int index) {
         return children.get(index);
     }
 
@@ -98,7 +98,7 @@ public class JsonTreeNode2 {
     /**
      * 删除节点并更新父节点及其祖先节点的 size
      */
-    public void removeAndUpdateSize(JsonTreeNode2 child) {
+    public void removeAndUpdateSize(JsonNode child) {
         // 1. 获取被删除节点在父节点中的索引
         int childIndex = this.getIndex(child);
 
@@ -122,7 +122,7 @@ public class JsonTreeNode2 {
             int newSize = getChildCount();
             if (newSize != this.size) {
                 this.size = newSize;
-                JsonTreeNode2 parent = getParent();
+                JsonNode parent = getParent();
                 if (parent != null) {
                     parent.updateSize();
                 }
@@ -143,7 +143,7 @@ public class JsonTreeNode2 {
 
         // 遍历所有子节点，从指定的起始索引开始
         for (int i = startIndex; i < children.size(); i++) {
-            JsonTreeNode2 child = getChildAt(i);
+            JsonNode child = getChildAt(i);
 
             // 为子节点构建新的路径
             String newPath = JsonFilterableTree.buildArrayElementPath(getJsonPath(), i);
@@ -157,9 +157,9 @@ public class JsonTreeNode2 {
     /**
      * 递归更新子节点路径
      */
-    private void updateChildPaths(JsonTreeNode2 parentNode) {
+    private void updateChildPaths(JsonNode parentNode) {
         for (int i = 0; i < parentNode.getChildren().size(); i++) {
-            JsonTreeNode2 child = parentNode.getChildAt(i);
+            JsonNode child = parentNode.getChildAt(i);
 
             // 更新当前节点的路径
             updateNodePath(parentNode, child, i);
@@ -174,7 +174,7 @@ public class JsonTreeNode2 {
     /**
      * 更新单个节点的路径
      */
-    private void updateNodePath(JsonTreeNode2 parent, JsonTreeNode2 child, int indexInParent) {
+    private void updateNodePath(JsonNode parent, JsonNode child, int indexInParent) {
         String parentPath = parent.getJsonPath();
         String newPath;
 
@@ -210,7 +210,7 @@ public class JsonTreeNode2 {
         return value;
     }
 
-    public JsonTreeNode2 setValue(Object value) {
+    public JsonNode setValue(Object value) {
         this.value = value;
         return this;
     }
@@ -219,7 +219,7 @@ public class JsonTreeNode2 {
         return nodeType;
     }
 
-    public JsonTreeNode2 setNodeType(JsonTreeNodeType nodeType) {
+    public JsonNode setNodeType(JsonTreeNodeType nodeType) {
         this.nodeType = nodeType;
         return this;
     }
@@ -228,7 +228,7 @@ public class JsonTreeNode2 {
         return size;
     }
 
-    public JsonTreeNode2 setSize(Integer size) {
+    public JsonNode setSize(Integer size) {
         this.size = size;
         return this;
     }
@@ -237,7 +237,7 @@ public class JsonTreeNode2 {
         return comment;
     }
 
-    public JsonTreeNode2 setComment(String comment) {
+    public JsonNode setComment(String comment) {
         this.comment = comment;
         return this;
     }
@@ -246,7 +246,7 @@ public class JsonTreeNode2 {
         return jsonPath;
     }
 
-    public JsonTreeNode2 setJsonPath(String jsonPath) {
+    public JsonNode setJsonPath(String jsonPath) {
         this.jsonPath = jsonPath;
         return this;
     }
@@ -259,16 +259,16 @@ public class JsonTreeNode2 {
         isExpanded = expanded;
     }
 
-    public JsonTreeNode2 getParent() {
+    public JsonNode getParent() {
         return parent;
     }
 
-    public JsonTreeNode2 setParent(JsonTreeNode2 parent) {
+    public JsonNode setParent(JsonNode parent) {
         this.parent = parent;
         return this;
     }
 
-    public List<JsonTreeNode2> getChildren() {
+    public List<JsonNode> getChildren() {
         return children;
     }
 }

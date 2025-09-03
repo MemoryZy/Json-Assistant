@@ -2,6 +2,8 @@ package cn.memoryzy.json.util;
 
 import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.ui.list.FilterableListWithField;
+import cn.memoryzy.json.ui.tree.BaseNode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.notification.impl.NotificationsManagerImpl;
@@ -263,11 +265,11 @@ public class UIUtils {
         editor.setColorsScheme(EditorColorsManager.getInstance().getGlobalScheme());
     }
 
-    public static <T> JComponent wrapListWithFilter(@NotNull JList<? extends T> list,
-                                                    @Nullable Function<? super T, String> namer,
-                                                    boolean highlightAllOccurrences) {
-        // ListWithFilter 用于文本检索
-        return ListWithFilter.wrap(list, ScrollPaneFactory.createScrollPane(list), namer, highlightAllOccurrences);
+    public static JComponent wrapListWithFilter(@NotNull JList<? extends BaseNode> list,
+                                                @Nullable Function<? super BaseNode, String> namer,
+                                                boolean highlightAllOccurrences) {
+        // FilterableListWithField 用于文本检索
+        return FilterableListWithField.wrap(list, ScrollPaneFactory.createScrollPane(list), namer, highlightAllOccurrences);
     }
 
     public static void rebuildListWithFilter(JList<?> list) {
@@ -572,14 +574,18 @@ public class UIUtils {
      *
      * @return 字体
      */
-    public static Font getChineseFonts(float size) {
+    public static Font getChineseFont(float size) {
         // 支持中文的字体：
         // DialogInput、Monospaced、SansSerif、SimHei、SimSun、Microsoft JhengHei、Microsoft JhengHei UI
         // Microsoft YaHei UI、Source Han Sans SC Medium、Serif
 
         // return PlatformUtil.isNewUi() ? jetBrainsMonoFont(size) : UIUtil.getTreeFont().deriveFont((float) size);
         // return JBUI.Fonts.create("Serif", size).asBold();
+        // return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
+
         return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
+
+        // return JBUI.Fonts.create("Microsoft JhengHei UI", (int) size);
         // return UIUtil.getListFont().deriveFont(size);
     }
 

@@ -6,6 +6,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.converter.Base64Converter;
 import cn.memoryzy.json.service.persistent.converter.CompressConverter;
 import cn.memoryzy.json.service.persistent.converter.JsonWrapperConverter;
+import cn.memoryzy.json.ui.tree.BaseNode;
 import com.intellij.util.xmlb.annotations.OptionTag;
 import com.intellij.util.xmlb.annotations.Tag;
 
@@ -17,7 +18,7 @@ import java.util.Objects;
  */
 @Tag("record")
 @SuppressWarnings("UnusedReturnValue")
-public class JsonRecord {
+public class JsonRecord extends BaseNode {
 
     /**
      * 记录Id

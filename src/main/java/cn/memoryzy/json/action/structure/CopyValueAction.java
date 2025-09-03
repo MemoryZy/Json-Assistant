@@ -5,7 +5,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
-import cn.memoryzy.json.ui.tree.JsonTreeNode2;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -36,7 +36,7 @@ public class CopyValueAction extends DumbAwareAction implements UpdateInBackgrou
         if (paths != null) {
             List<String> valueList = new ArrayList<>();
             for (TreePath path : paths) {
-                JsonTreeNode2 node = JsonFilterableTree.getNode(path);
+                JsonNode node = JsonFilterableTree.getNode(path);
                 // 获取value值，多个的话用其他处理方式
                 Object value = node.getValue();
                 JsonTreeNodeType nodeType = node.getNodeType();
