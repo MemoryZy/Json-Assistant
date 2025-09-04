@@ -39,6 +39,7 @@ public class CountCharStatusBarWidget extends EditorBasedWidget
         implements StatusBarWidget.TextPresentation, BulkAwareDocumentListener.Simple, PropertyChangeListener {
 
     public static final String ID = "JsonAssistant.CountCharWidget";
+    public static final String SWING_FOCUS_OWNER_PROPERTY2 = "focusOwner";
 
     private String text = "";
     private String tooltipText = "";
@@ -89,10 +90,10 @@ public class CountCharStatusBarWidget extends EditorBasedWidget
         EditorEventMulticaster multicaster = EditorFactory.getInstance().getEventMulticaster();
         multicaster.addDocumentListener(this, this);
         // 注册焦点监听器
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(SWING_FOCUS_OWNER_PROPERTY, this);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener(SWING_FOCUS_OWNER_PROPERTY2, this);
         // 自动移除监听器（防止内存泄漏）
         Disposer.register(this,
-                () -> KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(SWING_FOCUS_OWNER_PROPERTY, this));
+                () -> KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(SWING_FOCUS_OWNER_PROPERTY2, this));
     }
 
     @Override

@@ -26,7 +26,6 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.*;
-import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
@@ -122,7 +121,7 @@ public class JsonStructureComponentProvider {
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
         tree.setToggleClickCount(1);
-        tree.setFont(UIUtils.jetBrainsMonoFont(12));
+        tree.setFont(UIUtils.JETBRAINS_MAPLE_MONO_FONT);
         tree.setCellRenderer(new StyleTreeCellRenderer());
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
         tree.addMouseMotionListener(new MouseAdapter() {
@@ -249,11 +248,11 @@ public class JsonStructureComponentProvider {
     private class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
 
         private final Font chineseFont;
-        private final Font baseFont;
+        // private final Font baseFont;
 
         public StyleTreeCellRenderer() {
-            this.chineseFont = UIUtils.getChineseFont(14);
-            this.baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+            this.chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+            // this.baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
         }
 
         @Override
@@ -312,11 +311,11 @@ public class JsonStructureComponentProvider {
             renderPathHint(jsonNode, node);
 
             // 7.根据匹配切换字体
-            if (jsonNode.isMatched()) {
-                setFont(chineseFont);
-            } else {
-                setFont(baseFont);
-            }
+            // if (jsonNode.isMatched()) {
+            //     setFont(chineseFont);
+            // } else {
+            //     setFont(baseFont);
+            // }
         }
 
 

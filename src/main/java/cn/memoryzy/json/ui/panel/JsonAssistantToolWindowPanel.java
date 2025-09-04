@@ -37,16 +37,18 @@ public class JsonAssistantToolWindowPanel extends JPanel {
         if (Objects.equals(UIUtils.JSON_TREE_CARD_NAME, cardName)) {
             // 重新生成根节点
             treeProvider.rebuildTree(wrapper, 3, editorContext);
-            treeProvider.requestFocusOnStructureComponent();
+            // treeProvider.requestFocusOnStructureComponent();
 
         } else if (Objects.equals(UIUtils.JSON_QUERY_CARD_NAME, cardName)) {
             queryProvider.setDocumentText(editor.getDocument().getText());
-            queryProvider.requestFocusOnComponent();
+            // queryProvider.requestFocusOnComponent();
 
         } else if (Objects.equals(UIUtils.JSON_GRID_CARD_NAME, cardName)) {
             gridProvider.rebuildTable(wrapper);
-            gridProvider.requestFocusOnComponent();
+            // gridProvider.requestFocusOnComponent();
         }
+
+        // editor.getContentComponent().setVisible(true);
     }
 
 

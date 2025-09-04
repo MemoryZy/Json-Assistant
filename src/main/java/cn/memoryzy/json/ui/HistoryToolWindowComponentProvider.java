@@ -55,7 +55,6 @@ import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.FilteringListModel;
 import com.intellij.ui.speedSearch.NameFilteringListModel;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
@@ -202,11 +201,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
 
     private JPanel createListPanel() {
-        Font chineseFont = UIUtils.getChineseFont(14);
-        Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        Font chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        // Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
 
         // 上方编辑器，下方列表
-        showList.setFont(baseFont);
+        showList.setFont(chineseFont);
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
@@ -229,11 +228,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
 
                 // 动态变更字体
-                if (value.isMatched()) {
-                    setFont(chineseFont);
-                } else {
-                    setFont(baseFont);
-                }
+                // if (value.isMatched()) {
+                //     setFont(chineseFont);
+                // } else {
+                //     setFont(baseFont);
+                // }
             }
         });
 
@@ -260,8 +259,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private JPanel createTreePanel() {
-        Font chineseFont = UIUtils.getChineseFont(14);
-        Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        Font chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        // Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
 
         showTree.setDragEnabled(true);
         showTree.setExpandableItemsEnabled(true);
@@ -269,7 +268,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 设置单击展开节点
         showTree.setToggleClickCount(1);
         showTree.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
-        showTree.setFont(baseFont);
+        showTree.setFont(chineseFont);
         showTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         showTree.setCellRenderer(new ColoredTreeCellRenderer() {
             @Override
@@ -297,11 +296,11 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                     tree.setToolTipText(null);
                 }
 
-                if (historyNode.isMatched()) {
-                    setFont(chineseFont);
-                } else {
-                    setFont(baseFont);
-                }
+                // if (historyNode.isMatched()) {
+                //     setFont(chineseFont);
+                // } else {
+                //     setFont(chineseFont);
+                // }
 
                 // SpeedSearchUtil.applySpeedSearchHighlighting(tree, this, true, selected);
             }

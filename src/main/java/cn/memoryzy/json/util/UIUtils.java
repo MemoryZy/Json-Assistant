@@ -74,6 +74,10 @@ public class UIUtils {
      */
     public static final String JSON_GRID_CARD_NAME = "grid";
 
+    /**
+     * JetBrains Maple Mono 融合字体（支持中文）
+     */
+    public static final Font JETBRAINS_MAPLE_MONO_FONT = getChineseFont(13);
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -583,7 +587,9 @@ public class UIUtils {
         // return JBUI.Fonts.create("Serif", size).asBold();
         // return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
 
-        return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
+        // return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
+
+        return PlatformUtil.loadFont("fonts", "JetBrainsMapleMono-Regular.ttf", size);
 
         // return JBUI.Fonts.create("Microsoft JhengHei UI", (int) size);
         // return UIUtil.getListFont().deriveFont(size);
@@ -594,7 +600,7 @@ public class UIUtils {
      *
      * @return 字体
      */
-    public static Font getChineseBoldFonts(float size) {
+    public static Font getChineseBoldFont(float size) {
         return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size).deriveFont(Font.BOLD);
         // return UIUtil.getListFont().deriveFont(size).deriveFont(Font.BOLD);
     }

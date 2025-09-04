@@ -67,8 +67,8 @@ import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
@@ -579,6 +579,32 @@ public class PlatformUtil {
 
         return StrUtil.EMPTY;
     }
+
+    /**
+     * 加载字体文件
+     *
+     * @param basePath 目录路径（resources目录下）
+     * @param fontName 文件名
+     * @return 字体
+     */
+    public static Font loadFont(String basePath, String fontName, float size) {
+        try (InputStream stream = ResourceUtil.getResourceAsStream(JsonAssistantIcons.class.getClassLoader(), basePath, fontName)) {
+            if (null != stream) {
+                Font font = Font.createFont(Font.TRUETYPE_FONT, stream);
+                return font.deriveFont(size);
+            } else {
+                // throw new RuntimeException("Font file not found in resources.");
+                return null;
+            }
+
+        } catch (Exception e) {
+            LOG.error("[Json Assistant] Failed to load font", e);
+        }
+
+        return null;
+    }
+
+
 
     public static String getSingleSelectText(Editor editor) {
         if (null == editor) return null;

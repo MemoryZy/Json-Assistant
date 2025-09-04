@@ -24,13 +24,11 @@ import cn.memoryzy.json.ui.listener.EditorDocumentMonitor;
 import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIUtils;
+import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
@@ -74,6 +72,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
     public static final String HISTORY_ADD_JUMP_KEY = "ADD";
     public static final String HISTORY_EXIST_JUMP_KEY = "EXIST";
+    public static final Object ALLOW_ACTION_PERFORM_WHEN_HIDDEN =
+            JsonAssistantUtil.readStaticFinalFieldValue(ActionUtil.class, "ALLOW_ACTION_PERFORM_WHEN_HIDDEN");
 
     /**
      * 消息总线（应用级）
@@ -222,6 +222,18 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         String value = propertiesComponent.getValue(PluginConstant.SOFT_WRAPS_SELECT_STATE);
         if (null != value) {
             AbstractToggleUseSoftWrapsAction.toggleSoftWraps(currentEditor, null, Boolean.parseBoolean(value));
+        }
+
+        /* FIXME 在新版IDE中，当切换了卡片时，无法切换回编辑器，
+            原因是因为在Action执行前，会在ActionUtil中验证组件是否可见，他获得到的组件（Component component = event.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT);）
+            是编辑器组件，但是我们可能已经切换回树或表格、搜索界面了，所以他判断出CONTEXT_COMPONENT没有可见，所以不允许执行Action
+
+            1.解决CONTEXT_COMPONENT绑定为编辑器的问题
+            2.下面的取巧的方式
+        */
+        if (null != ALLOW_ACTION_PERFORM_WHEN_HIDDEN) {
+            JComponent contentComponent = currentEditor.getContentComponent();
+            contentComponent.putClientProperty(ALLOW_ACTION_PERFORM_WHEN_HIDDEN, Boolean.TRUE);
         }
     }
 

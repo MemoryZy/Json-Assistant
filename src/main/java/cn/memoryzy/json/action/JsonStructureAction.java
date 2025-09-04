@@ -141,11 +141,11 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
             }
         }
 
-        // 获取标签页的面板，切换卡片
-        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, editorContext, cardName));
-
         // 打开窗口
         toolWindow.show();
+
+        // 获取标签页的面板，切换卡片
+        Optional.ofNullable(panelOnContent).ifPresent(panel -> panel.switchToCard(jsonWrapper, editorContext, cardName));
     }
 
     public static void showInAuxiliaryToolWindow(Project project, JsonWrapper jsonWrapper, EditorContext editorContext) {

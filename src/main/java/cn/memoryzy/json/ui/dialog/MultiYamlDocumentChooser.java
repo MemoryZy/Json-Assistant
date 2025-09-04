@@ -15,7 +15,6 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.util.ui.JBFont;
@@ -55,17 +54,17 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        Font chineseFont = UIUtils.getChineseFont(13);
-        Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        Font chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        // Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
 
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
         showTextField.setFont(UIUtils.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
-        showList.setFont(baseFont);
+        showList.setFont(chineseFont);
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
-        showList.setCellRenderer(new IconListCellRenderer(chineseFont, baseFont));
+        showList.setCellRenderer(new IconListCellRenderer());
 
         // 初始化鼠标左键双击事件
         initLeftMouseDoubleClickListener();
@@ -168,12 +167,12 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<YamlDocEntry> {
 
-        private final Font chineseFont;
-        private final Font baseFont;
+        // private final Font chineseFont;
+        // private final Font baseFont;
 
-        public IconListCellRenderer(Font chineseFont, Font baseFont) {
-            this.chineseFont = chineseFont;
-            this.baseFont = baseFont;
+        public IconListCellRenderer() {
+            // this.chineseFont = chineseFont;
+            // this.baseFont = baseFont;
         }
 
         @Override
@@ -185,11 +184,11 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
             SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
 
             // 动态变更字体
-            if (value.isMatched()) {
-                setFont(chineseFont);
-            } else {
-                setFont(baseFont);
-            }
+            // if (value.isMatched()) {
+            //     setFont(chineseFont);
+            // } else {
+            //     setFont(baseFont);
+            // }
         }
     }
 
