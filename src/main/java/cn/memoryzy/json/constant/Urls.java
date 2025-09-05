@@ -31,6 +31,9 @@ public class Urls {
     public static final String ANNOUNCEMENTS_SOURCE_GITHUB_LINK = "https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS";
     public static final String ANNOUNCEMENTS_SOURCE_GITEE_LINK = "https://gitee.com/MemoryZy/Json-Assistant/raw/main/ANNOUNCEMENTS";
 
+    public static final String JETBRAINS_MAPLEMONO_FONT_GITHUB_LINK = "https://github.com/MemoryZy/Json-Assistant/raw/refs/heads/main/JetBrainsMapleMono-Light.ttf";
+    public static final String JETBRAINS_MAPLEMONO_FONT_GITEE_LINK = "https://gitee.com/MemoryZy/Json-Assistant/raw/main/JetBrainsMapleMono-Light.ttf";
+
     public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";
     public static final String PLUGIN_UPDATE_DETAILS_LINK = "https://plugins.jetbrains.com/api/plugins/24738/updates";
 

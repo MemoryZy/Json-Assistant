@@ -589,7 +589,7 @@ public class UIUtils {
 
         // return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
 
-        return PlatformUtil.loadFont("fonts", "JetBrainsMapleMono-Regular.ttf", size);
+        return PlatformUtil.loadFont("fonts", "JetBrainsMapleMono-Light.ttf", size);
 
         // return JBUI.Fonts.create("Microsoft JhengHei UI", (int) size);
         // return UIUtil.getListFont().deriveFont(size);

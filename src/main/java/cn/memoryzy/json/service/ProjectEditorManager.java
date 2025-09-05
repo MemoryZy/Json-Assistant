@@ -1,7 +1,6 @@
 package cn.memoryzy.json.service;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.Service;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.project.Project;
@@ -14,7 +13,7 @@ import java.util.List;
  * @author Memory
  * @since 2025/8/25
  */
-@Service(Service.Level.PROJECT)
+// @Service(Service.Level.PROJECT)
 public final class ProjectEditorManager implements Disposable {
 
     private final Project project;

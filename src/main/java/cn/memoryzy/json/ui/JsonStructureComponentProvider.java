@@ -121,7 +121,7 @@ public class JsonStructureComponentProvider {
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
         tree.setToggleClickCount(1);
-        tree.setFont(UIUtils.JETBRAINS_MAPLE_MONO_FONT);
+        tree.setFont(UIUtils.JETBRAINS_MAPLE_MONO_FONT.deriveFont(12F));
         tree.setCellRenderer(new StyleTreeCellRenderer());
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
         tree.addMouseMotionListener(new MouseAdapter() {

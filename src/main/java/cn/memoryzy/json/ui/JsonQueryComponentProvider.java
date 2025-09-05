@@ -15,7 +15,7 @@ import cn.memoryzy.json.model.jsonpath.ResultNotFound;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.QueryState;
-import cn.memoryzy.json.ui.panel.SearchWrapper;
+import cn.memoryzy.json.ui.editor.SearchFieldWithHistory;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.Disposable;
@@ -29,7 +29,6 @@ import com.intellij.openapi.editor.EditorFactory;
 import com.intellij.openapi.editor.EditorKind;
 import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Key;
@@ -63,7 +62,7 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
     public static final Key<Boolean> QUERY_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".QueryEditorFlag");
 
     private final Project project;
-    private final SearchWrapper searchWrapper;
+    private final SearchFieldWithHistory searchField;
     private final JBPanelWithEmptyText resultWrapper;
     private final JBLabel resultLabel;
     private final Editor resultEditor;
@@ -83,7 +82,7 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
         Supplier<String> propertyNameSupplier = () -> (queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath)
                 ? PluginConstant.JSON_PATH_HISTORY_KEY : PluginConstant.JMES_PATH_HISTORY_KEY;
 
-        this.searchWrapper = new SearchWrapper(project, PlainTextFileType.INSTANCE, this::evaluate, propertyNameSupplier);
+        this.searchField = new SearchFieldWithHistory(project, this::evaluate, propertyNameSupplier);
 
         this.resultWrapper = new JBPanelWithEmptyText(new BorderLayout());
         this.resultLabel = new JBLabel(JsonAssistantBundle.messageOnSystem("json.query.evaluate.result"));
@@ -120,7 +119,8 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
     }
 
     private JComponent createFirstComponent() {
-        return searchWrapper;
+        searchField.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
+        return searchField;
     }
 
     private JComponent createSecondComponent() {
@@ -284,7 +284,7 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
 
     public void clearSearchAndResultText() {
         WriteAction.run(() -> {
-            searchWrapper.clearSearchText();
+            searchField.setText("");
             resultEditor.getDocument().setText("");
 
             resultWrapper.removeAll();
@@ -299,6 +299,6 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
     }
 
     public void requestFocusOnComponent() {
-        IdeFocusManager.findInstance().requestFocus(searchWrapper.getSearchTextField(), true);
+        IdeFocusManager.findInstance().requestFocus(searchField, true);
     }
 }

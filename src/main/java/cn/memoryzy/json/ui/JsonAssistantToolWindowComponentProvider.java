@@ -12,7 +12,6 @@ import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
 import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.ProjectEditorManager;
 import cn.memoryzy.json.service.persistent.HistoryManager;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.EditorVisualState;
@@ -82,7 +81,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
 
     private final Project project;
-    private final ProjectEditorManager editorManager;
     private final ToolWindowEx toolWindow;
     @SuppressWarnings("FieldCanBeLocal")
     private final Content currentContent;
@@ -109,7 +107,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.toolWindow = toolWindow;
         this.currentContent = content;
         this.sourceFile = sourceFile;
-        this.editorManager = ProjectEditorManager.getInstance(project);
 
         ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
         this.visualState = toolWindowSettings.getVisualState();
@@ -120,7 +117,6 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         this.cardLayout = new CombineCardLayout();
         this.cardPanel = new JPanel(cardLayout);
         this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, sourceFile, false, EditorKind.MAIN_EDITOR);
-        this.editorManager.addEditor(currentEditor);
 
         this.treeProvider = new JsonStructureComponentProvider(null, toolWindowPanel, getStructureSetting());
         this.queryProvider = new JsonQueryComponentProvider(project);
@@ -451,7 +447,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
     @Override
     public void dispose() {
-        EditorFactory.getInstance().releaseEditor(currentEditor);
-        editorManager.removeEditor(currentEditor);
+        if (!currentEditor.isDisposed()) {
+            EditorFactory.getInstance().releaseEditor(currentEditor);
+        }
     }
 }
