@@ -77,7 +77,7 @@ public class UIUtils {
     /**
      * JetBrains Maple Mono 融合字体（支持中文）
      */
-    public static final Font JETBRAINS_MAPLE_MONO_FONT = getChineseFont(13);
+    public static final Font JETBRAINS_MAPLE_MONO_FONT = getJetBrainsMapleMonoFont(13);
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -578,7 +578,7 @@ public class UIUtils {
      *
      * @return 字体
      */
-    public static Font getChineseFont(float size) {
+    public static Font getJetBrainsMapleMonoFont(float size) {
         // 支持中文的字体：
         // DialogInput、Monospaced、SansSerif、SimHei、SimSun、Microsoft JhengHei、Microsoft JhengHei UI
         // Microsoft YaHei UI、Source Han Sans SC Medium、Serif
@@ -594,15 +594,4 @@ public class UIUtils {
         // return JBUI.Fonts.create("Microsoft JhengHei UI", (int) size);
         // return UIUtil.getListFont().deriveFont(size);
     }
-
-    /**
-     * 获取支持中文的字体（在旧 UI 中的 List和 Tree 的高亮中，如果使用 JetBrainsMono 字体，会乱码）
-     *
-     * @return 字体
-     */
-    public static Font getChineseBoldFont(float size) {
-        return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size).deriveFont(Font.BOLD);
-        // return UIUtil.getListFont().deriveFont(size).deriveFont(Font.BOLD);
-    }
-
 }
