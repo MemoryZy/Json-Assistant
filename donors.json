@@ -152,5 +152,12 @@
     "message": "谢谢",
     "total": 6.66,
     "currency": "CNY"
+  },
+  {
+    "name": "sanp",
+    "website": "https://www.haozhuji.net/",
+    "message": "好主机",
+    "total": 10.24,
+    "currency": "CNY"
   }
 ]
