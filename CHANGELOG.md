@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.8.7] - 2025-09-12
+
 - 优化历史记录窗口。
 - 增加 JSON 排序功能。
 - 增加字符统计功能。
@@ -372,7 +374,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.5...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.7...HEAD
+[1.8.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.5...v1.8.7
 [1.8.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.2...v1.8.5
 [1.8.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.0...v1.8.2
 [1.8.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.7.8...v1.8.0
