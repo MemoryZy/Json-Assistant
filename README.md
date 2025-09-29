@@ -161,6 +161,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | ◎♪TEL |  |  | 10.00 CNY |
 | Danny |  | 支持✊ | 10.00 CNY |
 | **静 |  |  | 10.00 CNY |
+| - |  |  | 10.00 CNY |
 | AC |  |  | 8.88 CNY |
 | 爱心人士 |  | 很好用，加油 | 8.88 CNY |
 | **乐 |  |  | 8.88 CNY |
@@ -180,6 +181,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | **权 |  |  | 1.00 CNY |
 | **成 |  |  | 1.00 CNY |
 | *伟 |  |  | 1.00 CNY |
+| **明 |  |  | 1.00 CNY |
 
 <!-- DONORS_TABLE_EN_END -->
 
