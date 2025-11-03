@@ -183,6 +183,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | **成 |  |  | 1.00 CNY |
 | *伟 |  |  | 1.00 CNY |
 | **明 |  |  | 1.00 CNY |
+| 爱心人士 |  |  | 1.00 CNY |
 
 <!-- DONORS_TABLE_EN_END -->
 
