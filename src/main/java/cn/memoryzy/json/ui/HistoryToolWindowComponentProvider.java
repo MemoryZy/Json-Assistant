@@ -21,7 +21,7 @@ import cn.memoryzy.json.service.persistent.HistoryManager;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.HistoryState;
 import cn.memoryzy.json.service.persistent.state.JsonRecord;
-import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.decorator.EditorErrorPopupManager;
 import cn.memoryzy.json.ui.editor.EditExtension;
 import cn.memoryzy.json.ui.list.FilterableList;
 import cn.memoryzy.json.ui.listener.history.AddAction;
@@ -55,12 +55,14 @@ import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.FilteringListModel;
 import com.intellij.ui.speedSearch.NameFilteringListModel;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.messages.MessageBusConnection;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.StatusText;
 import com.intellij.util.ui.UIUtil;
@@ -122,7 +124,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     private final Editor recordEditor;
     private final JPanel updatePanel;
     private final ExtendableTextField nameTextField;
-    private TextEditorErrorPopupDecorator nameDecorator;
+    private EditorErrorPopupManager nameDecorator;
     private final JButton addButton;
     private final JButton updateButton;
     private final JButton cancelButton;
@@ -201,11 +203,20 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
 
     private JPanel createListPanel() {
-        Font chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
-        // Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        int fontSize = JBUIScale.scaleFontSize(13);
+        JBFont jbFont = UIUtils.jetBrainsMonoFont(fontSize);
+        Font chineseFont = UIUtils.getChineseFont(fontSize);
+
+        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        boolean isFontInitialized = null != font;
+
+        if (!isFontInitialized) {
+            // 先设置 JetBrains Mono，在搜索时，切换为
+            font = jbFont;
+        }
 
         // 上方编辑器，下方列表
-        showList.setFont(chineseFont);
+        showList.setFont(font);
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
@@ -228,11 +239,13 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                 SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
 
                 // 动态变更字体
-                // if (value.isMatched()) {
-                //     setFont(chineseFont);
-                // } else {
-                //     setFont(baseFont);
-                // }
+                if (!isFontInitialized) {
+                    if (value.isMatched()) {
+                        setFont(chineseFont);
+                    } else {
+                        setFont(jbFont);
+                    }
+                }
             }
         });
 
@@ -259,8 +272,17 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private JPanel createTreePanel() {
-        Font chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
-        // Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        int fontSize = JBUIScale.scaleFontSize(13);
+        JBFont jbFont = UIUtils.jetBrainsMonoFont(fontSize);
+        Font chineseFont = UIUtils.getChineseFont(fontSize);
+
+        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        boolean isFontInitialized = null != font;
+
+        if (!isFontInitialized) {
+            // 先设置 JetBrains Mono，在搜索时，切换为
+            font = jbFont;
+        }
 
         showTree.setDragEnabled(true);
         showTree.setExpandableItemsEnabled(true);
@@ -268,7 +290,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         // 设置单击展开节点
         showTree.setToggleClickCount(1);
         showTree.getEmptyText().setText(JsonAssistantBundle.messageOnSystem("dialog.history.empty.text"));
-        showTree.setFont(chineseFont);
+        showTree.setFont(font);
         showTree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         showTree.setCellRenderer(new ColoredTreeCellRenderer() {
             @Override
@@ -296,11 +318,13 @@ public class HistoryToolWindowComponentProvider implements Disposable {
                     tree.setToolTipText(null);
                 }
 
-                // if (historyNode.isMatched()) {
-                //     setFont(chineseFont);
-                // } else {
-                //     setFont(chineseFont);
-                // }
+                if (!isFontInitialized) {
+                    if (historyNode.isMatched()) {
+                        setFont(chineseFont);
+                    } else {
+                        setFont(jbFont);
+                    }
+                }
 
                 // SpeedSearchUtil.applySpeedSearchHighlighting(tree, this, true, selected);
             }
@@ -351,7 +375,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
     }
 
     private void configureUpdatePanel() {
-        nameDecorator = new TextEditorErrorPopupDecorator(windowPanel.getRootPane(), nameTextField);
+        nameDecorator = new EditorErrorPopupManager(windowPanel.getRootPane(), nameTextField);
 
         StatusText emptyText = nameTextField.getEmptyText();
         emptyText.setText("Name");

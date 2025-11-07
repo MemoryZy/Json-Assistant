@@ -38,6 +38,9 @@ repositories {
     maven {
         setUrl("https://maven.aliyun.com/nexus/content/groups/public/")
         setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
+        setUrl("https://maven.aliyun.com/repository/central")
+        setUrl("https://maven.aliyun.com/repository/public")
+        setUrl("https://maven.aliyun.com/repository/gradle-plugin")
     }
     mavenCentral()
     gradlePluginPortal()

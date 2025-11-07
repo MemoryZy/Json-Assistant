@@ -26,7 +26,9 @@ import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.*;
+import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -117,12 +119,23 @@ public class JsonStructureComponentProvider {
         // 重构树
         filterableTree.setWrapper(wrapper).update();
 
+        int fontSize = JBUIScale.scaleFontSize(13);
+        JBFont jbFont = UIUtils.jetBrainsMonoFont(fontSize);
+
+        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        boolean isFontInitialized = null != font;
+
+        if (!isFontInitialized) {
+            // 先设置 JetBrains Mono，在搜索时，切换为
+            font = jbFont;
+        }
+
         // 构建树
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
         tree.setToggleClickCount(1);
-        tree.setFont(UIUtils.JETBRAINS_MAPLE_MONO_FONT.deriveFont(12F));
-        tree.setCellRenderer(new StyleTreeCellRenderer());
+        tree.setFont(font);
+        tree.setCellRenderer(new StyleTreeCellRenderer(isFontInitialized, fontSize));
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
         tree.addMouseMotionListener(new MouseAdapter() {
             @Override
@@ -247,12 +260,14 @@ public class JsonStructureComponentProvider {
 
     private class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
 
+        private final boolean isFontInitialized;
         private final Font chineseFont;
-        // private final Font baseFont;
+        private final JBFont jbFont;
 
-        public StyleTreeCellRenderer() {
-            this.chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
-            // this.baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        public StyleTreeCellRenderer(boolean isFontInitialized, int fontSize) {
+            this.isFontInitialized = isFontInitialized;
+            this.jbFont = UIUtils.jetBrainsMonoFont(fontSize);
+            this.chineseFont = UIUtils.getChineseFont(fontSize);
         }
 
         @Override
@@ -311,11 +326,13 @@ public class JsonStructureComponentProvider {
             renderPathHint(jsonNode, node);
 
             // 7.根据匹配切换字体
-            // if (jsonNode.isMatched()) {
-            //     setFont(chineseFont);
-            // } else {
-            //     setFont(baseFont);
-            // }
+            if (!isFontInitialized) {
+                if (jsonNode.isMatched()) {
+                    setFont(chineseFont);
+                } else {
+                    setFont(jbFont);
+                }
+            }
         }
 
 

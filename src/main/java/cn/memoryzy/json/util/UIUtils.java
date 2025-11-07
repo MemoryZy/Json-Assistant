@@ -1,12 +1,20 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.ZipUtil;
+import cn.hutool.crypto.digest.DigestUtil;
+import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.constant.ColorHolder;
+import cn.memoryzy.json.constant.PathManager;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.ui.list.FilterableListWithField;
 import cn.memoryzy.json.ui.tree.BaseNode;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.notification.impl.NotificationsManagerImpl;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
@@ -44,6 +52,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
@@ -53,6 +63,8 @@ import java.util.*;
  * @since 2024/7/30
  */
 public class UIUtils {
+
+    private static final Logger LOG = Logger.getInstance(UIUtils.class);
 
     /**
      * Json 编辑器卡片名称
@@ -74,10 +86,41 @@ public class UIUtils {
      */
     public static final String JSON_GRID_CARD_NAME = "grid";
 
+
     /**
      * JetBrains Maple Mono 融合字体（支持中文）
      */
-    public static final Font JETBRAINS_MAPLE_MONO_FONT = getJetBrainsMapleMonoFont(13);
+    public static Font JETBRAINS_MAPLE_MONO_FONT = null;
+
+    /**
+     * JetBrains Maple Mono 融合字体名称
+     */
+    public static final String JETBRAINS_MAPLE_MONO_FONT_NAME = "JetBrainsMapleMono-Light.ttf";
+
+    /**
+     * 字体压缩包路径
+     */
+    private static final String JETBRAINS_MAPLE_MONO_FONT_ZIP_FILE_PATH = PathManager.FONTS_DIRECTORY + File.separator + "JetBrainsMapleMono-XX-NR-XX.zip";
+
+    /**
+     * JetBrains Maple Mono 融合字体路径
+     */
+    private static final String JETBRAINS_MAPLE_MONO_FONT_FILE_PATH = PathManager.FONTS_DIRECTORY + File.separator + JETBRAINS_MAPLE_MONO_FONT_NAME;
+
+    /**
+     * 字体压缩包的 SHA-256
+     */
+    private static final String EXPECTED_FONT_ZIP_HASH = "8139235ee73b71b156f764b0e23ffeb02e3fdb5cb7701216ac34284661d11e1b";
+
+    /**
+     * 字体的 SHA-256
+     */
+    private static final String EXPECTED_FONT_HASH = "8fc48787877be1f576c31feb50f5b20f7b0050652e5a17b459047cb21682d727";
+
+    /**
+     * 最大下载重试次数
+     */
+    private static final int MAX_RETRIES = 3;
 
     /**
      * 生成 IDE 默认编辑器组件
@@ -578,20 +621,117 @@ public class UIUtils {
      *
      * @return 字体
      */
-    public static Font getJetBrainsMapleMonoFont(float size) {
-        // 支持中文的字体：
-        // DialogInput、Monospaced、SansSerif、SimHei、SimSun、Microsoft JhengHei、Microsoft JhengHei UI
-        // Microsoft YaHei UI、Source Han Sans SC Medium、Serif
-
-        // return PlatformUtil.isNewUi() ? jetBrainsMonoFont(size) : UIUtil.getTreeFont().deriveFont((float) size);
-        // return JBUI.Fonts.create("Serif", size).asBold();
-        // return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
-
-        // return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
-
-        return PlatformUtil.loadFont("fonts", "JetBrainsMapleMono-Light.ttf", size);
-
-        // return JBUI.Fonts.create("Microsoft JhengHei UI", (int) size);
-        // return UIUtil.getListFont().deriveFont(size);
+    public static Font getChineseFont(float size) {
+        return UIUtil.getLabelFont(UIUtil.FontSize.NORMAL).deriveFont(size);
     }
+
+
+    /**
+     * 加载 JetBrains Maple Mono 字体
+     */
+    public static void loadAndDownloadJetbrainsMapleMonoFont() {
+        // 建立一系列的父目录
+        createFontsDirectories();
+
+        // 检测字体是否存在
+        File file = new File(JETBRAINS_MAPLE_MONO_FONT_FILE_PATH);
+        if (FileUtil.exist(file) && EXPECTED_FONT_HASH.equals(DigestUtil.sha256Hex(file))) {
+            loadJetbrainsMapleMonoFont();
+
+        } else {
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                // 定义循环初始条件
+                File zipFile = new File(JETBRAINS_MAPLE_MONO_FONT_ZIP_FILE_PATH);
+                boolean success = false;
+                int retryCount = 0;
+
+                // 带重试机制的下载验证流程
+                while (!success && retryCount < MAX_RETRIES) {
+                    try {
+                        retryCount++;
+
+                        // 通过网络请求拉取字体压缩包
+                        if (!downloadFontZip(zipFile)) {
+                            LOG.warn("## 字体下载失败，尝试次数: " + retryCount);
+                            continue;
+                        }
+
+                        // 验证 SHA-256，防止在网络传输中出现问题
+                        if (!Objects.equals(EXPECTED_FONT_ZIP_HASH, DigestUtil.sha256Hex(zipFile))) {
+                            LOG.warn("## SHA-256验证失败，尝试次数: " + retryCount);
+                            // 删除无效文件
+                            FileUtil.del(zipFile);
+                            continue;
+                        }
+
+                        // 验证成功后，解压压缩包，并加载字体文件
+                        if (extractFontFromZip(zipFile)) {
+                            success = true;
+                            LOG.info("## 字体加载成功");
+                        }
+
+                    } catch (Exception e) {
+                        LOG.warn("## 字体处理过程出错: " + e.getMessage(), e);
+                        if (zipFile.exists()) {
+                            FileUtil.del(zipFile);
+                        }
+                    }
+                }
+
+                if (success) {
+                    loadJetbrainsMapleMonoFont();
+                } else {
+                    LOG.warn("## 字体加载失败，已达最大重试次数: " + MAX_RETRIES);
+                }
+            });
+        }
+    }
+
+    private static boolean downloadFontZip(File outputFile) {
+        String url = PlatformUtil.isChineseLocale() ? Urls.GITEE_FONT_URL : Urls.GITHUB_FONT_URL;
+        // 下载并写入到指定位置
+        long size = HttpUtil.downloadFile(url, outputFile);
+        // 验证字节大小
+        return size > 8000000;
+    }
+
+    private static boolean extractFontFromZip(File zipFile) {
+        // 解压到指定目录下，不保留原压缩目录名
+        try {
+            // 先清空指定目录
+            File file = PathManager.FONTS_DIRECTORY.toFile();
+            FileUtil.clean(file);
+            // 解压
+            ZipUtil.unzip(zipFile, file);
+        } catch (Exception e) {
+            LOG.warn("## 解压失败: " + e.getMessage(), e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private static synchronized void loadJetbrainsMapleMonoFont() {
+        // 存在则加载出来
+        try {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, new File(JETBRAINS_MAPLE_MONO_FONT_FILE_PATH));
+            // 设置默认大小
+            font = font.deriveFont(13f);
+
+            // 给 JETBRAINS_MAPLE_MONO_FONT 变量赋值
+            JETBRAINS_MAPLE_MONO_FONT = font;
+
+        } catch (Exception e) {
+            LOG.warn("## 字体加载失败: " + e.getMessage(), e);
+        }
+    }
+
+    private static void createFontsDirectories() {
+        try {
+            PathManager.createFontsDirectoriesIfNotExists();
+        } catch (IOException e) {
+            throw new RuntimeException("Fonts directory creation failed!", e);
+        }
+    }
+
 }

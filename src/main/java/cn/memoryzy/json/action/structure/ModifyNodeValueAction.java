@@ -9,7 +9,7 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.TreeStructureState;
-import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.decorator.EditorErrorPopupManager;
 import cn.memoryzy.json.ui.editor.ExpandableEditorTextField;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
 import cn.memoryzy.json.ui.tree.JsonNode;
@@ -70,7 +70,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
 
     private Balloon currentBalloon;
     private ExpandableEditorTextField expandableTextField;
-    private TextEditorErrorPopupDecorator decorator;
+    private EditorErrorPopupManager decorator;
     private JBCheckBox sourceFileCheckBox;
     private JButton saveButton;
 
@@ -112,7 +112,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
         JRootPane rootPane = component.getRootPane();
         rootPane.setDefaultButton(saveButton);
         this.expandableTextField.requestFocus();
-        this.decorator = new TextEditorErrorPopupDecorator(rootPane, expandableTextField);
+        this.decorator = new EditorErrorPopupManager(rootPane, expandableTextField);
     }
 
     private JComponent createComponent(Project project, JsonNode node) {

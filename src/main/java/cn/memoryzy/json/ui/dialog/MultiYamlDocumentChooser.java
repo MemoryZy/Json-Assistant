@@ -15,6 +15,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.util.ui.JBFont;
@@ -54,14 +55,16 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        Font chineseFont = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
-        // Font baseFont = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        if (null == font) {
+            font = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        }
 
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
         showTextField.setFont(UIUtils.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
-        showList.setFont(chineseFont);
+        showList.setFont(font);
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());

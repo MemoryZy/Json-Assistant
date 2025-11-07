@@ -20,17 +20,19 @@ import java.awt.event.ComponentEvent;
 import java.util.Objects;
 
 /**
+ * 为文本编辑器组件（如 JTextField, EditorTextField等）装饰一个错误或警告提示弹窗
+ *
  * @author Memory
  * @since 2024/1/26
  */
-public class TextEditorErrorPopupDecorator {
+public class EditorErrorPopupManager {
 
     private final JComponent myTextField;
     private RelativePoint myErrorShowPoint;
     private AbstractPopup myErrorPopup;
     private Dimension hintSize;
 
-    public TextEditorErrorPopupDecorator(JRootPane rootPane, JComponent myTextField) {
+    public EditorErrorPopupManager(JRootPane rootPane, JComponent myTextField) {
         this.myTextField = myTextField;
         if (Objects.nonNull(rootPane)) {
             initRootPaneListener(rootPane);

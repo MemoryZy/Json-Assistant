@@ -2,17 +2,18 @@
 package cn.memoryzy.json.ui.tree;
 
 import cn.hutool.core.util.ReflectUtil;
-import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.ide.ui.UISettings;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Condition;
 import com.intellij.openapi.util.Conditions;
-import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.ui.*;
+import com.intellij.ui.DocumentAdapter;
+import com.intellij.ui.LightColors;
+import com.intellij.ui.SearchTextField;
+import com.intellij.ui.TreeSpeedSearch;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.speedSearch.SpeedSearch;
 import com.intellij.ui.speedSearch.SpeedSearchSupply;
@@ -53,10 +54,6 @@ import java.util.*;
  * @since 2025/8/20
  */
 public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends BaseNode> {
-
-    @SuppressWarnings("unchecked")
-    private static final Key<String> SEARCH_TEXT_KEY =
-            (Key<String>) JsonAssistantUtil.readStaticFinalFieldValue(SpeedSearchBase.class, "SEARCH_TEXT_KEY");
 
     public static final SpeedSearchSupply DUMMY_SEARCH = new SpeedSearchSupply() {
         @Nullable

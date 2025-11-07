@@ -3,7 +3,7 @@ package cn.memoryzy.json.ui.dialog;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.UrlType;
-import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.decorator.EditorErrorPopupManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
@@ -27,8 +27,8 @@ public class DiffNameDialog extends DialogWrapper {
     private final JBLabel leftSourceLabel;
     private final JBLabel rightSourceLabel;
 
-    private final TextEditorErrorPopupDecorator leftErrorDecorator;
-    private final TextEditorErrorPopupDecorator rightErrorDecorator;
+    private final EditorErrorPopupManager leftErrorDecorator;
+    private final EditorErrorPopupManager rightErrorDecorator;
 
     public DiffNameDialog(JBLabel leftSourceLabel, JBLabel rightSourceLabel) {
         super((Project) null);
@@ -36,8 +36,8 @@ public class DiffNameDialog extends DialogWrapper {
         this.rightSourceLabel = rightSourceLabel;
 
         JRootPane rootPane = getRootPane();
-        this.leftErrorDecorator = new TextEditorErrorPopupDecorator(rootPane, leftSideTextField);
-        this.rightErrorDecorator = new TextEditorErrorPopupDecorator(rootPane, rightSideTextField);
+        this.leftErrorDecorator = new EditorErrorPopupManager(rootPane, leftSideTextField);
+        this.rightErrorDecorator = new EditorErrorPopupManager(rootPane, rightSideTextField);
 
         setTitle(JsonAssistantBundle.messageOnSystem("dialog.diffName.title"));
         init();

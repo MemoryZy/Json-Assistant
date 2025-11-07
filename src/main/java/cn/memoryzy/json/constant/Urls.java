@@ -37,6 +37,10 @@ public class Urls {
     public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";
     public static final String PLUGIN_UPDATE_DETAILS_LINK = "https://plugins.jetbrains.com/api/plugins/24738/updates";
 
+    public static final String GITHUB_FONT_URL = "https://github.com/MemoryZy/JetBrainsMapleMono-Font-Distribution/releases/download/v1.0.0/JetBrainsMapleMono-XX-NR-XX.zip";
+    public static final String GITEE_FONT_URL = "https://gitee.com/MemoryZy/JetBrainsMapleMono-Font-Distribution/releases/download/v1.0.0/JetBrainsMapleMono-XX-NR-XX.zip";
+
+
     public static final String FRONT_URL = "http://0.0.0.0";
 
 }

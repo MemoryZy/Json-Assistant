@@ -24,7 +24,7 @@ import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.SerializationSettings;
 import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import cn.memoryzy.json.ui.component.ActionGroupPopupButton;
-import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.decorator.EditorErrorPopupManager;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
@@ -91,8 +91,8 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private final JBTextField classNameTextField;
     private final EditorTextField jsonTextField;
-    private final TextEditorErrorPopupDecorator classNameErrorDecorator;
-    private final TextEditorErrorPopupDecorator jsonErrorDecorator;
+    private final EditorErrorPopupManager classNameErrorDecorator;
+    private final EditorErrorPopupManager jsonErrorDecorator;
 
     private final Project project;
     private final PsiDirectory directory;
@@ -111,8 +111,8 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         this.classNameTextField = new JBTextField();
         this.jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
-        this.classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
-        this.jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
+        this.classNameErrorDecorator = new EditorErrorPopupManager(getRootPane(), classNameTextField);
+        this.jsonErrorDecorator = new EditorErrorPopupManager(getRootPane(), jsonTextField);
 
         if (this.deserializationState == null) {
             LOG.error("[Json Assistant] Deserialized configuration object is empty!");
