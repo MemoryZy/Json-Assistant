@@ -9,6 +9,7 @@ on:
       - 'CHANGELOG.md'      # 监控变更日志
       - 'DESCRIPTION.md'    # 监控项目描述文件
       - 'ANNOUNCEMENTS'    # 公告文件
+      - 'NOTICE'    # NOTICE
   workflow_dispatch:
 
 jobs:
