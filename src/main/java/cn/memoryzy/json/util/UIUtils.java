@@ -93,6 +93,11 @@ public class UIUtils {
     public static Font JETBRAINS_MAPLE_MONO_FONT = null;
 
     /**
+     * JetBrains Maple Mono 融合字体压缩包名
+     */
+    public static final String JETBRAINS_MAPLE_MONO_ZIP_NAME = "JetBrainsMapleMono-XX-NR-XX.zip";
+
+    /**
      * JetBrains Maple Mono 融合字体名称
      */
     public static final String JETBRAINS_MAPLE_MONO_FONT_NAME = "JetBrainsMapleMono-Light.ttf";
@@ -100,7 +105,7 @@ public class UIUtils {
     /**
      * 字体压缩包路径
      */
-    private static final String JETBRAINS_MAPLE_MONO_FONT_ZIP_FILE_PATH = PathManager.FONTS_DIRECTORY + File.separator + "JetBrainsMapleMono-XX-NR-XX.zip";
+    private static final String JETBRAINS_MAPLE_MONO_FONT_ZIP_FILE_PATH = PathManager.BASE_DIRECTORY + File.separator + JETBRAINS_MAPLE_MONO_ZIP_NAME;
 
     /**
      * JetBrains Maple Mono 融合字体路径
@@ -703,6 +708,8 @@ public class UIUtils {
             FileUtil.clean(file);
             // 解压
             ZipUtil.unzip(zipFile, file);
+            // 移动压缩包
+            FileUtil.move(zipFile, new File(PathManager.FONTS_DIRECTORY + File.separator + JETBRAINS_MAPLE_MONO_ZIP_NAME), true);
         } catch (Exception e) {
             LOG.warn("## 解压失败: " + e.getMessage(), e);
             return false;

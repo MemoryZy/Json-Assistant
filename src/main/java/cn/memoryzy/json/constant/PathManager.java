@@ -22,6 +22,14 @@ public class PathManager {
     private static final String USER_HOME_PATH = System.getProperty("user.home");
 
     /**
+     * 基础目录
+     *
+     * <p>- Windows: "%LOCALAPPDATA%\MemoryZy\"</p>
+     * <p>- Other OS: "$XDG_DATA_HOME/MemoryZy/" or "~/.MemoryZy/"</p>
+     */
+    public static final Path BASE_DIRECTORY = getBaseDirectory();
+
+    /**
      * The data root directory of this plugin. Usually at the following locations:
      *
      *
@@ -77,56 +85,32 @@ public class PathManager {
     }
 
 
+    private static Path getBaseDirectory() {
+        String envVarValue = System.getenv(SystemInfo.isWindows ? "LOCALAPPDATA" : "XDG_DATA_HOME");
+        return StrUtil.isNotBlank(envVarValue)
+                ? Paths.get(envVarValue, "MemoryZy")
+                : Paths.get(USER_HOME_PATH, ".MemoryZy");
+    }
 
     private static Path getDataDirectory() {
-        String envVarValue = System.getenv(SystemInfo.isWindows ? "LOCALAPPDATA" : "XDG_DATA_HOME");
-        Path directory;
-
-        if (StrUtil.isNotBlank(envVarValue)) {
-            directory = Paths.get(envVarValue, "MemoryZy", DATA_DIRECTORY_NAME);
-        } else {
-            directory = Paths.get(USER_HOME_PATH, ".MemoryZy", DATA_DIRECTORY_NAME);
-        }
-
-        return directory;
+        Path baseDirectory = getBaseDirectory();
+        return baseDirectory.resolve(DATA_DIRECTORY_NAME);
     }
 
     private static Path getFontsDirectory() {
-        String envVarValue = System.getenv(SystemInfo.isWindows ? "LOCALAPPDATA" : "XDG_DATA_HOME");
-        Path directory;
-
-        if (StrUtil.isNotBlank(envVarValue)) {
-            directory = Paths.get(envVarValue, "MemoryZy", FONTS_DIRECTORY_NAME);
-        } else {
-            directory = Paths.get(USER_HOME_PATH, ".MemoryZy", FONTS_DIRECTORY_NAME);
-        }
-
-        return directory;
+        Path baseDirectory = getBaseDirectory();
+        return baseDirectory.resolve(FONTS_DIRECTORY_NAME);
     }
 
     private static Path getLibDirectory() {
-        String envVarValue = System.getenv(SystemInfo.isWindows ? "LOCALAPPDATA" : "XDG_DATA_HOME");
-        Path directory;
-
-        if (StrUtil.isNotBlank(envVarValue)) {
-            directory = Paths.get(envVarValue, "MemoryZy", LIB_DIRECTORY_NAME);
-        } else {
-            directory = Paths.get(USER_HOME_PATH, ".MemoryZy", LIB_DIRECTORY_NAME);
-        }
-
-        return directory;
+        Path baseDirectory = getBaseDirectory();
+        return baseDirectory.resolve(LIB_DIRECTORY_NAME);
     }
 
     private static Path getTranslationDirectory() {
         String envVarValue = System.getenv(SystemInfo.isWindows ? "LOCALAPPDATA" : "XDG_DATA_HOME");
-        Path directory;
-
-        if (StrUtil.isNotBlank(envVarValue)) {
-            directory = Paths.get(envVarValue, "Yii.Guxing", TRANSLATION_DIRECTORY_NAME);
-        } else {
-            directory = Paths.get(USER_HOME_PATH, "." + TRANSLATION_DIRECTORY_NAME);
-        }
-
-        return directory;
+        return StrUtil.isNotBlank(envVarValue)
+                ? Paths.get(envVarValue, "Yii.Guxing", TRANSLATION_DIRECTORY_NAME)
+                : Paths.get(USER_HOME_PATH, "." + TRANSLATION_DIRECTORY_NAME);
     }
 }
