@@ -26,6 +26,7 @@ on:
       - 'DESCRIPTION.md'
       - 'ANNOUNCEMENTS'
       - 'donors.json'
+      - 'NOTICE'
 
   # Trigger the workflow on any pull request
   pull_request:
@@ -38,6 +39,7 @@ on:
       - 'DESCRIPTION.md'
       - 'ANNOUNCEMENTS'
       - 'donors.json'
+      - 'NOTICE'
 
   # 可手动操控
   workflow_dispatch:
