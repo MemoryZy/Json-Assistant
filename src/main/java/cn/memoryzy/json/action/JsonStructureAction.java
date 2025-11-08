@@ -120,7 +120,7 @@ public class JsonStructureAction extends DumbAwareAction implements UpdateInBack
                                                 String cardName) {
 
         // 原本的工具窗口窗口（Json Assistant）展示
-        ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantToolWindow(project);
+        ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantWindow(project);
 
         // 如果是 Toolbar Action 或 ToolWindow 的编辑器内打开的，那么就获取当前选中的标签页
         Content content = ToolWindowUtil.getSelectedContent(toolWindow);

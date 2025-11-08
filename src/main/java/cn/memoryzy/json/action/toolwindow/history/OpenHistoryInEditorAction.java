@@ -42,7 +42,7 @@ public class OpenHistoryInEditorAction extends DumbAwareAction implements Update
         Project project = getEventProject(e);
         if (null == project) return;
 
-        ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantToolWindow(project);
+        ToolWindowEx toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantWindow(project);
         Content content = ToolWindowUtil.getSelectedContent(toolWindow);
         JsonAssistantToolWindowPanel panelOnContent = ToolWindowUtil.getPanelOnContent(content);
         boolean hasText = Optional.ofNullable(panelOnContent)

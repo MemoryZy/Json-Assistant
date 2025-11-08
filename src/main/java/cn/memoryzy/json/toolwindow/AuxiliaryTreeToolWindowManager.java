@@ -108,7 +108,7 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         }
 
         // 将 Json 编辑器窗口移至右上角
-        ToolWindowUtil.moveWindowToRightTop(ToolWindowUtil.getJsonAssistantToolWindow(project));
+        ToolWindowUtil.moveWindowToRightTop(ToolWindowUtil.getJsonAssistantWindow(project));
 
         // 辅助窗口只允许打开一个，会自动隐藏其他的窗口
         toolWindow.show();

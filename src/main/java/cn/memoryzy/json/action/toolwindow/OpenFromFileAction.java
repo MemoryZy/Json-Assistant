@@ -163,7 +163,7 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
                                                       String newText,
                                                       boolean shouldApplyToSource) {
         String tag = shouldApplyToSource ? JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.sourceFile.tag") : JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.copy.tag");
-        if (null == toolWindow) toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantToolWindow(project);
+        if (null == toolWindow) toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantWindow(project);
         Content content = ToolWindowUtil.addNewContent(project, toolWindow, ContentFactory.SERVICE.getInstance(), selectFile);
         content.setDisplayName(ToolWindowUtil.generateTagName(toolWindow.getContentManager(), JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.title") + " (" + tag + ")"));
 

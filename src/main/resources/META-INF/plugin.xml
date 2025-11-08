@@ -132,6 +132,10 @@
         <action id="JsonAssistant.Action.LengthAscAction" class="cn.memoryzy.json.action.sort.LengthAscAction"/>
         <action id="JsonAssistant.Action.LengthDescAction" class="cn.memoryzy.json.action.sort.LengthDescAction"/>
 
+        <action id="JsonAssistant.Action.OpenToolWindowAction" class="cn.memoryzy.json.action.toolwindow.OpenToolWindowAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt 9"/>
+        </action>
+
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
 <!--            <keyboard-shortcut keymap="$default" first-keystroke="alt C"/>-->

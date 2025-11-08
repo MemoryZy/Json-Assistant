@@ -47,7 +47,7 @@ public class ToolWindowUtil {
      */
     public static void addNewContentWithEditorContentIfNeeded(Project project, String processedText, FileType editorFileType, String tabName) {
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-        ToolWindowEx toolWindow = (ToolWindowEx) getJsonAssistantToolWindow(project);
+        ToolWindowEx toolWindow = (ToolWindowEx) getJsonAssistantWindow(project);
         Content mainContent = getInitialContent(toolWindow);
         EditorEx editor = getEditorOnContent(mainContent);
 
@@ -69,7 +69,7 @@ public class ToolWindowUtil {
      * @param project 项目实例，用于确定工具窗口所属的项目
      * @return ToolWindow 返回找到或新创建的工具窗口实例
      */
-    public static ToolWindow getJsonAssistantToolWindow(Project project) {
+    public static ToolWindow getJsonAssistantWindow(Project project) {
         return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID);
     }
 
@@ -263,7 +263,7 @@ public class ToolWindowUtil {
             if (contentCount == 0) {
                 toolWindow.setAvailable(false);
                 // 当辅助窗口被关闭时，再将Json 编辑器窗口移回右下角
-                ToolWindowUtil.moveWindowToRightBottom(ToolWindowUtil.getJsonAssistantToolWindow(project));
+                ToolWindowUtil.moveWindowToRightBottom(ToolWindowUtil.getJsonAssistantWindow(project));
             }
         };
     }
