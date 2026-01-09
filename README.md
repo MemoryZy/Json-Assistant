@@ -167,6 +167,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | **乐 |  |  | 8.88 CNY |
 | 晴空一鹤 |  | 加个鸡腿～ | 8.88 CNY |
 | 🤨🤪 |  |  | 8.88 CNY |
+| 小白的旅途 |  | 谢谢大佬的开源！ | 8.88 CNY |
 | ت |  | Json插件很好用，加油 | 6.66 CNY |
 | 广柔散人 |  | good | 6.66 CNY |
 | One |  |  | 6.66 CNY |
