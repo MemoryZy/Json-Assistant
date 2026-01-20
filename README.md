@@ -179,6 +179,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | 可惜 |  |  | 6.66 CNY |
 | 缘 |  | 谢谢 | 6.66 CNY |
 | 爱心人士 |  | 很方便补充单测哈哈 | 6.66 CNY |
+| 刘帅 |  |  | 6.66 CNY |
 | **成 |  |  | 6.60 CNY |
 | *瑞 |  |  | 5.00 CNY |
 | JiaoJunWei |  |  | 5.00 CNY |
