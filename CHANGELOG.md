@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+- 改变历史记录窗口样式，去除列表样式，只保留树样式。
+- 修改历史记录存储方式，防止丢失。
+- 增加实时显示 JSON 路径的功能。
+- 用户体验优化与改进。
+- 兼容性优化。
+- Change the style of the history record window, remove the list style and only retain the tree style.
+- Modify the storage method of the history records to prevent loss.
+- Add the function of real-time display of JSON paths.
+- Optimize and improve user experience.
+- Optimize compatibility.
+
 ## [1.8.7] - 2025-09-12
 
 - 优化历史记录窗口。
