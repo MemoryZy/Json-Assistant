@@ -1,6 +1,5 @@
 package cn.memoryzy.json.service.persistent.state;
 
-import cn.memoryzy.json.enums.HistoryDisplayMode;
 import com.intellij.util.xmlb.annotations.Tag;
 
 /**
@@ -18,11 +17,6 @@ public class HistoryState {
     private boolean enableHistory = true;
 
     /**
-     * 历史记录显示类型
-     */
-    private HistoryDisplayMode historyDisplayMode = HistoryDisplayMode.TREE;
-
-    /**
      * 是否自动记录
      */
     private boolean autoRecordHistory = false;
@@ -32,10 +26,6 @@ public class HistoryState {
         this.enableHistory = enableHistory;
     }
 
-    public void setHistoryDisplayMode(HistoryDisplayMode historyDisplayMode) {
-        this.historyDisplayMode = historyDisplayMode;
-    }
-
     public void setAutoRecordHistory(boolean autoRecordHistory) {
         this.autoRecordHistory = autoRecordHistory;
     }
@@ -43,10 +33,6 @@ public class HistoryState {
 
     public boolean isEnableHistory() {
         return enableHistory;
-    }
-
-    public HistoryDisplayMode getHistoryDisplayMode() {
-        return historyDisplayMode;
     }
 
     public boolean isAutoRecordHistory() {

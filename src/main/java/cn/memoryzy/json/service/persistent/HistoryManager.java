@@ -1,111 +1,171 @@
 package cn.memoryzy.json.service.persistent;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.PathManager;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.state.JsonGroup;
 import cn.memoryzy.json.service.persistent.state.JsonRecord;
+import cn.memoryzy.json.service.persistent.state.RecordSerialization;
+import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.components.*;
+import com.intellij.openapi.components.Service;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.util.xmlb.annotations.Attribute;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * 每个项目都有一个实例
+ *
  * @author Memory
- * @since 2025/6/18
+ * @since 2025/12/12
  */
 @Service(Service.Level.PROJECT)
-@State(name = "Json History", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_HISTORY_FILE, roamingType = RoamingType.DISABLED)})
-public final class HistoryManager implements PersistentStateComponent<HistoryManager>, Disposable {
+public final class HistoryManager implements Disposable {
+
+    private final Project project;
+
+    private static final String HISTORIES_FILE_NAME = "histories.json";
 
     /**
-     * 最大保留记录数
+     * 项目下的插件目录：
+     * <br></br>
+     * <p>- DIRECTORY_BASED: %PROJECT_DIR%/.idea/JsonAssistant/</p>
+     * <p>- FILE_BASE: %LOCALAPPDATA%/MemoryZy/JsonAssistantPlugin/Projects/%PROJECT_DIR%/</p>
      */
-    private static final int MAX_HISTORY_ITEMS = 50;
+    private final Path projectPluginDirectory;
+
+    /**
+     * 记录存放目录：
+     * <br></br>
+     * <p>- DIRECTORY_BASED: %PROJECT_DIR%/.idea/JsonAssistant/.histories/</p>
+     * <p>- FILE_BASE: %LOCALAPPDATA%/MemoryZy/JsonAssistantPlugin/Projects/%PROJECT_DIR%/.histories/</p>
+     */
+    private final Path projectHistoriesDirectory;
+
+    /**
+     * 记录信息文件：
+     * <br></br>
+     * <p>- DIRECTORY_BASED: %PROJECT_DIR%/.idea/JsonAssistant/histories.json</p>
+     * <p>- FILE_BASE: %LOCALAPPDATA%/MemoryZy/JsonAssistantPlugin/Projects/%PROJECT_DIR%/histories.json</p>
+     */
+    private final Path projectHistoriesFilePath;
+
+    /**
+     * 记录文件所在的目录
+     */
+    @JsonIgnore
+    private volatile VirtualFile recordsDir;
+
+    /**
+     * 记录信息文件
+     */
+    private final VirtualFile historiesFile;
+
+
+    /**
+     * 最后存储时间
+     */
+    private Date lastSaved;
+
+    /**
+     * 历史记录信息
+     */
+    private List<JsonRecord> records;
+
+    /**
+     * 历史记录分组信息
+     */
+    private List<JsonGroup> groups;
+
+
+    public HistoryManager(Project project) {
+        this.project = project;
+        this.projectPluginDirectory = PathManager.createAndGetProjectPluginDirectory(project);
+        this.projectHistoriesDirectory = PathManager.createAndGetProjectHistoriesDirectory(projectPluginDirectory);
+        this.projectHistoriesFilePath = projectPluginDirectory.resolve(HISTORIES_FILE_NAME);
+        this.recordsDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(projectHistoriesDirectory);
+        this.historiesFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(projectHistoriesFilePath);
+        // 该实例初始化时执行，补充初始数据
+        loadState();
+    }
+
+
+    // TODO 给记录增加自定义分组功能，并且可以定义某个记录是全局的还是只属于项目的
 
     public static HistoryManager getInstance(Project project) {
         return project.getService(HistoryManager.class);
     }
 
-    /**
-     * 配置版本
-     */
-    private Integer version = JsonAssistantPlugin.CONFIG_VERSION;
 
-    /**
-     * 历史记录列表（双向队列）
-     */
-    private Deque<JsonRecord> histories = new ArrayDeque<>(MAX_HISTORY_ITEMS);
+    // ---------------------------------- 记录/分组操作 ---------------------------------- //
 
-    @Override
-    public @NotNull HistoryManager getState() {
-        return this;
-    }
+    public synchronized JsonRecord addRecord(String content, JsonWrapper wrapper, String fileExtension, boolean checkRepeat) {
+        if (checkRepeat && existsRecord(wrapper)) return null;
 
-    @Override
-    public void loadState(@NotNull HistoryManager state) {
-        this.histories = state.histories;
-        // 确保加载后不超出限制
-        trimHistory();
-    }
-
-
-    /**
-     * 添加新记录到历史
-     *
-     * @param record 记录对象
-     */
-    public synchronized JsonRecord addEntry(JsonRecord record) {
-        JsonWrapper wrapper = record.getWrapper();
-        // 避免添加重复记录
-        if (!exists(wrapper)) {
-            // 计算并补充属性
-            populateMissingAttributes(record);
-            // 添加
-            histories.addLast(record);
-            // 裁剪
-            trimHistory();
-        }
-
+        JsonRecord record = new JsonRecord();
+        record.setWrapper(wrapper);
+        record.setFileExtension(fileExtension);
+        record.setDisplayText(getShortText(wrapper));
+        addRecord(record, content, true);
         return record;
     }
 
+    public void addRecord(JsonRecord record, boolean writeState) {
+        addRecord(record, null, writeState);
+    }
 
-    /**
-     * 获取最近的历史记录（倒序：最新记录在前）
-     */
-    public synchronized List<JsonRecord> getRecentHistories() {
-        // 将历史记录拷贝到临时列表（避免直接操作原始数据）
-        List<JsonRecord> recent = new ArrayList<>(histories);
-        recent.sort(Comparator.comparingLong(JsonRecord::getUpdateTime).reversed());
-        return recent;
+    public void addRecord(JsonRecord record, String content, boolean writeState) {
+        record.setDeleted(false);
+        if (StrUtil.isBlank(record.getId())) record.setId(IdUtil.simpleUUID());
+        if (null == record.getCreatedTime()) record.setCreatedTime(new Date());
+        if (null == record.getUpdatedTime()) record.setUpdatedTime(new Date());
+        record.setSourceFile(createSourceFile(record.getId(), record.getFileExtension(), content));
+        records.add(record);
+
+        // 与分组建立联系
+        associateRecordWithGroup(record.getParentId(), record.getId());
+
+        if (writeState) {
+            // 写入文件
+            saveState();
+        }
+    }
+
+    public JsonRecord findRecord(String id) {
+        return records.stream().filter(el -> el.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    public List<JsonRecord> findRecords(Collection<String> ids) {
+        if (CollUtil.isEmpty(ids)) return new ArrayList<>();
+        return records.stream().filter(el -> ids.contains(el.getId())).collect(Collectors.toList());
     }
 
     /**
-     * 将历史记录以更新时间进行分组
+     * 查找相同结构的记录
      *
-     * @return 分组结果
+     * @param wrapper 结构
+     * @return 记录
      */
-    public synchronized Map<String, List<JsonRecord>> groupByUpdateTime() {
-        return histories.stream().collect(Collectors.groupingBy(record -> {
-            String timeStr = DateUtil.format(new Date(record.getUpdateTime()), DatePattern.NORM_DATE_FORMATTER);
-            return timeStr != null ? timeStr : PluginConstant.UNKNOWN;
-        }));
-    }
-
-    /**
-     * 清空所有历史记录
-     */
-    public synchronized void clearHistory() {
-        histories.clear();
+    public JsonRecord findRecord(JsonWrapper wrapper) {
+        return records.stream().filter(record -> null != record.getWrapper() && Objects.equals(wrapper, record.getWrapper())).findFirst().orElse(null);
     }
 
     /**
@@ -114,102 +174,370 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
      * @param wrapper 要添加的元素
      * @return 存在则返回true，不存在则返回false
      */
-    public boolean exists(JsonWrapper wrapper) {
-        return histories.stream().anyMatch(record -> Objects.equals(wrapper, record.getWrapper()));
+    public boolean existsRecord(JsonWrapper wrapper) {
+        return null != findRecord(wrapper);
+    }
+
+    public boolean containsRecord(String recordId) {
+        return null != findRecord(recordId);
     }
 
 
-    /**
-     * 查找相同结构的记录
-     *
-     * @param wrapper 结构
-     * @return 记录
-     */
-    public JsonRecord find(JsonWrapper wrapper) {
-        return histories.stream().filter(record -> Objects.equals(wrapper, record.getWrapper())).findFirst().orElse(null);
+    public void delRecord(JsonRecord record) {
+        // 删除记录
+        records.removeIf(el -> Objects.equals(el.getId(), record.getId()));
+        detachRecordFromGroup(record.getParentId(), record.getId());
+        // 删除源文件
+        delSourceFile(record);
+        // 写入文件
+        saveState();
     }
 
-    /**
-     * 查找相同结构的记录（排除某个元素）
-     *
-     * @param wrapper         结构
-     * @param excludedWrapper 排除结构
-     * @return 记录
-     */
-    public JsonRecord findAndExcluding(JsonWrapper wrapper, JsonWrapper excludedWrapper) {
-        return histories.stream()
-                // 匹配相同结构
-                .filter(record -> Objects.equals(record.getWrapper(), wrapper))
-                // 排除指定结构
-                .filter(record -> !Objects.equals(record.getWrapper(), excludedWrapper))
-                .findFirst()
-                .orElse(null);
+
+    public void delRecords(Collection<String> ids) {
+        delRecords(ids, true);
     }
 
-    /**
-     * 查找相同结构的记录
-     *
-     * @param rawText 原文
-     * @return 记录
-     */
-    public JsonRecord find(String rawText) {
-        return histories.stream().filter(record -> Objects.equals(rawText, record.getRawText())).findFirst().orElse(null);
-    }
 
-    /**
-     * 查找相同名称的记录
-     *
-     * @param name 名称
-     * @return 记录
-     */
-    public JsonRecord findByName(String name) {
-        return histories.stream()
-                .filter(record -> StrUtil.isNotBlank(record.getName()) && Objects.equals(name, record.getName()))
-                .findFirst()
-                .orElse(null);
-    }
+    public void delRecords(Collection<String> ids, boolean writeState) {
+        if (CollUtil.isEmpty(ids)) return;
+        Iterator<JsonRecord> iterator = records.iterator();
+        while (iterator.hasNext()) {
+            JsonRecord record = iterator.next();
+            if (ids.contains(record.getId())) {
+                iterator.remove();
+                detachRecordFromGroup(record.getParentId(), record.getId());
+                delSourceFile(record);
+            }
+        }
 
-    public void batchRemove(List<Integer> ids) {
-        histories.removeIf(record -> ids.contains(record.getId()));
-    }
-
-    public void batchRemove(Integer... ids) {
-        histories.removeIf(record -> List.of(ids).contains(record.getId()));
-    }
-
-    /**
-     * 裁剪历史记录到最大容量
-     */
-    private void trimHistory() {
-        while (histories.size() > MAX_HISTORY_ITEMS) {
-            // FIFO策略：移除最早记录
-            histories.removeFirst();
+        if (writeState) {
+            // 写入文件
+            saveState();
         }
     }
 
+    public List<JsonRecord> findTopLevelRecords() {
+        return records.stream().filter(el -> null == el.getParentId()).collect(Collectors.toList());
+    }
+
+    public void addGroup(JsonGroup group) {
+        group.setDeleted(false);
+        if (StrUtil.isBlank(group.getId())) group.setId(IdUtil.simpleUUID());
+        if (null == group.getCreatedTime()) group.setCreatedTime(new Date());
+        if (null == group.getUpdatedTime()) group.setUpdatedTime(new Date());
+
+        groups.add(group);
+        // 写入文件
+        saveState();
+    }
+
+    public JsonGroup findGroup(String id) {
+        return groups.stream().filter(el -> el.getId().equals(id)).findFirst().orElse(null);
+    }
+
+
     /**
-     * 补充记录属性
+     * 删除组（需递归删除）
      *
-     * @param record 记录
+     * @param group 组
      */
-    private void populateMissingAttributes(JsonRecord record) {
-        if (null == record.getId()) {
-            record.setId(histories.stream().map(JsonRecord::getId).max(Integer::compareTo).orElse(-1) + 1);
+    public void delGroup(JsonGroup group) {
+        delGroups(ListUtil.toList(group.getId()));
+    }
+
+
+    /**
+     * 删除分组及其所有子分组和记录（队列实现）
+     */
+    public void delGroups(Collection<String> ids) {
+        delGroups(ids, true);
+    }
+
+
+    /**
+     * 删除分组及其所有子分组和记录（队列实现）
+     */
+    public void delGroups(Collection<String> ids, boolean writeState) {
+        if (CollUtil.isEmpty(ids)) return;
+
+        Set<String> recordIds = new HashSet<>();
+        Set<String> groupIds = new HashSet<>();
+        Queue<String> queue = new LinkedList<>(ids);
+
+        // 使用队列进行广度优先遍历，收集所有要删除的分组ID
+        while (CollUtil.isNotEmpty(queue)) {
+            String currentId = queue.poll();
+
+            // 避免重复处理
+            if (groupIds.contains(currentId)) {
+                continue;
+            }
+
+            groupIds.add(currentId);
+
+            // 查找当前分组的所有子分组
+            for (JsonGroup group : groups) {
+                if (Objects.equals(currentId, group.getParentId())) {
+                    queue.offer(group.getId());
+                }
+            }
+
+            // 添加当前分组的记录ID
+            for (JsonGroup group : groups) {
+                if (Objects.equals(currentId, group.getId())) {
+                    recordIds.addAll(group.getRecordIds());
+                    break;
+                }
+            }
         }
 
-        if (StrUtil.isBlank(record.getDisplayText())) {
-            record.setDisplayText(getShortText(record.getWrapper()));
+        // 执行删除操作
+        if (CollUtil.isNotEmpty(groupIds)) groups.removeIf(group -> groupIds.contains(group.getId()));
+        // 兼顾文件删除
+        if (CollUtil.isNotEmpty(recordIds)) delRecords(recordIds, false);
+        // 写入文件
+        if (writeState) saveState();
+    }
+
+    public void delAllRecords() {
+        delAllRecords(true);
+    }
+
+    public void delAllRecords(boolean writeState) {
+        records.clear();
+        // 删除所有文件
+        FileUtil.clean(projectHistoriesDirectory.toFile());
+        // 写入文件
+        if (writeState) saveState();
+    }
+
+    public void delAllGroups() {
+        groups.clear();
+        delAllRecords(false);
+        saveState();
+    }
+
+
+    /**
+     * 根据 parentId 查找子分组
+     *
+     * @param parentId 父ID
+     * @return 子分组
+     */
+    public List<JsonGroup> findChildGroups(String parentId) {
+        return groups.stream().filter(el -> Objects.equals(parentId, el.getParentId())).collect(Collectors.toList());
+    }
+
+    public List<JsonGroup> findTopLevelGroups() {
+        return groups.stream().filter(el -> null == el.getParentId()).collect(Collectors.toList());
+    }
+
+    public void associateRecordWithGroup(String groupId, String recordId) {
+        associateRecordWithGroup(findGroup(groupId), recordId);
+    }
+
+    public void associateRecordWithGroup(JsonGroup group, String recordId) {
+        if (null != group) group.getRecordIds().add(recordId);
+    }
+
+    public void detachRecordFromGroup(String groupId, String recordId) {
+        detachRecordFromGroup(findGroup(groupId), recordId);
+    }
+
+    public void detachRecordFromGroup(JsonGroup group, String recordId) {
+        if (null != group) group.getRecordIds().remove(recordId);
+    }
+
+    // ---------------------------------- 记录/分组操作 ---------------------------------- //
+
+
+    private void loadState() {
+        File historiesFile = projectHistoriesFilePath.toFile();
+        if (historiesFile.exists() && historiesFile.length() > 0) {
+            try {
+                // 反序列化对象为 RecordSerialization，这是为了防止 HistoryManager 构造器触发 loadState 方法
+                assignData(JsonUtil.MAPPER.readValue(historiesFile, RecordSerialization.class));
+
+            } catch (IOException e) {
+                // 把造成错误的 JSON 文件备份起来，留待之后检查
+                String bakPath = HISTORIES_FILE_NAME + "." + DateUtil.format(new Date(), DatePattern.PURE_DATETIME_FORMATTER) + ".bak";
+                Path dest = projectPluginDirectory.resolve(bakPath);
+                FileUtil.move(historiesFile, dest.toFile(), true);
+                assignData(null);
+                throw new RuntimeException(e);
+            }
+
+        } else {
+            assignData(null);
+        }
+    }
+
+    public void saveState() {
+        try {
+            this.lastSaved = new Date();
+            JsonUtil.MAPPER.writeValue(projectHistoriesFilePath.toFile(), new RecordSerialization(this));
+
+            // 重新加载
+            Document document = FileDocumentManager.getInstance().getCachedDocument(historiesFile);
+            if (null != document) FileDocumentManager.getInstance().reloadFromDisk(document);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void assignData(RecordSerialization recordSerialization) {
+        if (null == recordSerialization) {
+            this.records = new ArrayList<>();
+            this.groups = new ArrayList<>();
+
+        } else {
+            this.lastSaved = recordSerialization.getLastSaved();
+            List<JsonRecord> newRecords = recordSerialization.getRecords();
+            List<JsonGroup> newGroups = recordSerialization.getGroups();
+
+            if (CollUtil.isNotEmpty(newRecords)) this.records = newRecords;
+            else this.records = new ArrayList<>();
+
+            if (CollUtil.isNotEmpty(newGroups)) this.groups = newGroups;
+            else this.groups = new ArrayList<>();
+
+            // 补充源文件对象
+            replenishSourceFile();
+        }
+    }
+
+    public void replenishSourceFile() {
+        refreshDir();
+        List<VirtualFile> children = ListUtil.toList(recordsDir.getChildren());
+
+        for (JsonRecord record : records) {
+            VirtualFile file = record.getSourceFile();
+            if (PlatformUtil.isValidFile(file)) continue;
+            // 组合文件名称
+            String fileName = record.getId() + "." + record.getFileExtension();
+            VirtualFile sourceFile = children.stream()
+                    .filter(el -> null != el && !el.isDirectory() && StrUtil.equals(fileName, el.getName()))
+                    .findFirst()
+                    .orElse(null);
+            // sourceFile 实例存在，但是源文件不存在
+            if (null != sourceFile && !sourceFile.isValid()) {
+                sourceFile = null;
+            }
+
+            // 添加标记，防止判定为外部文件不允许编辑
+            PlatformUtil.markVirtualFileWritable(sourceFile);
+            // 添加标记，标记为记录文件
+            PlatformUtil.markVirtualFileFlag(sourceFile, project.getName());
+            record.setSourceFile(sourceFile);
+
+            // 在此获取源文件文本，用于构建 wrapper
+            File scFile = projectHistoriesDirectory.resolve(fileName).toFile();
+            if (scFile.exists()) {
+                String content = FileUtil.readUtf8String(scFile);
+
+                // 解析
+                JsonWrapper wrapper = null;
+                if (StrUtil.isNotBlank(content)) {
+                    if (JsonUtil.isJson(content)) {
+                        wrapper = JsonUtil.parse(content);
+
+                    } else if (Json5Util.isJson5(content)) {
+                        wrapper = Json5Util.parse(content);
+                    }
+                }
+
+                if (null != wrapper && !wrapper.noItems()) record.setWrapper(wrapper);
+            }
+        }
+    }
+
+    public VirtualFile createSourceFile(String id, String extension, String content) {
+        String fileName = id + "." + extension;
+        Path filePath = projectHistoriesDirectory.resolve(fileName);
+        File file = filePath.toFile();
+        if (StrUtil.isNotBlank(content)) {
+            FileUtil.writeUtf8String(content, file);
+        } else {
+            FileUtil.touch(file);
         }
 
-        Long createTime = record.getCreateTime();
-        if (null == createTime || createTime <= 0) {
-            record.setCreateTime(System.currentTimeMillis());
-        }
+        refreshDir();
+        VirtualFile childFile = findChildFile(fileName);
+        // 添加标记，防止判定为外部文件不允许编辑
+        PlatformUtil.markVirtualFileWritable(childFile);
+        // 添加标记，标记为记录文件
+        PlatformUtil.markVirtualFileFlag(childFile, project.getName());
+        return childFile;
+    }
 
-        Long updateTime = record.getUpdateTime();
-        if (null == updateTime || updateTime <= 0) {
-            record.setUpdateTime(System.currentTimeMillis());
+    public void delSourceFile(JsonRecord record) {
+        // 删除源文件
+        VirtualFile sourceFile = record.getSourceFile();
+        if (null != sourceFile) {
+            FileUtil.del(sourceFile.toNioPath());
+            refreshDir();
+
+        } else {
+            // 拼接
+            Path path = projectHistoriesDirectory.resolve(record.getId() + "." + record.getFileExtension());
+            if (FileUtil.exist(path.toFile())) {
+                FileUtil.del(path);
+                refreshDir();
+            }
         }
+    }
+
+    public VirtualFile findChildFile(String fileNameWithExtension) {
+        for (VirtualFile child : recordsDir.getChildren()) {
+            if (!child.isDirectory() && Objects.equals(child.getName(), fileNameWithExtension)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    public void refreshDir() {
+        refreshDir(false);
+    }
+
+    public void refreshDir(boolean asynchronous) {
+        reloadDir();
+        recordsDir.refresh(asynchronous, false);
+    }
+
+    private synchronized void reloadDir() {
+        this.recordsDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(projectHistoriesDirectory);
+    }
+
+    public Date getLastSaved() {
+        return lastSaved;
+    }
+
+    public void setLastSaved(Date lastSaved) {
+        this.lastSaved = lastSaved;
+    }
+
+    public List<JsonRecord> getRecords() {
+        return records;
+    }
+
+    public void setRecords(List<JsonRecord> records) {
+        this.records = records;
+    }
+
+    public List<JsonGroup> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<JsonGroup> groups) {
+        this.groups = groups;
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
     public static String getShortText(JsonWrapper wrapper) {
@@ -218,26 +546,4 @@ public final class HistoryManager implements PersistentStateComponent<HistoryMan
         // return StringUtil.convertLineSeparators(truncatedText, ContentChooser.RETURN_SYMBOL);
     }
 
-
-    @Attribute
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
-
-    public Deque<JsonRecord> getHistories() {
-        return histories;
-    }
-
-    public void setHistories(Deque<JsonRecord> histories) {
-        this.histories = histories;
-    }
-
-    @Override
-    public void dispose() {
-
-    }
 }

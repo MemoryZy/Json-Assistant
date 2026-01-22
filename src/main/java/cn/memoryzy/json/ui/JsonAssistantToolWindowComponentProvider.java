@@ -5,9 +5,11 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
+import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.enums.HistoryAffectType;
 import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
 import cn.memoryzy.json.model.structure.StructureSetting;
@@ -55,6 +57,8 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.components.BorderLayoutPanel;
+import com.intellij.xml.breadcrumbs.BreadcrumbsXmlWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -69,8 +73,8 @@ import java.util.Objects;
 public class JsonAssistantToolWindowComponentProvider implements Disposable, EditorColorsListener {
 
     public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
-    public static final String HISTORY_ADD_JUMP_KEY = "ADD";
-    public static final String HISTORY_EXIST_JUMP_KEY = "EXIST";
+    public static final String HISTORY_NAMING_JUMP_KEY = "NAMING";
+    public static final String HISTORY_CAT_JUMP_KEY = "CAT";
     public static final Object ALLOW_ACTION_PERFORM_WHEN_HIDDEN =
             JsonAssistantUtil.readStaticFinalFieldValue(ActionUtil.class, "ALLOW_ACTION_PERFORM_WHEN_HIDDEN");
 
@@ -99,7 +103,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
     private final JsonGridComponentProvider gridProvider;
 
     public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, FileType fileType) {
-        this(project, toolWindow, content, PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, fileType));
+        this(project, toolWindow, content, PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, fileType));
     }
 
     public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, VirtualFile sourceFile) {
@@ -152,6 +156,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
         // Json 编辑器
         JComponent editorComponent = currentEditor.getComponent();
+        // 面包屑
+        BreadcrumbsXmlWrapper wrapper = new BreadcrumbsXmlWrapper(currentEditor);
+        // 组合
+        BorderLayoutPanel editorPanel = new BorderLayoutPanel().addToCenter(editorComponent).addToBottom(wrapper);
+
         // Json 树
         JPanel treeComponent = treeProvider.getTreeComponent();
         // Json 查询界面
@@ -163,7 +172,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         resizeTreeFont(treeProvider);
 
         // 添加 Json 编辑器
-        cardPanel.add(editorComponent, UIUtils.JSON_EDITOR_CARD_NAME);
+        cardPanel.add(editorPanel, UIUtils.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树
         cardPanel.add(treeComponent, UIUtils.JSON_TREE_CARD_NAME);
         // 添加 Json 查询界面
@@ -215,7 +224,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
         // 切换软换行状态
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        String value = propertiesComponent.getValue(PluginConstant.SOFT_WRAPS_SELECT_STATE);
+        String value = propertiesComponent.getValue(ToolWindowConstant.Main.SOFT_WRAPS_SELECT_STATE);
         if (null != value) {
             AbstractToggleUseSoftWrapsAction.toggleSoftWraps(currentEditor, null, Boolean.parseBoolean(value));
         }
@@ -365,7 +374,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
             // 判断是否是包装过的文件
             if (!(sourceFile instanceof ExternalFileWrapper)) return;
             // 定义虚拟文件
-            VirtualFile file = PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, text);
+            VirtualFile file = PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, text);
             // 新开标签页，再关闭旧标签页
             ApplicationManager.getApplication().invokeLater(() -> {
                 // 切换到真实文件
@@ -401,7 +410,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         if (null == wrapper || wrapper.noItems()) return;
 
         // 查找
-        JsonRecord record = historyManager.find(wrapper);
+        JsonRecord record = historyManager.findRecord(wrapper);
         // 判断是否为新增
         boolean isAdd = (null == record);
         // 提示信息
@@ -409,19 +418,29 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
 
         if (isAdd) {
             // 新增
-            record = historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
-            // 触发事件
-            project.getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
+            String fileExtension = DataFormatType.JSON == formatType
+                    ? FileTypes.JSON.getExtension()
+                    : FileTypes.JSON5.getExtension();
 
-            message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_ADD_JUMP_KEY);
+            record = historyManager.addRecord(content, wrapper, fileExtension, true);
+            // 触发事件
+            if (null != record) {
+                project.getMessageBus().syncPublisher(RefreshHistoryTreeEvent.TOPIC).refresh(project, HistoryAffectType.ADD_RECORD, record.getId());
+                message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_NAMING_JUMP_KEY);
+
+            } else {
+                record = historyManager.findRecord(wrapper);
+                message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_CAT_JUMP_KEY);
+            }
+
         } else {
-            message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_EXIST_JUMP_KEY);
+            message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_CAT_JUMP_KEY);
         }
 
         // 提示粘贴成功的消息
         JsonRecord finalRecord = record;
         ToolWindowManager.getInstance(project).notifyByBalloon(
-                PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
+                ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID,
                 MessageType.INFO,
                 message,
                 null,
@@ -429,9 +448,11 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
                     if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
                         String url = e.getDescription();
                         HistoryToolWindowManager.getInstance(project).show();
-                        boolean shouldEdit = Objects.equals(HISTORY_ADD_JUMP_KEY, url);
-                        // 打开历史记录窗口，展示刚添加的记录，给名称编辑器指定焦点
-                        project.getMessageBus().syncPublisher(NavigateRecordEvent.TOPIC).navigate(finalRecord.getId(), shouldEdit);
+
+                        // 命名：打开工具窗口，选中此记录，并弹出重命名弹窗
+                        // 查看：打开工具窗口，选中此记录
+                        boolean needNaming = Objects.equals(HISTORY_NAMING_JUMP_KEY, url);
+                        project.getMessageBus().syncPublisher(NavigateRecordEvent.TOPIC).navigate(finalRecord.getId(), needNaming);
                     }
                 });
     }

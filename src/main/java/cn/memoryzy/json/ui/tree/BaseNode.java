@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui.tree;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.intellij.util.xmlb.annotations.Transient;
 
 /**
@@ -16,6 +17,7 @@ public abstract class BaseNode {
     private boolean matched;
 
     @Transient
+    @JsonIgnore
     public boolean isMatched() {
         return matched;
     }

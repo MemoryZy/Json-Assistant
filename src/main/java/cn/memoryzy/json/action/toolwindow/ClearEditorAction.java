@@ -3,7 +3,7 @@ package cn.memoryzy.json.action.toolwindow;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
 import cn.memoryzy.json.ui.dialog.OkCancelDialog;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
@@ -84,7 +84,7 @@ public class ClearEditorAction extends DumbAwareAction implements UpdateInBackgr
             String displayName = content.getDisplayName();
             // 如果不属于默认名称，那就清除
             if (!ToolWindowUtil.isDefaultTabName(displayName)) {
-                content.setDisplayName(ToolWindowUtil.generateTagName(toolWindow.getContentManager(), PluginConstant.MAIN_WINDOW_DISPLAY_NAME));
+                content.setDisplayName(ToolWindowUtil.generateTagName(toolWindow.getContentManager(), ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME));
             }
         }
     }

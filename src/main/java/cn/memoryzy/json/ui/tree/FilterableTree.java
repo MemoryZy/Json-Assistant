@@ -10,10 +10,7 @@ import com.intellij.openapi.util.Conditions;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.wm.IdeFocusManager;
-import com.intellij.ui.DocumentAdapter;
-import com.intellij.ui.LightColors;
-import com.intellij.ui.SearchTextField;
-import com.intellij.ui.TreeSpeedSearch;
+import com.intellij.ui.*;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.speedSearch.SpeedSearch;
 import com.intellij.ui.speedSearch.SpeedSearchSupply;
@@ -48,7 +45,7 @@ import java.beans.PropertyChangeListener;
 import java.util.*;
 
 /**
- * 自定义可过滤元素的处理类（原先的{@link com.intellij.ui.FilteringTree} 无法使用，因为其在低版本IDE中是三个构造器，在高版本是两个构造器，无法同时兼容）
+ * 自定义可过滤元素的处理类（原先的{@link FilteringTree} 无法使用，因为其在低版本IDE中是三个构造器，在高版本是两个构造器，无法同时兼容）
  *
  * @author Memory
  * @since 2025/8/20
@@ -96,7 +93,8 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
         rebuildTree();
         // 配置树
         configureTree(myTree);
-        myTree.setModel(new SearchTreeModel<>(myRoot, DUMMY_SEARCH, this::getText, this::createNode, this::getChildren, useIdentityHashing()));
+        myTree.setModel(new SearchTreeModel<>(myRoot, DUMMY_SEARCH, this::getText, this::createNode, this::getChildren,
+                this::handleNoMatch, this::handleHasMatch, useIdentityHashing()));
     }
 
     @NotNull
@@ -180,7 +178,10 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
             TreePath[] paths = myTree.getSelectionModel().getSelectionPaths();
             getSearchModel().refilter();
             expandTreeOnSearchUpdateComplete(pattern);
-            myTree.getSelectionModel().setSelectionPaths(paths);
+            // 如果目前因匹配的原因，导致没有任何节点，那么不选中节点
+            if (getRoot().getChildCount() > 0) {
+                myTree.getSelectionModel().setSelectionPaths(paths);
+            }
             onSpeedSearchUpdateComplete(pattern);
         }
 
@@ -299,6 +300,14 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
         myTree.repaint();
     }
 
+    protected void handleNoMatch() {
+
+    }
+
+    protected void handleHasMatch() {
+
+    }
+
     public static class SearchTreeModel<N extends DefaultMutableTreeNode, U extends BaseNode> extends DefaultTreeModel {
         public interface Listener<U> extends EventListener {
             void beforeNodeChanged(U x);
@@ -342,6 +351,16 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
         private Map<U, N> myNodeCache;
 
         /**
+         * 当没匹配到节点时执行（也就是树为空时）
+         */
+        private final Runnable myNoMatchAction;
+
+        /**
+         * 当匹配到了节点时执行（也就是树不为空时）
+         */
+        private final Runnable myHasMatchAction;
+
+        /**
          * 节点变化事件分发器
          */
         @SuppressWarnings("unchecked")
@@ -349,13 +368,16 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
 
         public SearchTreeModel(@NotNull N root, @NotNull SpeedSearchSupply speedSearch,
                                @NotNull Function<? super U, String> namer, @NotNull Function<? super U, ? extends N> nodeFactory,
-                               @NotNull Function<? super U, ? extends Iterable<? extends U>> structure, boolean useIdentityHashing) {
+                               @NotNull Function<? super U, ? extends Iterable<? extends U>> structure,
+                               @Nullable Runnable noMatchAction, @Nullable Runnable hasMatchAction, boolean useIdentityHashing) {
             super(root);
             myRootObject = Objects.requireNonNull(getUserObject(root));
             mySpeedSearch = speedSearch;
             myNamer = namer;
             myFactory = nodeFactory;
             myStructure = structure;
+            myNoMatchAction = noMatchAction;
+            myHasMatchAction = hasMatchAction;
             myUseIdentityHashing = useIdentityHashing;
             myNodeCache = createNodeCache();
             addTreeModelListener(new TreeModelListener() {
@@ -461,6 +483,18 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
                 computeAcceptCache(myRootObject, acceptCache);
                 // 按照计算过后的来过滤
                 filterChildren(myRootObject, acceptCache::contains);
+
+                // 如果没有节点被匹配上，则执行无匹配动作
+                boolean onlyRootOrEmpty = isOnlyRootOrEmpty(acceptCache);
+                if (null != myNoMatchAction && onlyRootOrEmpty) {
+                    myNoMatchAction.run();
+                }
+
+                // 如果有节点被匹配上，则执行有匹配动作
+                if (null != myHasMatchAction && !onlyRootOrEmpty) {
+                    myHasMatchAction.run();
+                }
+
             } else {
                 // 如果 SpeedSearch 没有过滤条件，那么恢复所有的节点
                 filterChildren(myRootObject, x -> true);
@@ -689,6 +723,21 @@ public abstract class FilterableTree<T extends DefaultMutableTreeNode, U extends
         @Override
         public boolean isLeaf(Object node) {
             return getRoot() != node && super.isLeaf(node);
+        }
+
+        /**
+         * 判断是否只剩根节点或为空（没有任何节点）
+         *
+         * @return 如果树为空或仅剩根节点，则返回true；否则返回fals
+         */
+        public boolean isOnlyRootOrEmpty(Set<U> acceptCache) {
+            if (acceptCache.isEmpty()) return true;
+            if (acceptCache.size() == 1) {
+                U next = acceptCache.iterator().next();
+                return Objects.equals(getRootObject(), next);
+            }
+
+            return false;
         }
 
         @Nullable

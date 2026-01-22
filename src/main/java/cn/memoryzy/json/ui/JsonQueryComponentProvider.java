@@ -6,7 +6,7 @@ import cn.memoryzy.json.action.query.ShowOriginalTextAction;
 import cn.memoryzy.json.action.query.SwitchAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.enums.JsonQueryLanguage;
 import cn.memoryzy.json.model.jsonpath.EvaluateResult;
 import cn.memoryzy.json.model.jsonpath.IncorrectDocument;
@@ -80,7 +80,7 @@ public class JsonQueryComponentProvider implements Disposable, EditorColorsListe
         this.queryState = ToolWindowSettings.getInstance().getQueryState();
 
         Supplier<String> propertyNameSupplier = () -> (queryState.getQueryLanguage() == JsonQueryLanguage.JSONPath)
-                ? PluginConstant.JSON_PATH_HISTORY_KEY : PluginConstant.JMES_PATH_HISTORY_KEY;
+                ? ToolWindowConstant.Search.JSON_PATH_HISTORY_KEY : ToolWindowConstant.Search.JMES_PATH_HISTORY_KEY;
 
         this.searchField = new SearchFieldWithHistory(project, this::evaluate, propertyNameSupplier);
 

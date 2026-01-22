@@ -1,4 +1,4 @@
-package cn.memoryzy.json.action.group;
+package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction;
 import cn.memoryzy.json.action.extend.ConvertAllTimestampAction;
@@ -6,8 +6,10 @@ import cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.project.Project;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -20,16 +22,12 @@ import java.util.List;
  * @author Memory
  * @since 2025/2/25
  */
-public class ExtendGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
+public class ExtendGroup extends DumbAwareBaseActionGroup {
 
     public ExtendGroup() {
-        super();
+        super(JsonAssistantBundle.message("group.extend.text"), JsonAssistantBundle.messageOnSystem("group.extend.description"), JsonAssistantIcons.OPEN);
         setPopup(true);
         setEnabledInModalContext(true);
-        Presentation templatePresentation = getTemplatePresentation();
-        templatePresentation.setText(JsonAssistantBundle.message("group.extend.text"));
-        templatePresentation.setDescription(JsonAssistantBundle.messageOnSystem("group.extend.description"));
-        templatePresentation.setIcon(JsonAssistantIcons.OPEN);
     }
 
     @Override

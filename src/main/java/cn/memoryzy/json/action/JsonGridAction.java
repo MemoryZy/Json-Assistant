@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.enums.StructureActionSource;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.GlobalTextConverter;
@@ -40,7 +40,7 @@ public class JsonGridAction extends DumbAwareAction implements UpdateInBackgroun
         Editor editor = PlatformUtil.getEditor(dataContext);
 
         ToolWindow toolWindow = PlatformDataKeys.TOOL_WINDOW.getData(dataContext);
-        StructureActionSource source = Objects.nonNull(toolWindow) && PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID.equals(toolWindow.getId())
+        StructureActionSource source = Objects.nonNull(toolWindow) && ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID.equals(toolWindow.getId())
                 ? StructureActionSource.TOOLWINDOW_EDITOR
                 : StructureActionSource.OUTSIDE;
 

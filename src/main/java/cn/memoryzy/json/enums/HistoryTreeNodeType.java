@@ -19,6 +19,6 @@ public enum HistoryTreeNodeType {
     /**
      * 数据节点
      */
-    NODE;
+    RECORD;
 
 }

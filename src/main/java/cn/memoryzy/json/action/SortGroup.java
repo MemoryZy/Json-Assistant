@@ -1,10 +1,11 @@
-package cn.memoryzy.json.action.group;
+package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.util.PlatformUtil;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.Separator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * @author Memory
  * @since 2025/9/1
  */
-public class SortGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
+public class SortGroup extends DumbAwareBaseActionGroup {
 
     private final boolean fromPopup;
 
@@ -24,12 +25,9 @@ public class SortGroup extends DefaultActionGroup implements DumbAware, UpdateIn
     }
 
     public SortGroup(boolean fromPopup) {
-        super();
+        super(JsonAssistantBundle.message("group.sort.text"), JsonAssistantBundle.messageOnSystem("group.sort.description"), null);
         setPopup(true);
         setEnabledInModalContext(true);
-        Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("group.sort.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("group.sort.description"));
         this.fromPopup = fromPopup;
     }
 

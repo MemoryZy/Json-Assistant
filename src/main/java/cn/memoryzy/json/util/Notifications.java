@@ -112,6 +112,16 @@ public class Notifications {
     }
 
     /**
+     * 展示通知（瞬态通知）
+     */
+    public static void showNotification(String content, NotificationType notificationType, List<? extends @NotNull AnAction> actions, Project project) {
+        // 使用通知组创建通知
+        Notification notification = getBalloonNotificationGroup().createNotification(content, notificationType);
+        actions.forEach(notification::addAction);
+        notification.notify(project);
+    }
+
+    /**
      * 展示通知（通知记录在 Event Log 或 Notifications 中）
      */
     public static void showLogNotification(String content, NotificationType notificationType, Project project) {
@@ -192,7 +202,7 @@ public class Notifications {
 
     @SuppressWarnings({"DuplicatedCode", "deprecation"})
     public static void showUpdateNotification(Project project) {
-        String changeNotes = JsonAssistantPlugin.getJsonAssistant().getChangeNotes();
+        String changeNotes = JsonAssistantPlugin.getJsonAssistantPlugin().getChangeNotes();
         if (StrUtil.isBlank(changeNotes)) {
             changeNotes = "<ul></ul>";
         } else {

@@ -3,7 +3,7 @@ package cn.memoryzy.json.toolwindow;
 import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.event.HistoryEnabledEvent;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.ui.HistoryToolWindowComponentProvider;
@@ -46,11 +46,11 @@ public final class HistoryToolWindowManager implements Disposable {
     @SuppressWarnings("deprecation")
     private ToolWindow createToolWindow(Project project) {
         ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
-        ToolWindow toolWindow = windowManager.getToolWindow(PluginConstant.HISTORY_TOOLWINDOW_ID);
+        ToolWindow toolWindow = windowManager.getToolWindow(ToolWindowConstant.History.HISTORY_TOOLWINDOW_ID);
         if (toolWindow == null) {
             // 这里的parentDisposable无效
             toolWindow = windowManager.registerToolWindow(
-                    PluginConstant.HISTORY_TOOLWINDOW_ID,
+                    ToolWindowConstant.History.HISTORY_TOOLWINDOW_ID,
                     false,
                     ToolWindowAnchor.BOTTOM,
                     this,
@@ -105,7 +105,7 @@ public final class HistoryToolWindowManager implements Disposable {
 
         // 因为一开始就创建了组件，所以用 content.setPreferredFocusableComponent 并无意义
         Content content = contentFactory.createContent(null, "", true);
-        this.provider = new HistoryToolWindowComponentProvider(project);
+        this.provider = new HistoryToolWindowComponentProvider(project, ((ToolWindowEx)toolWindow));
 
         content.setComponent(provider.createComponent());
         content.setCloseable(false);

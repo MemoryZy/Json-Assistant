@@ -1,13 +1,14 @@
-package cn.memoryzy.json.action.group;
+package cn.memoryzy.json.action;
 
-import cn.memoryzy.json.action.OnlineDocAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.Separator;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.ListPopup;
 import icons.JsonAssistantIcons;
@@ -21,19 +22,15 @@ import java.util.List;
  * @author Memory
  * @since 2024/7/2
  */
-public class MainGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
+public class MainGroup extends DumbAwareBaseActionGroup {
 
     private final boolean fromPopup;
 
     @SuppressWarnings("unused")
     public MainGroup() {
-        super();
+        super(JsonAssistantBundle.message("action.main.text"), JsonAssistantBundle.messageOnSystem("action.main.description"), JsonAssistantIcons.BOX);
         setPopup(true);
         setEnabledInModalContext(true);
-        Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.main.text"));
-        presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.main.description"));
-        presentation.setIcon(JsonAssistantIcons.BOX);
         this.fromPopup = false;
     }
 

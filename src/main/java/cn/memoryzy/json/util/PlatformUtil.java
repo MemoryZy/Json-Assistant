@@ -25,9 +25,7 @@ import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.ApplicationInfo;
-import com.intellij.openapi.application.ApplicationNamesInfo;
-import com.intellij.openapi.application.PathManager;
+import com.intellij.openapi.application.*;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
@@ -46,6 +44,8 @@ import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
@@ -89,6 +89,12 @@ import java.util.*;
  */
 public class PlatformUtil {
     private static final Logger LOG = Logger.getInstance(PlatformUtil.class);
+
+    /**
+     * 记录文件标记，存储着项目名
+     */
+    public static final Key<String> RECORD_PROJECT_FILE_MARKER = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".RECORD_PROJECT_FILE_MARKER");
+
 
     /**
      * 获取结构化文件
@@ -334,7 +340,7 @@ public class PlatformUtil {
     public static void setDocumentText(Document document, String text) {
         // StringUtil.convertLineSeparators(text)
         text = JsonAssistantUtil.normalizeLineEndings(text);
-        if (text == null) return;
+        if (text == null) text = "";
         document.setText(text);
     }
 
@@ -745,13 +751,31 @@ public class PlatformUtil {
     }
 
     public static void markVirtualFileWritable(VirtualFile file) {
-        // 包装文件，允许修改
-        try {
-            file.setWritable(true);
-        } catch (IOException ignored) {
+        if (null == file) return;
+
+        Application application = ApplicationManager.getApplication();
+
+        // 需在事件线程执行它
+        Runnable task = () -> {
+            // 包装文件，允许修改
+            try {
+                file.setWritable(true);
+            } catch (IOException ignored) {
+            }
+        };
+
+        if (application.isDispatchThread()) {
+            task.run();
+        } else {
+            application.runWriteAction(task);
         }
 
         file.putUserData(OpenFromFileAction.EXTERNAL_FILE_MARKER, true);
+    }
+
+    public static void markVirtualFileFlag(VirtualFile file, String projectName) {
+        if (null == file) return;
+        file.putUserData(RECORD_PROJECT_FILE_MARKER, projectName);
     }
 
     /**
@@ -777,4 +801,45 @@ public class PlatformUtil {
                 && "com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent".equals(parameterTypes[0].getName())
                 && "com.intellij.openapi.Disposable".equals(parameterTypes[1].getName());
     }
+
+    /**
+     * 获取当前插件运行的环境（为空表示正式环境）
+     *
+     * @return 环境
+     */
+    public static @Nullable String getEnvironment() {
+        return System.getProperty("jsonassistant.env");
+    }
+
+    public static boolean isTestEnvironment() {
+        return StrUtil.equalsIgnoreCase(getEnvironment(), "test");
+    }
+
+    public static boolean isProdEnvironment() {
+        return StrUtil.isBlank(getEnvironment());
+    }
+
+    public static boolean isValidFile(@Nullable VirtualFile file) {
+        return null != file && file.isValid();
+    }
+
+    /**
+     * 获取应用的版本号
+     *
+     * @return 203、221、241 等这样的格式
+     */
+    public static int getAppVersion() {
+        return ApplicationInfo.getInstance().getBuild().getBaselineVersion();
+    }
+
+    public static Project findProject(String projectName) {
+        for (Project openProject : ProjectManager.getInstance().getOpenProjects()) {
+            if (openProject.getName().equals(projectName)){
+                return openProject;
+            }
+        }
+
+        return null;
+    }
+
 }

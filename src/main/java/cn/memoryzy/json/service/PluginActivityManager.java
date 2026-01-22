@@ -36,8 +36,14 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
         AnnouncementManager.getInstance().scheduleDelayedAnnouncement(project);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            ConfigurationMerger configurationMerger = ConfigurationMerger.getInstance();
             // 合并旧配置
-            ConfigurationMerger.getInstance().mergeProjectLegacySettings(project);
+            configurationMerger.mergeProjectLegacySettings(project);
+            // 合并旧记录
+            configurationMerger.moveHistories(project);
+            // 删除旧记录
+            configurationMerger.delOldHistoriesFile(project);
+
             // 检查有无更新
             checkForUpdates();
         });

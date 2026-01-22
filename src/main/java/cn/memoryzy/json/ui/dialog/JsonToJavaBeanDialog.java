@@ -6,7 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
-import cn.memoryzy.json.action.group.OptionsGroup;
+import cn.memoryzy.json.action.deserializer.OptionsGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
 import cn.memoryzy.json.constant.LanguageHolder;

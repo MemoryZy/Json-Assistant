@@ -1,6 +1,5 @@
-package cn.memoryzy.json.action.group;
+package cn.memoryzy.json.action.deserializer;
 
-import cn.memoryzy.json.action.deserializer.*;
 import cn.memoryzy.json.action.deserializer.comment.SwaggerToggleAction;
 import cn.memoryzy.json.action.deserializer.comment.SwaggerV3ToggleAction;
 import cn.memoryzy.json.action.deserializer.lombok.LombokGroup;

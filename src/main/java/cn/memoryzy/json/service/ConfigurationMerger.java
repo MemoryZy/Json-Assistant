@@ -7,14 +7,12 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.enums.*;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.service.persistent.GeneralSettings;
-import cn.memoryzy.json.service.persistent.HistoryManager;
-import cn.memoryzy.json.service.persistent.SerializationSettings;
-import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.*;
 import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.util.Json5Util;
 import cn.memoryzy.json.util.JsonAssistantUtil;
@@ -24,19 +22,19 @@ import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.ide.impl.convert.JDomConvertingUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
+import com.intellij.project.ProjectKt;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.jps.model.serialization.JDomSerializationUtil;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 配置合并
@@ -197,12 +195,9 @@ public final class ConfigurationMerger {
         if (StrUtil.isNotBlank(historyStateStr)) {
             ObjectWrapper wrapper = JsonUtil.parseObject(historyStateStr);
             Boolean switchHistory = (Boolean) wrapper.get("switchHistory");
-            String historyViewTypeStr = (String) wrapper.get("historyViewType");
-            HistoryDisplayMode historyViewType = HistoryDisplayMode.of(historyViewTypeStr);
             Boolean autoStore = (Boolean) wrapper.get("autoStore");
 
             if (null != switchHistory) historyState.setEnableHistory(switchHistory);
-            if (null != historyViewType) historyState.setHistoryDisplayMode(historyViewType);
             if (null != autoStore) historyState.setAutoRecordHistory(autoStore);
         }
     }
@@ -261,7 +256,7 @@ public final class ConfigurationMerger {
         Element dataElement = getHistoryPersistentDataElement(project);
         if (null == dataElement) return;
 
-        HistoryManager manager = HistoryManager.getInstance(project);
+        HistoryOldManager manager = HistoryOldManager.getInstance(project);
         String historyStr = dataElement.getAttributeValue("history");
         if (StrUtil.isNotBlank(historyStr)) {
             if (Base64.isBase64(historyStr)) {
@@ -285,7 +280,7 @@ public final class ConfigurationMerger {
                 // 若原文不存在
                 if (StrUtil.isBlank(jsonString)) continue;
 
-                JsonRecord record = new JsonRecord()
+                JsonOldRecord record = new JsonOldRecord()
                         .setRawText(jsonString)
                         .setSourceType(JsonUtil.isJson(jsonString) ? DataFormatType.JSON : DataFormatType.JSON5);
 
@@ -318,6 +313,47 @@ public final class ConfigurationMerger {
         }
 
     }
+
+    public void moveHistories(Project project) {
+        HistoryOldManager oldManager = HistoryOldManager.getInstance(project);
+        Deque<JsonOldRecord> histories = oldManager.getHistories();
+        // 迁移完成后，清空原记录数据，所以这里判断是否为空即可
+        if (CollUtil.isEmpty(histories)) return;
+
+        HistoryManager newManager = HistoryManager.getInstance(project);
+        for (JsonOldRecord oldRecord : histories) {
+            JsonRecord record = convert(oldRecord);
+            newManager.addRecord(record, oldRecord.getRawText(), false);
+        }
+
+        newManager.saveState();
+        histories.clear();
+    }
+
+    private static @NotNull JsonRecord convert(JsonOldRecord oldRecord) {
+        JsonRecord record = new JsonRecord();
+        record.setName(oldRecord.getName());
+        record.setDisplayText(oldRecord.getDisplayText());
+        record.setSourceType(oldRecord.getSourceType());
+        record.setWrapper(oldRecord.getWrapper());
+        record.setFileExtension(FileTypes.JSON.getExtension());
+        record.setCreatedTime(JsonAssistantUtil.toDate(oldRecord.getCreateTime()));
+        record.setUpdatedTime(JsonAssistantUtil.toDate(oldRecord.getUpdateTime()));
+        return record;
+    }
+
+    public void delOldHistoriesFile(Project project) {
+        // 直接删除文件
+        IProjectStore store = ProjectKt.getStateStore(project);
+        Path directoryStorePath = store.getDirectoryStorePath();
+        if (null == directoryStorePath) return;
+
+        Path path = directoryStorePath.resolve(JsonAssistantPlugin.STORAGE_HISTORY_FILE);
+        if (Files.exists(path) && !Files.isDirectory(path)) {
+            FileUtil.del(path);
+        }
+    }
+
 
     private Element getPluginSettingsElement() {
         try {

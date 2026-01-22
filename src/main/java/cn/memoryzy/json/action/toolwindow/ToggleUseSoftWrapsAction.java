@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -66,6 +66,6 @@ public class ToggleUseSoftWrapsAction extends AbstractToggleUseSoftWrapsAction i
 
     private void saveToPropertiesComponent(boolean state) {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        propertiesComponent.setValue(PluginConstant.SOFT_WRAPS_SELECT_STATE, state + "");
+        propertiesComponent.setValue(ToolWindowConstant.Main.SOFT_WRAPS_SELECT_STATE, state + "");
     }
 }

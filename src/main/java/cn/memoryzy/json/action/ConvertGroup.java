@@ -1,9 +1,9 @@
-package cn.memoryzy.json.action.group;
+package cn.memoryzy.json.action;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.ActionHolder;
-import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.DumbAware;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,16 +12,12 @@ import org.jetbrains.annotations.Nullable;
  * @author Memory
  * @since 2024/8/3
  */
-public class ConvertGroup extends DefaultActionGroup implements DumbAware, UpdateInBackground {
+public class ConvertGroup extends DumbAwareBaseActionGroup {
 
     public ConvertGroup() {
-        super();
+        super(JsonAssistantBundle.message("group.convert.other.formats.text"), JsonAssistantBundle.messageOnSystem("group.convert.other.formats.description"), JsonAssistantIcons.FUNCTION);
         setPopup(true);
         setEnabledInModalContext(true);
-        Presentation templatePresentation = getTemplatePresentation();
-        templatePresentation.setText(JsonAssistantBundle.message("group.convert.other.formats.text"));
-        templatePresentation.setDescription(JsonAssistantBundle.messageOnSystem("group.convert.other.formats.description"));
-        templatePresentation.setIcon(JsonAssistantIcons.FUNCTION);
     }
 
     @Override

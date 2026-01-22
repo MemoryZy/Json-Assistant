@@ -478,4 +478,24 @@ public class JsonAssistantUtil {
                 .toString();
     }
 
+    public static Date toDate(Long timestamp) {
+        return null == timestamp ? null : new Date(timestamp);
+    }
+
+    /**
+     * 计算字符在字符串中出现的次数
+     *
+     * @param str 原始字符串
+     * @param ch  要计数的字符
+     * @return 字符出现的次数
+     */
+    public static int countCharacterOccurrences(String str, char ch) {
+        int count = 0;
+        for (char c : str.toCharArray()) {
+            if (c == ch) {
+                count++;
+            }
+        }
+        return count;
+    }
 }

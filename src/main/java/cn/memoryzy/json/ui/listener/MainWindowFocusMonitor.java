@@ -2,8 +2,10 @@ package cn.memoryzy.json.ui.listener;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.enums.DataFormatType;
-import cn.memoryzy.json.event.HistoryAddedEvent;
+import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.enums.HistoryAffectType;
 import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
+import cn.memoryzy.json.event.RefreshHistoryTreeEvent;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.HistoryManager;
 import cn.memoryzy.json.service.persistent.state.HistoryState;
@@ -15,6 +17,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.FocusChangeListener;
+import com.intellij.openapi.project.Project;
 import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import com.intellij.util.messages.MessageBus;
@@ -122,12 +125,21 @@ public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
         if (null == wrapper || wrapper.noItems()) return;
 
         // 如果在记录中存在的话，无需保存
-        if (historyManager.exists(wrapper)) return;
+        if (historyManager.existsRecord(wrapper)) return;
+
+        String fileExtension = DataFormatType.JSON == formatType
+                ? FileTypes.JSON.getExtension()
+                : FileTypes.JSON5.getExtension();
 
         // 自动保存的话，无需指定名称
-        historyManager.addEntry(new JsonRecord().setRawText(content).setSourceType(formatType).setWrapper(wrapper));
+        JsonRecord record = historyManager.addRecord(content, wrapper, fileExtension, true);
         // 触发事件
-        Objects.requireNonNull(editor.getProject()).getMessageBus().syncPublisher(HistoryAddedEvent.TOPIC).added();
+        if (null != record) {
+            Project project = editor.getProject();
+            Objects.requireNonNull(project).getMessageBus()
+                    .syncPublisher(RefreshHistoryTreeEvent.TOPIC)
+                    .refresh(project, HistoryAffectType.ADD_RECORD, record.getId());
+        }
     }
 
     /**

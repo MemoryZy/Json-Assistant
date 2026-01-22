@@ -53,7 +53,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.*;
 
@@ -734,11 +733,50 @@ public class UIUtils {
     }
 
     private static void createFontsDirectories() {
-        try {
-            PathManager.createFontsDirectoriesIfNotExists();
-        } catch (IOException e) {
-            throw new RuntimeException("Fonts directory creation failed!", e);
+        PathManager.createFontsDirectoriesIfNotExists();
+    }
+
+    /**
+     * 查找并选中JTree中的第一个叶子节点
+     *
+     * @param tree 要操作的JTree
+     */
+    public static void selectFirstLeafNode(JTree tree) {
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        DefaultMutableTreeNode firstLeaf = findFirstLeafNode(root);
+
+        if (firstLeaf != null) {
+            // 构建从根节点到叶子节点的路径
+            TreePath path = new TreePath(firstLeaf.getPath());
+            // 选中该路径
+            tree.setSelectionPath(path);
+            // 确保选中节点可见
+            tree.scrollPathToVisible(path);
         }
     }
 
+    /**
+     * 递归查找树中的第一个叶子节点
+     *
+     * @param node 起始节点
+     * @return 找到的第一个叶子节点，未找到返回null
+     */
+    private static DefaultMutableTreeNode findFirstLeafNode(DefaultMutableTreeNode node) {
+        // 如果当前节点是叶子节点，直接返回
+        if (node.isLeaf()) {
+            return node;
+        }
+
+        // 遍历子节点查找第一个叶子节点
+        Enumeration<?> children = node.children();
+        while (children.hasMoreElements()) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) children.nextElement();
+            DefaultMutableTreeNode leaf = findFirstLeafNode(child);
+            if (leaf != null) {
+                return leaf;
+            }
+        }
+
+        return null; // 未找到叶子节点
+    }
 }

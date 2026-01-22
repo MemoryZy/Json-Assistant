@@ -10,6 +10,12 @@ public interface NavigateRecordEvent {
 
     Topic<NavigateRecordEvent> TOPIC = Topic.create("Navigate Record", NavigateRecordEvent.class);
 
-    void navigate(Integer id, boolean shouldEdit);
+    /**
+     * 导航到具体的记录
+     *
+     * @param id         记录ID
+     * @param needNaming 是否需要重命名
+     */
+    void navigate(String id, boolean needNaming);
 
 }

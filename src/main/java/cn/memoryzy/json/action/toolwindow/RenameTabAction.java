@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.util.ToolWindowUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -117,7 +117,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
             String id = toolWindow.getId();
             Content content = ToolWindowUtil.getContextContent(event.getDataContext());
             enabled = project != null
-                    && (Objects.equals(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, id) || Objects.equals(PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID, id))
+                    && (Objects.equals(ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID, id) || Objects.equals(ToolWindowConstant.Structure.AUXILIARY_TREE_TOOLWINDOW_ID, id))
                     && content != null;
         }
 

@@ -53,7 +53,7 @@
         <fileEditorProvider implementation="cn.memoryzy.json.extension.editor.JsonTreeFileEditorProvider"/>
         <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
-        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.ImportHistoryFloatingToolbarProvider"/>
+        <!--<editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.ImportHistoryFloatingToolbarProvider"/>-->
         <nonProjectFileWritingAccessExtension implementation="cn.memoryzy.json.extension.file.ExternalFileAccessProvider"/>
         <statusBarWidgetFactory id="JsonAssistant.CountCharWidget" order="before positionWidget" implementation="cn.memoryzy.json.extension.widget.CountCharWidgetFactory"/>
 
@@ -83,13 +83,14 @@
 
     <applicationListeners>
         <listener class="cn.memoryzy.json.service.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
-<!--        <listener class="cn.memoryzy.json.extension.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>-->
-        <listener class="cn.memoryzy.json.extension.AppLifecycleManager" topic="com.intellij.ide.AppLifecycleListener"/>
+<!--        <listener class="cn.memoryzy.json.service.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>-->
+        <listener class="cn.memoryzy.json.service.AppLifecycleManager" topic="com.intellij.ide.AppLifecycleListener"/>
+        <listener class="cn.memoryzy.json.listener.FileChangeListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
     </applicationListeners>
 
     <actions>
         <!-- Main -->
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.MainGroup"/>
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.MainGroup"/>
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.action.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.action.JsonMinifyAction"/>
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
@@ -99,13 +100,13 @@
         <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
 
         <!-- Extend -->
-        <group id="JsonAssistant.Group.Extend" class="cn.memoryzy.json.action.group.ExtendGroup"/>
+        <group id="JsonAssistant.Group.Extend" class="cn.memoryzy.json.action.ExtendGroup"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>
         <action id="JsonAssistant.Action.ExpandAllNestedJsonAction" class="cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction"/>
         <action id="JsonAssistant.Action.ConvertAllReadableTimeAction" class="cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction"/>
 
         <!-- Convert -->
-        <group id="JsonAssistant.Group.Convert" class="cn.memoryzy.json.action.group.ConvertGroup"/>
+        <group id="JsonAssistant.Group.Convert" class="cn.memoryzy.json.action.ConvertGroup"/>
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
         <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
@@ -119,7 +120,7 @@
         <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
 
         <!-- Sort -->
-        <group id="JsonAssistant.Group.Sort" class="cn.memoryzy.json.action.group.SortGroup"/>
+        <group id="JsonAssistant.Group.Sort" class="cn.memoryzy.json.action.SortGroup"/>
         <action id="JsonAssistant.Action.CaseSensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseSensitiveAZAction"/>
         <action id="JsonAssistant.Action.CaseSensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseSensitiveZAAction"/>
         <action id="JsonAssistant.Action.CaseInsensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveAZAction"/>
@@ -188,10 +189,6 @@
             <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction"/>
             <separator/>
             <action id="JsonAssistant.Action.DonateAction" class="cn.memoryzy.json.action.notification.DonateAction"/>
-
-<!--        TODO 待删除    -->
-<!--            <separator/>-->
-<!--            <action id="JsonAssistant.Action.TestCatConfigAction" class="cn.memoryzy.json.action.test.TestCatNewConfigAction"/>-->
         </group>
 
         <group id="JsonAssistant.Group.JsonAssistantHelpMenu">
@@ -204,10 +201,6 @@
 
         <group id="JsonAssistant.Group.PasteEditorFloatGroup">
             <action id="JsonAssistant.Action.PasteDataAction" class="cn.memoryzy.json.action.toolwindow.PasteDataAction"/>
-        </group>
-
-        <group id="JsonAssistant.Group.HistoryFloatGroup">
-            <action id="JsonAssistant.Action.OpenHistoryInEditorAction" class="cn.memoryzy.json.action.toolwindow.history.OpenHistoryInEditorAction"/>
         </group>
     </actions>
 

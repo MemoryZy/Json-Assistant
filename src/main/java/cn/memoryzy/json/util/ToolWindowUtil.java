@@ -1,7 +1,7 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import com.intellij.openapi.Disposable;
@@ -70,7 +70,7 @@ public class ToolWindowUtil {
      * @return ToolWindow 返回找到或新创建的工具窗口实例
      */
     public static ToolWindow getJsonAssistantWindow(Project project) {
-        return ToolWindowManager.getInstance(project).getToolWindow(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID);
+        return ToolWindowManager.getInstance(project).getToolWindow(ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID);
     }
 
     /**
@@ -146,7 +146,7 @@ public class ToolWindowUtil {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
 
-        String presetName = StrUtil.isNotBlank(tabName) ? tabName : PluginConstant.MAIN_WINDOW_DISPLAY_NAME;
+        String presetName = StrUtil.isNotBlank(tabName) ? tabName : ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME;
         String displayName = generateTagName(contentManager, presetName);
         Content content = contentFactory.createContent(null, displayName, false);
         JsonAssistantToolWindowComponentProvider provider = new JsonAssistantToolWindowComponentProvider(project, toolWindow, content, editorFileType);
@@ -172,7 +172,7 @@ public class ToolWindowUtil {
         ContentManager contentManager = toolWindow.getContentManager();
         int contentCount = contentManager.getContentCount();
 
-        String displayName = generateTagName(contentManager, PluginConstant.MAIN_WINDOW_DISPLAY_NAME);
+        String displayName = generateTagName(contentManager, ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME);
         Content content = contentFactory.createContent(null, displayName, false);
         JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, toolWindow, content, sourceFile);
 
@@ -337,7 +337,7 @@ public class ToolWindowUtil {
 
         // 使用正则表达式匹配"View"后跟一个或多个数字的模式
         // ^表示字符串开始，$表示字符串结束，\\s+表示一个或多个空白字符，\\d+表示一个或多个数字
-        return PluginConstant.MAIN_WINDOW_DISPLAY_NAME.equals(input) || input.matches("^View\\s+\\d+$");
+        return ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME.equals(input) || input.matches("^View\\s+\\d+$");
     }
 
 }

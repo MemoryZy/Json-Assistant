@@ -1,6 +1,5 @@
 package cn.memoryzy.json.action;
 
-import cn.memoryzy.json.action.group.MainGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.util.PlatformUtil;

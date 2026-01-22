@@ -4,7 +4,7 @@ import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.FloatingWindowAction;
 import cn.memoryzy.json.action.toolwindow.RenameTabAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.model.EditorContext;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.AuxiliaryTreeToolWindowComponentProvider;
@@ -54,7 +54,7 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
         ContentManager contentManager = toolWindow.getContentManager();
         int count = contentManager.getContentCount();
 
-        String displayName = ToolWindowUtil.generateTagName(contentManager, PluginConstant.AUXILIARY_TREE_WINDOW_DISPLAY_NAME);
+        String displayName = ToolWindowUtil.generateTagName(contentManager, ToolWindowConstant.Structure.AUXILIARY_TREE_WINDOW_DISPLAY_NAME);
         Content content = contentFactory.createContent(provider.createComponent(), displayName, false);
         content.setCloseable(true);
         content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
@@ -70,11 +70,11 @@ public final class AuxiliaryTreeToolWindowManager implements Disposable {
     @SuppressWarnings("deprecation")
     private ToolWindow createToolWindow(Project project) {
         ToolWindowManager windowManager = ToolWindowManager.getInstance(project);
-        ToolWindow toolWindow = windowManager.getToolWindow(PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID);
+        ToolWindow toolWindow = windowManager.getToolWindow(ToolWindowConstant.Structure.AUXILIARY_TREE_TOOLWINDOW_ID);
         if (toolWindow == null) {
             // 这里的parentDisposable无效
             toolWindow = windowManager.registerToolWindow(
-                    PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID,
+                    ToolWindowConstant.Structure.AUXILIARY_TREE_TOOLWINDOW_ID,
                     true,
                     ToolWindowAnchor.RIGHT,
                     this,

@@ -57,7 +57,6 @@ public interface ActionIdHolder {
 
     interface Float {
         String EDITOR_FLOAT_GROUP_ID = "JsonAssistant.Group.PasteEditorFloatGroup";
-        String HISTORY_FLOAT_GROUP_ID = "JsonAssistant.Group.HistoryFloatGroup";
     }
 
 }

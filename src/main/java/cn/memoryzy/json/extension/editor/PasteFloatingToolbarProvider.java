@@ -3,7 +3,7 @@ package cn.memoryzy.json.extension.editor;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.ActionHolder;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
 import cn.memoryzy.json.event.RegisterClipboardUsageEvent;
 import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
@@ -181,7 +181,7 @@ public class PasteFloatingToolbarProvider implements FloatingToolbarProvider, Di
         }
 
         // 暂时将这种名字的编辑器当作是自定义编辑器
-        String fileName = PluginConstant.MAIN_WINDOW_DISPLAY_NAME + ".json5";
+        String fileName = ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME + ".json5";
         if (!Objects.equals(fileName, file.getName())) {
             component.scheduleHide();
             return;

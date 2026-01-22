@@ -6,6 +6,7 @@ import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.extension.file.ExternalFileWrapper;
 import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
@@ -105,7 +106,7 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
         String content = PlatformUtil.getContentFromVirtualFile(selectFile);
         if (!JsonUtil.isJson(content) && !Json5Util.isJson5(content)) {
             windowManager.notifyByBalloon(
-                    PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
+                    ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID,
                     MessageType.WARNING,
                     JsonAssistantBundle.messageOnSystem("hint.select.json.content"));
             return;
@@ -120,7 +121,7 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
         // 如果选择修改不作用于源文件，那么只拷贝内容
         if (!editorBehaviorState.isShouldApplyToSource()) {
             // 使用 LightVirtualFile，只处理内容
-            selectFile = PlatformUtil.createLightVirtualFile(PluginConstant.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, content);
+            selectFile = PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, content);
         }
 
         // 获取当前选择的窗口页，判断其是否存在内容，若存在，则新开标签页
@@ -142,7 +143,7 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
                 ? JsonAssistantBundle.messageOnSystem("hint.edit.mode.content")
                 : JsonAssistantBundle.messageOnSystem("hint.safe.mode.content");
 
-        windowManager.notifyByBalloon(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, MessageType.INFO, message, null, event -> {
+        windowManager.notifyByBalloon(ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID, MessageType.INFO, message, null, event -> {
             if (HyperlinkEvent.EventType.ACTIVATED == event.getEventType()) {
                 ShowSettingsUtil.getInstance().showSettingsDialog(project, JsonAssistantBundle.message("setting.display.name"));
             }

@@ -15,29 +15,6 @@ import java.util.*;
  */
 public interface PluginConstant {
 
-    /**
-     * Json Assistant 工具窗口 ID
-     */
-    String JSON_ASSISTANT_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonAssistant";
-
-    /**
-     * Json Structure 工具窗口 ID
-     */
-    String AUXILIARY_TREE_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.AuxiliaryTree";
-
-    /**
-     * Json 历史记录工具窗口 ID
-     */
-    String HISTORY_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonHistory";
-
-    /**
-     * 选择的软换行状态 Key
-     */
-    String SOFT_WRAPS_SELECT_STATE = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SOFT_WRAPS_SELECT_STATE";
-
-    String JSON_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JsonPathHistory";
-    String JMES_PATH_HISTORY_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".JmesPathHistory";
-
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
 
     String JSON_EXAMPLE = " {\"name\": \"Memory\", \"age\": 18}";
@@ -64,9 +41,6 @@ public interface PluginConstant {
             "}";
 
     String JSON_EXAMPLE_ID = JsonAssistantPlugin.PLUGIN_ID_NAME + "#EXAMPLE";
-
-    String MAIN_WINDOW_DISPLAY_NAME = "View";
-    String AUXILIARY_TREE_WINDOW_DISPLAY_NAME = "Tab";
 
     String HISTORY_EDITOR_NAME = "record";
 

@@ -1,4 +1,4 @@
-package cn.memoryzy.json.extension;
+package cn.memoryzy.json.service;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.ReflectUtil;

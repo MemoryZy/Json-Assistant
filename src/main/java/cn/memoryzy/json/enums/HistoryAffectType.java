@@ -6,6 +6,6 @@ package cn.memoryzy.json.enums;
  */
 public enum HistoryAffectType {
 
-    ADD, UPDATE, REMOVE
+    ADD_GROUP, ADD_RECORD, UPDATE, REMOVE, MOVE
 
 }

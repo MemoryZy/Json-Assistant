@@ -35,12 +35,12 @@ public class JsonAssistantPlugin {
             new AtomicReference<>(new UpdateInfo(false, null, null));
 
 
-    public static IdeaPluginDescriptor getJsonAssistant() {
+    public static IdeaPluginDescriptor getJsonAssistantPlugin() {
         return PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID));
     }
 
     public static String getVersion() {
-        return getJsonAssistant().getVersion();
+        return getJsonAssistantPlugin().getVersion();
     }
 
 

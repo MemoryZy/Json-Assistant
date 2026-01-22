@@ -100,6 +100,10 @@ kover.xmlReport {
 tasks {
     runIde {
         systemProperty("idea.is.internal", true)
+
+        // 区分测试环境与正式环境
+        systemProperty("jsonassistant.env", "test")
+
         autoReloadPlugins.set(true)
 
         // Enable hotswap, requires JBR 17+ or JBR 11 with DCEVM, and run in debug mode.

@@ -58,6 +58,5 @@ public interface ActionHolder {
 
     interface Float {
         AnAction EDITOR_FLOAT_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Float.EDITOR_FLOAT_GROUP_ID);
-        AnAction HISTORY_FLOAT_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Float.HISTORY_FLOAT_GROUP_ID);
     }
 }

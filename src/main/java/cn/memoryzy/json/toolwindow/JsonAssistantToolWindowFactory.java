@@ -6,6 +6,7 @@ import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
 import cn.memoryzy.json.util.JsonAssistantUtil;
@@ -61,7 +62,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         toolWindowEx.setAdditionalGearActions(createAdditionalGearActions(toolWindowEx));
 
         // 创建初始内容页
-        Content content = contentFactory.createContent(null, PluginConstant.MAIN_WINDOW_DISPLAY_NAME, false);
+        Content content = contentFactory.createContent(null, ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, false);
         JsonAssistantToolWindowComponentProvider provider = new JsonAssistantToolWindowComponentProvider(project, toolWindowEx, content, FileTypeHolder.JSON5);
 
         content.setComponent(provider.createComponent());
@@ -103,7 +104,7 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         if (time >= 3 || JsonAssistantUtil.isTimestampToday(timestamp)) return;
 
         ToolWindowManager.getInstance(project).notifyByBalloon(
-                PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
+                ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID,
                 MessageType.INFO,
                 JsonAssistantBundle.messageOnSystem("hint.manual.history.content"));
 

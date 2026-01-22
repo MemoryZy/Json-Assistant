@@ -3,7 +3,6 @@ package cn.memoryzy.json.ui;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
 import cn.memoryzy.json.enums.DataFormatType;
-import cn.memoryzy.json.enums.HistoryDisplayMode;
 import cn.memoryzy.json.enums.TreeViewMode;
 import cn.memoryzy.json.event.*;
 import cn.memoryzy.json.service.persistent.GeneralSettings;
@@ -22,6 +21,9 @@ import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
 import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBUI;
@@ -71,8 +73,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
     private TitledSeparator historyTitle;
     private JBCheckBox enableHistoryCheckBox;
-    private JBLabel historyStyleLabel;
-    private ComboBox<HistoryDisplayMode> historyStyleComboBox;
 
     private TitledSeparator generalTitle;
     private JBLabel treeViewModeLabel;
@@ -214,17 +214,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private void configureHistoryComponents() {
         historyTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
         enableHistoryCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
-        historyStyleLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
-        for (HistoryDisplayMode value : HistoryDisplayMode.values()) {
-            historyStyleComboBox.addItem(value);
-        }
-
-        historyStyleComboBox.setRenderer(new SimpleListCellRenderer<>() {
-            @Override
-            public void customize(@NotNull JList<? extends HistoryDisplayMode> list, HistoryDisplayMode value, int index, boolean selected, boolean hasFocus) {
-                setText(null != value ? JsonAssistantBundle.messageOnSystem(value.getKey()) : "");
-            }
-        });
 
         autoRecordHistoryLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
         autoRecordHistoryRadioBtn.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
@@ -239,15 +228,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, true);
                 UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, true);
-                if (!historyStyleComboBox.isEnabled()) {
-                    historyStyleComboBox.setEnabled(true);
-                }
+
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                 UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, false);
                 UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, false);
-                if (historyStyleComboBox.isEnabled()) {
-                    historyStyleComboBox.setEnabled(false);
-                }
             }
         });
     }
@@ -302,7 +286,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean enableHistory = historyState.isEnableHistory();
 
         enableHistoryCheckBox.setSelected(enableHistory);
-        historyStyleComboBox.setItem(historyState.getHistoryDisplayMode());
         if (historyState.isAutoRecordHistory()) {
             autoRecordHistoryRadioBtn.setSelected(true);
         } else {
@@ -316,15 +299,10 @@ public class JsonAssistantMainConfigurableComponentProvider {
         if (enableHistory) {
             UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, true);
             UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, true);
-            if (!historyStyleComboBox.isEnabled()) {
-                historyStyleComboBox.setEnabled(true);
-            }
+
         } else {
             UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, false);
             UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, false);
-            if (historyStyleComboBox.isEnabled()) {
-                historyStyleComboBox.setEnabled(false);
-            }
         }
 
         // ---------------------------- 解析格式
@@ -375,7 +353,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         HistoryState historyState = toolWindowSettings.getHistoryState();
         boolean oldEnableHistory = historyState.isEnableHistory();
         boolean oldAutoRecordHistory = historyState.isAutoRecordHistory();
-        HistoryDisplayMode oldHistoryDisplayMode = historyState.getHistoryDisplayMode();
 
         // ----------------------------------- 常规
         TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
@@ -405,7 +382,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
         // ----------------------------------- 历史记录
         boolean newEnableHistory = enableHistoryCheckBox.isSelected();
         boolean newAutoRecordHistory = autoRecordHistoryRadioBtn.isSelected();
-        HistoryDisplayMode newHistoryDisplayMode = historyStyleComboBox.getItem();
 
         // ----------------------------------- 常规
         TreeViewMode newTreeViewMode = treeViewModeComboBox.getItem();
@@ -430,7 +406,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
 
                 || !Objects.equals(oldEnableHistory, newEnableHistory)
                 || !Objects.equals(oldAutoRecordHistory, newAutoRecordHistory)
-                || !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode)
                 || !Objects.equals(oldTreeViewMode, newTreeViewMode)
 
                 ;
@@ -459,11 +434,9 @@ public class JsonAssistantMainConfigurableComponentProvider {
         // ----------------------------------- 历史记录
         HistoryState historyState = toolWindowSettings.getHistoryState();
         boolean oldEnableHistory = historyState.isEnableHistory();
-        HistoryDisplayMode oldHistoryDisplayMode = historyState.getHistoryDisplayMode();
 
         historyState.setEnableHistory(enableHistoryCheckBox.isSelected());
         historyState.setAutoRecordHistory(autoRecordHistoryRadioBtn.isSelected());
-        historyState.setHistoryDisplayMode(historyStyleComboBox.getItem());
 
         // ----------------------------------- 外观
         EditorVisualState visualState = toolWindowSettings.getVisualState();
@@ -480,7 +453,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         treeStructureState.setTreeViewMode(treeViewModeComboBox.getItem());
 
         // 发布配置更新事件
-        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme, oldEnableHistory, oldHistoryDisplayMode, oldShouldApplyToSource);
+        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme, oldEnableHistory, oldShouldApplyToSource);
     }
 
     /**
@@ -490,21 +463,18 @@ public class JsonAssistantMainConfigurableComponentProvider {
                                               boolean oldShowFoldingOutline,
                                               ColorScheme oldColorScheme,
                                               boolean oldEnableHistory,
-                                              HistoryDisplayMode oldHistoryDisplayMode,
                                               boolean oldShouldApplyToSource) {
 
         boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
         boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
         ColorScheme newColorScheme = backgroundComboBox.getItem();
         boolean newEnableHistory = enableHistoryCheckBox.isSelected();
-        HistoryDisplayMode newHistoryDisplayMode = historyStyleComboBox.getItem();
         boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
 
         boolean showLineNumbersUpdate = !Objects.equals(oldShowLineNumbers, newShowLineNumbers);
         boolean showFoldingOutlineUpdate = !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline);
         boolean colorSchemeUpdate = !Objects.equals(oldColorScheme, newColorScheme);
         boolean enableHistoryUpdate = !Objects.equals(oldEnableHistory, newEnableHistory);
-        boolean historyDisplayModeUpdate = !Objects.equals(oldHistoryDisplayMode, newHistoryDisplayMode);
         boolean shouldApplyToSourceUpdate = !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource);
 
 
@@ -513,7 +483,6 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || showFoldingOutlineUpdate
                 || (isIdea && colorSchemeUpdate)
                 || enableHistoryUpdate
-                || historyDisplayModeUpdate
                 || shouldApplyToSourceUpdate) {
 
             MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
@@ -537,15 +506,189 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 messageBus.syncPublisher(HistoryEnabledEvent.TOPIC).enable(newEnableHistory);
             }
 
-            if (historyDisplayModeUpdate) {
-                messageBus.syncPublisher(HistoryViewChangedEvent.TOPIC).change(newHistoryDisplayMode);
-            }
-
             if (shouldApplyToSourceUpdate) {
                 // 使编辑器切换到 源文件/安全 模式
                 messageBus.syncPublisher(ApplyToSourceToggleEvent.TOPIC).apply(newShouldApplyToSource);
             }
         }
+    }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(18, 1, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(1, 1, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        serializationTitle = new TitledSeparator();
+        panel2.add(serializationTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        panel1.add(spacer1, new GridConstraints(16, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(2, 2, new Insets(4, 17, 0, 0), -1, -1));
+        panel1.add(panel3, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        serializeRandomValuesCheckBox = new JBCheckBox();
+        panel3.add(serializeRandomValuesCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        panel3.add(spacer2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        serializeRandomValuesDesc = new JBLabel();
+        panel3.add(serializeRandomValuesDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(2, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        detectFastJsonAnnotationsCheckBox = new JBCheckBox();
+        panel4.add(detectFastJsonAnnotationsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer3 = new Spacer();
+        panel4.add(spacer3, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        detectFastJsonAnnotationsDesc = new JBLabel();
+        panel4.add(detectFastJsonAnnotationsDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new GridLayoutManager(2, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel5, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        detectJacksonAnnotationsCheckBox = new JBCheckBox();
+        panel5.add(detectJacksonAnnotationsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer4 = new Spacer();
+        panel5.add(spacer4, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        detectJacksonAnnotationsDesc = new JBLabel();
+        panel5.add(detectJacksonAnnotationsDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new GridLayoutManager(1, 1, new Insets(5, 0, 4, 0), -1, -1));
+        panel1.add(panel6, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        editorBehaviorTitle = new TitledSeparator();
+        panel6.add(editorBehaviorTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel7 = new JPanel();
+        panel7.setLayout(new GridLayoutManager(2, 4, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel7, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel8 = new JPanel();
+        panel8.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel7.add(panel8, new GridConstraints(0, 0, 1, 4, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer5 = new Spacer();
+        panel8.add(spacer5, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        autoRecognizeFormatsCheckBox = new JBCheckBox();
+        panel8.add(autoRecognizeFormatsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        autoRecognizeFormatsDesc = new JBLabel();
+        panel8.add(autoRecognizeFormatsDesc, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        formatsCheckBoxPanel = new JPanel();
+        formatsCheckBoxPanel.setLayout(new GridLayoutManager(1, 5, new Insets(0, 0, 0, 0), -1, -1));
+        panel7.add(formatsCheckBoxPanel, new GridConstraints(1, 0, 1, 4, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        enableXmlFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableXmlFormatsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer6 = new Spacer();
+        formatsCheckBoxPanel.add(spacer6, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        enableYamlFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableYamlFormatsCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        enableTomlFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableTomlFormatsCheckBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        enableUrlParamFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableUrlParamFormatsCheckBox, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        final JPanel panel9 = new JPanel();
+        panel9.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel9, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        showLineNumbersCheckBox = new JBCheckBox();
+        panel9.add(showLineNumbersCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer7 = new Spacer();
+        panel9.add(spacer7, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel10 = new JPanel();
+        panel10.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel10, new GridConstraints(11, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        showFoldingOutlineCheckBox = new JBCheckBox();
+        panel10.add(showFoldingOutlineCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer8 = new Spacer();
+        panel10.add(spacer8, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel11 = new JPanel();
+        panel11.setLayout(new GridLayoutManager(1, 2, new Insets(20, 10, 0, 0), -1, -1));
+        panel1.add(panel11, new GridConstraints(17, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        donateLink = new ActionLink();
+        panel11.add(donateLink, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer9 = new Spacer();
+        panel11.add(spacer9, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        backgroundPanel = new JPanel();
+        backgroundPanel.setLayout(new GridLayoutManager(1, 3, new Insets(0, 20, 0, 0), -1, -1));
+        panel1.add(backgroundPanel, new GridConstraints(12, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        backgroundLabel = new JBLabel();
+        backgroundPanel.add(backgroundLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        backgroundComboBox = new ComboBox();
+        backgroundPanel.add(backgroundComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer10 = new Spacer();
+        backgroundPanel.add(spacer10, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel12 = new JPanel();
+        panel12.setLayout(new GridLayoutManager(1, 1, new Insets(5, 0, 4, 0), -1, -1));
+        panel1.add(panel12, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        editorVisualTitle = new TitledSeparator();
+        panel12.add(editorVisualTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel13 = new JPanel();
+        panel13.setLayout(new GridLayoutManager(1, 1, new Insets(8, 0, 4, 0), -1, -1));
+        panel1.add(panel13, new GridConstraints(13, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        historyTitle = new TitledSeparator();
+        panel13.add(historyTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel14 = new JPanel();
+        panel14.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 4, 0), -1, -1));
+        panel1.add(panel14, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        generalTitle = new TitledSeparator();
+        panel14.add(generalTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel15 = new JPanel();
+        panel15.setLayout(new GridLayoutManager(1, 4, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel15, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        treeViewModeLabel = new JBLabel();
+        panel15.add(treeViewModeLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer11 = new Spacer();
+        panel15.add(spacer11, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        treeViewModeComboBox = new ComboBox();
+        panel15.add(treeViewModeComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        treeViewModeDesc = new JBLabel();
+        panel15.add(treeViewModeDesc, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel16 = new JPanel();
+        panel16.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel16, new GridConstraints(14, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        enableHistoryCheckBox = new JBCheckBox();
+        panel16.add(enableHistoryCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer12 = new Spacer();
+        panel16.add(spacer12, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel17 = new JPanel();
+        panel17.setLayout(new GridLayoutManager(1, 5, new Insets(4, 20, 2, 0), -1, -1));
+        panel1.add(panel17, new GridConstraints(15, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer13 = new Spacer();
+        panel17.add(spacer13, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        autoRecordHistoryLabel = new JBLabel();
+        panel17.add(autoRecordHistoryLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        autoRecordHistoryRadioBtn = new JBRadioButton();
+        panel17.add(autoRecordHistoryRadioBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        manualRecordHistoryRadioBtn = new JBRadioButton();
+        panel17.add(manualRecordHistoryRadioBtn, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        autoRecordHistoryDesc = new JBLabel();
+        panel17.add(autoRecordHistoryDesc, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel18 = new JPanel();
+        panel18.setLayout(new GridLayoutManager(2, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel18, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        applyToSourceCheckBox = new JBCheckBox();
+        panel18.add(applyToSourceCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer14 = new Spacer();
+        panel18.add(spacer14, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        applyToSourceDesc = new JBLabel();
+        panel18.add(applyToSourceDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return rootPanel;
     }
 
 }
