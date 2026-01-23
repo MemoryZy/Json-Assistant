@@ -323,20 +323,7 @@ public class TestGlobalAction extends BaseTestDumbAwareAction {
         // String s = FileUtil.readUtf8String(file1);
 
 
-        IProjectStore store = ProjectKt.getStateStore(project);
-        Path projectBasePath = store.getProjectBasePath();
-        Path directoryStorePath = store.getDirectoryStorePath();
-        String presentableUrl = store.getPresentableUrl();
-        Path projectFilePath = store.getProjectFilePath();
-        String projectName = store.getProjectName();
-        String projectWorkspaceId = store.getProjectWorkspaceId();
-        StorageScheme storageScheme = store.getStorageScheme();
-        Path workspacePath = store.getWorkspacePath();
-
-        StateStorageManager storageManager = store.getStorageManager();
-
-
-        // TODO 如果是文件型的，就用自定义目录，否则在 .idea 下建立文件
+        
 
         System.out.println();
 
