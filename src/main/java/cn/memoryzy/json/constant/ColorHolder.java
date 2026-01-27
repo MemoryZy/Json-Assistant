@@ -27,4 +27,6 @@ public interface ColorHolder {
         Color SECONDARY = JBColor.namedColor("Link.secondaryForeground", 0x779DBD, 0x5676A0);
     }
 
+    Color BACKGROUND = JBColor.namedColor("Popup.background", JBUI.CurrentTheme.List.BACKGROUND);
+
 }

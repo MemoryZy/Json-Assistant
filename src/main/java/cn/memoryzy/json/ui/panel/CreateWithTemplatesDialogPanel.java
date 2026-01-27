@@ -1,5 +1,6 @@
 package cn.memoryzy.json.ui.panel;
 
+import cn.memoryzy.json.constant.ColorHolder;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.ui.newItemPopup.NewItemWithTemplatesPopupPanel;
 import com.intellij.openapi.util.text.StringUtil;
@@ -31,7 +32,7 @@ public class CreateWithTemplatesDialogPanel extends NewItemWithTemplatesPopupPan
             }
         });
         if (PlatformUtil.isNewUi()) {
-            myTemplatesList.setBackground(JBUI.CurrentTheme.Popup.BACKGROUND);
+            myTemplatesList.setBackground(ColorHolder.BACKGROUND);
         }
         selectTemplate(selectedItem);
         setTemplatesListVisible(templates.size() > 1);
