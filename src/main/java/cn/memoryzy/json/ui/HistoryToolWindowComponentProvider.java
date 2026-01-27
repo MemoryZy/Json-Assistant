@@ -22,6 +22,7 @@ import cn.memoryzy.json.service.persistent.state.JsonGroup;
 import cn.memoryzy.json.service.persistent.state.JsonRecord;
 import cn.memoryzy.json.ui.dialog.TargetGroupSelectionDialog;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
+import cn.memoryzy.json.ui.panel.CreateWithTemplatesDialogPanel;
 import cn.memoryzy.json.ui.panel.NewItemPopupPanel;
 import cn.memoryzy.json.ui.tree.HistoryFilterableTree;
 import cn.memoryzy.json.ui.tree.HistoryNode;
@@ -30,7 +31,6 @@ import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.actions.newclass.CreateWithTemplatesDialogPanel;
 import com.intellij.ide.ui.newItemPopup.NewItemPopupUtil;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.notification.NotificationAction;
@@ -49,7 +49,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.util.Trinity;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.IdeFocusManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
@@ -809,11 +808,14 @@ public class HistoryToolWindowComponentProvider implements Disposable {
      */
     public void showNewRecordPopup(Project sourceProject, HistoryNode parentNode) {
         // 第一个做文本展示，第二个做图标展示，第三个做标识符
-        Trinity<String, Icon, String> jsonTrinity = Trinity.create(DataFormatType.JSON.getValue(), JsonAssistantIcons.FileTypes.JSON_CLASS, DataFormatType.JSON.getValue());
-        Trinity<String, Icon, String> json5Trinity = Trinity.create(DataFormatType.JSON5.getValue(), JsonAssistantIcons.FileTypes.JSON5_CLASS, DataFormatType.JSON5.getValue());
-        List<Trinity<String, Icon, String>> myTemplatesList = ListUtil.list(false, jsonTrinity, json5Trinity);
+        CreateWithTemplatesDialogPanel.TemplatePresentation jsonTemp =
+                new CreateWithTemplatesDialogPanel.TemplatePresentation(DataFormatType.JSON.getValue(), JsonAssistantIcons.FileTypes.JSON_NODE, DataFormatType.JSON.getValue());
+        CreateWithTemplatesDialogPanel.TemplatePresentation json5Temp =
+                new CreateWithTemplatesDialogPanel.TemplatePresentation(DataFormatType.JSON5.getValue(), JsonAssistantIcons.FileTypes.JSON5_NODE, DataFormatType.JSON5.getValue());
 
-        CreateWithTemplatesDialogPanel contentPanel = new CreateWithTemplatesDialogPanel(myTemplatesList, DataFormatType.JSON.getValue());
+        List<CreateWithTemplatesDialogPanel.TemplatePresentation> myTemplatesList = ListUtil.list(false, jsonTemp, json5Temp);
+
+        CreateWithTemplatesDialogPanel contentPanel = new CreateWithTemplatesDialogPanel(DataFormatType.JSON.getValue(), myTemplatesList);
         JTextField textField = contentPanel.getNameField();
         JBPopup popup = NewItemPopupUtil.createNewItemPopup(JsonAssistantBundle.messageOnSystem("popup.new.record.title"), contentPanel, textField);
 

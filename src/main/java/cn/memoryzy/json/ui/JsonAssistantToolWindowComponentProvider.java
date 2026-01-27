@@ -361,7 +361,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
             // 判断是否存在包装过的文件
             if (null == fileWrapper) return;
             // 标记为可写（允许修改）
-            PlatformUtil.markVirtualFileWritable(fileWrapper);
+            PlatformUtil.markVirtualFileWritable(fileWrapper, true);
             // 新开标签页，再关闭旧标签页
             ApplicationManager.getApplication().invokeLater(() -> {
                 // 切换到真实文件

@@ -77,7 +77,7 @@ public final class HistoryManager implements Disposable {
     /**
      * 记录信息文件
      */
-    private final VirtualFile historiesFile;
+    private volatile VirtualFile historiesFile;
 
 
     /**
@@ -379,8 +379,15 @@ public final class HistoryManager implements Disposable {
             JsonUtil.MAPPER.writeValue(projectHistoriesFilePath.toFile(), new RecordSerialization(this));
 
             // 重新加载
-            Document document = FileDocumentManager.getInstance().getCachedDocument(historiesFile);
-            if (null != document) FileDocumentManager.getInstance().reloadFromDisk(document);
+            if (null == historiesFile) {
+                // 如果没有过历史记录的项目，那么 histories.json 文件一开始就不存在，所以重新加载
+                historiesFile = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(projectHistoriesFilePath);
+            }
+
+            if (null != historiesFile) {
+                Document document = FileDocumentManager.getInstance().getCachedDocument(historiesFile);
+                if (null != document) FileDocumentManager.getInstance().reloadFromDisk(document);
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -427,7 +434,7 @@ public final class HistoryManager implements Disposable {
             }
 
             // 添加标记，防止判定为外部文件不允许编辑
-            PlatformUtil.markVirtualFileWritable(sourceFile);
+            PlatformUtil.markVirtualFileWritable(sourceFile, false);
             // 添加标记，标记为记录文件
             PlatformUtil.markVirtualFileFlag(sourceFile, project.getName());
             record.setSourceFile(sourceFile);
@@ -466,7 +473,7 @@ public final class HistoryManager implements Disposable {
         refreshDir();
         VirtualFile childFile = findChildFile(fileName);
         // 添加标记，防止判定为外部文件不允许编辑
-        PlatformUtil.markVirtualFileWritable(childFile);
+        PlatformUtil.markVirtualFileWritable(childFile, false);
         // 添加标记，标记为记录文件
         PlatformUtil.markVirtualFileFlag(childFile, project.getName());
         return childFile;

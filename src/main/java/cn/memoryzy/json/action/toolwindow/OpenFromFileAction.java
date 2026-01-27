@@ -114,7 +114,7 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
 
         // 包装虚拟文件，以便后续操作（为了在设置变更后，能切换到可写入的真实文件）
         ExternalFileWrapper fileWrapper = new ExternalFileWrapper(selectFile);
-        PlatformUtil.markVirtualFileWritable(fileWrapper);
+        PlatformUtil.markVirtualFileWritable(fileWrapper, true);
         // 默认用实体文件
         selectFile = fileWrapper;
 

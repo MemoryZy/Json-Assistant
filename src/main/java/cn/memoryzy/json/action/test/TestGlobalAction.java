@@ -1,15 +1,9 @@
 package cn.memoryzy.json.action.test;
 
-import com.intellij.configurationStore.StateStorageManager;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Constraints;
-import com.intellij.openapi.components.StorageScheme;
-import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.project.Project;
-import com.intellij.project.ProjectKt;
 import org.jetbrains.annotations.NotNull;
-
-import java.nio.file.Path;
 
 /**
  * @author Memory

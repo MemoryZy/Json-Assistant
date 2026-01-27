@@ -11,6 +11,7 @@ import com.intellij.ide.plugins.DynamicPluginListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.StartupActivity;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/7/25
  */
-public class PluginActivityManager implements StartupActivity, DynamicPluginListener {
+public class PluginActivityManager implements StartupActivity, DynamicPluginListener, DumbAware {
 
     /**
      * 项目打开，并在索引建立完后执行
@@ -30,6 +31,8 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
      */
     @Override
     public void runActivity(@NotNull Project project) {
+        PlatformUtil.enableBreadcrumbsShownForJson();
+
         // 展示欢迎或更新通知
         showWelcomeOrUpdateNotification(project);
         // 实现公告（公告只会拉取、执行一次）

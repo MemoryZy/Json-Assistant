@@ -22,15 +22,20 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
+import com.intellij.ide.ui.UISettings;
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.application.*;
+import com.intellij.openapi.application.ApplicationInfo;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ApplicationNamesInfo;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
 import com.intellij.openapi.extensions.PluginId;
@@ -611,7 +616,6 @@ public class PlatformUtil {
     }
 
 
-
     public static String getSingleSelectText(Editor editor) {
         if (null == editor) return null;
         Document document = editor.getDocument();
@@ -750,24 +754,18 @@ public class PlatformUtil {
         return false;
     }
 
-    public static void markVirtualFileWritable(VirtualFile file) {
+    public static void markVirtualFileWritable(VirtualFile file, boolean setWritable) {
         if (null == file) return;
 
-        Application application = ApplicationManager.getApplication();
-
-        // 需在事件线程执行它
-        Runnable task = () -> {
-            // 包装文件，允许修改
-            try {
-                file.setWritable(true);
-            } catch (IOException ignored) {
+        if (setWritable) {
+            if (!file.isWritable()) {
+                // 需在事件线程执行它（确保调用来的都是事件线程）
+                try {
+                    file.setWritable(true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
-        };
-
-        if (application.isDispatchThread()) {
-            task.run();
-        } else {
-            application.runWriteAction(task);
         }
 
         file.putUserData(OpenFromFileAction.EXTERNAL_FILE_MARKER, true);
@@ -780,6 +778,7 @@ public class PlatformUtil {
 
     /**
      * 检查指定插件是否已安装并启用
+     *
      * @param pluginId 插件ID
      */
     public static boolean isPluginEnabled(String pluginId) {
@@ -834,7 +833,7 @@ public class PlatformUtil {
 
     public static Project findProject(String projectName) {
         for (Project openProject : ProjectManager.getInstance().getOpenProjects()) {
-            if (openProject.getName().equals(projectName)){
+            if (openProject.getName().equals(projectName)) {
                 return openProject;
             }
         }
@@ -842,4 +841,35 @@ public class PlatformUtil {
         return null;
     }
 
+    /**
+     * 将 IDE 的路径导航中的 JSON 打开
+     *
+     * <p>有些 IDE 可能一开始不会启用 JSON 选项，这时给手动打开</p>
+     */
+    public static void enableBreadcrumbsShownForJson() {
+        EditorSettingsExternalizable settings = EditorSettingsExternalizable.getInstance();
+
+        // 是否通知设置更改
+        boolean fireChanged = false;
+        // 如果关闭了路径导航，则打开
+        if (!settings.isBreadcrumbsShown()) {
+            // 设置为显示 路径导航
+            settings.setBreadcrumbsShown(true);
+            fireChanged = true;
+        }
+
+        boolean shownForJson = settings.isBreadcrumbsShownFor("JSON");
+        if (!shownForJson) {
+            // 在这里将路径导航中的 JSON 选项打开
+            settings.setBreadcrumbsShownFor(/*JsonLanguage.INSTANCE.getID()*/ "JSON", true);
+            fireChanged = true;
+        }
+
+        if (fireChanged) {
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // 通知设置更改
+                UISettings.getInstance().fireUISettingsChanged();
+            });
+        }
+    }
 }

@@ -12,7 +12,9 @@
       "fileTypes": {
         "toml.svg": "icons/fileTypes/toml-file.svg",
         "url.svg": "icons/fileTypes/url.svg",
-        "kv.svg": "icons/fileTypes/kv.svg"
+        "kv.svg": "icons/fileTypes/kv.svg",
+        "jsonNode.svg": "icons/fileTypes/jsonNode.svg",
+        "json5Node.svg": "icons/fileTypes/json5Node.svg"
       },
       "toolwindow": {
         "logo.svg": "icons/toolwindow/logo.svg",
