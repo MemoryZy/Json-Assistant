@@ -101,7 +101,7 @@ public class PathManager {
      * @return 路径
      */
     public static Path createAndGetProjectPluginDirectory(Project project) {
-        return createAndGetProjectPluginDirectory(ProjectKt.getStateStore(project));
+        return createAndGetProjectPluginDirectory(ProjectKt.getStateStore(project), project);
     }
 
     /**
@@ -113,7 +113,7 @@ public class PathManager {
      * @param store 项目存储项
      * @return 路径
      */
-    public static Path createAndGetProjectPluginDirectory(IProjectStore store) {
+    public static Path createAndGetProjectPluginDirectory(IProjectStore store, Project project) {
         Path resultPath = null;
         // 获取项目存储类型
         StorageScheme storageScheme = store.getStorageScheme();
@@ -127,7 +127,7 @@ public class PathManager {
 
         if (null == resultPath) {
             // 基于文件(.ipr)
-            resultPath = Paths.get(PLUGIN_DIRECTORY.toString(), PROJECTS_DIRECTORY_NAME, store.getProjectName());
+            resultPath = Paths.get(PLUGIN_DIRECTORY.toString(), PROJECTS_DIRECTORY_NAME, project.getName());
         }
 
         // 创建目录
