@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-01-29
+
 - 改变历史记录窗口样式，去除列表样式，只保留树样式。
 - 修改历史记录存储方式，防止丢失。
 - 增加实时显示 JSON 路径的功能。
@@ -385,7 +387,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.7...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.0...HEAD
+[1.9.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.7...v1.9.0
 [1.8.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.5...v1.8.7
 [1.8.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.2...v1.8.5
 [1.8.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.0...v1.8.2
