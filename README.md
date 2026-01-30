@@ -155,6 +155,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 
 | Name | Website | Message | Amount |
 | --- | --- | --- | --- |
+| 4* |  |  | 250.00 CNY |
 | **音 |  |  | 20.00 CNY |
 | sanp | [https://www.haozhuji.net/](https://www.haozhuji.net/) | 好主机 | 10.24 CNY |
 | **程 |  |  | 10.00 CNY |
