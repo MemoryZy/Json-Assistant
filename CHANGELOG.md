@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+- 更换“节点值修改”功能的显示方式。
+- 修复一些BUG。
+- Changed the display method of the "node value modification" feature.
+- Fixed some bugs.
+
 ## [1.9.0] - 2026-01-29
 
 - 改变历史记录窗口样式，去除列表样式，只保留树样式。
