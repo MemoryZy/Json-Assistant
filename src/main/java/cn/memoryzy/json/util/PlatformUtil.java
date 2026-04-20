@@ -22,12 +22,10 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
-import com.intellij.ide.ui.UISettings;
 import com.intellij.lang.Language;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -35,7 +33,6 @@ import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
 import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
 import com.intellij.openapi.extensions.PluginId;
@@ -841,35 +838,35 @@ public class PlatformUtil {
         return null;
     }
 
-    /**
-     * 将 IDE 的路径导航中的 JSON 打开
-     *
-     * <p>有些 IDE 可能一开始不会启用 JSON 选项，这时给手动打开</p>
-     */
-    public static void enableBreadcrumbsShownForJson() {
-        EditorSettingsExternalizable settings = EditorSettingsExternalizable.getInstance();
-
-        // 是否通知设置更改
-        boolean fireChanged = false;
-        // 如果关闭了路径导航，则打开
-        if (!settings.isBreadcrumbsShown()) {
-            // 设置为显示 路径导航
-            settings.setBreadcrumbsShown(true);
-            fireChanged = true;
-        }
-
-        boolean shownForJson = settings.isBreadcrumbsShownFor("JSON");
-        if (!shownForJson) {
-            // 在这里将路径导航中的 JSON 选项打开
-            settings.setBreadcrumbsShownFor(/*JsonLanguage.INSTANCE.getID()*/ "JSON", true);
-            fireChanged = true;
-        }
-
-        if (fireChanged) {
-            ApplicationManager.getApplication().invokeLater(() -> {
-                // 通知设置更改
-                UISettings.getInstance().fireUISettingsChanged();
-            });
-        }
-    }
+    // /**
+    //  * 将 IDE 的路径导航中的 JSON 打开
+    //  *
+    //  * <p>有些 IDE 可能一开始不会启用 JSON 选项，这时给手动打开</p>
+    //  */
+    // public static void enableBreadcrumbsShownForJson() {
+    //     EditorSettingsExternalizable settings = EditorSettingsExternalizable.getInstance();
+    //
+    //     // 是否通知设置更改
+    //     boolean fireChanged = false;
+    //     // 如果关闭了路径导航，则打开
+    //     if (!settings.isBreadcrumbsShown()) {
+    //         // 设置为显示 路径导航
+    //         settings.setBreadcrumbsShown(true);
+    //         fireChanged = true;
+    //     }
+    //
+    //     boolean shownForJson = settings.isBreadcrumbsShownFor("JSON");
+    //     if (!shownForJson) {
+    //         // 在这里将路径导航中的 JSON 选项打开
+    //         settings.setBreadcrumbsShownFor(/*JsonLanguage.INSTANCE.getID()*/ "JSON", true);
+    //         fireChanged = true;
+    //     }
+    //
+    //     if (fireChanged) {
+    //         ApplicationManager.getApplication().invokeLater(() -> {
+    //             // 通知设置更改
+    //             UISettings.getInstance().fireUISettingsChanged();
+    //         });
+    //     }
+    // }
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.*;
 import com.intellij.openapi.diagnostic.Logger;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -75,12 +77,16 @@ public class JsonAssistantUtil {
 
     public static Method getMethod(Object obj, String methodName, Object... params) {
         Class<?> clazz = obj.getClass();
+        return getMethod(clazz, methodName, params);
+    }
+
+    public static Method getMethod(Class<?> clz, String methodName, Object... params) {
         Class<?>[] paramTypes = new Class[params.length];
         for (int i = 0; i < params.length; i++) {
             paramTypes[i] = params[i].getClass();
         }
 
-        return ReflectUtil.getMethod(clazz, methodName, paramTypes);
+        return ReflectUtil.getMethod(clz, methodName, paramTypes);
     }
 
 
@@ -92,6 +98,40 @@ public class JsonAssistantUtil {
         }
 
         return null;
+    }
+
+    public static Object invokeStaticMethod(Class<?> clz, String methodName, Object... params) {
+        Method method = getMethod(clz, methodName, params);
+        if (null != method) {
+            return ReflectUtil.invokeStatic(method, params);
+        }
+
+        return null;
+    }
+
+
+    public static <T> Object newInstance(Class<T> clazz, Class<?>[] paramTypes, Object... params) {
+        if (ArrayUtil.isEmpty(params)) {
+            final Constructor<T> constructor = ReflectUtil.getConstructor(clazz);
+            if (null == constructor) {
+                throw new UtilException("No constructor for [{}]", clazz);
+            }
+            try {
+                return constructor.newInstance();
+            } catch (Exception e) {
+                throw new UtilException(e, "Instance class [{}] error!", clazz);
+            }
+        }
+
+        final Constructor<T> constructor = ReflectUtil.getConstructor(clazz, paramTypes);
+        if (null == constructor) {
+            throw new UtilException("No Constructor matched for parameter types: [{}]", new Object[]{paramTypes});
+        }
+        try {
+            return constructor.newInstance(params);
+        } catch (Exception e) {
+            throw new UtilException(e, "Instance class [{}] error!", clazz);
+        }
     }
 
 

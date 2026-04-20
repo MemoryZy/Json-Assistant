@@ -25,6 +25,7 @@ import cn.memoryzy.json.ui.listener.EditorDocumentMonitor;
 import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.ResidentBreadcrumbsXmlWrapper;
 import cn.memoryzy.json.util.*;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
@@ -157,7 +158,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         // Json 编辑器
         JComponent editorComponent = currentEditor.getComponent();
         // 面包屑
-        BreadcrumbsXmlWrapper wrapper = new BreadcrumbsXmlWrapper(currentEditor);
+        BreadcrumbsXmlWrapper wrapper = new ResidentBreadcrumbsXmlWrapper(currentEditor);
         // 组合
         BorderLayoutPanel editorPanel = new BorderLayoutPanel().addToCenter(editorComponent).addToBottom(wrapper);
 

@@ -31,8 +31,6 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
      */
     @Override
     public void runActivity(@NotNull Project project) {
-        PlatformUtil.enableBreadcrumbsShownForJson();
-
         // 展示欢迎或更新通知
         showWelcomeOrUpdateNotification(project);
         // 实现公告（公告只会拉取、执行一次）
