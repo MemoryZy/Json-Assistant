@@ -9,13 +9,12 @@ import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 import cn.memoryzy.json.service.persistent.GeneralSettings;
 import cn.memoryzy.json.service.persistent.state.TreeStructureState;
-import cn.memoryzy.json.ui.decorator.EditorErrorPopupManager;
+import cn.memoryzy.json.ui.dialog.ModifyNodeValueDialog;
 import cn.memoryzy.json.ui.editor.ExpandableEditorTextField;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
 import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.*;
 import com.intellij.codeInsight.highlighting.HighlightManager;
-import com.intellij.json.json5.Json5Language;
 import com.intellij.json.psi.JsonElement;
 import com.intellij.json.psi.JsonElementGenerator;
 import com.intellij.json.psi.JsonFile;
@@ -28,23 +27,18 @@ import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.Balloon;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiFile;
 import com.intellij.ui.awt.RelativePoint;
-import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.components.BorderLayoutPanel;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -68,12 +62,6 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
     private final AtomicReference<EditorContext> editorContextReference;
     private final TreeStructureState structureState;
 
-    private Balloon currentBalloon;
-    private ExpandableEditorTextField expandableTextField;
-    private EditorErrorPopupManager decorator;
-    private JBCheckBox sourceFileCheckBox;
-    private JButton saveButton;
-
     public ModifyNodeValueAction(Tree tree, AtomicReference<EditorContext> editorContextReference, JsonFilterableTree filterableTree) {
         super(JsonAssistantBundle.messageOnSystem("action.modifyNodeValue.text"), JsonAssistantBundle.messageOnSystem("action.modifyNodeValue.description"), null);
         this.tree = tree;
@@ -92,88 +80,41 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
         DefaultMutableTreeNode selectedNode = getSelectedNode();
         JsonNode node = (JsonNode) selectedNode.getUserObject();
 
-        // 构建面板
-        JComponent component = createComponent(project, node);
-        // 获取节点在屏幕上的位置
-        RelativePoint point = getNodeScreenPosition(selectedNode);
-        // 构建气球
-        this.currentBalloon = JBPopupFactory.getInstance().createDialogBalloonBuilder(component, null)
-                .setShowCallout(true)
-                .setCloseButtonEnabled(false)
-                .setAnimationCycle(3)
-                .setHideOnKeyOutside(true)
-                .setHideOnClickOutside(true)
-                .setRequestFocus(true)
-                .setBlockClicksThroughBalloon(true)
-                .setShadow(true)
-                .createBalloon();
-
-        this.currentBalloon.show(point, Balloon.Position.below);
-        JRootPane rootPane = component.getRootPane();
-        rootPane.setDefaultButton(saveButton);
-        this.expandableTextField.requestFocus();
-        this.decorator = new EditorErrorPopupManager(rootPane, expandableTextField);
-    }
-
-    private JComponent createComponent(Project project, JsonNode node) {
-        this.expandableTextField = new ExpandableEditorTextField(project, Json5Language.INSTANCE);
-        this.expandableTextField.setText(String.valueOf(node.getValue()));
-        this.expandableTextField.selectAll();
-
-        // 编辑器
-        this.expandableTextField.addKeyListener(new KeyAdapter() {
+        // 将气泡改为弹窗（非模态）
+        ModifyNodeValueDialog dialog = new ModifyNodeValueDialog(project, node.getValue());
+        dialog.setOkAction(() -> executeSaveAction(project, dialog, node));
+        dialog.addEditorKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    executeSaveAction(project, node);
+                    if (executeSaveAction(project, dialog, node)) {
+                        dialog.close(DialogWrapper.OK_EXIT_CODE);
+                    }
                 }
             }
         });
-        this.expandableTextField.setShowPlaceholderWhenFocused(true);
-        this.expandableTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("popup.modifyNodeValue.placeholder"));
 
-        // 创建操作按钮
-        this.saveButton = new JButton(JsonAssistantBundle.messageOnSystem("popup.modifyNodeValue.save.button.text"));
-        this.saveButton.addActionListener(event -> executeSaveAction(project, node));
-
-        // 按钮面板
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(saveButton);
-
-        // 保存配置状态
-        this.sourceFileCheckBox = new JBCheckBox(JsonAssistantBundle.messageOnSystem("popup.modifyNodeValue.applyToSourceFile.text"), structureState.isShouldApplyToSource());
-        sourceFileCheckBox.addActionListener(
-                event -> structureState.setShouldApplyToSource(sourceFileCheckBox.isSelected()));
-
-        // 底部面板（选项+按钮）
-        BorderLayoutPanel bottomPanel = new BorderLayoutPanel()
-                .addToLeft(sourceFileCheckBox)
-                .addToRight(buttonPanel);
-
-        BorderLayoutPanel panel = new BorderLayoutPanel()
-                .addToCenter(expandableTextField)
-                .addToBottom(bottomPanel);
-        panel.setPreferredSize(new Dimension(220, 79));
-        panel.setBorder(JBUI.Borders.empty(10, 3, 0, 3));
-        return panel;
+        dialog.show();
     }
 
-    private void executeSaveAction(Project project, JsonNode node) {
+    private boolean executeSaveAction(Project project, ModifyNodeValueDialog dialog, JsonNode node) {
+        ExpandableEditorTextField expandableTextField = dialog.getExpandableTextField();
         EditorContext editorContext = editorContextReference.get();
         // 1.输入内容判断及处理（如果不为数值、布尔、null，则都为字符串。如果用户手动加了字符串，那都以字符串为准）
         String inputText = StrUtil.trim(expandableTextField.getText());
         if (StrUtil.isBlank(inputText)) {
-            decorator.setError(JsonAssistantBundle.messageOnSystem("error.invalid.value"));
-            return;
+            dialog.setError(JsonAssistantBundle.messageOnSystem("error.invalid.value"));
+            return false;
         }
 
-        if (Objects.equals(String.valueOf(node.getValue()), inputText)) {
-            decorator.setError(JsonAssistantBundle.messageOnSystem("error.content.repetition.content"));
-            return;
-        }
+        String oldValue = String.valueOf(node.getValue());
 
         // 解析输入文本，得到对应的值
         Object inputValue = parseInputText(inputText);
+        if (Objects.equals(oldValue, inputValue)) {
+            dialog.setError(JsonAssistantBundle.messageOnSystem("error.content.repetition.content"));
+            return false;
+        }
 
         // 2.判断是否应用到源文件
         if (structureState.isShouldApplyToSource()) {
@@ -185,15 +126,15 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
             Editor editor = editorContext.getEditor();
 
             if (null == editor || editor.isDisposed()) {
-                decorator.setError(JsonAssistantBundle.messageOnSystem("error.editor.disposed.content"));
-                return;
+                dialog.setError(JsonAssistantBundle.messageOnSystem("error.editor.disposed.content"));
+                return false;
             }
 
             // 定位到对应的 PSI 元素  TODO 这里可能只能暂时修改节点值，之后扩展为：可修改键
             Pair<JsonElement, JsonValue> elementPair = JsonPsiLocator.locateByPath(effectivePsiFile, node.getJsonPath());
             if (elementPair == null) {
-                decorator.setError(JsonAssistantBundle.messageOnSystem("error.content.changed.content"));
-                return;
+                dialog.setError(JsonAssistantBundle.messageOnSystem("error.content.changed.content"));
+                return false;
             }
 
             String valueStr;
@@ -221,7 +162,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
                     String originalContent = editorContext.getOriginalContent();
 
                     if (!Objects.equals(nowContent, originalContent)) {
-                        decorator.setError(JsonAssistantBundle.messageOnSystem("error.content.changed.content"));
+                        dialog.setError(JsonAssistantBundle.messageOnSystem("error.content.changed.content"));
                         return;
                     }
 
@@ -254,10 +195,7 @@ public class ModifyNodeValueAction extends DumbAwareAction implements UpdateInBa
             repaintTree(inputValue, node);
         }
 
-        // 关闭弹窗
-        if (null != currentBalloon) {
-            currentBalloon.hide();
-        }
+        return true;
     }
 
     @Override

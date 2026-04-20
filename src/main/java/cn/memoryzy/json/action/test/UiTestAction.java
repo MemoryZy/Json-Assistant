@@ -1,6 +1,7 @@
 package cn.memoryzy.json.action.test;
 
 import cn.hutool.core.collection.ListUtil;
+import cn.memoryzy.json.ui.dialog.ModifyNodeValueDialog;
 import cn.memoryzy.json.ui.panel.CreateWithTemplatesDialogPanel;
 import com.intellij.ide.fileTemplates.JavaTemplateUtil;
 import com.intellij.ide.ui.newItemPopup.NewItemPopupUtil;
@@ -41,9 +42,44 @@ public class UiTestAction extends BaseTestDumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        simulateNewPopup(e.getProject());
+        Project project = e.getProject();
+
+
+
+        // simulateNewPopup(project);
+
+        modifyNodeValueDialog(project);
     }
 
+    private void modifyNodeValueDialog(Project project) {
+        // DialogBuilder dialogBuilder = new DialogBuilder().title("修改节点值");
+        //
+        // DialogBuilder.CustomizableAction okAction = dialogBuilder.addOkAction();
+        // okAction.setText("确定");
+        // DialogBuilder.CustomizableAction cancelAction = dialogBuilder.addCancelAction();
+        // cancelAction.setText("取消");
+        //
+        // // 样式
+        // ExpandableEditorTextField expandableTextField = new ExpandableEditorTextField(project, Json5Language.INSTANCE);
+        // expandableTextField.setText("12");
+        // expandableTextField.selectAll();
+        //
+        // JBCheckBox checkBox = new JBCheckBox("作用于源文件");
+        //
+        // BorderLayoutPanel rootPanel = new BorderLayoutPanel()
+        //         .addToTop(expandableTextField)
+        //         .addToLeft(checkBox);
+        //
+        // dialogBuilder.centerPanel(rootPanel);
+        // dialogBuilder.show();
+        //
+        //
+        // MessageDialogBuilder.okCancel()
+
+        new ModifyNodeValueDialog(project, "12").show();
+
+
+    }
 
     /**
      * 模拟IDEA新建类时的弹窗
