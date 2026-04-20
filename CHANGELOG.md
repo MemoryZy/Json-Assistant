@@ -3,10 +3,10 @@
 ## [Unreleased]
 
 - 修复因插件导致的 Show Breadcrumbs 功能失效的[问题](https://github.com/MemoryZy/Json-Assistant/issues/106)。
-- 更换“节点值修改”功能的显示方式。
+- 更换 `节点值修改` 功能的显示方式。
 - 修复一些BUG。
 - Fix the [issue](https://github.com/MemoryZy/Json-Assistant/issues/106) where the Show Breadcrumbs feature does not work due to a plugin.
-- Changed the display method of the "node value modification" feature.
+- Changed the display method of the `node value modification` feature.
 - Fixed some bugs.
 
 ## [1.9.0] - 2026-01-29
