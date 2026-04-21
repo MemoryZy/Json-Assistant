@@ -8,16 +8,15 @@ import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.ex.EditorSettingsExternalizable;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.ui.breadcrumbs.BreadcrumbsProvider;
 import com.intellij.ui.breadcrumbs.BreadcrumbsUtil;
 import com.intellij.ui.components.breadcrumbs.Crumb;
-import com.intellij.xml.breadcrumbs.BreadcrumbsForceShownSettings;
-import com.intellij.xml.breadcrumbs.BreadcrumbsPresentationProvider;
-import com.intellij.xml.breadcrumbs.BreadcrumbsXmlWrapper;
-import com.intellij.xml.breadcrumbs.CrumbPresentation;
+import com.intellij.util.ObjectUtils;
+import com.intellij.xml.breadcrumbs.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,10 +27,12 @@ import java.util.Collections;
 /**
  * 常驻面包屑面板
  *
+ * <p>不继承BreadcrumbsXmlWrapper，因为其在后续版本被设定为final</p>
+ *
  * @author Memory
  * @since 2026/4/20
  */
-public class ResidentBreadcrumbsXmlWrapper extends BreadcrumbsXmlWrapper {
+public class ResidentBreadcrumbsXmlWrapper extends BreadcrumbsPanel {
 
     private final VirtualFile file;
     private final EditorSettingsExternalizable settings;
@@ -45,7 +46,7 @@ public class ResidentBreadcrumbsXmlWrapper extends BreadcrumbsXmlWrapper {
     @Nullable
     @Override
     protected Iterable<? extends Crumb> computeCrumbs(int offset) {
-        FileBreadcrumbsCollector breadcrumbsCollector = findCollectorFor(myProject, file, this);
+        FileBreadcrumbsCollector breadcrumbsCollector = findCollector(myProject, file);
         if (breadcrumbsCollector == null) return null;
 
         Document document = myEditor.getDocument();
@@ -55,6 +56,16 @@ public class ResidentBreadcrumbsXmlWrapper extends BreadcrumbsXmlWrapper {
         return settings.isBreadcrumbsShown() && settings.isBreadcrumbsShownFor("JSON")
                 ? breadcrumbsCollector.computeCrumbs(file, document, offset, forcedShown)
                 : computeCrumbs(file, document, offset, breadcrumbsCollector.getClass());
+    }
+
+    public void navigate(NavigatableCrumb crumb, boolean withSelection) {
+        myUserCaretChange = false;
+        crumb.navigate(myEditor, withSelection);
+    }
+
+    @Nullable
+    public static BreadcrumbsXmlWrapper getBreadcrumbsWrapper(@NotNull Editor editor) {
+        return ObjectUtils.tryCast(BreadcrumbsPanel.getBreadcrumbsComponent(editor), BreadcrumbsXmlWrapper.class);
     }
 
 
@@ -121,4 +132,13 @@ public class ResidentBreadcrumbsXmlWrapper extends BreadcrumbsXmlWrapper {
         }
         return null;
     }
+
+    @Nullable
+    protected FileBreadcrumbsCollector findCollector(@NotNull Project project, @Nullable VirtualFile file) {
+        if (file == null) return null;
+        FileBreadcrumbsCollector collector = FileBreadcrumbsCollector.findBreadcrumbsCollector(project, file);
+        collector.watchForChanges(file, myEditor, this, this::queueUpdate);
+        return collector;
+    }
+
 }

@@ -59,7 +59,7 @@ import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import com.intellij.xml.breadcrumbs.BreadcrumbsXmlWrapper;
+import com.intellij.xml.breadcrumbs.BreadcrumbsPanel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -158,7 +158,7 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
         // Json 编辑器
         JComponent editorComponent = currentEditor.getComponent();
         // 面包屑
-        BreadcrumbsXmlWrapper wrapper = new ResidentBreadcrumbsXmlWrapper(currentEditor);
+        BreadcrumbsPanel wrapper = new ResidentBreadcrumbsXmlWrapper(currentEditor);
         // 组合
         BorderLayoutPanel editorPanel = new BorderLayoutPanel().addToCenter(editorComponent).addToBottom(wrapper);
 
