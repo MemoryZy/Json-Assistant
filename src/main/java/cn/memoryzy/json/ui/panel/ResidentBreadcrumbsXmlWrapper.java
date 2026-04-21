@@ -50,12 +50,14 @@ public class ResidentBreadcrumbsXmlWrapper extends BreadcrumbsPanel {
         if (breadcrumbsCollector == null) return null;
 
         Document document = myEditor.getDocument();
-        Boolean forcedShown = BreadcrumbsForceShownSettings.getForcedShown(myEditor);
-
         // 如果开启面包屑并拥有 JSON 类型，则用原来的
-        return settings.isBreadcrumbsShown() && settings.isBreadcrumbsShownFor("JSON")
-                ? breadcrumbsCollector.computeCrumbs(file, document, offset, forcedShown)
-                : computeCrumbs(file, document, offset, breadcrumbsCollector.getClass());
+        if (settings.isBreadcrumbsShown() && settings.isBreadcrumbsShownFor("JSON")) {
+            // 在后来版本中，BreadcrumbsForceShownSettings这个类被标记为内部方法，所以用反射调用
+            // Boolean forcedShown = BreadcrumbsForceShownSettings.getForcedShown(myEditor);
+            return breadcrumbsCollector.computeCrumbs(file, document, offset, null);
+        }
+
+        return computeCrumbs(file, document, offset, breadcrumbsCollector.getClass());
     }
 
     public void navigate(NavigatableCrumb crumb, boolean withSelection) {
