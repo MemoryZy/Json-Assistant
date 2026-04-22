@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.9.1] - 2026-04-22
+
 - 修复因插件导致的 Show Breadcrumbs 功能失效的[问题](https://github.com/MemoryZy/Json-Assistant/issues/106)。
 - 更换 `节点值修改` 功能的显示方式。
 - 修复一些BUG。
@@ -398,7 +400,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.1...HEAD
+[1.9.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.7...v1.9.0
 [1.8.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.5...v1.8.7
 [1.8.5]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.2...v1.8.5
