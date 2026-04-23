@@ -1,5 +1,6 @@
 package cn.memoryzy.json.service;
 
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.Notifications;
 import com.intellij.notification.Notification;
 import com.intellij.openapi.Disposable;
@@ -34,11 +35,15 @@ public final class NotificationScheduler implements Disposable {
 
     private final Queue<Notification> notificationQueue = new ConcurrentLinkedQueue<>();
     private final AtomicBoolean isShowing = new AtomicBoolean(false);
-    private final AtomicInteger delayMillis = new AtomicInteger(60 * 1000);
+
+    /**
+     * 延迟展示时间（分钟）
+     */
+    private final AtomicInteger delayMinutes = new AtomicInteger(1);
     private final Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
 
-    public void setDelay(int millis) {
-        delayMillis.set(millis);
+    public void setDelay(int minutes) {
+        delayMinutes.set(minutes);
     }
 
     public void addNotifications(List<Notification> notifications, Consumer<String> consumer, @NotNull Project project) {
@@ -111,7 +116,7 @@ public final class NotificationScheduler implements Disposable {
                 }
             });
 
-        }, delayMillis.get());
+        }, JsonAssistantUtil.minutesToMilliseconds(delayMinutes.get()));
     }
 
     private void handleNotificationError(@NotNull Project project, Exception e) {

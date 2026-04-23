@@ -51,6 +51,11 @@ public final class AnnouncementManager implements Disposable {
 
     private final Alarm alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.POOLED_THREAD, this);
 
+    /**
+     * 延迟执行时间（分钟）
+     */
+    private static final int delayMinutes = 2;
+
     public void scheduleDelayedAnnouncement(@NotNull Project project) {
         if (alarm.isDisposed() || project.isDisposed()) return;
 
@@ -58,7 +63,7 @@ public final class AnnouncementManager implements Disposable {
             if (!project.isDisposed()) {
                 showAnnouncement(project);
             }
-        }, 2 * 60 * 1000);
+        }, JsonAssistantUtil.minutesToMilliseconds(delayMinutes));
     }
 
     private void showAnnouncement(@NotNull Project project) {
@@ -371,14 +376,92 @@ public final class AnnouncementManager implements Disposable {
 
         try {
             // 拉取公告
-            String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
+            // String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
             // 解析
-            return JsonUtil.MAPPER.readValue(respJson, new TypeReference<>() {
+            // return JsonUtil.MAPPER.readValue(respJson, new TypeReference<>() {
+            // });
+            return JsonUtil.MAPPER.readValue(json, new TypeReference<>() {
             });
         } catch (JsonProcessingException e) {
             return new ArrayList<>();
         }
     }
+
+    String json = "[\n" +
+            "  {\n" +
+            "    \"id\": \"tort_v1\",\n" +
+            "    \"locales\": {\n" +
+            "      \"en_US\": {\n" +
+            "        \"title\": \"Json Assistant\",\n" +
+            "        \"content\": \"It has recently come to light that the source code of my original plugin <b><a href=\\\"https://github.com/MemoryZy/Json-Assistant\\\">Json Assistant</a></b> was maliciously modified and redistributed by developer <b><a href=\\\"https://plugins.jetbrains.com/vendor/katter\\\">Infinitron</a></b>(JetBrains Plugin Marketplace username) as the infringing plugin <b><a href=\\\"https://plugins.jetbrains.com/plugin/26977-json-viewer\\\">Json Viewer</a></b>: It directly copied core code, illegally added paywall restrictions across all features for profit, and removed original author information along with open-source licenses. Despite attempted camouflage through updates (e.g., modifying icons), its core code logic and functionality remain substantially identical, and the essential nature of the infringement persists. We urge all users to exercise caution and avoid downloading or using <b>this infringing plugin</b>!<br/>\",\n" +
+            "        \"actions\": [\n" +
+            "          {\n" +
+            "            \"label\": \"Learn More\",\n" +
+            "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/89\"\n" +
+            "          }\n" +
+            "        ]\n" +
+            "      },\n" +
+            "      \"zh_CN\": {\n" +
+            "        \"title\": \"Json Assistant\",\n" +
+            "        \"content\": \"近期发现，本人原创插件 <b><a href=\\\"https://github.com/MemoryZy/Json-Assistant\\\">Json Assistant</a></b> 的源码被开发者 <b><a href=\\\"https://plugins.jetbrains.com/vendor/katter\\\">Infinitron</a></b>（JetBrains 插件市场用户名）恶意篡改并二次分发为侵权插件 <b><a href=\\\"https://plugins.jetbrains.com/plugin/26977-json-viewer\\\">Json Viewer</a></b>：其直接复制核心代码，非法添加全功能付费限制牟利，且删除原作者信息及开源协议。虽经更新伪装（如修改图标），但其核心代码逻辑与功能仍高度一致，侵权本质未变。请广大用户注意辨别，避免下载和使用此类侵权插件！<br/>\",\n" +
+            "        \"actions\": [\n" +
+            "          {\n" +
+            "            \"label\": \"了解更多\",\n" +
+            "            \"url\": \"https://github.com/MemoryZy/Json-Assistant/discussions/87\"\n" +
+            "          }\n" +
+            "        ]\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"type\": \"info\",\n" +
+            "    \"priority\": 100,\n" +
+            "    \"effectiveDate\": \"2025-05-27\",\n" +
+            "    \"expirationDate\": \"2025-08-02\",\n" +
+            "    \"versionConstraints\": \">=1.8.0\",\n" +
+            "    \"display\": 1,\n" +
+            "    \"autoHide\": false,\n" +
+            "    \"metadata\": {\n" +
+            "      \"author\": \"Memory\",\n" +
+            "      \"createdAt\": \"2025-05-27\"\n" +
+            "    }\n" +
+            "  },\n" +
+            "  {\n" +
+            "    \"id\": \"recommendation_v1\",\n" +
+            "    \"locales\": {\n" +
+            "      \"en_US\": {\n" +
+            "        \"title\": \"Json Assistant\",\n" +
+            "        \"content\": \"\",\n" +
+            "        \"actions\": [\n" +
+            "          {\n" +
+            "            \"label\": \"Learn More\",\n" +
+            "            \"url\": \"https://plugins.jetbrains.com/plugin/28958-notestack\"\n" +
+            "          }\n" +
+            "        ]\n" +
+            "      },\n" +
+            "      \"zh_CN\": {\n" +
+            "        \"title\": \"Json Assistant\",\n" +
+            "        \"content\": \"插件<b><a href=\\\"https://plugins.jetbrains.com/plugin/28958-notestack\\\">「NoteStack」</a></b>已上线，能让你在 IDE 内以树状结构记录灵感与代码片段，告别碎片化信息。\",\n" +
+            "        \"actions\": [\n" +
+            "          {\n" +
+            "            \"label\": \"了解更多\",\n" +
+            "            \"url\": \"https://plugins.jetbrains.com/plugin/28958-notestack\"\n" +
+            "          }\n" +
+            "        ]\n" +
+            "      }\n" +
+            "    },\n" +
+            "    \"type\": \"info\",\n" +
+            "    \"priority\": 100,\n" +
+            "    \"effectiveDate\": \"2026-04-23\",\n" +
+            "    \"expirationDate\": \"2026-08-23\",\n" +
+            "    \"versionConstraints\": \">=1.8.0\",\n" +
+            "    \"display\": 2,\n" +
+            "    \"autoHide\": false,\n" +
+            "    \"metadata\": {\n" +
+            "      \"author\": \"Memory\",\n" +
+            "      \"createdAt\": \"2026-04-23\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "]";
+
 
     @Override
     public void dispose() {

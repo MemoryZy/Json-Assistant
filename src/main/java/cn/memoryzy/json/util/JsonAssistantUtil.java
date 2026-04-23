@@ -538,4 +538,25 @@ public class JsonAssistantUtil {
         }
         return count;
     }
+
+    /**
+     * 使用整数秒转换为毫秒
+     *
+     * @param seconds 秒数（整数）
+     * @return 对应的毫秒数
+     */
+    public static int secondsToMilliseconds(int seconds) {
+        return seconds * 1000;
+    }
+
+    /**
+     * 分钟转毫秒（整数分钟）
+     *
+     * @param minutes 分钟数
+     * @return 对应的毫秒数
+     */
+    public static int minutesToMilliseconds(int minutes) {
+        return minutes * 60 * 1000;
+    }
+
 }
