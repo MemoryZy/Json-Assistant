@@ -34,5 +34,41 @@
       "author": "Memory",
       "createdAt": "2025-05-27"
     }
+  },
+  {
+    "id": "recommendation_v1",
+    "locales": {
+      "en_US": {
+        "title": "Json Assistant",
+        "content": "Bid farewell to scattered inspiration drafts and code snippets. The new plugin <b><a href=\"https://plugins.jetbrains.com/plugin/28958-notestack\">NoteStack</a></b> is now live! Through an intuitive tree-like structure, it systematically organizes fragmented ideas and code, helping you build a personalized knowledge base and making the creative process smoother, more efficient, and more focused.",
+        "actions": [
+          {
+            "label": "Learn More",
+            "url": "https://plugins.jetbrains.com/plugin/28958-notestack"
+          }
+        ]
+      },
+      "zh_CN": {
+        "title": "Json Assistant",
+        "content": "告别四处散落的灵感草稿和代码片段。全新插件<b><a href=\"https://plugins.jetbrains.com/plugin/28958-notestack\">「NoteStack」</a></b>现已上线！通过直观的树状结构，将零散想法与代码系统整合，助你打造专属知识库，让创作更流畅、更高效、更专注。",
+        "actions": [
+          {
+            "label": "了解更多",
+            "url": "https://plugins.jetbrains.com/plugin/28958-notestack"
+          }
+        ]
+      }
+    },
+    "type": "info",
+    "priority": 100,
+    "effectiveDate": "2026-04-23",
+    "expirationDate": "2027-08-23",
+    "versionConstraints": ">=1.8.0",
+    "display": 2,
+    "autoHide": false,
+    "metadata": {
+      "author": "Memory",
+      "createdAt": "2026-04-23"
+    }
   }
 ]

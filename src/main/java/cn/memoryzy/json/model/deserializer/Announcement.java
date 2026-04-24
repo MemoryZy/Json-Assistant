@@ -49,6 +49,8 @@ public class Announcement {
 
     /**
      * 版本约束（语义化版本范围）
+     *
+     * <p>支持语法：>=、<=、>、<、==、!=</p>
      */
     private String versionConstraints;
 
