@@ -43,7 +43,11 @@ public class EditorDocumentMonitor implements DocumentListener {
             DocumentEx document = editor.getDocument();
             // 发布文本改变事件
             int textLength = document.getTextLength();
-            projectMessageBus.syncPublisher(EditorCharChangedEvent.TOPIC).change(new EditorCountCharEvent(project, editor, sourceFile, textLength));
+
+            if (!project.isDisposed() && !editor.isDisposed()) {
+                projectMessageBus.syncPublisher(EditorCharChangedEvent.TOPIC).change(new EditorCountCharEvent(project, editor, sourceFile, textLength));
+                return;
+            }
 
             // -------------- 开启/关闭光标行
             EditorSettings settings = editor.getSettings();
