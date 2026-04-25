@@ -157,6 +157,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | --- | --- | --- | --- |
 | 4* |  |  | 250.00 CNY |
 | **音 |  |  | 20.00 CNY |
+| 0243 |  | 非常棒！感谢！ | 20.00 CNY |
 | sanp | [https://www.haozhuji.net/](https://www.haozhuji.net/) | 好主机 | 10.24 CNY |
 | **程 |  |  | 10.00 CNY |
 | ◎♪TEL |  |  | 10.00 CNY |
@@ -191,6 +192,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | *伟 |  |  | 1.00 CNY |
 | **明 |  |  | 1.00 CNY |
 | 爱心人士 |  |  | 1.00 CNY |
+| 🤨😛 |  |  | 1.00 CNY |
 | 愿得一人心 |  |  | 0.50 CNY |
 
 <!-- DONORS_TABLE_EN_END -->
