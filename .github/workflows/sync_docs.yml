@@ -12,6 +12,11 @@ on:
       - 'NOTICE'    # NOTICE
   workflow_dispatch:
 
+env:
+  TARGET_USER: MemoryZy
+  TARGET_REPO: Json-Assistant
+  TARGET_DOC_REPO: Json-Assistant-Doc
+
 jobs:
   update-readme:
     runs-on: ubuntu-latest
@@ -64,20 +69,20 @@ jobs:
           TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
         run: |
           # 强制删除旧目录（如果存在）
-          rm -rf Json-Assistant
+          rm -rf $TARGET_REPO
           
           # 克隆目标仓库（启用深度克隆加速）
-          git clone --depth 1 --branch main https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant.git
+          git clone --depth 1 --branch main https://x-access-token:$TARGET_TOKEN@github.com/$TARGET_USER/$TARGET_REPO.git
           
           # 复制文件（显示详情）
           echo "==== 开始复制文件 ===="
           echo "当前目录"
           pwd
           
-          cp -v README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS NOTICE Json-Assistant/
+          cp -v README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS NOTICE $TARGET_REPO/
           
           # 进入目录并提交
-          cd Json-Assistant
+          cd $TARGET_REPO
           echo "当前目录"
           pwd
           
@@ -102,12 +107,12 @@ jobs:
           SOURCE_WORKSPACE: ${{ github.workspace }}  # 注入源仓库路径
         run: |
           # 克隆目标仓库
-          git clone https://x-access-token:$TARGET_TOKEN@github.com/MemoryZy/Json-Assistant-Doc.git
+          git clone https://x-access-token:$TARGET_TOKEN@github.com/$TARGET_USER/$TARGET_DOC_REPO.git
           # 复制脚本到目标仓库
-          cp -r "$SOURCE_WORKSPACE/.github/scripts" Json-Assistant-Doc/.github/
+          cp -r "$SOURCE_WORKSPACE/.github/scripts" $TARGET_DOC_REPO/.github/
           
           # 进入目标仓库目录
-          cd Json-Assistant-Doc
+          cd $TARGET_DOC_REPO
           
           # 执行脚本（现在脚本在目标仓库内）
           python .github/scripts/update_donors_writerside_zh.py \
