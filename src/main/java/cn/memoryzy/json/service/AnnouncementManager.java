@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpException;
 import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
@@ -74,7 +75,7 @@ public final class AnnouncementManager implements Disposable {
             boolean isChineseLocale = PlatformUtil.isChineseLocale();
 
             // 拉取公告
-            List<Announcement> announcements = fetchAnnouncements(isChineseLocale);
+            List<Announcement> announcements = fetchAnnouncements();
 
             // 过滤
             filterAnnouncements(announcements);
@@ -369,20 +370,53 @@ public final class AnnouncementManager implements Disposable {
     /**
      * 拉取公告内容 (JSON)
      */
-    private List<Announcement> fetchAnnouncements(boolean isChineseLocale) {
-        String url = isChineseLocale
-                ? Urls.ANNOUNCEMENTS_SOURCE_GITEE_LINK
-                : Urls.ANNOUNCEMENTS_SOURCE_GITHUB_LINK;
+    private List<Announcement> fetchAnnouncements() {
+        List<Announcement> result = tryFetchWithRetry(Urls.ANNOUNCEMENTS_SOURCE_CF_PAGES_LINK, 3, 1000);
 
-        try {
-            // 拉取公告
-            String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
-            // 解析
-            return JsonUtil.MAPPER.readValue(respJson, new TypeReference<>() {});
-        } catch (JsonProcessingException e) {
-            return new ArrayList<>();
+        if (result == null) {
+            result = tryFetchWithRetry(Urls.ANNOUNCEMENTS_SOURCE_GITHUB_LINK, 3, 1000);
         }
+
+        return result != null ? result : new ArrayList<>();
     }
+
+
+    /**
+     * 带重试机制的公告拉取
+     *
+     * @param url           拉取地址
+     * @param maxRetries    最大重试次数
+     * @param retryInterval 重试间隔(ms)
+     * @return 公告列表，失败返回null
+     */
+    private List<Announcement> tryFetchWithRetry(String url, int maxRetries, long retryInterval) {
+        for (int attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
+                // 触发重试
+                if (StrUtil.isBlank(respJson) || !JsonUtil.isJson(respJson)) throw new HttpException("Blank response");
+
+                return JsonUtil.MAPPER.readValue(respJson, new TypeReference<>() {
+                });
+            } catch (JsonProcessingException e) {
+                // JSON解析失败，不需要重试
+                return null;
+            } catch (Exception e) {
+                // 网络或其他异常，可以重试
+                if (attempt < maxRetries) {
+                    try {
+                        // 重试等待
+                        Thread.sleep(retryInterval);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public void dispose() {
