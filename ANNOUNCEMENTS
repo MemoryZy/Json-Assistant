@@ -50,7 +50,7 @@
       },
       "zh_CN": {
         "title": "Json Assistant",
-        "content": "告别四处散落的灵感草稿和代码片段。全新插件<b><a href=\"https://plugins.jetbrains.com/plugin/28958-notestack\">「NoteStack」</a></b>现已上线！通过直观的树状结构，将零散想法与代码系统整合，助你打造专属知识库，让创作更流畅、更高效、更专注。",
+        "content": "告别四处散落的灵感草稿和代码片段。全新插件<b><a href=\"https://plugins.jetbrains.com/plugin/28958-notestack\">「NoteStack」</a></b>现已上线！通过直观的树状结构，将零散想法与代码系统整合，助您打造专属知识库，让创作更流畅、更高效、更专注。",
         "actions": [
           {
             "label": "了解更多",
