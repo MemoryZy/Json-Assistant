@@ -31,14 +31,12 @@ public class Urls {
     public static final String ANNOUNCEMENTS_SOURCE_GITHUB_LINK = "https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS";
     public static final String ANNOUNCEMENTS_SOURCE_CF_PAGES_LINK = "https://file-memoryzy.pages.dev/ANNOUNCEMENTS_JSON.json";
 
-    public static final String JETBRAINS_MAPLEMONO_FONT_GITHUB_LINK = "https://github.com/MemoryZy/Json-Assistant/raw/refs/heads/main/JetBrainsMapleMono-Light.ttf";
-    public static final String JETBRAINS_MAPLEMONO_FONT_GITEE_LINK = "https://gitee.com/MemoryZy/Json-Assistant/raw/main/JetBrainsMapleMono-Light.ttf";
-
     public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";
     public static final String PLUGIN_UPDATE_DETAILS_LINK = "https://plugins.jetbrains.com/api/plugins/24738/updates";
 
     public static final String GITHUB_FONT_URL = "https://github.com/MemoryZy/JetBrainsMapleMono-Font-Distribution/releases/download/v1.0.0/JetBrainsMapleMono-XX-NR-XX.zip";
     public static final String GITEE_FONT_URL = "https://gitee.com/MemoryZy/JetBrainsMapleMono-Font-Distribution/releases/download/v1.0.0/JetBrainsMapleMono-XX-NR-XX.zip";
+    public static final String CF_FONT_URL = "https://file-memoryzy.pages.dev/JetBrainsMapleMono-XX-NR-XX.zip";
 
 
     public static final String FRONT_URL = "http://0.0.0.0";
