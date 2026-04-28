@@ -20,6 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
@@ -557,6 +558,39 @@ public class JsonAssistantUtil {
      */
     public static int minutesToMilliseconds(int minutes) {
         return minutes * 60 * 1000;
+    }
+
+    /**
+     * 隐藏URL中的敏感信息
+     *
+     * @param url 原始URL
+     * @return 脱敏后的URL
+     */
+    public static String maskUrl(String url) {
+        if (StrUtil.isBlank(url)) {
+            return "";
+        }
+
+        try {
+            URI uri = new URI(url);
+            String host = uri.getHost();
+            if (host == null) {
+                return url;
+            }
+
+            // 显示协议和主机，隐藏详细路径
+            String protocol = uri.getScheme();
+            int port = uri.getPort();
+
+            if (port == -1 || port == uri.toURL().getDefaultPort()) {
+                return protocol + "://" + host;
+            } else {
+                return protocol + "://" + host + ":" + port;
+            }
+
+        } catch (Exception e) {
+            return url;
+        }
     }
 
 }

@@ -1,7 +1,7 @@
 package cn.memoryzy.json.ui.tree;
 
 import cn.memoryzy.json.service.persistent.state.JsonRecord;
-import cn.memoryzy.json.util.UIUtils;
+import cn.memoryzy.json.util.FontManager;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.treeView.NodeRenderer;
 import com.intellij.ui.SimpleTextAttributes;
@@ -22,9 +22,9 @@ public class HistoryTreeRenderer extends NodeRenderer {
     private final boolean isFontNotInitialized;
 
     public HistoryTreeRenderer(int fontSize) {
-        this.jbFont = UIUtils.jetBrainsMonoFont(fontSize);
-        this.chineseFont = UIUtils.getChineseFont(fontSize);
-        this.isFontNotInitialized = null == UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        this.jbFont = FontManager.jetBrainsMonoFont(fontSize);
+        this.chineseFont = FontManager.getChineseFont(fontSize);
+        this.isFontNotInitialized = null == FontManager.getJetbrainsMapleMonoFont();
     }
 
     @Override

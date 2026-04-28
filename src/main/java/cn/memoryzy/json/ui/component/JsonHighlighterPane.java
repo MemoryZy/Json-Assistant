@@ -1,6 +1,6 @@
 package cn.memoryzy.json.ui.component;
 
-import cn.memoryzy.json.util.UIUtils;
+import cn.memoryzy.json.util.FontManager;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.UIUtil;
@@ -103,7 +103,7 @@ public class JsonHighlighterPane extends JTextPane {
     
     private void configureComponent() {
         setEditable(false);
-        setFont(UIUtils.consolasFont(14));
+        setFont(FontManager.consolasFont(14));
         setBackground(UIUtil.getEditorPaneBackground());
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
     }

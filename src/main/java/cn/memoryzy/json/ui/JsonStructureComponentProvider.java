@@ -13,10 +13,7 @@ import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
 import cn.memoryzy.json.ui.tree.JsonFilterableTree;
 import cn.memoryzy.json.ui.tree.JsonNode;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIUtils;
+import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
@@ -120,9 +117,9 @@ public class JsonStructureComponentProvider {
         filterableTree.setWrapper(wrapper).update();
 
         int fontSize = JBUIScale.scaleFontSize(13);
-        JBFont jbFont = UIUtils.jetBrainsMonoFont(fontSize);
+        JBFont jbFont = FontManager.jetBrainsMonoFont(fontSize);
 
-        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        Font font = FontManager.getJetbrainsMapleMonoFont();
         boolean isFontInitialized = null != font;
 
         if (!isFontInitialized) {
@@ -266,8 +263,8 @@ public class JsonStructureComponentProvider {
 
         public StyleTreeCellRenderer(boolean isFontInitialized, int fontSize) {
             this.isFontInitialized = isFontInitialized;
-            this.jbFont = UIUtils.jetBrainsMonoFont(fontSize);
-            this.chineseFont = UIUtils.getChineseFont(fontSize);
+            this.jbFont = FontManager.jetBrainsMonoFont(fontSize);
+            this.chineseFont = FontManager.getChineseFont(fontSize);
         }
 
         @Override

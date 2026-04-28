@@ -5,8 +5,8 @@ import cn.hutool.core.lang.ClassScanner;
 import cn.hutool.core.util.ReflectUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.test.BaseTestDumbAwareAction;
+import cn.memoryzy.json.util.FontManager;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIUtils;
 import com.intellij.ide.AppLifecycleListener;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.openapi.actionSystem.*;
@@ -35,7 +35,7 @@ public class AppLifecycleManager implements AppLifecycleListener {
         // 合并旧配置
         ConfigurationMerger.getInstance().mergeGlobalLegacySettings();
         // 初始化字体文件
-        UIUtils.loadAndDownloadJetbrainsMapleMonoFont();
+        FontManager.loadAndDownloadJetbrainsMapleMonoFont();
 
         // ------------------------------------- 调试
         loadAllTestAction();

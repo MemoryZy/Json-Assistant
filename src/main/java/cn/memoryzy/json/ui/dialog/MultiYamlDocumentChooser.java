@@ -5,6 +5,7 @@ import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.util.FontManager;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
@@ -55,13 +56,13 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        Font font = FontManager.getJetbrainsMapleMonoFont();
         if (null == font) {
-            font = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+            font = FontManager.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
         }
 
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
-        showTextField.setFont(UIUtils.consolasFont(14));
+        showTextField.setFont(FontManager.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
         showList.setFont(font);

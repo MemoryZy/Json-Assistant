@@ -142,7 +142,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(optionPanel);
 
-        jsonTextField.setFont(UIUtils.consolasFont(15));
+        jsonTextField.setFont(FontManager.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());

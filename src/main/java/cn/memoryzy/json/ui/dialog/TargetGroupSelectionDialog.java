@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.ui.tree.GroupSelectionNode;
 import cn.memoryzy.json.ui.tree.HistoryNode;
+import cn.memoryzy.json.util.FontManager;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
@@ -50,10 +51,10 @@ public class TargetGroupSelectionDialog extends DialogWrapper {
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         tree.addTreeSelectionListener(e -> updateOkButtonState());
 
-        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        Font font = FontManager.getJetbrainsMapleMonoFont();
         if (null == font) {
             // 先设置 JetBrains Mono，在搜索时，切换为
-            font = UIUtils.jetBrainsMonoFont(JBUIScale.scaleFontSize(12));
+            font = FontManager.jetBrainsMonoFont(JBUIScale.scaleFontSize(12));
         }
 
         tree.setFont(font);

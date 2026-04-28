@@ -27,6 +27,7 @@ import cn.memoryzy.json.ui.panel.NewItemPopupPanel;
 import cn.memoryzy.json.ui.tree.HistoryFilterableTree;
 import cn.memoryzy.json.ui.tree.HistoryNode;
 import cn.memoryzy.json.ui.tree.HistoryTreeRenderer;
+import cn.memoryzy.json.util.FontManager;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.UIUtils;
@@ -194,8 +195,8 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         }
 
         int fontSize = JBUIScale.scaleFontSize(13);
-        JBFont jbFont = UIUtils.jetBrainsMonoFont(fontSize);
-        Font font = UIUtils.JETBRAINS_MAPLE_MONO_FONT;
+        JBFont jbFont = FontManager.jetBrainsMonoFont(fontSize);
+        Font font = FontManager.getJetbrainsMapleMonoFont();
 
         if (null != font) {
             font = font.deriveFont((float) fontSize);
@@ -360,7 +361,7 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         editor.setBorder(JBUI.Borders.empty());
 
         JComponent component = editor.getComponent();
-        component.setFont(UIUtils.consolasFont(15));
+        component.setFont(FontManager.consolasFont(15));
 
         // 切换软换行状态
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
