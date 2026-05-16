@@ -165,6 +165,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | Danny |  | 支持✊ | 10.00 CNY |
 | **静 |  |  | 10.00 CNY |
 | - |  |  | 10.00 CNY |
+| **强 |  |  | 10.00 CNY |
 | AC |  |  | 8.88 CNY |
 | 爱心人士 |  | 很好用，加油 | 8.88 CNY |
 | **乐 |  |  | 8.88 CNY |
