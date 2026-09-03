@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.9.2] - 2026-09-03
+
 - [增加 JavaBean 转 TypeScript Type，JSON 转 TypeScript Type 功能](https://github.com/MemoryZy/Json-Assistant/issues/90)。
 - 支持直接唤醒 JSON 比对窗口。
 - [解决与其他插件混淆类冲突问题](https://github.com/MemoryZy/Json-Assistant/issues/110)。
@@ -14,7 +16,6 @@
 - Fix the compatibility issues.
 - Optimize and improve user experience.
 - Optimize compatibility.
-
 
 ## [1.9.1] - 2026-04-22
 
@@ -414,7 +415,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.1...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.2...HEAD
+[1.9.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.7...v1.9.0
 [1.8.7]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.5...v1.8.7
