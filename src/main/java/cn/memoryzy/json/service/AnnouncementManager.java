@@ -5,7 +5,6 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpException;
-import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.constant.Urls;
@@ -32,7 +31,6 @@ import com.intellij.util.Alarm;
 import com.intellij.util.AlarmFactory;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -392,7 +390,7 @@ public final class AnnouncementManager implements Disposable {
     private List<Announcement> tryFetchWithRetry(String url, int maxRetries, long retryInterval) {
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                String respJson = HttpUtil.get(url, StandardCharsets.UTF_8);
+                String respJson = HttpUtil.get(url);
                 // 触发重试
                 if (StrUtil.isBlank(respJson) || !JsonUtil.isJson(respJson)) throw new HttpException("Blank response");
 

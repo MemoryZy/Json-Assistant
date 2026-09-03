@@ -2,7 +2,6 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.OpenFromFileAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
@@ -637,7 +636,7 @@ public class PlatformUtil {
 
     public static PluginDetail getPluginDetail() {
         try {
-            String xml = HttpUtil.get(Urls.PLUGIN_DETAILS_LINK, StandardCharsets.UTF_8);
+            String xml = HttpUtil.get(Urls.PLUGIN_DETAILS_LINK);
             PluginDetail pluginDetail = XmlUtil.parseXmlString(xml, PluginDetail.class);
             sortPluginsByUpdatedDate(pluginDetail);
             // 更新日志区分为中英文
@@ -681,7 +680,7 @@ public class PlatformUtil {
 
     public static List<PluginUpdateDetail> getPluginUpdateDetail() {
         try {
-            String json = HttpUtil.get(Urls.PLUGIN_UPDATE_DETAILS_LINK, StandardCharsets.UTF_8);
+            String json = HttpUtil.get(Urls.PLUGIN_UPDATE_DETAILS_LINK);
             List<PluginUpdateDetail> pluginUpdateDetails = JsonUtil.MAPPER.readValue(json, new TypeReference<>() {
             });
             pluginUpdateDetails.sort(Comparator.comparingLong(PluginUpdateDetail::getCdate).reversed());

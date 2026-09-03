@@ -4,7 +4,6 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.ZipUtil;
 import cn.hutool.crypto.digest.DigestUtil;
-import cn.hutool.http.HttpUtil;
 import cn.memoryzy.json.constant.PathManager;
 import cn.memoryzy.json.constant.Urls;
 import com.intellij.openapi.application.ApplicationManager;
