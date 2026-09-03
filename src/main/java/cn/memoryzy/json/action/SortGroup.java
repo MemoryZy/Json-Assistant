@@ -6,6 +6,7 @@ import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Separator;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +26,7 @@ public class SortGroup extends DumbAwareBaseActionGroup {
     }
 
     public SortGroup(boolean fromPopup) {
-        super(JsonAssistantBundle.message("group.sort.text"), JsonAssistantBundle.messageOnSystem("group.sort.description"), null);
+        super(JsonAssistantBundle.message("group.sort.text"), JsonAssistantBundle.messageOnSystem("group.sort.description"), JsonAssistantIcons.SORT);
         setPopup(true);
         setEnabledInModalContext(true);
         this.fromPopup = fromPopup;
