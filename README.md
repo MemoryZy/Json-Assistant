@@ -43,6 +43,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
 - Serialization
   - JavaBean to JSON Conversion
   - JavaBean to JSON5 Conversion (Including Comments)
+  - JavaBean to TypeScript Conversion
   - Runtime Object to JSON Conversion
   - JSON to JavaBean Conversion
   - JSON5 to JavaBean Conversion (Including Comments)
@@ -52,6 +53,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - XML
   - YAML
   - Toml
+  - TypeScript
   - Properties
   - URL Params
 - Extensions
