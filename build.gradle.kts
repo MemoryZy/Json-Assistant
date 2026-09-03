@@ -249,7 +249,8 @@ tasks {
         // 反射调用相关的方法、字段，也不能被混淆 (例如 BlacklistEntry.toJson()，序列化时，JSON5处理器默认会调用此方法)
         keepclassmembers("class * implements com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider {<methods>;}")
 
-
+        // 指定将所有混淆的类文件重新打包并移动至指定包中
+        repackageclasses("cn.memoryzy.json")
     }
 
     // 配置准备沙箱任务（打包插件前的步骤）
