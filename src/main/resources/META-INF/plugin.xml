@@ -138,6 +138,9 @@
             <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt 9"/>
         </action>
 
+        <action id="JsonAssistant.Action.JsonTextDiffAnywhereAction" class="cn.memoryzy.json.action.JsonTextDiffAnywhereAction"/>
+
+
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
 <!--            <keyboard-shortcut keymap="$default" first-keystroke="alt C"/>-->
@@ -165,6 +168,19 @@
             <add-to-group group-id="ConsoleEditorPopupMenu" anchor="first"/>
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
+
+
+        <group id="JsonAssistant.Group.JsonTextDiffAnywhereGroup">
+            <separator/>
+            <reference ref="JsonAssistant.Action.JsonTextDiffAnywhereAction"/>
+            <separator/>
+
+            <add-to-group group-id="BasicEditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="CompareClipboardWithSelection"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="Diff.EditorPopupMenu" anchor="last"/>
+        </group>
+
 
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
             <separator/>
