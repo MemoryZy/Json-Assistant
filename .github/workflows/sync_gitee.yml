@@ -37,5 +37,9 @@ jobs:
         run: |
           LOWER_REPO=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]')
           echo "Original: $REPO_NAME → Lowercase: $LOWER_REPO"
+          
+          # 删除所有以 origin/ 开头的本地分支（这些分支会被镜像推送，但远端拒绝）
+          git branch --list 'origin/*' | xargs git branch -D || true
+          
           git remote add gitee git@gitee.com:$GITEE_USER/$LOWER_REPO.git
           git push --force --mirror gitee
