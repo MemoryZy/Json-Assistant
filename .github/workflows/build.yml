@@ -60,6 +60,13 @@ jobs:
       pluginVerifierHomeDir: ${{ steps.properties.outputs.pluginVerifierHomeDir }}
     steps:
 
+      # Free GitHub Actions Environment Disk Space
+      - name: Maximize Build Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          large-packages: false
+
       # Check out the current repository
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -78,6 +85,8 @@ jobs:
       # Setup Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true   # 仅读取缓存，不写入新缓存
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
@@ -136,6 +145,9 @@ jobs:
           name: ${{ steps.artifact.outputs.filename }}
           path: ./build/distributions/content/*/*
           retention-days: 2  # 2天后自动删除
+
+      - name: Cleanup build artifacts
+        run: rm -rf ${{ github.workspace }}/build/distributions
 
   # Run tests and upload a code coverage report
 #  test:
