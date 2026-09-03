@@ -23,6 +23,7 @@
 - Serialization
   - JavaBean to JSON Conversion
   - JavaBean to JSON5 Conversion (Including Comments)
+  - JavaBean to TypeScript Conversion
   - Runtime Object to JSON Conversion
   - JSON to JavaBean Conversion
   - JSON5 to JavaBean Conversion (Including Comments)
@@ -32,6 +33,7 @@
   - XML
   - YAML
   - Toml
+  - TypeScript
   - Properties
   - URL Params
 - Extensions

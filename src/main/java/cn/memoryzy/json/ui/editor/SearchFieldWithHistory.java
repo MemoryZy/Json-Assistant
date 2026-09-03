@@ -1,8 +1,8 @@
 package cn.memoryzy.json.ui.editor;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.IdeBundle;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -148,7 +148,7 @@ public class SearchFieldWithHistory extends ExtendableTextField {
 
         @Override
         public String getTooltip() {
-            return IdeBundle.message("tooltip.search.history")
+            return JsonAssistantBundle.messageOnSystem("tooltip.search.history")
                     + " (" + KeymapUtil.getFirstKeyboardShortcutText("ShowSearchHistory") + ")";
         }
 

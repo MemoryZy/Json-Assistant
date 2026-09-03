@@ -1,7 +1,6 @@
 // Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license.
 package cn.memoryzy.json.ui.panel;
 
-import com.intellij.ide.IdeBundle;
 import com.intellij.ide.ui.laf.darcula.DarculaUIUtil;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.ui.ComponentValidator;
@@ -103,7 +102,7 @@ public class NewItemPopupPanel extends JBPanel<NewItemPopupPanel> implements Dis
         res.setBackground(JBUI.CurrentTheme.NewClassDialog.searchFieldBackground());
 
         res.putClientProperty("StatusVisibleFunction", (BooleanFunction<JBTextField>) field -> field.getText().isEmpty());
-        res.getEmptyText().setText(IdeBundle.message("action.create.new.class.name.field"));
+        res.getEmptyText().setText("Name");
         res.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {

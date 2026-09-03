@@ -17,7 +17,6 @@ import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
-import com.intellij.ide.IdeBundle;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.scratch.ScratchFileService;
@@ -562,7 +561,8 @@ public class PlatformUtil {
         for (FileEditor fileEditor : fileEditors) {
             String name = fileEditor.getName();
             EditorEx editorEx = EditorUtil.getEditorEx(fileEditor);
-            if (Objects.nonNull(editorEx) && Objects.equals(IdeBundle.message("tab.title.text"), name) && fileEditor instanceof TextEditorImpl) {
+            // 原来是 IdeBundle.message("tab.title.text")  "Text"
+            if (Objects.nonNull(editorEx) && Objects.equals("Text", name) && fileEditor instanceof TextEditorImpl) {
                 return editorEx;
             }
         }
@@ -779,7 +779,8 @@ public class PlatformUtil {
      * @param pluginId 插件ID
      */
     public static boolean isPluginEnabled(String pluginId) {
-        IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(PluginId.getId(pluginId));
+        IdeaPluginDescriptor plugin = (IdeaPluginDescriptor)
+                JsonAssistantUtil.invokeStaticMethod(PluginManagerCore.class, "getPlugin", PluginId.getId(pluginId));
         return plugin != null && plugin.isEnabled();
     }
 

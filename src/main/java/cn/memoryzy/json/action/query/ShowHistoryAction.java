@@ -2,7 +2,6 @@ package cn.memoryzy.json.action.query;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.util.UIUtils;
-import com.intellij.find.FindBundle;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -30,7 +29,7 @@ public class ShowHistoryAction extends DumbAwareAction implements UpdateInBackgr
     private final Supplier<String> propertyNameSupplier;
 
     public ShowHistoryAction(Component searchWrapper, JComponent searchTextField, Supplier<String> propertyNameSupplier) {
-        super(FindBundle.message("find.search.history"), null, AllIcons.Actions.SearchWithHistory);
+        super("Search History", null, AllIcons.Actions.SearchWithHistory);
         this.searchWrapper = searchWrapper;
         this.searchTextField = searchTextField;
         this.propertyNameSupplier = propertyNameSupplier;

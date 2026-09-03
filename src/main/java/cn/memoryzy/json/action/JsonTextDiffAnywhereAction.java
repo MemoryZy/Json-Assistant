@@ -9,7 +9,6 @@ import com.intellij.diff.editor.DiffVirtualFile;
 import com.intellij.diff.editor.SimpleDiffVirtualFile;
 import com.intellij.diff.requests.SimpleDiffRequest;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.fileEditor.FileEditorManager;

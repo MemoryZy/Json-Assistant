@@ -1,6 +1,7 @@
 package cn.memoryzy.json;
 
 import cn.memoryzy.json.model.deserializer.PluginUpdateDetail;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManagerCore;
@@ -36,7 +37,7 @@ public class JsonAssistantPlugin {
 
 
     public static IdeaPluginDescriptor getJsonAssistantPlugin() {
-        return PluginManagerCore.getPlugin(PluginId.getId(PLUGIN_ID));
+        return (IdeaPluginDescriptor) JsonAssistantUtil.invokeStaticMethod(PluginManagerCore.class, "getPlugin", PluginId.getId(PLUGIN_ID));
     }
 
     public static String getVersion() {

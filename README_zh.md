@@ -41,6 +41,7 @@
 - 序列化
   - JavaBean 转换为 JSON
   - JavaBean 转换为 JSON5 (支持解析注释)
+  - JavaBean 转为 TypeScript
   - 运行时对象转换为 JSON
   - JSON 转换为 JavaBean
   - JSON5 转换为 JavaBean (支持解析注释)
@@ -50,6 +51,7 @@
   - XML
   - YAML
   - Toml
+  - TypeScript
   - Properties
   - URL Params
 - 扩展
