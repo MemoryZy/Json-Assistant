@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
-- 增加 JavaBean 转 TypeScript Type，JSON 转 TypeScript Type [功能](https://github.com/MemoryZy/Json-Assistant/issues/90)。
+- [增加 JavaBean 转 TypeScript Type，JSON 转 TypeScript Type 功能](https://github.com/MemoryZy/Json-Assistant/issues/90)。
 - 支持直接唤醒 JSON 比对窗口。
+- [解决与其他插件混淆类冲突问题](https://github.com/MemoryZy/Json-Assistant/issues/110)。
 - 修复兼容性问题。
 - 用户体验优化与改进。
 - 兼容性优化。
-- Add functionality for converting JavaBeans to TypeScript types and JSON to TypeScript types.
+- [Add functionality for converting JavaBeans to TypeScript types and JSON to TypeScript types](https://github.com/MemoryZy/Json-Assistant/issues/90).
 - Support direct activation of the JSON comparison window.
+- [Resolve conflicts related to interference with other plugins](https://github.com/MemoryZy/Json-Assistant/issues/110).
 - Fix the compatibility issues.
 - Optimize and improve user experience.
 - Optimize compatibility.
