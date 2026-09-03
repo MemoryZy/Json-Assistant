@@ -14,7 +14,8 @@
         "url.svg": "icons/fileTypes/url.svg",
         "kv.svg": "icons/fileTypes/kv.svg",
         "jsonNode.svg": "icons/fileTypes/jsonNode.svg",
-        "json5Node.svg": "icons/fileTypes/json5Node.svg"
+        "json5Node.svg": "icons/fileTypes/json5Node.svg",
+        "typeScript.svg": "icons/fileTypes/typeScript.svg"
       },
       "toolwindow": {
         "logo.svg": "icons/toolwindow/logo.svg",

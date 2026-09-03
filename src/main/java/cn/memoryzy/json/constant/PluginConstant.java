@@ -74,7 +74,10 @@ public interface PluginConstant {
             LinkedList.class.getName()
     };
 
+    String[] MAP_FQN = {Map.class.getName()};
+
     String[] BIGDECIMAL_FQN = {BigDecimal.class.getName()};
+
 
     String[] DATE_TIME_FQN = {Date.class.getName(), LocalDateTime.class.getName()};
 

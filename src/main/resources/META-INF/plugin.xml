@@ -114,6 +114,7 @@
         <action id="JsonAssistant.Action.ToPropertiesAction" class="cn.memoryzy.json.action.transform.ToPropertiesAction"/>
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
+        <action id="JsonAssistant.Action.ToTypeScriptAction" class="cn.memoryzy.json.action.transform.ToTypeScriptAction"/>
 
         <!-- Diff组 -->
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>

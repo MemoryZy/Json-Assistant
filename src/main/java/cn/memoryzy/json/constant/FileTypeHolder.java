@@ -24,4 +24,6 @@ public interface FileTypeHolder {
 
     FileType PROPERTIES = PlatformUtil.getFileType(FileTypes.PROPERTIES);
 
+    FileType TYPESCRIPT = PlatformUtil.getFileType(FileTypes.TYPESCRIPT);
+
 }

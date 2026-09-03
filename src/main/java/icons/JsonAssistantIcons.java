@@ -43,6 +43,7 @@ public class JsonAssistantIcons {
         public static final Icon KV = load("/icons/fileTypes/kv.svg");
         public static final Icon JSON_NODE = load("/icons/fileTypes/jsonNode.svg");
         public static final Icon JSON5_NODE = load("/icons/fileTypes/json5Node.svg");
+        public static final Icon TYPESCRIPT = load("/icons/fileTypes/typeScript.svg");
     }
 
     /**

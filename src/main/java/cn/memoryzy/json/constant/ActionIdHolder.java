@@ -27,6 +27,7 @@ public interface ActionIdHolder {
         String TO_PROPERTIES_ACTION_ID = "JsonAssistant.Action.ToPropertiesAction";
         String TO_JSON5_ACTION_ID = "JsonAssistant.Action.ToJson5Action";
         String TO_JSON_ACTION_ID = "JsonAssistant.Action.ToJsonAction";
+        String TO_TYPESCRIPT_ACTION_ID = "JsonAssistant.Action.ToTypeScriptAction";
     }
 
     interface Extend {

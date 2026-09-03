@@ -28,6 +28,7 @@ public interface ActionHolder {
         AnAction TO_PROPERTIES_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_PROPERTIES_ACTION_ID);
         AnAction TO_JSON5_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_JSON5_ACTION_ID);
         AnAction TO_JSON_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_JSON_ACTION_ID);
+        AnAction TO_TYPESCRIPT_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_TYPESCRIPT_ACTION_ID);
     }
 
     interface Extend {

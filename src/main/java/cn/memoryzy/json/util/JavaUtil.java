@@ -313,7 +313,7 @@ public class JavaUtil {
      * @param serializationState 持久化配置
      * @return 键名（如果是{@link JsonAssistantPlugin#PLUGIN_ID_NAME}）则表示忽略该字段
      */
-    private static String getAnnotationJsonKeyName(PsiField psiField, SerializationState serializationState) {
+    public static String getAnnotationJsonKeyName(PsiField psiField, SerializationState serializationState) {
         // ---------------------------------- 获取注解判断是否忽略序列化
         boolean recognitionFastJsonAnnotation = serializationState.isDetectFastJsonAnnotations();
         boolean recognitionJacksonAnnotation = serializationState.isDetectJacksonAnnotations();

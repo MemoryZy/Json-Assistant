@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+- 增加 JavaBean 转 TypeScript Type，JSON 转 TypeScript Type [功能](https://github.com/MemoryZy/Json-Assistant/issues/90)。
+- 用户体验优化与改进。
+- 兼容性优化。
+- Add functionality for converting JavaBeans to TypeScript types and JSON to TypeScript types.
+- Optimize and improve user experience.
+- Optimize compatibility.
+
+
 ## [1.9.1] - 2026-04-22
 
 - 修复因插件导致的 Show Breadcrumbs 功能失效的[问题](https://github.com/MemoryZy/Json-Assistant/issues/106)。
