@@ -169,7 +169,7 @@
                   </component>
                 </children>
               </grid>
-              <grid id="60d91" binding="formatsCheckBoxPanel" layout-manager="GridLayoutManager" row-count="1" column-count="5" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+              <grid id="60d91" binding="formatsCheckBoxPanel" layout-manager="GridLayoutManager" row-count="1" column-count="6" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                 <margin top="0" left="0" bottom="0" right="0"/>
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="4" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -185,7 +185,7 @@
                   </component>
                   <hspacer id="d4c70">
                     <constraints>
-                      <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                     </constraints>
                   </hspacer>
                   <component id="a8dcf" class="com.intellij.ui.components.JBCheckBox" binding="enableYamlFormatsCheckBox">
@@ -200,9 +200,15 @@
                     </constraints>
                     <properties/>
                   </component>
-                  <component id="e1de0" class="com.intellij.ui.components.JBCheckBox" binding="enableUrlParamFormatsCheckBox">
+                  <component id="e1de0" class="com.intellij.ui.components.JBCheckBox" binding="enableTypeScriptFormatsCheckBox">
                     <constraints>
                       <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                  <component id="850e9" class="com.intellij.ui.components.JBCheckBox" binding="enableUrlParamFormatsCheckBox">
+                    <constraints>
+                      <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="8" fill="0" indent="1" use-parent-layout="false"/>
                     </constraints>
                     <properties/>
                   </component>

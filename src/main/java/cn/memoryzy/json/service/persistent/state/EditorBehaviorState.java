@@ -24,7 +24,8 @@ public class EditorBehaviorState {
     /**
      * 启用自动识别的数据格式列表（空列表表示禁用所有自动识别）
      */
-    private Set<DataFormatType> enabledFormats = CollUtil.newHashSet(DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM);
+    private Set<DataFormatType> enabledFormats = CollUtil.newHashSet(
+            DataFormatType.XML, DataFormatType.YAML, DataFormatType.TOML, DataFormatType.URL_PARAM, DataFormatType.TYPE_SCRIPT);
 
     /**
      * 是否将修改作用于源文件（外部 JSON 文件）

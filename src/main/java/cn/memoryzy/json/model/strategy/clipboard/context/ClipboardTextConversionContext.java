@@ -58,6 +58,10 @@ public class ClipboardTextConversionContext {
             conversionStrategies.add(new TomlConversionStrategy());
         }
 
+        if (enabledFormats.contains(DataFormatType.TYPE_SCRIPT)) {
+            conversionStrategies.add(new TypeScriptConversionStrategy());
+        }
+
         if (enabledFormats.contains(DataFormatType.URL_PARAM)) {
             conversionStrategies.add(new UrlParamConversionStrategy());
         }

@@ -63,6 +63,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBCheckBox enableXmlFormatsCheckBox;
     private JBCheckBox enableYamlFormatsCheckBox;
     private JBCheckBox enableTomlFormatsCheckBox;
+    private JBCheckBox enableTypeScriptFormatsCheckBox;
     private JBCheckBox enableUrlParamFormatsCheckBox;
     private JPanel formatsCheckBoxPanel;
 
@@ -152,6 +153,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         enableXmlFormatsCheckBox.setText("XML");
         enableYamlFormatsCheckBox.setText("YAML");
         enableTomlFormatsCheckBox.setText("TOML");
+        enableTypeScriptFormatsCheckBox.setText("TypeScript");
         enableUrlParamFormatsCheckBox.setText("URL Param");
 
         int left = UIUtil.getCheckBoxTextHorizontalOffset(autoRecognizeFormatsCheckBox);
@@ -162,11 +164,13 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                 UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
             }
         });
@@ -271,6 +275,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         enableXmlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.XML));
         enableYamlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.YAML));
         enableTomlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TOML));
+        enableTypeScriptFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TYPE_SCRIPT));
         enableUrlParamFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.URL_PARAM));
 
         applyToSourceCheckBox.setSelected(editorBehaviorState.isShouldApplyToSource());
@@ -310,11 +315,13 @@ public class JsonAssistantMainConfigurableComponentProvider {
             UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
         } else {
             UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
         }
 
@@ -339,6 +346,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean oldEnableXmlFormat = enabledFormats.contains(DataFormatType.XML);
         boolean oldEnableYamlFormat = enabledFormats.contains(DataFormatType.YAML);
         boolean oldEnableTomlFormat = enabledFormats.contains(DataFormatType.TOML);
+        boolean oldEnableTsFormat = enabledFormats.contains(DataFormatType.TYPE_SCRIPT);
         boolean oldEnableUrlParamFormat = enabledFormats.contains(DataFormatType.URL_PARAM);
 
         boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
@@ -376,6 +384,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newEnableXmlFormat = enableXmlFormatsCheckBox.isSelected();
         boolean newEnableYamlFormat = enableYamlFormatsCheckBox.isSelected();
         boolean newEnableTomlFormat = enableTomlFormatsCheckBox.isSelected();
+        boolean newEnableTsFormat = enableTypeScriptFormatsCheckBox.isSelected();
         boolean newEnableUrlParamFormat = enableUrlParamFormatsCheckBox.isSelected();
         boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
 
@@ -401,6 +410,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldEnableXmlFormat, newEnableXmlFormat)
                 || !Objects.equals(oldEnableYamlFormat, newEnableYamlFormat)
                 || !Objects.equals(oldEnableTomlFormat, newEnableTomlFormat)
+                || !Objects.equals(oldEnableTsFormat, newEnableTsFormat)
                 || !Objects.equals(oldEnableUrlParamFormat, newEnableUrlParamFormat)
                 || !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource)
 
@@ -426,6 +436,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         if (enableXmlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.XML);
         if (enableYamlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.YAML);
         if (enableTomlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TOML);
+        if (enableTypeScriptFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TYPE_SCRIPT);
         if (enableUrlParamFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.URL_PARAM);
 
         boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
@@ -595,8 +606,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
         formatsCheckBoxPanel.add(enableYamlFormatsCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
         enableTomlFormatsCheckBox = new JBCheckBox();
         formatsCheckBoxPanel.add(enableTomlFormatsCheckBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
-        enableUrlParamFormatsCheckBox = new JBCheckBox();
-        formatsCheckBoxPanel.add(enableUrlParamFormatsCheckBox, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        enableTypeScriptFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableTypeScriptFormatsCheckBox, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
         final JPanel panel9 = new JPanel();
         panel9.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
         panel1.add(panel9, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));

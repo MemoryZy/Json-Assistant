@@ -16,6 +16,8 @@ public interface DataTypeConstant {
 
     String TOML = "TOML";
 
+    String TYPE_SCRIPT = "TYPE_SCRIPT";
+
     String URL_PARAM = "URL Param";
 
 }

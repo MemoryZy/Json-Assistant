@@ -13,6 +13,8 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTypesUtil;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 类型转换工具：将 JavaBean / JSON 转换为 TypeScript 类型声明
@@ -421,5 +423,478 @@ public class TypeScriptUtil {
             return "";
         }
         return comment.replaceAll("\\s+", " ").trim().replace("*/", "*\\/");
+    }
+
+    // ================================================================
+    //                     TypeScript → JSON（剪贴板策略）
+    // ================================================================
+
+    /**
+     * TypeScript 类型声明匹配正则
+     */
+    private static final Pattern DECLARATION_PATTERN = Pattern.compile(
+            "\\b(interface|type)\\s+([A-Za-z_$][A-Za-z0-9_$]*)(?:\\s*<[^>]*)?");
+
+    /**
+     * 判断给定文本是否为可转换为 JSON 的 TypeScript 类型声明
+     *
+     * @param text 剪贴板文本
+     * @return 可转换返回 true
+     */
+    public static boolean canConvert(String text) {
+        if (StrUtil.isBlank(text)) {
+            return false;
+        }
+
+        try {
+            return !parseDeclarations(text).isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 将 TypeScript 类型声明转换为 JSON 示例文本
+     *
+     * @param text 剪贴板文本（TypeScript 类型声明）
+     * @return JSON 文本，无法转换时返回空字符串
+     */
+    public static String convertToJson(String text) {
+        if (StrUtil.isBlank(text)) {
+            return "";
+        }
+
+        try {
+            Map<String, List<TsProperty>> declarations = parseDeclarations(text);
+            if (declarations.isEmpty()) {
+                return "";
+            }
+
+            String rootName = declarations.keySet().iterator().next();
+            Set<String> resolving = new HashSet<>();
+            resolving.add(rootName);
+            Map<String, Object> root = buildTsObject(declarations.get(rootName), declarations, resolving);
+
+            return JsonUtil.MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * TypeScript 类型声明中的属性
+     */
+    private static class TsProperty {
+
+        final String name;
+
+        final String type;
+
+        final boolean optional;
+
+        TsProperty(String name, String type, boolean optional) {
+            this.name = name;
+            this.type = type;
+            this.optional = optional;
+        }
+    }
+
+    /**
+     * 解析文本中的所有 TypeScript interface/type 声明
+     */
+    private static Map<String, List<TsProperty>> parseDeclarations(String text) {
+        Map<String, List<TsProperty>> declarations = new LinkedHashMap<>();
+        String cleaned = stripComments(text);
+        Matcher matcher = DECLARATION_PATTERN.matcher(cleaned);
+        while (matcher.find()) {
+            String kind = matcher.group(1);
+            String name = matcher.group(2);
+            int openBrace = cleaned.indexOf('{', matcher.end());
+            if (openBrace < 0) {
+                continue;
+            }
+
+            String between = cleaned.substring(matcher.end(), openBrace);
+            // type 别名必须是对象字面量（含 '='）
+            if ("type".equals(kind) && !between.contains("=")) {
+                continue;
+            }
+
+            int closeBrace = findMatchingBrace(cleaned, openBrace);
+            if (closeBrace < 0) {
+                continue;
+            }
+
+            String body = cleaned.substring(openBrace + 1, closeBrace);
+            declarations.put(name, parseTsTypeBody(body));
+        }
+
+        return declarations;
+    }
+
+    /**
+     * 解析 TypeScript 类型体，提取属性列表
+     */
+    private static List<TsProperty> parseTsTypeBody(String body) {
+        List<TsProperty> props = new ArrayList<>();
+        for (String raw : splitTopLevel(body)) {
+            String member = StrUtil.trim(raw);
+            if (member.isEmpty()) {
+                continue;
+            }
+
+            // 跳过索引签名，如 [key: string]: X
+            if (member.startsWith("[")) {
+                continue;
+            }
+
+            int colon = indexOfTopLevelColon(member);
+            if (colon < 0) {
+                continue;
+            }
+
+            String keyPart = StrUtil.trim(member.substring(0, colon));
+            String typePart = StrUtil.trim(member.substring(colon + 1));
+            // 跳过方法声明，如 foo(): T
+            if (keyPart.contains("(") || keyPart.isEmpty()) {
+                continue;
+            }
+
+            boolean optional = false;
+            if (keyPart.endsWith("?")) {
+                optional = true;
+                keyPart = StrUtil.trim(keyPart.substring(0, keyPart.length() - 1));
+            }
+
+            // 去除引号包裹的键名
+            if ((keyPart.startsWith("\"") && keyPart.endsWith("\""))
+                    || (keyPart.startsWith("'") && keyPart.endsWith("'"))) {
+                keyPart = keyPart.substring(1, keyPart.length() - 1);
+            }
+
+            if (keyPart.isEmpty()) {
+                continue;
+            }
+
+            props.add(new TsProperty(keyPart, typePart, optional));
+        }
+
+        return props;
+    }
+
+    /**
+     * 构建 TypeScript 类型对应的示例 JSON 对象
+     */
+    private static Map<String, Object> buildTsObject(List<TsProperty> props, Map<String, List<TsProperty>> declarations,
+                                                    Set<String> resolving) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        if (props == null) {
+            return map;
+        }
+
+        for (TsProperty prop : props) {
+            map.put(prop.name, typeToJson(prop.type, declarations, resolving));
+        }
+
+        return map;
+    }
+
+    /**
+     * 将 TypeScript 类型表达式转换为示例 JSON 值
+     */
+    private static Object typeToJson(String typeExpr, Map<String, List<TsProperty>> declarations, Set<String> resolving) {
+        String t = StrUtil.trim(typeExpr);
+        if (t.isEmpty()) {
+            return null;
+        }
+
+        // 联合类型 -> 取第一个
+        List<String> unions = splitTopLevelChar(t, '|');
+        if (unions.size() > 1) {
+            return typeToJson(StrUtil.trim(unions.get(0)), declarations, resolving);
+        }
+
+        // 交叉类型 -> 合并对象
+        List<String> intersects = splitTopLevelChar(t, '&');
+        if (intersects.size() > 1) {
+            Map<String, Object> merged = new LinkedHashMap<>();
+            for (String part : intersects) {
+                Object value = typeToJson(StrUtil.trim(part), declarations, resolving);
+                if (value instanceof Map) {
+                    merged.putAll((Map<String, Object>) value);
+                }
+            }
+            return merged;
+        }
+
+        // 数组
+        if (t.endsWith("[]") || (t.startsWith("Array<") && t.endsWith(">"))
+                || (t.startsWith("ReadonlyArray<") && t.endsWith(">"))) {
+            return new ArrayList<>();
+        }
+
+        // Record / Map
+        if ((t.startsWith("Record<") || t.startsWith("Map<")) && t.endsWith(">")) {
+            return new LinkedHashMap<>();
+        }
+
+        // 内联对象类型 { ... }
+        if (t.startsWith("{")) {
+            int close = findMatchingBrace(t, 0);
+            if (close > 0) {
+                return buildTsObject(parseTsTypeBody(t.substring(1, close)), declarations, resolving);
+            }
+            return new LinkedHashMap<>();
+        }
+
+        // 字符串字面量
+        if ((t.startsWith("'") && t.endsWith("'")) || (t.startsWith("\"") && t.endsWith("\""))) {
+            return t.substring(1, t.length() - 1);
+        }
+
+        // 数字字面量
+        if (t.matches("-?\\d+(\\.\\d+)?")) {
+            try {
+                return Long.parseLong(t);
+            } catch (NumberFormatException e) {
+                try {
+                    return Double.parseDouble(t);
+                } catch (NumberFormatException ignored) {
+                    return t;
+                }
+            }
+        }
+
+        // 布尔 / null 字面量
+        switch (t) {
+            case "true":
+                return Boolean.TRUE;
+            case "false":
+                return Boolean.FALSE;
+            case "null":
+                return null;
+            default:
+                break;
+        }
+
+        // 基本类型
+        switch (t) {
+            case "string":
+                return "";
+            case "number":
+                return 0;
+            case "boolean":
+                return Boolean.FALSE;
+            case "Date":
+                return "";
+            default:
+                break;
+        }
+
+        // 任意/未知等 -> null
+        if ("any".equals(t) || "unknown".equals(t) || "void".equals(t) || "undefined".equals(t) || "never".equals(t)) {
+            return null;
+        }
+
+        // 函数类型 -> null
+        if (t.contains("=>") || t.startsWith("(")) {
+            return null;
+        }
+
+        // 泛型引用，如 Page<User>
+        String baseName = t;
+        int genericStart = t.indexOf('<');
+        if (genericStart > 0 && t.endsWith(">")) {
+            baseName = StrUtil.trim(t.substring(0, genericStart));
+        }
+
+        // 引用其他接口
+        if (declarations.containsKey(baseName)) {
+            if (resolving.contains(baseName)) {
+                return new LinkedHashMap<>();
+            }
+            resolving.add(baseName);
+            Object obj = buildTsObject(declarations.get(baseName), declarations, resolving);
+            resolving.remove(baseName);
+            return obj;
+        }
+
+        return null;
+    }
+
+    /**
+     * 按顶层分隔符拆分（不拆分字符串与括号内的内容）
+     */
+    private static List<String> splitTopLevelChar(String s, char sep) {
+        List<String> parts = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        int depth = 0;
+        int i = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '"' || c == '\'' || c == '`') {
+                int end = skipString(s, i);
+                cur.append(s, i, end);
+                i = end;
+                continue;
+            }
+            if (c == '{' || c == '[' || c == '(' || c == '<') {
+                depth++;
+            } else if (c == '}' || c == ']' || c == ')' || c == '>') {
+                depth--;
+            }
+            if (depth == 0 && c == sep) {
+                parts.add(cur.toString());
+                cur.setLength(0);
+            } else {
+                cur.append(c);
+            }
+            i++;
+        }
+        if (cur.length() > 0) {
+            parts.add(cur.toString());
+        }
+        return parts;
+    }
+
+    /**
+     * 按顶层分号或逗号拆分类型体
+     */
+    private static List<String> splitTopLevel(String body) {
+        List<String> parts = new ArrayList<>();
+        StringBuilder cur = new StringBuilder();
+        int depth = 0;
+        int i = 0;
+        while (i < body.length()) {
+            char c = body.charAt(i);
+            if (c == '"' || c == '\'' || c == '`') {
+                int end = skipString(body, i);
+                cur.append(body, i, end);
+                i = end;
+                continue;
+            }
+            if (c == '{' || c == '[' || c == '(' || c == '<') {
+                depth++;
+            } else if (c == '}' || c == ']' || c == ')' || c == '>') {
+                depth--;
+            }
+            if (depth == 0 && (c == ';' || c == ',')) {
+                parts.add(cur.toString());
+                cur.setLength(0);
+            } else {
+                cur.append(c);
+            }
+            i++;
+        }
+        if (cur.length() > 0) {
+            parts.add(cur.toString());
+        }
+        return parts;
+    }
+
+    /**
+     * 查找顶层冒号位置
+     */
+    private static int indexOfTopLevelColon(String s) {
+        int depth = 0;
+        int i = 0;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '"' || c == '\'' || c == '`') {
+                i = skipString(s, i);
+                continue;
+            }
+            if (c == '{' || c == '[' || c == '(' || c == '<') {
+                depth++;
+            } else if (c == '}' || c == ']' || c == ')' || c == '>') {
+                depth--;
+            } else if (c == ':' && depth == 0) {
+                return i;
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    /**
+     * 跳过字符串字面量，返回字符串结束后的下标
+     */
+    private static int skipString(String s, int start) {
+        char quote = s.charAt(start);
+        int i = start + 1;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '\\') {
+                i += 2;
+                continue;
+            }
+            if (c == quote) {
+                return i + 1;
+            }
+            i++;
+        }
+        return s.length();
+    }
+
+    /**
+     * 查找与左花括号匹配的右花括号下标
+     */
+    private static int findMatchingBrace(String s, int openIndex) {
+        int depth = 0;
+        int i = openIndex;
+        while (i < s.length()) {
+            char c = s.charAt(i);
+            if (c == '"' || c == '\'' || c == '`') {
+                i = skipString(s, i);
+                continue;
+            }
+            if (c == '{') {
+                depth++;
+            } else if (c == '}') {
+                depth--;
+                if (depth == 0) {
+                    return i;
+                }
+            }
+            i++;
+        }
+        return -1;
+    }
+
+    /**
+     * 去除注释（保留字符串字面量内容）
+     */
+    private static String stripComments(String text) {
+        StringBuilder sb = new StringBuilder(text.length());
+        int i = 0;
+        int n = text.length();
+        while (i < n) {
+            char c = text.charAt(i);
+            if (c == '"' || c == '\'' || c == '`') {
+                int end = skipString(text, i);
+                sb.append(text, i, end);
+                i = end;
+                continue;
+            }
+            if (c == '/' && i + 1 < n && text.charAt(i + 1) == '/') {
+                int end = text.indexOf('\n', i);
+                if (end < 0) {
+                    end = n;
+                }
+                i = end;
+                continue;
+            }
+            if (c == '/' && i + 1 < n && text.charAt(i + 1) == '*') {
+                int end = text.indexOf("*/", i + 2);
+                if (end < 0) {
+                    end = n - 2;
+                }
+                i = end + 2;
+                continue;
+            }
+            sb.append(c);
+            i++;
+        }
+        return sb.toString();
     }
 }

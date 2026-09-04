@@ -16,6 +16,8 @@ public enum DataFormatType {
 
     YAML("YAML"),
 
+    TYPE_SCRIPT("TYPE_SCRIPT"),
+
     TOML("TOML"),
 
     URL_PARAM("URL Param");
