@@ -56,7 +56,7 @@ public class HttpUtil {
             // 注意：这里没有设置 .timeout()，表示不限制总下载时间
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(fileUrl))
-                    .timeout(Duration.ofMinutes(20))
+                    .timeout(Duration.ofMinutes(30))
                     .GET()
                     .build();
 
