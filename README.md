@@ -38,6 +38,7 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Minify
   - Tree View
   - GridView
+  - Sort
   - Compare
   - Escape
 - Serialization
