@@ -18,6 +18,7 @@
   - Minify
   - Tree View
   - GridView
+  - Sort
   - Compare
   - Escape
 - Serialization
