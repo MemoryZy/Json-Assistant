@@ -4,6 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.DataStorages;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.service.persistent.state.JsonOldRecord;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Deprecated
 @Service(Service.Level.PROJECT)
-@State(name = "Json History", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_HISTORY_FILE, roamingType = RoamingType.DISABLED)})
+@State(name = "Json History", storages = {@Storage(value = DataStorages.STORAGE_HISTORY_FILE, roamingType = RoamingType.DISABLED)})
 public final class HistoryOldManager implements PersistentStateComponent<HistoryOldManager>, Disposable {
 
     /**

@@ -23,9 +23,6 @@ public class JsonAssistantPlugin {
     public static final String PLUGIN_ID_NAME = PLUGIN_ID + ".Json-Assistant";
     public static final String PLUGIN_VERSION = PLUGIN_ID + ".version";
 
-    public static final String STORAGE_MAIN_FILE = "json_assistant_settings.xml";
-    public static final String STORAGE_HISTORY_FILE = "json_assistant_history.xml";
-
     public static final Integer CONFIG_VERSION = 1;
     public static final boolean LEGACY_FLOATING_TOOLBAR_PROVIDER = PlatformUtil.isLegacyFloatingToolbarProvider();
 

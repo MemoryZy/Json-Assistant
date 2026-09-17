@@ -28,7 +28,7 @@ public class Urls {
     public static final String JMESPATH_EXPRESS_DESCRIPTION = "https://jmespath.org/";
     public static final String JSON5_SITE_LINK = "https://json5.org/";
 
-    public static final String ANNOUNCEMENTS_SOURCE_GITHUB_LINK = "https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS";
+    // public static final String ANNOUNCEMENTS_SOURCE_GITHUB_LINK = "https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS";
     public static final String ANNOUNCEMENTS_SOURCE_CF_PAGES_LINK = "https://file-memoryzy.pages.dev/ANNOUNCEMENTS_JSON.json";
 
     public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";

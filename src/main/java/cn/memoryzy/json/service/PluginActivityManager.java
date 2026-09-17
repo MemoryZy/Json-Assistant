@@ -33,8 +33,6 @@ public class PluginActivityManager implements StartupActivity, DynamicPluginList
     public void runActivity(@NotNull Project project) {
         // 展示欢迎或更新通知
         showWelcomeOrUpdateNotification(project);
-        // 实现公告（公告只会拉取、执行一次）
-        AnnouncementManager.getInstance().scheduleDelayedAnnouncement(project);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             ConfigurationMerger configurationMerger = ConfigurationMerger.getInstance();

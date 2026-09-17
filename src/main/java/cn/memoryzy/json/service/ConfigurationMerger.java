@@ -8,6 +8,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.DataStorages;
 import cn.memoryzy.json.enums.*;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
@@ -20,6 +21,7 @@ import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.conversion.ComponentManagerSettings;
 import com.intellij.ide.impl.convert.JDomConvertingUtil;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
@@ -43,7 +45,7 @@ import java.util.*;
  * @since 2025/6/17
  */
 @Service(Service.Level.APP)
-public final class ConfigurationMerger {
+public final class ConfigurationMerger implements Disposable {
 
     private static final Logger LOG = Logger.getInstance(ConfigurationMerger.class);
 
@@ -348,7 +350,7 @@ public final class ConfigurationMerger {
         Path directoryStorePath = store.getDirectoryStorePath();
         if (null == directoryStorePath) return;
 
-        Path path = directoryStorePath.resolve(JsonAssistantPlugin.STORAGE_HISTORY_FILE);
+        Path path = directoryStorePath.resolve(DataStorages.STORAGE_HISTORY_FILE);
         if (Files.exists(path) && !Files.isDirectory(path)) {
             FileUtil.del(path);
         }
@@ -392,4 +394,8 @@ public final class ConfigurationMerger {
         FileUtil.del(path);
     }
 
+    @Override
+    public void dispose() {
+
+    }
 }

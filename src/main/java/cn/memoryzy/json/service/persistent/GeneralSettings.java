@@ -1,6 +1,7 @@
 package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.DataStorages;
 import cn.memoryzy.json.service.persistent.state.GeneralState;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 2025/6/17
  */
 @Service(Service.Level.APP)
-@State(name = "General", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
+@State(name = "General", storages = {@Storage(value = DataStorages.STORAGE_MAIN_FILE)})
 public final class GeneralSettings implements PersistentStateComponent<GeneralState> {
 
     public static GeneralSettings getInstance() {

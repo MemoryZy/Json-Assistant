@@ -18,6 +18,13 @@ jobs:
       pull-requests: write
     steps:
 
+      # Free GitHub Actions Environment Disk Space
+      - name: Maximize Build Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          large-packages: false
+
       # Check out the current repository
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -104,25 +111,25 @@ jobs:
           CERTIFICATE_CHAIN: ${{ secrets.CERTIFICATE_CHAIN }}
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           PRIVATE_KEY_PASSWORD: ${{ secrets.PRIVATE_KEY_PASSWORD }}
-          RELEASE_MODE: "true" # 设置发布标识
+#          RELEASE_MODE: "true" # 设置发布标识
         run: ./gradlew publishPlugin
 
-      # 上传保存混淆映射文件（重要，因为每次混淆的类名都可能不一样）
-      - name: Upload Obfuscation Mapping
-        uses: actions/upload-artifact@v4
-        with:
-          name: Obfuscation-Mapping
-          path: ./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}
-          retention-days: 60  # 60天后自动删除
+#      # 上传保存混淆映射文件（重要，因为每次混淆的类名都可能不一样）
+#      - name: Upload Obfuscation Mapping
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: Obfuscation-Mapping
+#          path: ./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}
+#          retention-days: 60  # 60天后自动删除
 
-      - name: Upload WebDAV
-        uses: bxb100/action-upload-webdav@v0.0.6
-        with:
-          webdav_address: ${{ secrets.WEBDAV_ADDRESS }}
-          webdav_username: ${{ secrets.WEBDAV_USERNAME }}
-          webdav_password: ${{ secrets.WEBDAV_PASSWORD }}
-          webdav_upload_path: "/Plugins/Json-Assistant/ProGuard"
-          files: "./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}"
+#      - name: Upload WebDAV
+#        uses: bxb100/action-upload-webdav@v0.0.6
+#        with:
+#          webdav_address: ${{ secrets.WEBDAV_ADDRESS }}
+#          webdav_username: ${{ secrets.WEBDAV_USERNAME }}
+#          webdav_password: ${{ secrets.WEBDAV_PASSWORD }}
+#          webdav_upload_path: "/Plugins/Json-Assistant/ProGuard"
+#          files: "./build/obfuscated/output/${{ steps.properties.outputs.proguardMappingFileName }}"
 
       - name: Move zip
         run: |
@@ -154,32 +161,32 @@ jobs:
         run: gh release upload ${{ github.event.release.tag_name }} ./build/distributions/${{ steps.properties.outputs.coming_name }}
 
       # 同步发布目标仓库的草稿Release
-      - name: Publish Draft in Target Repository
-        env:
-          GH_TOKEN: ${{ secrets.TARGET_TOKEN }}  # 目标仓库PAT
-          TARGET_REPO: "${{ github.repository_owner }}/Json-Assistant"
-          RELEASE_TAG: "${{ github.event.release.tag_name }}"
-        run: |
-          gh release edit "$RELEASE_TAG" \
-          --draft=false \
-          --repo "$TARGET_REPO"
+#      - name: Publish Draft in Target Repository
+#        env:
+#          GH_TOKEN: ${{ secrets.TARGET_TOKEN }}  # 目标仓库PAT
+#          TARGET_REPO: "${{ github.repository_owner }}/Json-Assistant"
+#          RELEASE_TAG: "${{ github.event.release.tag_name }}"
+#        run: |
+#          gh release edit "$RELEASE_TAG" \
+#          --draft=false \
+#          --repo "$TARGET_REPO"
 
       # 上传到目标仓库的Release
-      - name: Upload to Target Repository Release
-        env:
-          GH_TOKEN: ${{ secrets.TARGET_TOKEN }}  # 目标仓库PAT
-          TARGET_REPO: "${{ github.repository_owner }}/Json-Assistant"
-          RELEASE_TAG: "${{ github.event.release.tag_name }}"
-          FILE_PATH: ./build/distributions/${{ steps.properties.outputs.coming_name }}
-        run: |
-          echo "⬆️ Uploading to target repository: $TARGET_REPO"
-
-          gh release upload $RELEASE_TAG \
-            $FILE_PATH \
-            -R $TARGET_REPO \
-            --clobber  # 覆盖已存在文件
-
-          echo "✅ Assets uploaded to target repository"
+#      - name: Upload to Target Repository Release
+#        env:
+#          GH_TOKEN: ${{ secrets.TARGET_TOKEN }}  # 目标仓库PAT
+#          TARGET_REPO: "${{ github.repository_owner }}/Json-Assistant"
+#          RELEASE_TAG: "${{ github.event.release.tag_name }}"
+#          FILE_PATH: ./build/distributions/${{ steps.properties.outputs.coming_name }}
+#        run: |
+#          echo "⬆️ Uploading to target repository: $TARGET_REPO"
+#
+#          gh release upload $RELEASE_TAG \
+#            $FILE_PATH \
+#            -R $TARGET_REPO \
+#            --clobber  # 覆盖已存在文件
+#
+#          echo "✅ Assets uploaded to target repository"
 
       # 删除新标签分支
       - name: Check If Branch Exists

@@ -1,6 +1,7 @@
 package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.DataStorages;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import cn.memoryzy.json.service.persistent.state.EditorVisualState;
 import cn.memoryzy.json.service.persistent.state.HistoryState;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 2025/6/17
  */
 @Service(Service.Level.APP)
-@State(name = "ToolWindow", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
+@State(name = "ToolWindow", storages = {@Storage(value = DataStorages.STORAGE_MAIN_FILE)})
 public final class ToolWindowSettings implements PersistentStateComponent<ToolWindowSettings>, Disposable {
 
     public static ToolWindowSettings getInstance() {

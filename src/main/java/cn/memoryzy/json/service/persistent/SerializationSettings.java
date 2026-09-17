@@ -1,6 +1,7 @@
 package cn.memoryzy.json.service.persistent;
 
 import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.constant.DataStorages;
 import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import cn.memoryzy.json.service.persistent.state.SerializationState;
 import com.intellij.openapi.application.ApplicationManager;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 2025/6/17
  */
 @Service(Service.Level.APP)
-@State(name = "Serialization/Deserialization", storages = {@Storage(value = JsonAssistantPlugin.STORAGE_MAIN_FILE)})
+@State(name = "Serialization/Deserialization", storages = {@Storage(value = DataStorages.STORAGE_MAIN_FILE)})
 public final class SerializationSettings implements PersistentStateComponent<SerializationSettings> {
 
     public static SerializationSettings getInstance() {
