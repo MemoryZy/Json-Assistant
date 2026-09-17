@@ -1,10 +1,10 @@
 package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
 import cn.memoryzy.json.util.ToolWindowUtil;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -38,7 +38,7 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
     public void actionPerformed(@NotNull AnActionEvent e) {
         Content selectedContent = ToolWindowUtil.getSelectedContent(toolWindow);
         Optional.ofNullable(ToolWindowUtil.getPanelOnContent(selectedContent))
-                .ifPresent(panel -> panel.switchToCard(null, PluginConstant.JSON_EDITOR_CARD_NAME));
+                .ifPresent(panel -> panel.switchToCard(null, null, UIUtils.JSON_EDITOR_CARD_NAME));
     }
 
     @Override
@@ -51,13 +51,22 @@ public class BackToEditorViewAction extends DumbAwareAction implements UpdateInB
 
         boolean enabled = false;
         Presentation presentation = e.getPresentation();
-        if (cardLayout != null) {
-            boolean treeCardDisplayed = cardLayout.isTreeCardDisplayed();
-            boolean queryCardDisplayed = cardLayout.isQueryCardDisplayed();
+        if (null != getEventProject(e) && cardLayout != null) {
+            boolean treeCardDisplayed = cardLayout.isTreeView();
+            boolean queryCardDisplayed = cardLayout.isQueryView();
+            boolean gridCardDisplayed = cardLayout.isGridView();
 
-            if (treeCardDisplayed || queryCardDisplayed) {
+            if (treeCardDisplayed || queryCardDisplayed || gridCardDisplayed) {
                 enabled = true;
-                String text = treeCardDisplayed ? JsonAssistantBundle.messageOnSystem("action.close.tree.card.text") : JsonAssistantBundle.messageOnSystem("action.close.query.card.text");
+                String text;
+                if (treeCardDisplayed) {
+                    text = JsonAssistantBundle.messageOnSystem("action.close.tree.card.text");
+                } else if (queryCardDisplayed) {
+                    text = JsonAssistantBundle.messageOnSystem("action.close.query.card.text");
+                } else {
+                    text = JsonAssistantBundle.messageOnSystem("action.close.grid.card.text");
+                }
+
                 presentation.setText(text);
             }
         }

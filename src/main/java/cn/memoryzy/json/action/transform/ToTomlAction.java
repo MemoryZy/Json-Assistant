@@ -4,10 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
-import cn.memoryzy.json.util.DataConverter;
-import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.TextTransformUtil;
-import cn.memoryzy.json.util.TomlUtil;
+import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -46,13 +43,13 @@ public class ToTomlAction extends DumbAwareAction implements UpdateInBackground 
             GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
             String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
             // 处理不同的 Json 类型
-            tomlStr = TomlUtil.toToml(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+            tomlStr = TomlUtil.toToml(json, JsonUtil.isJson(json));
         } catch (Exception ex) {
-            LOG.error("Toml conversion failure", ex);
+            LOG.error("[Json Assistant] Toml conversion failure", ex);
             return;
         }
 
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), tomlStr, FileTypeHolder.TOML);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), tomlStr, FileTypeHolder.TOML, "TOML");
     }
 
 

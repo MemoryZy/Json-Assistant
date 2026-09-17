@@ -33,12 +33,12 @@ public class ShowOriginalTextAction extends DumbAwareToggleAction implements Upd
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return queryState.showOriginalText;
+        return queryState.isDisplayOriginalText();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        queryState.showOriginalText = state;
+        queryState.setDisplayOriginalText(state);
         queryComponentProvider.toggleJsonDocumentVisibility(state);
     }
 }

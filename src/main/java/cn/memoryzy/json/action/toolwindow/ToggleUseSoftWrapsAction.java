@@ -2,8 +2,8 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.constant.ToolWindowConstant;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -13,7 +13,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.AbstractToggleUseSoftWrapsAction;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.impl.softwrap.SoftWrapAppliancePlaces;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,12 +24,12 @@ import org.jetbrains.annotations.Nullable;
 public class ToggleUseSoftWrapsAction extends AbstractToggleUseSoftWrapsAction implements UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public ToggleUseSoftWrapsAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public ToggleUseSoftWrapsAction(EditorEx editor, CombineCardLayout cardLayout) {
         super(SoftWrapAppliancePlaces.MAIN_EDITOR, false);
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.toggle.softWraps.text"));
@@ -49,7 +48,7 @@ public class ToggleUseSoftWrapsAction extends AbstractToggleUseSoftWrapsAction i
     public void update(@NotNull AnActionEvent e) {
         boolean enabled = getEventProject(e) != null
                 && StrUtil.isNotBlank(editor.getDocument().getText())
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel);
+                && cardLayout.isEditorView();
 
         final Presentation presentation = e.getPresentation();
         if (enabled) {
@@ -67,6 +66,6 @@ public class ToggleUseSoftWrapsAction extends AbstractToggleUseSoftWrapsAction i
 
     private void saveToPropertiesComponent(boolean state) {
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        propertiesComponent.setValue(PluginConstant.SOFT_WRAPS_SELECT_STATE, state + "");
+        propertiesComponent.setValue(ToolWindowConstant.Main.SOFT_WRAPS_SELECT_STATE, state + "");
     }
 }

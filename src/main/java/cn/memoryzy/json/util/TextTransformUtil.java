@@ -43,12 +43,13 @@ public class TextTransformUtil {
                                                     Editor editor,
                                                     String processedText,
                                                     AbstractGlobalTextConversionProcessor processor,
-                                                    boolean canWrite) {
+                                                    boolean canWrite,
+                                                    String tabName) {
         // 若当前文档允许写入
         if (canWrite) {
             applyTextWhenWritable(project, editor, processedText, processor);
         } else {
-            applyTextWhenNotWritable(project, processedText, processor.getFileTypeData().getProcessedFileType());
+            applyTextWhenNotWritable(project, processedText, processor.getFileTypeData().getProcessedFileType(), tabName);
         }
 
         removeSelection(processor);
@@ -108,11 +109,12 @@ public class TextTransformUtil {
      * @param project       项目对象
      * @param processedText 处理完的文本
      * @param fileType      指定新编辑器的文本类型
+     * @param tabName
      */
-    public static void applyTextWhenNotWritable(Project project, String processedText, FileType fileType) {
+    public static void applyTextWhenNotWritable(Project project, String processedText, FileType fileType, String tabName) {
         // 若当前文档不允许写入，则新开工具窗口，用于展示处理完的文本
         try {
-            ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, processedText, fileType);
+            ToolWindowUtil.addNewContentWithEditorContentIfNeeded(project, processedText, fileType, tabName);
         } catch (Exception e) {
             copyToClipboardAndShowNotification(project, processedText);
         }

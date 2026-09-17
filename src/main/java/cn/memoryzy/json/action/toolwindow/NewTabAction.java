@@ -37,6 +37,6 @@ public class NewTabAction extends DumbAwareAction implements UpdateInBackground 
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
-        ToolWindowUtil.addNewContent(event.getProject(), toolWindow, contentFactory, FileTypeHolder.JSON5);
+        ToolWindowUtil.addNewContent(event.getProject(), toolWindow, contentFactory, FileTypeHolder.JSON5, null);
     }
 }

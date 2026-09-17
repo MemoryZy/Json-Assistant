@@ -1,27 +1,29 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonNode;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.util.Map;
 
 public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBackground {
 
     private final Tree tree;
+    private final JsonFilterableTree filterableTree;
 
-    public RemoveTreeNodeAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.remove.text"),
+    public RemoveTreeNodeAction(Tree tree, JsonFilterableTree filterableTree) {
+        super(JsonAssistantBundle.messageOnSystem("action.structure.remove.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.remove.description"),
                 null);
         this.tree = tree;
+        this.filterableTree = filterableTree;
     }
 
     @Override
@@ -29,20 +31,20 @@ public class RemoveTreeNodeAction extends DumbAwareAction implements UpdateInBac
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             // 记录树节点展开状态
-            Map<TreePath, Boolean> expandedStates = UIManager.recordExpandedStates(tree);
+            Map<TreePath, Boolean> expandedStates = UIUtils.recordExpandedStates(tree);
 
             for (TreePath path : paths) {
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
-                JsonTreeNode parent = (JsonTreeNode) node.getParent();
+                JsonNode node = JsonFilterableTree.getNode(path);
+                JsonNode parent = node.getParent();
                 if (parent != null) {
                     parent.removeAndUpdateSize(node);
                 }
             }
 
-            ((DefaultTreeModel) tree.getModel()).reload();
+            filterableTree.updateStructure();
 
             // 恢复树节点展开状态
-            UIManager.restoreExpandedStates(tree, expandedStates);
+            UIUtils.restoreExpandedStates(tree, expandedStates);
         }
     }
 

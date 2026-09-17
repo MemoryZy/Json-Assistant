@@ -1,6 +1,6 @@
 package cn.memoryzy.json.enums;
 
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 
 import java.util.Objects;

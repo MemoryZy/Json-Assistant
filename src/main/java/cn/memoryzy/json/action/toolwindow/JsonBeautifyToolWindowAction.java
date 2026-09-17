@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -20,18 +20,18 @@ import org.jetbrains.annotations.NotNull;
 public class JsonBeautifyToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public JsonBeautifyToolWindowAction(@NotNull EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonBeautifyToolWindowAction(@NotNull EditorEx editor, CombineCardLayout cardLayout, SimpleToolWindowPanel windowPanel) {
         super();
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.beautify.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.beautify.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.MAGIC);
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt B"), simpleToolWindowPanel);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt B"), windowPanel);
     }
 
     @Override
@@ -44,9 +44,9 @@ public class JsonBeautifyToolWindowAction extends DumbAwareAction implements Upd
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
-                && !editor.isViewer());
+        event.getPresentation().setEnabled(
+                GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                        && cardLayout.isEditorView());
     }
 
 }

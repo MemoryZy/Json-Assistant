@@ -1,15 +1,23 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.action.toolwindow.OpenFromFileAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.model.EditorContext;
+import cn.memoryzy.json.model.deserializer.PluginDetail;
+import cn.memoryzy.json.model.deserializer.PluginUpdateDetail;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.conversion.ComponentManagerSettings;
+import com.intellij.conversion.ConversionContext;
 import com.intellij.conversion.impl.ConversionContextImpl;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.ide.DataManager;
-import com.intellij.ide.IdeBundle;
+import com.intellij.ide.plugins.IdeaPluginDescriptor;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.ide.scratch.ScratchFileService;
 import com.intellij.ide.scratch.ScratchRootType;
 import com.intellij.lang.Language;
@@ -17,15 +25,16 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.application.ApplicationInfo;
 import com.intellij.openapi.application.ApplicationNamesInfo;
+import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.impl.stores.IProjectStore;
 import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.util.EditorUtil;
+import com.intellij.openapi.editor.toolbar.floating.FloatingToolbarProvider;
+import com.intellij.openapi.extensions.PluginId;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.impl.HTMLEditorProvider;
@@ -35,10 +44,14 @@ import com.intellij.openapi.fileTypes.PlainTextFileType;
 import com.intellij.openapi.fileTypes.PlainTextLanguage;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.registry.Registry;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.wm.WindowManager;
 import com.intellij.project.ProjectKt;
 import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
@@ -52,21 +65,23 @@ import com.intellij.util.ResourceUtil;
 import com.intellij.util.ui.TextTransferable;
 import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.List;
 
 /**
  * @author Memory
@@ -74,6 +89,12 @@ import java.util.Optional;
  */
 public class PlatformUtil {
     private static final Logger LOG = Logger.getInstance(PlatformUtil.class);
+
+    /**
+     * 记录文件标记，存储着项目名
+     */
+    public static final Key<String> RECORD_PROJECT_FILE_MARKER = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".RECORD_PROJECT_FILE_MARKER");
+
 
     /**
      * 获取结构化文件
@@ -91,6 +112,11 @@ public class PlatformUtil {
 
     public static PsiFile getPsiFile(Project project, Document document) {
         return PsiDocumentManager.getInstance(project).getPsiFile(document);
+    }
+
+    public static PsiFile getPsiFile(Project project, Editor editor) {
+        if (null == editor) return null;
+        return PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument());
     }
 
     public static PsiFile getPsiFile(DataContext dataContext, Document document) {
@@ -312,11 +338,15 @@ public class PlatformUtil {
      * @param text 文本
      */
     public static void setDocumentText(Document document, String text) {
+        // StringUtil.convertLineSeparators(text)
         text = JsonAssistantUtil.normalizeLineEndings(text);
-        if (text == null) return;
+        if (text == null) text = "";
         document.setText(text);
     }
 
+    public static void safeSetDocumentText(Project project, Document document, String text) {
+        WriteCommandAction.runWriteCommandAction(project, () -> setDocumentText(document, text));
+    }
 
     public static void openOnlineDoc(Project project, boolean useHtmlEditor) {
         String url = Urls.OVERVIEW;
@@ -331,10 +361,8 @@ public class PlatformUtil {
                     .replace("__MESSAGE__", JsonAssistantBundle.messageOnSystem("open.html.timeout.message"))
                     .replace("__ACTION__", JsonAssistantBundle.messageOnSystem("open.html.timeout.action", url));
 
-            if (Urls.isReachable()) {
-                HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("open.html.quick.start.title"), url, timeoutContent);
-                return;
-            }
+            HTMLEditorProvider.openEditor(project, JsonAssistantBundle.messageOnSystem("open.html.quick.start.title"), url, timeoutContent);
+            return;
         }
 
         BrowserUtil.browse(url);
@@ -405,20 +433,65 @@ public class PlatformUtil {
         IProjectStore store = ProjectKt.getStateStore(project);
         Path projectBasePath = store.getProjectBasePath();
 
-        ConversionContextImpl conversionContext = new ConversionContextImpl(projectBasePath);
+        ConversionContext conversionContext = new ConversionContextImpl(projectBasePath);
         return conversionContext.getProjectRootManagerSettings();
     }
 
-    public static String getFileContent(VirtualFile file) {
-        String content = null;
-        try {
-            content = StrUtil.str(file.contentsToByteArray(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            LOG.error("Failed to get text", e);
-        }
+    /**
+     * 为指定配置文件创建数据管理
+     *
+     * @param project  项目
+     * @param fileName 文件名
+     * @return 数据管理器
+     */
+    public static ComponentManagerSettings createProjectSettings(Project project, String fileName) {
+        IProjectStore store = ProjectKt.getStateStore(project);
+        Path projectBasePath = store.getProjectBasePath();
 
-        return content;
+        ConversionContext conversionContext = new ConversionContextImpl(projectBasePath);
+        return conversionContext.createProjectSettings(fileName);
     }
+
+
+    /**
+     * 获取IDE的全局配置路径
+     *
+     * @return 全局配置路径
+     */
+    public static String getApplicationConfigPath() {
+        return PathManager.getOptionsPath();
+    }
+
+    /**
+     * 获取指定配置文件（XML格式）
+     *
+     * @param configFileName 配置文件名
+     * @return 配置文件
+     */
+    public static File getOptionsConfigFile(@NotNull String configFileName) {
+        return PathManager.getOptionsFile(configFileName);
+    }
+
+    /**
+     * 从虚拟文件获取内容（带异常处理）
+     */
+    public static String getContentFromVirtualFile(VirtualFile virtualFile) {
+        try {
+            // 尝试通过文件文档管理器获取（保留行结束符）
+            FileDocumentManager docManager = FileDocumentManager.getInstance();
+            Document document = docManager.getDocument(virtualFile);
+            if (document != null) {
+                return document.getText();
+            }
+
+            // 直接加载文件内容
+            return new String(virtualFile.contentsToByteArray(), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            // 处理所有可能的异常（文件不存在、权限问题等）
+            return null;
+        }
+    }
+
 
     public static String getFileRealContent(Project project, VirtualFile file) {
         try {
@@ -433,7 +506,7 @@ public class PlatformUtil {
 
             return text;
         } catch (Exception e) {
-            LOG.error("Failed to get text", e);
+            LOG.error("[Json Assistant] Failed to get text", e);
         }
 
         return null;
@@ -441,6 +514,7 @@ public class PlatformUtil {
 
 
     public static Editor createEditor(Project project, String fileName, FileType fileType, boolean isViewer, EditorKind kind, String text) {
+        fileName = fileName + "." + fileType.getDefaultExtension();
         VirtualFile sourceVirtualFile = new LightVirtualFile(fileName, fileType, text);
         PsiFile sourceFile = PsiManager.getInstance(project).findFile(sourceVirtualFile);
 
@@ -449,6 +523,26 @@ public class PlatformUtil {
 
         assert document != null;
         return EditorFactory.getInstance().createEditor(document, project, sourceVirtualFile, isViewer, kind);
+    }
+
+    public static Editor createEditor(Project project, VirtualFile virtualFile, boolean isViewer, EditorKind kind) {
+        PsiFile sourceFile = PsiManager.getInstance(project).findFile(virtualFile);
+
+        assert sourceFile != null;
+        Document document = PsiDocumentManager.getInstance(project).getDocument(sourceFile);
+
+        assert document != null;
+        return EditorFactory.getInstance().createEditor(document, project, virtualFile, isViewer, kind);
+    }
+
+    public static VirtualFile createLightVirtualFile(String fileName, FileType fileType) {
+        fileName = fileName + "." + fileType.getDefaultExtension();
+        return new LightVirtualFile(fileName, fileType, "");
+    }
+
+    public static VirtualFile createLightVirtualFile(String fileName, FileType fileType, String text) {
+        fileName = fileName + "." + fileType.getDefaultExtension();
+        return new LightVirtualFile(fileName, fileType, text);
     }
 
     public static String getFullProductName() {
@@ -466,7 +560,8 @@ public class PlatformUtil {
         for (FileEditor fileEditor : fileEditors) {
             String name = fileEditor.getName();
             EditorEx editorEx = EditorUtil.getEditorEx(fileEditor);
-            if (Objects.nonNull(editorEx) && Objects.equals(IdeBundle.message("tab.title.text"), name) && fileEditor instanceof TextEditorImpl) {
+            // 原来是 IdeBundle.message("tab.title.text")  "Text"
+            if (Objects.nonNull(editorEx) && Objects.equals("Text", name) && fileEditor instanceof TextEditorImpl) {
                 return editorEx;
             }
         }
@@ -486,9 +581,292 @@ public class PlatformUtil {
         try (InputStream stream = ResourceUtil.getResourceAsStream(JsonAssistantIcons.class.getClassLoader(), basePath, fileName)) {
             return ResourceUtil.loadText(stream);
         } catch (Exception e) {
-            LOG.error("Failed to load text", e);
+            LOG.error("[Json Assistant] Failed to load text", e);
         }
 
         return StrUtil.EMPTY;
     }
+
+    /**
+     * 加载字体文件
+     *
+     * @param basePath 目录路径（resources目录下）
+     * @param fontName 文件名
+     * @return 字体
+     */
+    public static Font loadFont(String basePath, String fontName, float size) {
+        try (InputStream stream = ResourceUtil.getResourceAsStream(JsonAssistantIcons.class.getClassLoader(), basePath, fontName)) {
+            if (null != stream) {
+                Font font = Font.createFont(Font.TRUETYPE_FONT, stream);
+                return font.deriveFont(size);
+            } else {
+                // throw new RuntimeException("Font file not found in resources.");
+                return null;
+            }
+
+        } catch (Exception e) {
+            LOG.error("[Json Assistant] Failed to load font", e);
+        }
+
+        return null;
+    }
+
+
+    public static String getSingleSelectText(Editor editor) {
+        if (null == editor) return null;
+        Document document = editor.getDocument();
+        Caret primaryCaret = editor.getCaretModel().getPrimaryCaret();
+        int startOffset = primaryCaret.getSelectionStart();
+        int endOffset = primaryCaret.getSelectionEnd();
+        return document.getText(new TextRange(startOffset, endOffset));
+    }
+
+    public static boolean hasJavaEnvironment(Project project) {
+        Class<?> languageClz = JsonAssistantUtil.getClassByName(FileTypes.JAVA.getLanguageQualifiedName());
+        Class<?> classClz = JsonAssistantUtil.getClassByName("com.intellij.psi.PsiClass");
+        return project != null && languageClz != null && classClz != null;
+    }
+
+    public static boolean hasJsonEnvironment(Project project) {
+        Class<?> fileClz = JsonAssistantUtil.getClassByName("com.intellij.json.psi.JsonFile");
+        Class<?> typeClz = JsonAssistantUtil.getClassByName("com.intellij.json.JsonFileType");
+        return project != null && fileClz != null && typeClz != null;
+    }
+
+
+    public static PluginDetail getPluginDetail() {
+        try {
+            String xml = HttpUtil.get(Urls.PLUGIN_DETAILS_LINK);
+            PluginDetail pluginDetail = XmlUtil.parseXmlString(xml, PluginDetail.class);
+            sortPluginsByUpdatedDate(pluginDetail);
+            // 更新日志区分为中英文
+            resolveMultiLocaleChangeNotes(pluginDetail);
+            return pluginDetail;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static void sortPluginsByUpdatedDate(PluginDetail detail) {
+        if (detail != null &&
+                detail.getCategory() != null &&
+                detail.getCategory().getIdeaPlugins() != null) {
+
+            List<PluginDetail.IdeaPlugin> plugins = detail.getCategory().getIdeaPlugins();
+            plugins.sort(Comparator.comparingLong(PluginDetail.IdeaPlugin::getUpdatedDate).reversed());
+        }
+    }
+
+    private static void resolveMultiLocaleChangeNotes(PluginDetail detail) {
+        if (detail != null &&
+                detail.getCategory() != null &&
+                detail.getCategory().getIdeaPlugins() != null) {
+
+            List<PluginDetail.IdeaPlugin> plugins = detail.getCategory().getIdeaPlugins();
+
+            for (PluginDetail.IdeaPlugin plugin : plugins) {
+                String changeNotes = StrUtil.trim(plugin.getChangeNotes());
+                // 被cdata包裹的文本，要去除此包裹
+                if (changeNotes.startsWith("<![CDATA[") && changeNotes.endsWith("]]>")) {
+                    changeNotes = XmlUtil.extractCdataContent(changeNotes);
+                }
+
+                ImmutablePair<String, String> pair = Notifications.distinguishChineseAndEnglishChangeNote(changeNotes);
+                plugin.setChineseChangeNotes(pair.left);
+                plugin.setEnglishChangeNotes(pair.right);
+            }
+        }
+    }
+
+    public static List<PluginUpdateDetail> getPluginUpdateDetail() {
+        try {
+            String json = HttpUtil.get(Urls.PLUGIN_UPDATE_DETAILS_LINK);
+            List<PluginUpdateDetail> pluginUpdateDetails = JsonUtil.MAPPER.readValue(json, new TypeReference<>() {
+            });
+            pluginUpdateDetails.sort(Comparator.comparingLong(PluginUpdateDetail::getCdate).reversed());
+            pluginUpdateDetails.forEach(PlatformUtil::resolveMultiLocaleChangeNotes);
+            return pluginUpdateDetails;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+
+    private static void resolveMultiLocaleChangeNotes(PluginUpdateDetail detail) {
+        ImmutablePair<String, String> pair = Notifications.distinguishChineseAndEnglishChangeNote(detail.getNotes());
+        detail.setZhNotes(pair.left);
+        detail.setEnNotes(pair.right);
+    }
+
+
+    /**
+     * 获取编辑器及文件上下文信息
+     *
+     * @param project 项目
+     * @param editor  编辑器
+     * @return 上下文
+     */
+    public static EditorContext getEditorContext(Project project, Editor editor) {
+        EditorContext editorContext = new EditorContext();
+        if (null == project || null == editor) return editorContext;
+
+        editorContext.setEditor(editor);
+        PsiFile psiFile = getPsiFile(project, editor);
+        if (null == psiFile) return editorContext;
+
+        // 如果是内存文件，那 VirtualFile 为空
+        return editorContext.setPsiFile(psiFile).setFile(psiFile.getVirtualFile());
+    }
+
+
+    /**
+     * 判断当前编辑器是否为新窗口打开的
+     *
+     * @param project 项目
+     * @param file    虚拟文件
+     * @return 是否为新窗口打开的
+     */
+    public static boolean isNewWindow(Project project, VirtualFile file) {
+        Window mainWindow = WindowManager.getInstance().getFrame(project);
+        Window editorWindow = Optional.ofNullable(FileEditorManager.getInstance(project).getSelectedEditor(file))
+                .map(FileEditor::getComponent)
+                .map(SwingUtilities::getWindowAncestor)
+                .orElse(null);
+
+        return editorWindow != null && !editorWindow.equals(mainWindow);
+    }
+
+    public static boolean isJsonFile(PsiFile psiFile) {
+        if (psiFile == null) {
+            return false;
+        }
+
+        Class<?> clazz = psiFile.getClass();
+        for (Class<?> iface : clazz.getInterfaces()) {
+            if ("com.intellij.json.psi.JsonFile".equals(iface.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void markVirtualFileWritable(VirtualFile file, boolean setWritable) {
+        if (null == file) return;
+
+        if (setWritable) {
+            if (!file.isWritable()) {
+                // 需在事件线程执行它（确保调用来的都是事件线程）
+                try {
+                    file.setWritable(true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        file.putUserData(OpenFromFileAction.EXTERNAL_FILE_MARKER, true);
+    }
+
+    public static void markVirtualFileFlag(VirtualFile file, String projectName) {
+        if (null == file) return;
+        file.putUserData(RECORD_PROJECT_FILE_MARKER, projectName);
+    }
+
+    /**
+     * 检查指定插件是否已安装并启用
+     *
+     * @param pluginId 插件ID
+     */
+    public static boolean isPluginEnabled(String pluginId) {
+        IdeaPluginDescriptor plugin = (IdeaPluginDescriptor)
+                JsonAssistantUtil.invokeStaticMethod(PluginManagerCore.class, "getPlugin", PluginId.getId(pluginId));
+        return plugin != null && plugin.isEnabled();
+    }
+
+    public static boolean isLegacyFloatingToolbarProvider() {
+        // 获取所有名为 "register" 的方法
+        Method[] registerMethods = ReflectUtil.getMethods(FloatingToolbarProvider.class, method -> "register".equals(method.getName()));
+        // 检查是否只有一个 register 方法
+        if (registerMethods.length != 1) return false;
+
+        Method registerMethod = registerMethods[0];
+        Class<?>[] parameterTypes = registerMethod.getParameterTypes();
+
+        // 检查参数数量和类型
+        return parameterTypes.length == 2
+                && "com.intellij.openapi.editor.toolbar.floating.FloatingToolbarComponent".equals(parameterTypes[0].getName())
+                && "com.intellij.openapi.Disposable".equals(parameterTypes[1].getName());
+    }
+
+    /**
+     * 获取当前插件运行的环境（为空表示正式环境）
+     *
+     * @return 环境
+     */
+    public static @Nullable String getEnvironment() {
+        return System.getProperty("jsonassistant.env");
+    }
+
+    public static boolean isTestEnvironment() {
+        return StrUtil.equalsIgnoreCase(getEnvironment(), "test");
+    }
+
+    public static boolean isProdEnvironment() {
+        return StrUtil.isBlank(getEnvironment());
+    }
+
+    public static boolean isValidFile(@Nullable VirtualFile file) {
+        return null != file && file.isValid();
+    }
+
+    /**
+     * 获取应用的版本号
+     *
+     * @return 203、221、241 等这样的格式
+     */
+    public static int getAppVersion() {
+        return ApplicationInfo.getInstance().getBuild().getBaselineVersion();
+    }
+
+    public static Project findProject(String projectName) {
+        for (Project openProject : ProjectManager.getInstance().getOpenProjects()) {
+            if (openProject.getName().equals(projectName)) {
+                return openProject;
+            }
+        }
+
+        return null;
+    }
+
+    // /**
+    //  * 将 IDE 的路径导航中的 JSON 打开
+    //  *
+    //  * <p>有些 IDE 可能一开始不会启用 JSON 选项，这时给手动打开</p>
+    //  */
+    // public static void enableBreadcrumbsShownForJson() {
+    //     EditorSettingsExternalizable settings = EditorSettingsExternalizable.getInstance();
+    //
+    //     // 是否通知设置更改
+    //     boolean fireChanged = false;
+    //     // 如果关闭了路径导航，则打开
+    //     if (!settings.isBreadcrumbsShown()) {
+    //         // 设置为显示 路径导航
+    //         settings.setBreadcrumbsShown(true);
+    //         fireChanged = true;
+    //     }
+    //
+    //     boolean shownForJson = settings.isBreadcrumbsShownFor("JSON");
+    //     if (!shownForJson) {
+    //         // 在这里将路径导航中的 JSON 选项打开
+    //         settings.setBreadcrumbsShownFor(/*JsonLanguage.INSTANCE.getID()*/ "JSON", true);
+    //         fireChanged = true;
+    //     }
+    //
+    //     if (fireChanged) {
+    //         ApplicationManager.getApplication().invokeLater(() -> {
+    //             // 通知设置更改
+    //             UISettings.getInstance().fireUISettingsChanged();
+    //         });
+    //     }
+    // }
 }

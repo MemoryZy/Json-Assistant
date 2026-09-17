@@ -7,6 +7,11 @@ package cn.memoryzy.json.enums;
 public enum HistoryTreeNodeType {
 
     /**
+     * 根节点
+     */
+    ROOT,
+
+    /**
      * 组节点
      */
     GROUP,
@@ -14,6 +19,6 @@ public enum HistoryTreeNodeType {
     /**
      * 数据节点
      */
-    NODE;
+    RECORD;
 
 }

@@ -1,0 +1,165 @@
+package cn.memoryzy.json.ui.listener;
+
+import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.enums.DataFormatType;
+import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.enums.HistoryAffectType;
+import cn.memoryzy.json.event.RefreshFloatToolbarEvent;
+import cn.memoryzy.json.event.RefreshHistoryTreeEvent;
+import cn.memoryzy.json.model.wrapper.JsonWrapper;
+import cn.memoryzy.json.service.persistent.HistoryManager;
+import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.JsonRecord;
+import cn.memoryzy.json.util.Json5Util;
+import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.util.PlatformUtil;
+import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.ex.FocusChangeListener;
+import com.intellij.openapi.project.Project;
+import com.intellij.util.Alarm;
+import com.intellij.util.AlarmFactory;
+import com.intellij.util.messages.MessageBus;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+
+/**
+ * @author Memory
+ * @since 2025/6/25
+ */
+public class MainWindowFocusMonitor implements FocusChangeListener, Disposable {
+
+    /**
+     * 最大字符数量
+     */
+    public static final int THRESHOLD = 50000;
+
+    /**
+     * 5秒延迟保存
+     */
+    private static final int SAVE_DELAY = 5000;
+
+    private final HistoryState historyState;
+    private final HistoryManager historyManager;
+    private final Alarm alarm;
+
+    public MainWindowFocusMonitor(HistoryState historyState, HistoryManager historyManager) {
+        this.historyState = historyState;
+        this.historyManager = historyManager;
+        // 这里要刷新历史记录树，不能用后台线程，需要用EDT线程
+        this.alarm = AlarmFactory.getInstance().create(Alarm.ThreadToUse.SWING_THREAD, this);
+    }
+
+    @Override
+    public void focusGained(@NotNull Editor editor) {
+        if (isAutoHistoryEnabled()) {
+            // 获取焦点时，取消之前的任务
+            cancelPendingSave();
+        }
+
+        // ----------- 处理剪贴板数据（这些判断必须在内层，因为要保证符合条件后展示出来，后又因不符合条件而无法消失）
+        processClipboardContent(editor);
+    }
+
+    @Override
+    public void focusLost(@NotNull Editor editor) {
+        if (isAutoHistoryEnabled()) {
+            // 添加当前编辑器的 JSON 至历史记录
+            scheduleDelayedSave(editor);
+        }
+    }
+
+
+    private void processClipboardContent(Editor editor) {
+        String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
+        if (Objects.nonNull(clipboard) && clipboard.length() > THRESHOLD) {
+            // 异步处理大文本
+            ApplicationManager.getApplication().executeOnPooledThread(
+                    () -> processClipboardContent(editor, clipboard));
+        } else {
+            processClipboardContent(editor, clipboard);
+        }
+    }
+
+    private void processClipboardContent(Editor editor, String clipboard) {
+        MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
+        messageBus.syncPublisher(RefreshFloatToolbarEvent.TOPIC).accept(editor, clipboard);
+    }
+
+
+    private void scheduleDelayedSave(@NotNull Editor editor) {
+        // 取消之前所有的保存请求
+        cancelPendingSave();
+        // 添加新的延迟保存请求
+        alarm.addRequest(() -> automaticallySaveHistory(editor), SAVE_DELAY);
+    }
+
+    /**
+     * 自动保存历史记录
+     *
+     * @param editor 编辑器
+     */
+    private void automaticallySaveHistory(@NotNull Editor editor) {
+        // 检查编辑器是否仍然有效
+        if (editor.isDisposed()) return;
+        // 获取编辑器内容
+        String content = StrUtil.trim(editor.getDocument().getText());
+        // 检查内容有效性
+        if (StrUtil.isBlank(content)) return;
+
+        // 解析格式
+        JsonWrapper wrapper = null;
+        DataFormatType formatType = DataFormatType.JSON;
+        if (JsonUtil.isJson(content)) {
+            wrapper = JsonUtil.parse(content);
+
+        } else if (Json5Util.isJson5(content)) {
+            formatType = DataFormatType.JSON5;
+            wrapper = Json5Util.parse(content);
+            // 由这里再进行格式化（不可避免会去掉一些Array上的注释）
+            content = Json5Util.formatJson5WithComment(content);
+        }
+
+        if (null == wrapper || wrapper.noItems()) return;
+
+        // 如果在记录中存在的话，无需保存
+        if (historyManager.existsRecord(wrapper)) return;
+
+        String fileExtension = DataFormatType.JSON == formatType
+                ? FileTypes.JSON.getExtension()
+                : FileTypes.JSON5.getExtension();
+
+        // 自动保存的话，无需指定名称
+        JsonRecord record = historyManager.addRecord(content, wrapper, fileExtension, true);
+        // 触发事件
+        if (null != record) {
+            Project project = editor.getProject();
+            Objects.requireNonNull(project).getMessageBus()
+                    .syncPublisher(RefreshHistoryTreeEvent.TOPIC)
+                    .refresh(project, HistoryAffectType.ADD_RECORD, record.getId());
+        }
+    }
+
+    /**
+     * 是否启用自动记录历史记录
+     *
+     * @return true：启用；false：
+     */
+    private boolean isAutoHistoryEnabled() {
+        return historyState.isEnableHistory() && historyState.isAutoRecordHistory();
+    }
+
+    /**
+     * 取消所有挂起的请求
+     */
+    private void cancelPendingSave() {
+        alarm.cancelAllRequests();
+    }
+
+    @Override
+    public void dispose() {
+        cancelPendingSave();
+    }
+}

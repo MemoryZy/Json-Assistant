@@ -47,15 +47,15 @@
                 bundle="messages.JsonAssistantBundle"
                 key="setting.display.name"/>
 
-        <projectService serviceImplementation="cn.memoryzy.json.service.persistent.JsonHistoryPersistentState"/>
-        <projectService serviceImplementation="cn.memoryzy.json.toolwindow.AuxiliaryTreeToolWindowManager"/>
-        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.JsonAssistantPersistentState"/>
-        <applicationService serviceImplementation="cn.memoryzy.json.service.persistent.ClipboardDataBlacklistPersistentState"/>
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
-
-        <fileEditorProvider implementation="cn.memoryzy.json.extension.provider.JsonTreeFileEditorProvider"/>
+        <fileEditorProvider implementation="cn.memoryzy.json.extension.editor.JsonTreeFileEditorProvider"/>
+        <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
+        <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
+        <!--<editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.ImportHistoryFloatingToolbarProvider"/>-->
+        <nonProjectFileWritingAccessExtension implementation="cn.memoryzy.json.extension.file.ExternalFileAccessProvider"/>
+        <statusBarWidgetFactory id="JsonAssistant.CountCharWidget" order="before positionWidget" implementation="cn.memoryzy.json.extension.widget.CountCharWidgetFactory"/>
 
         <localInspection language="JSON"
                          key="inspection.expand.json.familyName"
@@ -78,27 +78,35 @@
             <category>JSON</category>
         </intentionAction>
 
-        <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
-        
         <iconMapper mappingFile="JsonAssistantIconMappings.json"/>
     </extensions>
 
     <applicationListeners>
         <listener class="cn.memoryzy.json.service.PluginActivityManager" topic="com.intellij.ide.plugins.DynamicPluginListener"/>
-<!--        <listener class="cn.memoryzy.json.extension.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>-->
+<!--        <listener class="cn.memoryzy.json.service.ProxyInjector" topic="com.intellij.ide.AppLifecycleListener"/>-->
+        <listener class="cn.memoryzy.json.service.AppLifecycleManager" topic="com.intellij.ide.AppLifecycleListener"/>
+        <listener class="cn.memoryzy.json.listener.FileChangeListener" topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
     </applicationListeners>
 
     <actions>
+        <!-- Main -->
+        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.MainGroup"/>
         <action id="JsonAssistant.Action.JsonBeautifyAction" class="cn.memoryzy.json.action.JsonBeautifyAction"/>
         <action id="JsonAssistant.Action.JsonMinifyAction" class="cn.memoryzy.json.action.JsonMinifyAction"/>
         <action id="JsonAssistant.Action.JsonStructureAction" class="cn.memoryzy.json.action.JsonStructureAction"/>
+        <action id="JsonAssistant.Action.JsonGridAction" class="cn.memoryzy.json.action.JsonGridAction"/>
         <action id="JsonAssistant.Action.JsonTextDiffAction" class="cn.memoryzy.json.action.JsonTextDiffAction"/>
-        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
         <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
+        <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
+
+        <!-- Extend -->
+        <group id="JsonAssistant.Group.Extend" class="cn.memoryzy.json.action.ExtendGroup"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>
         <action id="JsonAssistant.Action.ExpandAllNestedJsonAction" class="cn.memoryzy.json.action.extend.ExpandAllNestedJsonAction"/>
         <action id="JsonAssistant.Action.ConvertAllReadableTimeAction" class="cn.memoryzy.json.action.extend.ConvertAllReadableTimeAction"/>
 
+        <!-- Convert -->
+        <group id="JsonAssistant.Group.Convert" class="cn.memoryzy.json.action.ConvertGroup"/>
         <action id="JsonAssistant.Action.ToXmlAction" class="cn.memoryzy.json.action.transform.ToXmlAction"/>
         <action id="JsonAssistant.Action.ToYamlAction" class="cn.memoryzy.json.action.transform.ToYamlAction"/>
         <action id="JsonAssistant.Action.ToTomlAction" class="cn.memoryzy.json.action.transform.ToTomlAction"/>
@@ -106,9 +114,34 @@
         <action id="JsonAssistant.Action.ToPropertiesAction" class="cn.memoryzy.json.action.transform.ToPropertiesAction"/>
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
+        <action id="JsonAssistant.Action.ToCsvAction" class="cn.memoryzy.json.action.transform.ToCsvAction"/>
+        <action id="JsonAssistant.Action.CsvToJsonAction" class="cn.memoryzy.json.action.transform.CsvToJsonAction"/>
+        <action id="JsonAssistant.Action.ToTypeScriptAction" class="cn.memoryzy.json.action.transform.ToTypeScriptAction"/>
 
+        <!-- Diff组 -->
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
         <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
+
+        <!-- Sort -->
+        <group id="JsonAssistant.Group.Sort" class="cn.memoryzy.json.action.SortGroup"/>
+        <action id="JsonAssistant.Action.CaseSensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseSensitiveAZAction"/>
+        <action id="JsonAssistant.Action.CaseSensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseSensitiveZAAction"/>
+        <action id="JsonAssistant.Action.CaseInsensitiveAZAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveAZAction"/>
+        <action id="JsonAssistant.Action.CaseInsensitiveZAAction" class="cn.memoryzy.json.action.sort.CaseInsensitiveZAAction"/>
+        <action id="JsonAssistant.Action.NaturalAZAction" class="cn.memoryzy.json.action.sort.NaturalAZAction"/>
+        <action id="JsonAssistant.Action.NaturalZAAction" class="cn.memoryzy.json.action.sort.NaturalZAAction"/>
+        <action id="JsonAssistant.Action.HexaAction" class="cn.memoryzy.json.action.sort.HexaAction"/>
+        <action id="JsonAssistant.Action.ReverseAction" class="cn.memoryzy.json.action.sort.ReverseAction"/>
+        <action id="JsonAssistant.Action.ShuffleAction" class="cn.memoryzy.json.action.sort.ShuffleAction"/>
+        <action id="JsonAssistant.Action.LengthAscAction" class="cn.memoryzy.json.action.sort.LengthAscAction"/>
+        <action id="JsonAssistant.Action.LengthDescAction" class="cn.memoryzy.json.action.sort.LengthDescAction"/>
+
+        <action id="JsonAssistant.Action.OpenToolWindowAction" class="cn.memoryzy.json.action.toolwindow.OpenToolWindowAction">
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt 9"/>
+        </action>
+
+        <action id="JsonAssistant.Action.JsonTextDiffAnywhereAction" class="cn.memoryzy.json.action.JsonTextDiffAnywhereAction"/>
+
 
 <!--        <action id="JsonAssistant.Action.StructureComparisonAction" class="cn.memoryzy.json.action.structure.StructureComparisonAction">-->
 <!--            <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>-->
@@ -121,18 +154,10 @@
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift P"/>
         </action>
 
-        <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction">
-            <add-to-group group-id="HelpMenu" relative-to-action="OnlineDocAction" anchor="after"/>
-        </action>
-
         <action id="JsonAssistant.Action.Main" class="cn.memoryzy.json.action.JsonAssistantAction">
             <keyboard-shortcut keymap="$default" first-keystroke="alt K"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift K"/>
         </action>
-
-        <group id="JsonAssistant.Group.Main" class="cn.memoryzy.json.action.group.JsonAssistantPopupGroup"/>
-        <group id="JsonAssistant.Group.ConvertOtherFormatsGroup" class="cn.memoryzy.json.action.group.ConvertOtherFormatsGroup"/>
-        <group id="JsonAssistant.Group.ExtendGroup" class="cn.memoryzy.json.action.group.ExtendGroup"/>
 
         <group id="JsonAssistant.Group.JsonProcessPopupMenu" text="JsonAssistant Popup Menu Actions">
             <separator/>
@@ -146,9 +171,23 @@
             <add-to-group group-id="Diff.EditorPopupMenu" anchor="first"/>
         </group>
 
+
+        <group id="JsonAssistant.Group.JsonTextDiffAnywhereGroup">
+            <separator/>
+            <reference ref="JsonAssistant.Action.JsonTextDiffAnywhereAction"/>
+            <separator/>
+
+            <add-to-group group-id="BasicEditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="after" relative-to-action="CompareClipboardWithSelection"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="Diff.EditorPopupMenu" anchor="last"/>
+        </group>
+
+
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
             <separator/>
             <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
+            <reference ref="JsonAssistant.Action.CsvToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>
@@ -165,7 +204,24 @@
             <add-to-group group-id="Diff.ViewerToolbar" anchor="last"/>
         </group>
 
+        <group id="JsonAssistant.Group.JsonAssistantHelpPopupMenu" text="Json _Assistant" popup="true">
+            <action id="JsonAssistant.Action.LatestVersionAction" class="cn.memoryzy.json.action.LatestVersionAction"/>
+            <action id="JsonAssistant.Action.OnlineDocAction" class="cn.memoryzy.json.action.OnlineDocAction"/>
+            <separator/>
+            <action id="JsonAssistant.Action.DonateAction" class="cn.memoryzy.json.action.notification.DonateAction"/>
+        </group>
 
+        <group id="JsonAssistant.Group.JsonAssistantHelpMenu">
+            <separator/>
+            <reference ref="JsonAssistant.Group.JsonAssistantHelpPopupMenu"/>
+            <separator/>
+
+            <add-to-group group-id="HelpMenu" relative-to-action="WhatsNewAction" anchor="before"/>
+        </group>
+
+        <group id="JsonAssistant.Group.PasteEditorFloatGroup">
+            <action id="JsonAssistant.Action.PasteDataAction" class="cn.memoryzy.json.action.toolwindow.PasteDataAction"/>
+        </group>
     </actions>
 
 </idea-plugin>

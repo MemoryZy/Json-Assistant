@@ -2,13 +2,12 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.actions.ScrollToTheEndToolbarAction;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,12 +18,12 @@ import org.jetbrains.annotations.NotNull;
 public class ScrollToTheEndAction extends ScrollToTheEndToolbarAction implements UpdateInBackground {
 
     private final Editor editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public ScrollToTheEndAction(@NotNull Editor editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public ScrollToTheEndAction(@NotNull Editor editor, CombineCardLayout cardLayout) {
         super(editor);
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.scroll.to.end.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.scroll.to.end.description"));
@@ -36,7 +35,7 @@ public class ScrollToTheEndAction extends ScrollToTheEndToolbarAction implements
         e.getPresentation().setEnabled(
                 getEventProject(e) != null
                         && StrUtil.isNotBlank(editor.getDocument().getText())
-                        && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel));
+                        && cardLayout.isEditorView());
     }
 
 }

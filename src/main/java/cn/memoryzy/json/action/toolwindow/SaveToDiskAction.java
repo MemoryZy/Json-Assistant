@@ -4,7 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.util.JsonUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -15,7 +15,6 @@ import com.intellij.openapi.fileChooser.FileSaverDescriptor;
 import com.intellij.openapi.fileChooser.FileSaverDialog;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
@@ -30,12 +29,12 @@ import java.util.Objects;
 public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public SaveToDiskAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public SaveToDiskAction(EditorEx editor, CombineCardLayout cardLayout) {
         super();
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.save.json.text"));
@@ -46,7 +45,7 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
-        String docText = editor.getDocument().getText();
+        String docText = StrUtil.trim(editor.getDocument().getText());
         String extension = JsonUtil.canResolveToJson(docText) ? "json" : "json5";
         FileChooserFactory chooserFactory = FileChooserFactory.getInstance();
         FileSaverDescriptor saverDescriptor = new FileSaverDescriptor(JsonAssistantBundle.messageOnSystem("dialog.save.json.title"), "", extension);
@@ -54,18 +53,15 @@ public class SaveToDiskAction extends DumbAwareAction implements UpdateInBackgro
         VirtualFileWrapper virtualFileWrapper = saverDialog.save("export." + extension);
 
         if (Objects.nonNull(virtualFileWrapper)) {
-            String text = StrUtil.trim(editor.getDocument().getText());
-            String jsonStr = JsonUtil.ensureJson(text);
-
             File file = virtualFileWrapper.getFile();
-            FileUtil.writeUtf8String(jsonStr, file);
+            FileUtil.writeUtf8String(docText, file);
         }
     }
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
-                && !editor.isViewer());
+        event.getPresentation().setEnabled(
+                GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                        && cardLayout.isEditorView());
     }
 }

@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action.deserializer.lombok;
 
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -12,20 +12,20 @@ import org.jetbrains.annotations.NotNull;
  */
 public class GetterToggleAction extends ToggleAction implements UpdateInBackground {
 
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
 
-    public GetterToggleAction(DeserializerState deserializerState) {
+    public GetterToggleAction(DeserializationState deserializationState) {
         super("@Getter", null, null);
-        this.deserializerState = deserializerState;
+        this.deserializationState = deserializationState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializerState.getterLombokAnnotation;
+        return deserializationState.isEnableLombokGetter();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializerState.getterLombokAnnotation = state;
+        deserializationState.setEnableLombokGetter(state);
     }
 }

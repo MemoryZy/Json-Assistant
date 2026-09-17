@@ -1,12 +1,9 @@
 package cn.memoryzy.json.enums;
 
-import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.ui.JBColor;
-import com.intellij.util.ui.UIUtil;
 
 import java.awt.*;
 import java.util.Objects;
@@ -62,10 +59,7 @@ public enum ColorScheme {
      */
     Gray("setting.component.background.color.gray.text", JBColor.namedColor("FileColor.Gray", new JBColor(0xf5f5f5, 0x45484a))),
 
-    /**
-     * 自定义主题
-     */
-    Custom("setting.component.background.color.custom.text", null);
+    ;
 
 
     private final String key;
@@ -81,18 +75,23 @@ public enum ColorScheme {
             return EditorColorsManager.getInstance().getGlobalScheme().getDefaultBackground();
         } else if (Objects.equals(Classic, this)) {
             return PlatformUtil.isNewUi() ? new JBColor(0xffffff, 0x1e1f22) : new JBColor(0xffffff, 0x2b2b2b);
-        } else if (Objects.equals(Custom, this)) {
-            JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-            EditorAppearanceState appearanceState = persistentState.editorAppearanceState;
-            return UIUtil.isUnderDarcula() ? appearanceState.customDarkcolor : appearanceState.customLightColor;
         }
 
         return color;
     }
 
-    @Override
-    public String toString() {
-        return JsonAssistantBundle.messageOnSystem(key);
+    public String getKey() {
+        return key;
+    }
+
+    public static ColorScheme of(String name) {
+        for (ColorScheme value : values()) {
+            if (StrUtil.equalsIgnoreCase(value.name(), name)){
+                return value;
+            }
+        }
+
+        return null;
     }
 
 }

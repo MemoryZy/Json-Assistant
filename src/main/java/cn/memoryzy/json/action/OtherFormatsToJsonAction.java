@@ -45,7 +45,8 @@ public class OtherFormatsToJsonAction extends DumbAwareAction implements UpdateI
                     processedText,
                     context.getProcessor(),
                     // 创建新窗口展示转换完成的文本
-                    false);
+                    false,
+                    null);
         }
     }
 

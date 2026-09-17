@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -42,9 +42,9 @@ public class ExpandAllAction extends DumbAwareActionButton implements UpdateInBa
     public void actionPerformed(@NotNull AnActionEvent event) {
         TreeNode root = (TreeNode) tree.getModel().getRoot();
         if (includeRoot) {
-            UIManager.expandAll(tree, new TreePath(root));
+            UIUtils.expandAll(tree, new TreePath(root));
         } else {
-            UIManager.expandSecondaryNode(tree, root);
+            UIUtils.expandSecondaryNode(tree, root);
         }
     }
 }

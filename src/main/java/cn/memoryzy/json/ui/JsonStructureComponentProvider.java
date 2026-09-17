@@ -3,38 +3,41 @@ package cn.memoryzy.json.ui;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.structure.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.model.StructureConfig;
-import cn.memoryzy.json.model.wrapper.ArrayWrapper;
+import cn.memoryzy.json.model.EditorContext;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.StructureState;
+import cn.memoryzy.json.service.persistent.GeneralSettings;
+import cn.memoryzy.json.service.persistent.state.TreeStructureState;
 import cn.memoryzy.json.ui.listener.TreeRightClickPopupMenuMouseAdapter;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonNode;
+import cn.memoryzy.json.util.*;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.wm.IdeFocusManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.*;
+import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.treeStructure.Tree;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
@@ -42,45 +45,94 @@ import java.util.Objects;
  */
 public class JsonStructureComponentProvider {
 
-    private Tree tree;
-    private JPanel treeComponent;
+    public static final SimpleTextAttributes LIGHT_ATTRIBUTES = SimpleTextAttributes.merge(SimpleTextAttributes.REGULAR_ATTRIBUTES, SimpleTextAttributes.GRAYED_ATTRIBUTES);
+    public static final SimpleTextAttributes BLUE_ATTRIBUTES = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(63, 120, 230), new Color(137, 174, 246)));
+    public static final SimpleTextAttributes PURPLE_ATTRIBUTES = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(248, 108, 101), new Color(244, 184, 181)));
+    public static final SimpleTextAttributes STRING_COLOR_ATTRIBUTES = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(6, 125, 23), new Color(104, 169, 114)));
+    public static final SimpleTextAttributes BOOLEAN_NULL_ATTRIBUTES = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(0, 51, 179), new Color(206, 141, 108)));
+    public static final SimpleTextAttributes NUMBER_COLOR_ATTRIBUTES = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(25, 80, 234), new Color(41, 171, 183)));
+    public static final SimpleTextAttributes PATH_COLOR_ATTRIBUTES = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(120, 80, 130), new Color(180, 140, 170)));
+
+
+    private final Tree tree;
+    private final JsonFilterableTree filterableTree;
+    private final JPanel treeComponent;
     private Object hoverNode;
-    private final StructureState structureState;
+    private final TreeStructureState structureState;
+    private final StructureSetting setting;
+
+    /**
+     * 是否已初始化完毕
+     */
+    private boolean initializationDone;
+
+    /**
+     * 上下文或上下文内的内容
+     * <br/>
+     * <br/>
+     * <b>注意：</b>
+     * <p>因为在初始化此类时，ModifyNodeValueAction 就已经被构建了，而它取到的EditorContext是一开始创建此类时的默认实例，不包含任何信息。</p>
+     * <p>后续使用此ModifyNodeValueAction类操作时，其 EditorContext 永远是默认的那个实例，所以需要将其改为函数式获取，或者用一个引用包裹。</p>
+     */
+    private final AtomicReference<EditorContext> editorContextReference = new AtomicReference<>();
+
+    // TODO 尝试按需解析，初始只解析到第2层级，展开节点时动态加载子树（类似IDE的大文件处理）
 
     /**
      * 构造器
      *
      * @param wrapper   JSON 结构
      * @param component 注册快捷键的组件
-     * @param config    配置
+     * @param setting   配置
      */
-    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
-        this.structureState = JsonAssistantPersistentState.getInstance().structureState;
-        init(wrapper, component, config);
+    public JsonStructureComponentProvider(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
+        this.structureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        this.setting = setting;
+        this.editorContextReference.set(setting.getEditorContext());
+
+        this.filterableTree = new JsonFilterableTree(null, new JsonNode("root").setJsonPath("$"), wrapper);
+        this.tree = filterableTree.getTree();
+        this.treeComponent = new JPanel(new BorderLayout());
+
+        // 安装弹窗编辑器过滤
+        filterableTree.installSimple();
+
+        if (!setting.isLazyLoad()) {
+            component = null == component ? treeComponent : component;
+            init(wrapper, component, setting);
+        }
+
+        replenishTempPsiFile();
     }
 
     /**
-     * 初始化组件
+     * 初始化组件（同时允许在后面再进行树的构建）
      *
      * @param wrapper   JSON 结构
      * @param component 注册快捷键的组件
-     * @param config    配置
+     * @param setting   配置
      */
-    private void init(JsonWrapper wrapper, @Nullable JComponent component, StructureConfig config) {
-        JsonTreeNode rootNode = new JsonTreeNode("root");
-        // 允许在后面再进行树的构建
-        if (wrapper != null) {
-            convertToTreeNode(wrapper, rootNode);
+    private void init(JsonWrapper wrapper, @Nullable JComponent component, StructureSetting setting) {
+        // 重构树
+        filterableTree.setWrapper(wrapper).update();
+
+        int fontSize = JBUIScale.scaleFontSize(13);
+        JBFont jbFont = FontManager.jetBrainsMonoFont(fontSize);
+
+        Font font = FontManager.getJetbrainsMapleMonoFont();
+        boolean isFontInitialized = null != font;
+
+        if (!isFontInitialized) {
+            // 先设置 JetBrains Mono，在搜索时，切换为
+            font = jbFont;
         }
 
         // 构建树
-        this.treeComponent = new JPanel(new BorderLayout());
-
-        tree = new Tree(new DefaultTreeModel(rootNode));
         tree.setDragEnabled(true);
         tree.setExpandableItemsEnabled(true);
-        tree.setFont(UIManager.jetBrainsMonoFont(12));
-        tree.setCellRenderer(new StyleTreeCellRenderer());
+        tree.setToggleClickCount(1);
+        tree.setFont(font);
+        tree.setCellRenderer(new StyleTreeCellRenderer(isFontInitialized, fontSize));
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, buildRightMousePopupMenu()));
         tree.addMouseMotionListener(new MouseAdapter() {
             @Override
@@ -91,13 +143,21 @@ public class JsonStructureComponentProvider {
             }
         });
 
-        // 触发快速检索
-        new TreeSpeedSearch(tree);
+        // 创建工具栏包装
+        ToolbarDecorator decorator = createDecorator(component);
+        // 展开指定层数节点
+        UIUtils.expandSpecifiedLevelNode(tree, setting.getExpandLevel());
+        this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
 
+        // 初始化完毕
+        initializationDone = true;
+    }
+
+    private ToolbarDecorator createDecorator(@Nullable JComponent component) {
         ToolbarDecorator decorator = ToolbarDecorator.createDecorator(tree);
-        if (config.isNeedToolbar()) {
-            if (config.isNeedRefresh()) {
-                decorator.addExtraAction(AnActionButton.fromAction(new RefreshStructureAction(this, config.getFile())));
+        if (setting.isNeedToolbar()) {
+            if (setting.isNeedRefresh()) {
+                decorator.addExtraAction(AnActionButton.fromAction(new RefreshStructureAction(this, setting.getFile())));
             }
 
             decorator.addExtraAction(new ExpandAllAction(tree, component, true))
@@ -107,127 +167,33 @@ public class JsonStructureComponentProvider {
             decorator.setPanelBorder(JBUI.Borders.empty());
         }
 
-        if (!config.isNeedBorder()) {
+        if (!setting.isNeedBorder()) {
             // 去除边框
             decorator.setPanelBorder(JBUI.Borders.empty(0, 1))
                     .setScrollPaneBorder(JBUI.Borders.empty(0, 1));
         }
 
-        UIManager.expandSpecifiedLevelNode(tree, config.getExpandLevel());
-
-        this.treeComponent.add(decorator.createPanel(), BorderLayout.CENTER);
+        return decorator;
     }
 
-    public void rebuildTree(JsonWrapper wrapper, int expandLevel) {
-        JsonTreeNode rootNode = new JsonTreeNode("root");
-        if (wrapper != null) {
-            convertToTreeNode(wrapper, rootNode);
-        }
+    public void rebuildTree(JsonWrapper wrapper, int expandLevel, EditorContext editorContext) {
+        this.editorContextReference.set(editorContext);
+        replenishTempPsiFile();
+        this.setting.setExpandLevel(expandLevel);
 
-        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-        model.setRoot(rootNode);
-
-        UIManager.repaintComponent(tree);
-
-        // 默认展开前3级节点
-        UIManager.expandSpecifiedLevelNode(tree, expandLevel);
-    }
-
-    private void convertToTreeNode(JsonWrapper jsonWrapper, JsonTreeNode node) {
-        if (jsonWrapper instanceof ObjectWrapper) {
-            ObjectWrapper jsonObject = (ObjectWrapper) jsonWrapper;
-            // 为了确定图标
-            if (Objects.isNull(node.getNodeType())) {
-                node.setNodeType(JsonTreeNodeType.JSONObject);
-            }
-
-            if (Objects.isNull(node.getValue())) {
-                node.setValue(jsonObject);
-            }
-
-            node.setSize(jsonObject.size());
-
-            // 提取注释Map
-            Map<?, ?> commentsMap = Json5Util.getCommentsMap(jsonObject);
-
-            for (Map.Entry<String, Object> entry : jsonObject.entrySet()) {
-                String key = entry.getKey();
-                // 注释
-                if (PluginConstant.COMMENT_KEY.equals(key)) {
-                    continue;
-                }
-
-                Object value = entry.getValue();
-                // 获取注释
-                String comment = Json5Util.getComment(commentsMap, key);
-                JsonTreeNode childNode = new JsonTreeNode(key).setComment(comment);
-
-                if (value instanceof ObjectWrapper) {
-                    ObjectWrapper nestedJsonObject = (ObjectWrapper) value;
-                    childNode.setValue(value).setNodeType(JsonTreeNodeType.JSONObject).setSize(nestedJsonObject.size());
-                    convertToTreeNode(nestedJsonObject, childNode);
-
-                } else if (value instanceof ArrayWrapper) {
-                    ArrayWrapper jsonArray = (ArrayWrapper) value;
-                    childNode.setValue(value).setNodeType(JsonTreeNodeType.JSONArray).setSize(jsonArray.size());
-                    handleJsonArray(childNode, jsonArray);
-
-                } else {
-                    // 若不是对象或数组，则不添加子集，直接同层级
-                    childNode.setValue(value)
-                            .setNodeType(JsonTreeNodeType.JSONObjectProperty)
-                            .setUserObject(key);
-                }
-
-                node.add(childNode);
-            }
-        } else if (jsonWrapper instanceof ArrayWrapper) {
-            ArrayWrapper jsonArray = (ArrayWrapper) jsonWrapper;
-            // 为了确定图标
-            if (Objects.isNull(node.getNodeType())) {
-                node.setNodeType(JsonTreeNodeType.JSONArray);
-            }
-
-            if (Objects.isNull(node.getSize())) {
-                node.setSize(jsonArray.size());
-            }
-
-            if (Objects.isNull(node.getValue())) {
-                node.setValue(jsonArray);
-            }
-
-            handleJsonArray(node, jsonArray);
+        // 之前因为懒加载没有执行样式加载，这里进行
+        if (!initializationDone && setting.isLazyLoad()) {
+            init(wrapper, treeComponent, setting);
+        } else {
+            // 重构树节点
+            filterableTree.setWrapper(wrapper).update();
+            // 默认展开前3级节点
+            UIUtils.expandSpecifiedLevelNode(tree, expandLevel);
         }
     }
 
-    private void handleJsonArray(JsonTreeNode childNode, ArrayWrapper jsonArray) {
-        for (int i = 0; i < jsonArray.size(); i++) {
-            Object el = jsonArray.get(i);
-            if (el instanceof ObjectWrapper) {
-                ObjectWrapper jsonObjectElement = (ObjectWrapper) el;
-                JsonTreeNode childNodeElement = new JsonTreeNode(
-                        "item" + i, el, JsonTreeNodeType.JSONObjectElement, jsonObjectElement.size());
 
-                convertToTreeNode(jsonObjectElement, childNodeElement);
-                childNode.add(childNodeElement);
-            } else if (el instanceof ArrayWrapper) {
-                ArrayWrapper jsonArrayElement = (ArrayWrapper) el;
-                JsonTreeNode childNodeElement = new JsonTreeNode(
-                        "item" + i, el, JsonTreeNodeType.JSONArrayElementArray, jsonArrayElement.size());
-
-                convertToTreeNode(jsonArrayElement, childNodeElement);
-                childNode.add(childNodeElement);
-            } else {
-                Object obj = el;
-                if (el instanceof String) {
-                    String str = (String) el;
-                    obj = "\"" + str + "\"";
-                }
-
-                childNode.add(new JsonTreeNode(obj).setValue(el).setNodeType(JsonTreeNodeType.JSONArrayElement));
-            }
-        }
-    }
+    // TODO 还需要设置，在点击树化时，把焦点切换到树上
 
     private JPopupMenu buildRightMousePopupMenu() {
         DefaultActionGroup group = new DefaultActionGroup();
@@ -242,13 +208,39 @@ public class JsonStructureComponentProvider {
         group.addSeparator();
         group.add(new CopyNodeCommentAction(tree));
         group.addSeparator();
+        group.add(new ModifyNodeValueAction(tree, editorContextReference, filterableTree));
+        group.addSeparator();
+        // group.add(new NavigateToSourceAction(tree, editorContextReference));
+        // group.addSeparator();
+        group.add(new ShowAsTableAction(tree));
+        group.addSeparator();
         group.add(new ExpandMultiAction(tree));
         group.addSeparator();
         group.add(new CollapseMultiAction(tree));
         group.addSeparator();
-        group.add(new RemoveTreeNodeAction(tree));
+        group.add(new RemoveTreeNodeAction(tree, filterableTree));
         ActionPopupMenu actionPopupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.POPUP, group);
         return actionPopupMenu.getComponent();
+    }
+
+    private void replenishTempPsiFile() {
+        EditorContext editorContext = editorContextReference.get();
+        PsiFile psiFile = editorContext.getPsiFile();
+        // 如果源PSI文件为null，说明我们连一个可用的PSI文件都没有，此时创建临时文件也没有意义
+        if (psiFile == null) return;
+
+        String content = editorContext.getContentText();
+        if (!JsonUtil.isJson(content) && !Json5Util.isJson5(content)) return;
+
+        editorContext.setOriginalContent(content);
+
+        // 如果不是JSON文件，则创建临时PSI文件
+        if (PlatformUtil.isJsonFile(psiFile)) return;
+        FileType fileType = FileTypeHolder.JSON5;
+        PsiFile tempFile = PsiFileFactory.getInstance(psiFile.getProject())
+                .createFileFromText("temp." + fileType.getDefaultExtension(), fileType, content);
+
+        editorContext.setTempPsiFile(tempFile);
     }
 
     public Tree getTree() {
@@ -259,239 +251,272 @@ public class JsonStructureComponentProvider {
         return treeComponent;
     }
 
+    public void requestFocusOnStructureComponent() {
+        IdeFocusManager.findInstance().requestFocus(tree, true);
+    }
+
     private class StyleTreeCellRenderer extends ColoredTreeCellRenderer {
+
+        private final boolean isFontInitialized;
+        private final Font chineseFont;
+        private final JBFont jbFont;
+
+        public StyleTreeCellRenderer(boolean isFontInitialized, int fontSize) {
+            this.isFontInitialized = isFontInitialized;
+            this.jbFont = FontManager.jetBrainsMonoFont(fontSize);
+            this.chineseFont = FontManager.getChineseFont(fontSize);
+        }
+
         @Override
         public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            JsonTreeNode jsonTreeNode = (JsonTreeNode) value;
-            JsonTreeNodeType nodeType = jsonTreeNode.getNodeType();
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            JsonNode jsonNode = (JsonNode) node.getUserObject();
+            JsonTreeNodeType nodeType = jsonNode.getNodeType();
 
-            String text = String.valueOf(jsonTreeNode.getUserObject());
-            SimpleTextAttributes simpleTextAttributes = SimpleTextAttributes.REGULAR_ATTRIBUTES;
+            if (nodeType == null) return;
 
-            SimpleTextAttributes lightAttributes = SimpleTextAttributes.merge(simpleTextAttributes, SimpleTextAttributes.GRAYED_ATTRIBUTES);
-            SimpleTextAttributes blueAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(63, 120, 230), new Color(137, 174, 246)));
-            SimpleTextAttributes purpleAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(248, 108, 101), new Color(244, 184, 181)));
+            // 1. 提取节点类型渲染信息
+            NodeRenderData renderData = resolveNodeRenderData(nodeType, jsonNode);
+            setIcon(renderData.icon);
 
-            SimpleTextAttributes stringColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(6, 125, 23), new Color(104, 169, 114)));
-            SimpleTextAttributes booleanWithNullColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(0, 51, 179), new Color(206, 141, 108)));
-            SimpleTextAttributes numberColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(25, 80, 234), new Color(41, 171, 183)));
+            // 2. 渲染主文本（键名）
+            if (nodeType != JsonTreeNodeType.JSONArrayElement) {
+                String text = String.valueOf(jsonNode.getKey());
+                String prefix = (nodeType == JsonTreeNodeType.JSONObjectProperty) ? text + ": " : text;
+                append(prefix, SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
+            }
 
-            SimpleTextAttributes pathColorAttributes = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new JBColor(new Color(120, 80, 130), new Color(180, 140, 170)));
+            // 3. 渲染类型标识符（如 [object]）
+            appendIfNonBlank(renderData.typePrefix, LIGHT_ATTRIBUTES);
+            appendIfNonBlank(renderData.typeLabel, BLUE_ATTRIBUTES);
+            appendIfNonBlank(renderData.typeSuffix, LIGHT_ATTRIBUTES);
+            appendIfNonBlank(renderData.sizePrefix, LIGHT_ATTRIBUTES);
+            appendIfNonBlank(renderData.sizeDescription, PURPLE_ATTRIBUTES);
+            appendIfNonBlank(renderData.sizeSuffix, LIGHT_ATTRIBUTES);
 
-            Icon icon = JsonAssistantIcons.Structure.JSON_KEY;
-
-            Integer size = jsonTreeNode.getSize();
-            Object nodeValue = jsonTreeNode.getValue();
-
-            String squareBracketsStart = "";
-            String nodeTypeStr = "";
-            String squareBracketsEnd = "";
-
-            String sizeStrPre = "";
-            String sizeStr = "";
-            String sizeStrPost = "";
-
-            // json的value
-            String jsonValue = "";
-            String jsonValueType = "";
-
-            if (Objects.nonNull(nodeType)) {
-                switch (nodeType) {
-                    case JSONObject: {
-                        squareBracketsStart = " [";
-                        nodeTypeStr = "object";
-                        squareBracketsEnd = "]";
-                        sizeStrPre = " (";
-                        sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.obj.singular.text" : "dialog.structure.size.obj.plural.text");
-                        sizeStrPost = ")";
-
-                        icon = JsonAssistantIcons.Structure.JSON_OBJECT;
+            // 4. 渲染值（若存在）
+            if (renderData.formattedValue != null) {
+                SimpleTextAttributes valueAttrs;
+                switch (renderData.valueType) {
+                    case "null":
+                    case "java.lang.Boolean": {
+                        valueAttrs = BOOLEAN_NULL_ATTRIBUTES;
                         break;
                     }
-
-                    case JSONArray: {
-                        squareBracketsStart = " [";
-                        nodeTypeStr = "array";
-                        squareBracketsEnd = "]";
-                        sizeStrPre = " (";
-                        sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.array.singular.text" : "dialog.structure.size.array.plural.text");
-                        sizeStrPost = ")";
-
-                        icon = JsonAssistantIcons.Structure.JSON_ARRAY;
+                    case "java.lang.Number": {
+                        valueAttrs = NUMBER_COLOR_ATTRIBUTES;
                         break;
                     }
-
-                    case JSONObjectElement: {
-                        squareBracketsStart = " [";
-                        nodeTypeStr = "array_object";
-                        squareBracketsEnd = "]";
-                        sizeStrPre = " (";
-                        sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.obj.singular.text" : "dialog.structure.size.obj.plural.text");
-                        sizeStrPost = ")";
-
-                        icon = JsonAssistantIcons.Structure.JSON_OBJECT_ITEM;
-                        break;
-                    }
-
-                    case JSONArrayElementArray: {
-                        squareBracketsStart = " [";
-                        nodeTypeStr = "array_array";
-                        squareBracketsEnd = "]";
-                        sizeStrPre = " (";
-                        sizeStr = size + " " + JsonAssistantBundle.messageOnSystem(size == 1 ? "dialog.structure.size.array.singular.text" : "dialog.structure.size.array.plural.text");
-                        sizeStrPost = ")";
-
-                        icon = JsonAssistantIcons.Structure.JSON_ARRAY;
-                        break;
-                    }
-
-                    case JSONArrayElement: {
-                        icon = JsonAssistantIcons.Structure.JSON_ITEM;
-                        String valueStr;
-                        if (Objects.isNull(nodeValue)) {
-                            valueStr = "null";
-                            jsonValueType = "null";
-                        } else {
-                            if (nodeValue instanceof String) {
-                                String str = (String) nodeValue;
-
-                                if (str.isEmpty()) {
-                                    valueStr = "\"\"";
-                                } else {
-                                    valueStr = "\"" + str + "\"";
-                                }
-                                jsonValueType = String.class.getName();
-
-                            } else if (nodeValue instanceof Boolean) {
-                                jsonValueType = Boolean.class.getName();
-                                valueStr = nodeValue + "";
-
-                            } else if (nodeValue instanceof Number) {
-                                jsonValueType = Number.class.getName();
-                                valueStr = nodeValue + "";
-                            } else {
-                                valueStr = nodeValue + "";
-                            }
-                        }
-
-                        jsonValue = valueStr;
-                        break;
-                    }
-
-                    case JSONObjectProperty: {
-                        String valueStr;
-                        if (Objects.isNull(nodeValue)) {
-                            valueStr = "null";
-                            jsonValueType = "null";
-                        } else {
-                            if (nodeValue instanceof String) {
-                                String str = (String) nodeValue;
-
-                                if (str.isEmpty()) {
-                                    valueStr = "\"\"";
-                                } else {
-                                    valueStr = "\"" + str + "\"";
-                                }
-                                jsonValueType = String.class.getName();
-
-                            } else if (nodeValue instanceof Boolean) {
-                                jsonValueType = Boolean.class.getName();
-                                valueStr = nodeValue + "";
-
-                            } else if (nodeValue instanceof Number) {
-                                jsonValueType = Number.class.getName();
-                                valueStr = nodeValue + "";
-                            } else {
-                                valueStr = nodeValue + "";
-                            }
-                        }
-
-                        jsonValue = valueStr;
+                    default: {
+                        valueAttrs = STRING_COLOR_ATTRIBUTES;
                         break;
                     }
                 }
+
+                append(renderData.formattedValue, valueAttrs, true);
             }
 
-            if (!Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType)) {
-                append(Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeType) ? text + ": " : text, simpleTextAttributes);
-            }
+            // 5. 渲染注释
+            appendComment(jsonNode.getComment());
 
-            if (StrUtil.isNotBlank(squareBracketsStart)) append(squareBracketsStart, lightAttributes, false);
-            if (StrUtil.isNotBlank(nodeTypeStr)) append(nodeTypeStr, blueAttributes, false);
-            if (StrUtil.isNotBlank(squareBracketsEnd)) append(squareBracketsEnd, lightAttributes, false);
-            if (StrUtil.isNotBlank(sizeStrPre)) append(sizeStrPre, lightAttributes, false);
-            if (StrUtil.isNotBlank(sizeStr)) append(sizeStr, purpleAttributes, false);
-            if (StrUtil.isNotBlank(sizeStrPost)) append(sizeStrPost, lightAttributes, false);
+            // 6. 渲染路径提示
+            renderPathHint(jsonNode, node);
 
-            // 普通节点
-            if (StrUtil.isNotBlank(jsonValue)) {
-                SimpleTextAttributes attributes;
-                if ("null".equals(jsonValueType) || Boolean.class.getName().equals(jsonValueType)) {
-                    attributes = booleanWithNullColorAttributes;
-                } else if (String.class.getName().equals(jsonValueType)) {
-                    attributes = stringColorAttributes;
-                } else if (Number.class.getName().equals(jsonValueType)) {
-                    attributes = numberColorAttributes;
+            // 7.根据匹配切换字体
+            if (!isFontInitialized) {
+                if (jsonNode.isMatched()) {
+                    setFont(chineseFont);
                 } else {
-                    attributes = stringColorAttributes;
+                    setFont(jbFont);
                 }
+            }
+        }
 
-                append(jsonValue, attributes, Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType));
+
+        // --------------------------- 重构的辅助方法 --------------------------- //
+
+        private NodeRenderData resolveNodeRenderData(JsonTreeNodeType nodeType, JsonNode node) {
+            NodeRenderData data = new NodeRenderData();
+            switch (nodeType) {
+                case JSONObject: {
+                    configureObjectNode(data, node);
+                    break;
+                }
+                case JSONArray: {
+                    configureArrayNode(data, node);
+                    break;
+                }
+                case JSONObjectElement: {
+                    configureObjectElement(data, node);
+                    break;
+                }
+                case JSONArrayElementArray: {
+                    configureArrayElementArray(data, node);
+                    break;
+                }
+                case JSONArrayElement:
+                case JSONObjectProperty: {
+                    configureValueNode(data, node);
+                    break;
+                }
             }
 
-            // 添加注释（如有）
-            String comment = jsonTreeNode.getComment();
+            return data;
+        }
+
+
+        private void configureObjectNode(NodeRenderData data, JsonNode node) {
+            data.icon = JsonAssistantIcons.Structure.JSON_OBJECT;
+            data.typePrefix = " [";
+            data.typeLabel = "object";
+            data.typeSuffix = "]";
+            data.sizeDescription = node.getSize() + " " + getSizeText("obj", node.getSize());
+            wrapSizeString(data);
+        }
+
+        private void configureArrayNode(NodeRenderData data, JsonNode node) {
+            data.icon = JsonAssistantIcons.Structure.JSON_ARRAY;
+            data.typePrefix = " [";
+            data.typeLabel = "array";
+            data.typeSuffix = "]";
+            data.sizeDescription = node.getSize() + " " + getSizeText("array", node.getSize());
+            wrapSizeString(data);
+        }
+
+        private void configureObjectElement(NodeRenderData data, JsonNode node) {
+            data.icon = JsonAssistantIcons.Structure.JSON_OBJECT_ITEM;
+            data.typePrefix = " [";
+            data.typeLabel = "array_object";
+            data.typeSuffix = "]";
+            data.sizeDescription = node.getSize() + " " + getSizeText("obj", node.getSize());
+            wrapSizeString(data);
+        }
+
+        private void configureArrayElementArray(NodeRenderData data, JsonNode node) {
+            data.icon = JsonAssistantIcons.Structure.JSON_ARRAY;
+            data.typePrefix = " [";
+            data.typeLabel = "array_array";
+            data.typeSuffix = "]";
+            data.sizeDescription = node.getSize() + " " + getSizeText("array", node.getSize());
+            wrapSizeString(data);
+        }
+
+        private void configureValueNode(NodeRenderData data, JsonNode node) {
+            Object value = node.getValue();
+            data.formattedValue = formatNodeValue(value);
+            data.valueType = value == null ? "null" : value.getClass().getName();
+            data.icon = (node.getNodeType() == JsonTreeNodeType.JSONArrayElement)
+                    ? JsonAssistantIcons.Structure.JSON_ITEM
+                    : JsonAssistantIcons.Structure.JSON_KEY;
+        }
+
+        private void appendComment(String comment) {
             if (StrUtil.isNotBlank(comment)) {
                 append("  " + comment, SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES, false);
             }
+        }
 
-            if (structureState.displayNodePath && jsonTreeNode.equals(hoverNode)) {
-                TreeNode[] pathElements = jsonTreeNode.getPath();
-                // 不显示根节点与第二层的节点路径
-                if (pathElements.length > 2) {
-                    // 悬停时显示完整路径
-                    StringBuilder pathString = new StringBuilder();
-
-                    for (int i = 0; i < pathElements.length; i++) {
-                        JsonTreeNode node = (JsonTreeNode) pathElements[i];
-                        JsonTreeNodeType parentNodeType = node.getNodeType();
-
-                        if (JsonTreeNodeType.JSONArrayElement == parentNodeType
-                                || JsonTreeNodeType.JSONArrayElementArray == parentNodeType
-                                || JsonTreeNodeType.JSONObjectElement == parentNodeType) {
-                            appendArrayElementPath(node, pathString);
-                        } else {
-                            appendObjectElementPath(node, pathString, i, pathElements.length);
-                        }
-                    }
-
-                    String pathResult = pathString.toString();
-                    // 同时显示工具提示
-                    setToolTipText(pathResult);
-
-                    // 路径换个颜色
-                    append("  " + pathResult, pathColorAttributes, false);
-                }
-            } else {
+        private void renderPathHint(JsonNode node, DefaultMutableTreeNode treeNode) {
+            if (!structureState.isDisplayNodePath() || !treeNode.equals(hoverNode)) {
                 setToolTipText(null);
+                return;
             }
 
-            setIcon(icon);
+            String path = node.getJsonPath();
+            setToolTipText(path);
+            if (treeNode.getPath().length > 2) append("  " + path, PATH_COLOR_ATTRIBUTES, false);
         }
+
+        private void appendIfNonBlank(String text, SimpleTextAttributes attrs) {
+            if (StrUtil.isNotBlank(text)) append(text, attrs, false);
+        }
+
+        private String getSizeText(String type, int size) {
+            String key = size == 1 ?
+                    "dialog.structure.size." + type + ".singular.text" :
+                    "dialog.structure.size." + type + ".plural.text";
+            return JsonAssistantBundle.messageOnSystem(key);
+        }
+
+        private void wrapSizeString(NodeRenderData data) {
+            if (data.sizeDescription != null) {
+                data.sizePrefix = " (";
+                data.sizeSuffix = ")";
+            }
+        }
+
     }
 
-    public static void appendArrayElementPath(JsonTreeNode node, StringBuilder pathString) {
-        TreeNode parent = node.getParent();
-        int index = parent.getIndex(node);
-        pathString.append("[").append(index).append("]");
+    public static String formatNodeValue(Object value) {
+        if (value == null) return "null";
+        if (value instanceof String) {
+            String str = (String) value;
+            return str.isEmpty() ? "\"\"" : "\"" + str + "\"";
+        }
+        return String.valueOf(value);
     }
 
-    private static void appendObjectElementPath(JsonTreeNode node, StringBuilder pathString, int currentIndex, int totalLength) {
-        boolean isLastElement = currentIndex == totalLength - 1;
-        String separator = (pathString.length() > 0 && !isLastElement) ? "." : "";
-        String elementValue = isLastElement ? "" : String.valueOf(node.getUserObject());
 
-        pathString.append(separator).append(elementValue);
+    /**
+     * 封装树节点渲染所需数据
+     */
+    private static class NodeRenderData {
+
+        /**
+         * 方括号开始部分（如" ["），用于表示结构化节点的开始
+         * 通常用于JSON对象和数组类型的节点
+         */
+        String typePrefix = "";
+
+        /**
+         * 节点类型描述字符串（如"object"、"array"）
+         * 显示在方括号内，标识节点的JSON类型
+         */
+        String typeLabel = "";
+
+        /**
+         * 方括号结束部分（如"]"），与squareBracketsStart配对使用
+         */
+        String typeSuffix = "";
+
+        /**
+         * 尺寸信息的前缀字符串（如" ("）
+         * 用于包裹节点包含的元素数量信息
+         */
+        String sizePrefix = "";
+
+        /**
+         * 尺寸信息字符串（如"3 objects"）
+         * 包含节点包含的元素数量和类型描述，使用国际化消息
+         */
+        String sizeDescription = "";
+
+        /**
+         * 尺寸信息的后缀字符串（如")"）
+         * 与sizeStrPre配对使用，形成完整的尺寸信息包裹
+         */
+        String sizeSuffix = "";
+
+        /**
+         * 节点的值字符串表示（如"\"text\""、"123"、"null"）
+         * 对于基本类型节点（字符串、数字、布尔值、null）存储格式化后的值
+         * 结构化节点（对象、数组）此字段为null
+         */
+        String formattedValue = null;
+
+        /**
+         * 节点值的类型标识（如"java.lang.String"、"java.lang.Number"、"null"）
+         * 用于确定值的渲染颜色和样式
+         */
+        String valueType = "";
+
+        /**
+         * 节点对应的图标资源
+         * 根据节点类型使用不同的图标（如JSON对象图标、数组图标、键值对图标等）
+         * 默认值为{@link JsonAssistantIcons.Structure#JSON_KEY}
+         */
+        Icon icon = JsonAssistantIcons.Structure.JSON_KEY;
+
     }
 
 }

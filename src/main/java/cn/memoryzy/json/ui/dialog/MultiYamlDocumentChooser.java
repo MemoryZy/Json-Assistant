@@ -1,13 +1,13 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.model.YamlDocEntry;
 import cn.memoryzy.json.ui.editor.ViewerModeLanguageTextEditor;
+import cn.memoryzy.json.util.FontManager;
 import cn.memoryzy.json.util.JsonAssistantUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -16,6 +16,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.scale.JBUIScale;
 import com.intellij.ui.speedSearch.ListWithFilter;
 import com.intellij.ui.speedSearch.SpeedSearchUtil;
 import com.intellij.util.ui.JBFont;
@@ -55,11 +56,16 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
+        Font font = FontManager.getJetbrainsMapleMonoFont();
+        if (null == font) {
+            font = FontManager.jetBrainsMonoFont(JBUIScale.scaleFontSize(13));
+        }
+
         showTextField = new ViewerModeLanguageTextEditor(LanguageHolder.YAML, null, "", true);
-        showTextField.setFont(UIManager.consolasFont(14));
+        showTextField.setFont(FontManager.consolasFont(14));
 
         showList = new JBList<>(fillListModel());
-        showList.setFont(UIManager.jetBrainsMonoFont(13));
+        showList.setFont(font);
         showList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         showList.addListSelectionListener(new UpdateEditorListSelectionListener());
         showList.setCellRenderer(new IconListCellRenderer());
@@ -71,15 +77,15 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
         // 默认选中第一条
         selectFirstItemInList();
 
-        UIManager.updateComponentColorsScheme(showList);
-        UIManager.updateComponentColorsScheme(showTextField);
+        UIUtils.updateComponentColorsScheme(showList);
+        UIUtils.updateComponentColorsScheme(showTextField);
 
         JBLabel label = new JBLabel();
         label.setFont(JBFont.label().deriveFont(13F));
-        label.setText(HtmlConstant.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint")));
+        label.setText(JsonAssistantUtil.wrapHtml(JsonAssistantBundle.messageOnSystem("dialog.yaml.chooser.hint")));
         label.setBorder(JBUI.Borders.emptyBottom(10));
 
-        JComponent wrapComponent = UIManager.wrapListWithFilter(showList, YamlDocEntry::getShortText, true);
+        JComponent wrapComponent = UIUtils.wrapListWithFilter(showList, el -> ((YamlDocEntry) el).getShortText(), true);
         rebuildListWithFilter();
 
         JPanel firstPanel = new JPanel(new BorderLayout());
@@ -164,6 +170,15 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
 
 
     public static class IconListCellRenderer extends ColoredListCellRenderer<YamlDocEntry> {
+
+        // private final Font chineseFont;
+        // private final Font baseFont;
+
+        public IconListCellRenderer() {
+            // this.chineseFont = chineseFont;
+            // this.baseFont = baseFont;
+        }
+
         @Override
         protected void customizeCellRenderer(@NotNull JList<? extends YamlDocEntry> list, YamlDocEntry value,
                                              int index, boolean selected, boolean hasFocus) {
@@ -171,6 +186,13 @@ public class MultiYamlDocumentChooser extends DialogWrapper {
             append(" " + value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES, true);
             setIcon(AllIcons.FileTypes.Yaml);
             SpeedSearchUtil.applySpeedSearchHighlighting(list, this, true, selected);
+
+            // 动态变更字体
+            // if (value.isMatched()) {
+            //     setFont(chineseFont);
+            // } else {
+            //     setFont(baseFont);
+            // }
         }
     }
 

@@ -1,21 +1,28 @@
 package cn.memoryzy.json.toolwindow;
 
+import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.constant.Urls;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.JsonAssistantToolWindowComponentProvider;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.ToolWindowUtil;
+import com.intellij.ide.util.PropertiesComponent;
+import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.Separator;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.wm.ToolWindowFactory;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.content.Content;
@@ -49,54 +56,104 @@ public class JsonAssistantToolWindowFactory implements ToolWindowFactory, DumbAw
         ContentManager contentManager = toolWindow.getContentManager();
         ToolWindowEx toolWindowEx = (ToolWindowEx) toolWindow;
 
-        // 主界面
-        JsonAssistantToolWindowComponentProvider window = new JsonAssistantToolWindowComponentProvider(project, FileTypeHolder.JSON5, true);
+        // 补充工具窗口的操作栏
+        toolWindowEx.setTabActions(createTabActions(contentFactory, toolWindowEx));
+        toolWindowEx.setTitleActions(createTitleActions(toolWindowEx));
+        toolWindowEx.setAdditionalGearActions(createAdditionalGearActions(toolWindowEx));
 
-        // 选项卡旁
-        AnAction[] tabActions = {new NewTabAction(contentFactory, toolWindowEx)};
-        // 标题行，在此增加一个切换卡片展示的Action
-        List<AnAction> titleActions = List.of(
+        // 创建初始内容页
+        Content content = contentFactory.createContent(null, ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, false);
+        JsonAssistantToolWindowComponentProvider provider = new JsonAssistantToolWindowComponentProvider(project, toolWindowEx, content, FileTypeHolder.JSON5);
+
+        content.setComponent(provider.createComponent());
+        content.setPreferredFocusableComponent(provider.getPreferredFocusedComponent());
+        content.setCloseable(false);
+        content.setDisposer(provider);
+        contentManager.addContent(content, 0);
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // 检查位置
+            if (ToolWindowAnchor.RIGHT.equals(toolWindow.getAnchor()) && !toolWindow.isSplitMode()) {
+                ToolWindowUtil.moveWindowToRightBottom(toolWindow);
+            }
+
+            // 提醒手动保存历史记录
+            showManualSaveReminder(project);
+        });
+    }
+
+    private void showManualSaveReminder(@NotNull Project project) {
+        // 一天提示一次，总共3次
+        PropertiesComponent component = PropertiesComponent.getInstance();
+        String value = component.getValue(PluginConstant.MANUAL_SAVE_HISTORY_REMINDER);
+
+        // 时间戳
+        long timestamp = 0;
+        // 总次数
+        int time = 0;
+
+        if (StrUtil.isNotBlank(value)) {
+            String[] split = value.split("-");
+            // 时间戳
+            timestamp = Long.parseLong(split[0]);
+            // 总次数
+            time = Integer.parseInt(split[1]);
+        }
+
+        // 大于等于3次 或 今天已经提示过
+        if (time >= 3 || JsonAssistantUtil.isTimestampToday(timestamp)) return;
+
+        ToolWindowManager.getInstance(project).notifyByBalloon(
+                ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID,
+                MessageType.INFO,
+                JsonAssistantBundle.messageOnSystem("hint.manual.history.content"));
+
+        // 时间戳 + 次数
+        component.setValue(PluginConstant.MANUAL_SAVE_HISTORY_REMINDER, System.currentTimeMillis() + "-" + (time + 1));
+    }
+
+    /**
+     * 构建选项卡右侧的操作栏
+     *
+     * @return 操作栏
+     */
+    private AnAction[] createTabActions(ContentFactory contentFactory, ToolWindowEx toolWindowEx) {
+        return new NewTabAction[]{new NewTabAction(contentFactory, toolWindowEx)};
+    }
+
+    /**
+     * 构建标题行的操作栏（最右侧）
+     *
+     * @return 操作栏
+     */
+    private List<AnAction> createTitleActions(ToolWindowEx toolWindowEx) {
+        return List.of(
                 new BackToEditorViewAction(toolWindowEx),
+                Separator.create(),
+                new UpgradeHintAction(),
                 Separator.create(),
                 new JsonHistoryAction(toolWindowEx),
                 new OpenSettingsAction());
+    }
 
-        // 右键弹出菜单
+    /**
+     * 构建弹出菜单的的操作栏
+     *
+     * @return 操作栏
+     */
+    private ActionGroup createAdditionalGearActions(ToolWindowEx toolWindowEx) {
         SimpleActionGroup group = new SimpleActionGroup();
         group.add(Separator.create());
         group.add(new RenameTabAction());
-        group.add(new MoveToEditorAction(toolWindowEx));
-        group.add(new FloatingWindowAction(toolWindowEx));
-        group.add(new EditInNewWindowAction(toolWindowEx));
         group.add(Separator.create());
-        group.add(new ManageClipboardDataBlacklistAction(toolWindowEx));
+        group.add(new FloatingWindowAction(toolWindowEx));
+        group.add(new MoveToEditorAction(toolWindowEx));
+        group.add(new EditInNewWindowAction(toolWindowEx));
         group.add(Separator.create());
         group.add(new DonateAction(JsonAssistantBundle.messageOnSystem("action.donate.text")));
         group.add(Separator.create());
-
-        toolWindowEx.setTabActions(tabActions);
-        toolWindowEx.setTitleActions(titleActions);
-        toolWindowEx.setAdditionalGearActions(group);
-
-        Content content = contentFactory.createContent(null, PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, false);
-        window.setContent(content);
-        content.setComponent(window.createComponent());
-
-        content.setCloseable(false);
-        content.setDisposer(window);
-        contentManager.addContent(content, 0);
-
-
-        // 检查位置
-        if (ToolWindowAnchor.RIGHT.equals(toolWindow.getAnchor()) && !toolWindow.isSplitMode()) {
-            ToolWindowUtil.moveWindowToRightBottom(toolWindow);
-        }
-
-        // 验证地址可达性
-        Urls.verifyReachable();
-
-        // 兼容旧版本历史记录数据
-        JsonHistoryAction.compatibilityHistory(project);
+        return group;
     }
+
 
 }

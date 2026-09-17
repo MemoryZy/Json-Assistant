@@ -1,15 +1,20 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.util.StrUtil;
 import com.ctc.wstx.stax.WstxInputFactory;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -22,6 +27,7 @@ public class XmlUtil {
      * 线程安全的工厂实例
      */
     private static final WstxInputFactory factory = new WstxInputFactory();
+    private static final XmlMapper xmlMapper = createXmlMapper();
 
     static {
         factory.configureForSpeed();
@@ -29,6 +35,12 @@ public class XmlUtil {
         factory.setProperty(XMLInputFactory.IS_COALESCING, false);
         // 禁用DTD
         factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+    }
+
+    private static XmlMapper createXmlMapper() {
+        XmlMapper mapper = new XmlMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
     }
 
     /**
@@ -81,7 +93,6 @@ public class XmlUtil {
         Object object = isJson
                 ? JsonUtil.parse(jsonStr)
                 : Json5Util.parse(jsonStr);
-        XmlMapper xmlMapper = new XmlMapper();
         return xmlMapper.writerWithDefaultPrettyPrinter()
                 .withRootName("root")
                 .writeValueAsString(object);
@@ -89,11 +100,60 @@ public class XmlUtil {
 
     public static String toJson(String xmlStr) {
         try {
-            ObjectMapper xmlMapper = new XmlMapper();
             JsonNode jsonNode = xmlMapper.readTree(xmlStr.getBytes(StandardCharsets.UTF_8));
             return JsonUtil.toJsonStr(jsonNode);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+
+    public static <T> T parseXmlFile(File xmlFile, Class<T> clz)  {
+        try {
+            return xmlMapper.readValue(xmlFile, clz);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static <T> T parseXmlString(String xml, Class<T> clz)  {
+        try {
+            return xmlMapper.readValue(xml, clz);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 从XML中提取CDATA内容
+     *
+     * @param cdata XML字符串，必须由 CDATA 包裹
+     * @return CDATA内容，如果解析失败返回null
+     */
+    public static String extractCdataContent(String cdata) {
+        try {
+            cdata = StrUtil.format("<root><content>{}</content></root>", cdata);
+            XmlMapper xmlMapper = new XmlMapper();
+            XmlRoot root = xmlMapper.readValue(cdata, XmlRoot.class);
+            return root.getContent();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @JacksonXmlRootElement(localName = "root")
+    public static class XmlRoot {
+
+        @JacksonXmlCData
+        @JacksonXmlProperty(localName = "content")
+        private String content;
+
+        public String getContent() {
+            return content;
+        }
+
+        public void setContent(String content) {
+            this.content = content;
         }
     }
 

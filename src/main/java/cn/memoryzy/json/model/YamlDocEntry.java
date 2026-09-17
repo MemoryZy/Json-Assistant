@@ -1,5 +1,6 @@
 package cn.memoryzy.json.model;
 
+import cn.memoryzy.json.ui.tree.BaseNode;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.YamlUtil;
 import com.intellij.openapi.editor.actions.ContentChooser;
@@ -12,7 +13,7 @@ import java.util.List;
  * @author Memory
  * @since 2024/9/25
  */
-public class YamlDocEntry {
+public class YamlDocEntry extends BaseNode {
 
     private final String shortText;
     private final String longText;

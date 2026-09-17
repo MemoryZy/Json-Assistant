@@ -157,7 +157,7 @@ class JsonParser {
 
       String key = extractIdenty(path);
       if (parseComment && PluginConstant.COMMENT_KEY.equals(key)) {
-        LOG.warn(StrUtil.format("Key '{}' is reserved for internal use, at position {}, path '{}'.",
+        LOG.warn(StrUtil.format("[Json Assistant] Key '{}' is reserved for internal use, at position {}, path '{}'.",
                 PluginConstant.COMMENT_KEY, index, path.getName()));
       }
 
@@ -259,7 +259,7 @@ class JsonParser {
       }
 
     } catch (ParseException e) {
-      LOG.warn(StrUtil.format("Conflict with reserved key: '{}', at position {}, path '{}'.",
+      LOG.warn(StrUtil.format("[Json Assistant] Conflict with reserved key: '{}', at position {}, path '{}'.",
               PluginConstant.COMMENT_KEY, index, path.getName()));
     }
   }
@@ -293,7 +293,7 @@ class JsonParser {
         currentIndex++;
       }
     } catch (Exception e) {
-      LOG.warn(StrUtil.format("Parsing error, key '{}', at position {}, path '{}'.", key, index, path.getName(), e.getMessage()), e);
+      LOG.warn(StrUtil.format("[Json Assistant] Parsing error, key '{}', at position {}, path '{}'.", key, index, path.getName(), e.getMessage()), e);
     }
   }
 

@@ -14,7 +14,10 @@ import javax.swing.*;
  * @since 2024/9/13
  */
 public class JsonAssistantMainConfigurable implements Configurable {
+
     private JsonAssistantMainConfigurableComponentProvider componentProvider;
+
+    public static final String ID = "JsonAssistant.Configurable.JsonAssistantMainConfigurable";
 
     @Override
     public String getDisplayName() {

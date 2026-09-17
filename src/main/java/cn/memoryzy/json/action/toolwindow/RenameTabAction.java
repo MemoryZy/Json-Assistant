@@ -1,23 +1,14 @@
 package cn.memoryzy.json.action.toolwindow;
 
-import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.PluginConstant;
-import cn.memoryzy.json.model.HistoryLimitedList;
-import cn.memoryzy.json.model.JsonEntry;
-import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.util.Json5Util;
-import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.util.ToolWindowUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -54,7 +45,7 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.rename.tab.text"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.rename.tab.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.rename.tab.description"));
     }
 
@@ -64,10 +55,10 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
         BaseLabel tabLabel = contextComponent instanceof BaseLabel ? (BaseLabel) contextComponent : event.getData(ToolWindowContentUi.SELECTED_CONTENT_TAB_LABEL);
         if (tabLabel == null) return;
         Content content = tabLabel.getContent();
-        showContentRenamePopup(getEventProject(event), tabLabel, Objects.requireNonNull(content));
+        showContentRenamePopup(tabLabel, Objects.requireNonNull(content));
     }
 
-    private void showContentRenamePopup(Project project, BaseLabel baseLabel, Content content) {
+    private void showContentRenamePopup(BaseLabel baseLabel, Content content) {
         JBTextField textField = new JBTextField(content.getDisplayName());
         textField.selectAll();
 
@@ -101,21 +92,19 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
                     if (!Disposer.isDisposed(content)) {
                         if (StrUtil.isBlank(textField.getText())) {
                             // 将输入框边框红色，以示警告
-                            UIManager.addErrorBorder(textField);
+                            UIUtils.addErrorBorder(textField);
                             return;
                         }
 
                         String name = textField.getText();
                         content.setDisplayName(name);
-
-                        asyncUpdateName(project, name, content);
                     }
                     balloon.hide();
                 }
             }
         });
 
-        UIManager.addRemoveErrorListener(textField);
+        UIUtils.addRemoveErrorListener(textField);
         balloon.show(new RelativePoint(baseLabel, new Point(baseLabel.getWidth() / 2, baseLabel.getHeight())), Balloon.Position.above);
     }
 
@@ -128,61 +117,11 @@ public class RenameTabAction extends DumbAwareAction implements UpdateInBackgrou
             String id = toolWindow.getId();
             Content content = ToolWindowUtil.getContextContent(event.getDataContext());
             enabled = project != null
-                    && (Objects.equals(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, id) || Objects.equals(PluginConstant.AUXILIARY_TREE_TOOLWINDOW_ID, id))
+                    && (Objects.equals(ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID, id) || Objects.equals(ToolWindowConstant.Structure.AUXILIARY_TREE_TOOLWINDOW_ID, id))
                     && content != null;
         }
 
         event.getPresentation().setEnabledAndVisible(enabled);
     }
 
-    private void asyncUpdateName(Project project, String name, Content content) {
-        // 寻找历史记录，找到相同记录，更改名称
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (isDefaultName(name)) {
-                return;
-            }
-
-            EditorEx editor = ToolWindowUtil.getEditorOnContent(content);
-            if (editor == null) {
-                return;
-            }
-
-            String text = editor.getDocument().getText();
-            if (StrUtil.isBlank(text)) {
-                return;
-            }
-
-            JsonWrapper jsonWrapper = null;
-            if (JsonUtil.isJson(text)) {
-                jsonWrapper = JsonUtil.parse(text);
-            } else if (Json5Util.isJson5(text)) {
-                jsonWrapper = Json5Util.parse(text);
-            }
-
-            if (jsonWrapper == null) {
-                return;
-            }
-
-            HistoryLimitedList history = JsonHistoryPersistentState.getInstance(project).getHistory();
-            for (JsonEntry entry : history) {
-                if (Objects.equals(jsonWrapper, entry.getJsonWrapper())) {
-                    entry.setName(name);
-                }
-            }
-        });
-    }
-
-    private boolean isDefaultName(String name) {
-        if (StrUtil.equalsIgnoreCase(PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, name)) {
-            return true;
-        }
-
-        if (name.length() >= 4) {
-            String prefix = name.substring(0, 4);
-            String postfix = name.substring(4);
-            return StrUtil.equalsIgnoreCase(PluginConstant.JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME, prefix) && ReUtil.isMatch("\\d+", postfix);
-        }
-
-        return true;
-    }
 }

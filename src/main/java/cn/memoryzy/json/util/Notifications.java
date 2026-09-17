@@ -1,12 +1,13 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.notification.DonateAction;
 import cn.memoryzy.json.action.notification.QuickStartAction;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
+import cn.memoryzy.json.service.NotificationScheduler;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.*;
@@ -15,6 +16,8 @@ import com.intellij.notification.impl.NotificationsManagerImpl;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.Balloon;
+import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.openapi.wm.IdeFrame;
 import com.intellij.ui.BalloonImpl;
 import com.intellij.ui.BalloonLayoutData;
@@ -22,6 +25,7 @@ import com.intellij.ui.awt.RelativePoint;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -30,8 +34,11 @@ import org.jsoup.select.Elements;
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -100,6 +107,16 @@ public class Notifications {
     public static void showNotification(String title, String content, NotificationType notificationType, List<? extends @NotNull AnAction> actions, Project project) {
         // 使用通知组创建通知
         Notification notification = getBalloonNotificationGroup().createNotification(content, notificationType).setTitle(title);
+        actions.forEach(notification::addAction);
+        notification.notify(project);
+    }
+
+    /**
+     * 展示通知（瞬态通知）
+     */
+    public static void showNotification(String content, NotificationType notificationType, List<? extends @NotNull AnAction> actions, Project project) {
+        // 使用通知组创建通知
+        Notification notification = getBalloonNotificationGroup().createNotification(content, notificationType);
         actions.forEach(notification::addAction);
         notification.notify(project);
     }
@@ -175,7 +192,7 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    UIManager.getInstance());
+                    NotificationScheduler.getInstance());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
@@ -185,7 +202,7 @@ public class Notifications {
 
     @SuppressWarnings({"DuplicatedCode", "deprecation"})
     public static void showUpdateNotification(Project project) {
-        String changeNotes = JsonAssistantPlugin.getJsonAssistant().getChangeNotes();
+        String changeNotes = JsonAssistantPlugin.getJsonAssistantPlugin().getChangeNotes();
         if (StrUtil.isBlank(changeNotes)) {
             changeNotes = "<ul></ul>";
         } else {
@@ -211,7 +228,7 @@ public class Notifications {
                     false,
                     false,
                     BalloonLayoutData.fullContent(),
-                    UIManager.getInstance());
+                    NotificationScheduler.getInstance());
 
             JComponent component = window.getComponent();
             balloon.show(getUpperRightRelativePoint(component, (BalloonImpl) balloon), Balloon.Position.above);
@@ -220,29 +237,60 @@ public class Notifications {
 
 
     public static RelativePoint getUpperRightRelativePoint(JComponent component, BalloonImpl balloon) {
-        // 在其他平台上，气球提示显示在标题栏的右侧边缘
-        JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
+        // // 在其他平台上，气球提示显示在标题栏的右侧边缘
+        // JLayeredPane layeredPane = component.getRootPane().getLayeredPane();
+        //
+        // // 查找标题栏组件
+        // Component titleBar = Arrays.stream(layeredPane.getComponents())
+        //         .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
+        //         .findFirst()
+        //         .orElse(null);
+        //
+        // // 计算垂直偏移量
+        // int insetTop = balloon.getShadowBorderInsets().top;
+        // int contentHalfHeight = (int) (balloon.getContent().getPreferredSize().getHeight() / 2);
+        // int titleBarHeight = titleBar != null ? titleBar.getHeight() : 40;
+        // int offsetY = titleBarHeight + insetTop + contentHalfHeight;
+        //
+        // // 设置气球提示的显示位置
+        // Component relativeComponent = titleBar != null ? titleBar : component;
+        //
+        // int insetRight = balloon.getShadowBorderInsets().right;
+        // int contentHalfWidth = (int) (balloon.getContent().getPreferredSize().getWidth() / 2);
+        // int offsetX = relativeComponent.getWidth() - (25 + insetRight + contentHalfWidth);
+        //
+        // return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
 
-        // 查找标题栏组件
-        Component titleBar = Arrays.stream(layeredPane.getComponents())
-                .filter(c -> c.getX() == 0 && c.getY() == 0 && c.getWidth() == layeredPane.getWidth() && c.getHeight() > 0)
-                .findFirst()
-                .orElse(null);
+        Dimension componentSize = component.getSize();
+        Dimension balloonSize = balloon.getPreferredSize();
 
-        // 计算垂直偏移量
-        int insetTop = balloon.getShadowBorderInsets().top;
-        int contentHalfHeight = (int) (balloon.getContent().getPreferredSize().getHeight() / 2);
-        int titleBarHeight = titleBar != null ? titleBar.getHeight() : 40;
-        int offsetY = titleBarHeight + insetTop + contentHalfHeight;
+        int width = Math.min(balloonSize.width, componentSize.width);
+        int height = Math.min(balloonSize.height, componentSize.height);
 
-        // 设置气球提示的显示位置
-        Component relativeComponent = titleBar != null ? titleBar : component;
+        // top-right corner, 20px to the edges
+        return new RelativePoint(component, new Point(componentSize.width - 20 - width / 2, 20 + height / 2));
+    }
 
-        int insetRight = balloon.getShadowBorderInsets().right;
-        int contentHalfWidth = (int) (balloon.getContent().getPreferredSize().getWidth() / 2);
-        int offsetX = relativeComponent.getWidth() - (25 + insetRight + contentHalfWidth);
+    /**
+     * 计算组件右下角的相对位置（适合放置气球控件的中心点）
+     *
+     * @param component 目标组件
+     * @param balloon   气球控件
+     * @return 位于组件右下角区域的相对坐标点
+     */
+    public static RelativePoint getLowerRightRelativePoint(JComponent component, BalloonImpl balloon) {
+        Dimension componentSize = component.getSize();
+        Dimension balloonSize = balloon.getPreferredSize();
 
-        return new RelativePoint(relativeComponent, new Point(offsetX, offsetY));
+        // 使用组件和气球的最小尺寸确保不超出边界
+        int width = Math.min(balloonSize.width, componentSize.width);
+        int height = Math.min(balloonSize.height, componentSize.height);
+
+        // 计算右下角位置：距右边缘20px，距底边缘20px
+        int x = componentSize.width - 20 - width / 2; // 中心点水平位置
+        int y = componentSize.height - 20 - height / 2; // 中心点垂直位置
+
+        return new RelativePoint(component, new Point(x, y));
     }
 
     /**
@@ -301,25 +349,91 @@ public class Notifications {
     }
 
     public static class FullContentNotification extends Notification implements NotificationFullContent {
-        public FullContentNotification(@NotNull @NonNls String groupId, @NotNull String title, @NotNull String content, @NotNull NotificationType type) {
+
+        private final String announcementId;
+        private volatile Consumer<String> closedIdConsumer;
+
+        public FullContentNotification(@NotNull @NonNls String groupId,
+                                       @NotNull String title,
+                                       @NotNull String content,
+                                       @NotNull NotificationType type) {
             super(groupId, title, content, type);
+            this.announcementId = null;
+        }
+
+        public FullContentNotification(@NotNull String groupId,
+                                       @NotNull String title,
+                                       @NotNull String content,
+                                       @NotNull NotificationType type,
+                                       String announcementId) {
+            super(groupId, title, content, type);
+            this.announcementId = announcementId;
+        }
+
+        public String getAnnouncementId() {
+            return announcementId;
+        }
+
+        public void setClosedIdConsumer(Consumer<String> closedIdConsumer) {
+            this.closedIdConsumer = closedIdConsumer;
+        }
+
+        @Override
+        public void notify(@Nullable Project project) {
+            super.notify(project);
+            Balloon balloon = getBalloon();
+            if (balloon != null) {
+                balloon.addListener(new JBPopupListener() {
+                    @Override
+                    public void onClosed(@NotNull LightweightWindowEvent event) {
+                        Consumer<String> consumer = closedIdConsumer;
+                        if (consumer != null) consumer.accept(announcementId);
+                    }
+                });
+            }
         }
     }
 
-    private static class NotificationListenerImpl extends NotificationListener.Adapter {
+    public static class NotificationListenerImpl extends NotificationListener.Adapter {
         @Override
         protected void hyperlinkActivated(@NotNull Notification notification, @NotNull HyperlinkEvent e) {
             String url = e.getDescription();
 
             if (Objects.equals(UrlType.DONATE.getId(), url)) {
-                if (Urls.isReachable()) {
-                    BrowserUtil.browse(UrlType.DONATE.getUrl());
-                } else {
-                    new SupportDialog().show();
-                }
+                // BrowserUtil.browse(UrlType.DONATE.getUrl());
+                new SupportDialog().show();
             } else {
                 BrowserUtil.browse(url);
             }
         }
     }
+
+
+
+    /*
+        // bottom-right corner
+    balloon.show(new PositionTracker<Balloon>(jFrame.getRootPane()) {
+      @Override
+      public RelativePoint recalculateLocation(@NotNull Balloon balloon) {
+        Dimension jFrameSize = jFrame.getSize();
+        Dimension balloonSize = balloon.getPreferredSize();
+        return new RelativePoint(jFrame, new Point(jFrameSize.width - balloonSize.width / 2, jFrameSize.height - balloonSize.height / 2));
+      }
+    }, Balloon.Position.above);
+
+    -----------------------
+
+        Dimension componentSize = component.getSize();
+    Dimension balloonSize = balloon.getPreferredSize();
+
+    int width = Math.min(balloonSize.width, componentSize.width);
+    int height = Math.min(balloonSize.height, componentSize.height);
+
+    // top-right corner, 20px to the edges
+    RelativePoint point = new RelativePoint(component, new Point(componentSize.width - 20 - width / 2, 20 + height / 2));
+    balloon.show(point, Balloon.Position.above);
+
+
+     */
+
 }

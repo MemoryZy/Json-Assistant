@@ -24,7 +24,6 @@ public class ActionGroupPopupButton extends ActionButton {
         super(action, presentation, place, minimumSize);
     }
 
-    @Override
     protected void showActionGroupPopup(@NotNull ActionGroup actionGroup, @NotNull AnActionEvent event) {
         HelpTooltip.hide(this);
         ReflectUtil.invoke(actionGroup, "actionPerformed", event);

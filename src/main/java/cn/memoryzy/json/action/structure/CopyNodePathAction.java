@@ -3,9 +3,8 @@ package cn.memoryzy.json.action.structure;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.ui.JsonStructureComponentProvider;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -26,7 +25,7 @@ public class CopyNodePathAction extends DumbAwareAction implements UpdateInBackg
     private final Tree tree;
 
     public CopyNodePathAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.copy.node.path.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.copy.node.path.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.copy.node.path.description"),
                 null);
         this.tree = tree;
@@ -38,23 +37,8 @@ public class CopyNodePathAction extends DumbAwareAction implements UpdateInBackg
         if (ArrayUtil.isNotEmpty(selectPaths)) {
             List<String> pathList = new ArrayList<>();
             for (TreePath path : selectPaths) {
-                StringBuilder pathString = new StringBuilder();
-                Object[] pathElements = path.getPath();
-
-                for (Object pathElement : pathElements) {
-                    JsonTreeNode node = (JsonTreeNode) pathElement;
-                    JsonTreeNodeType nodeType = node.getNodeType();
-
-                    if (JsonTreeNodeType.JSONArrayElement == nodeType
-                            || JsonTreeNodeType.JSONArrayElementArray == nodeType
-                            || JsonTreeNodeType.JSONObjectElement == nodeType) {
-                        JsonStructureComponentProvider.appendArrayElementPath(node, pathString);
-                    } else {
-                        pathString.append(pathString.length() > 0 ? "." : "").append(node.getUserObject());
-                    }
-                }
-
-                pathList.add(pathString.toString());
+                JsonNode node = JsonFilterableTree.getNode(path);
+                pathList.add(node.getJsonPath());
             }
 
             PlatformUtil.setClipboard(StrUtil.join(", \n", pathList));

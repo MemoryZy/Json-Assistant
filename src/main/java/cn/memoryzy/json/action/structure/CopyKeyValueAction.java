@@ -4,7 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -22,7 +23,7 @@ public class CopyKeyValueAction extends DumbAwareAction implements UpdateInBackg
     private final Tree tree;
 
     public CopyKeyValueAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.copy.kv.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.copy.kv.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.copy.kv.description"),
                 null);
         this.tree = tree;
@@ -35,12 +36,12 @@ public class CopyKeyValueAction extends DumbAwareAction implements UpdateInBackg
         if (paths != null) {
             List<String> valueList = new ArrayList<>();
             for (TreePath path : paths) {
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonNode node = JsonFilterableTree.getNode(path);
                 // 获取value值，多个的话用其他处理方式
                 Object value = node.getValue();
                 JsonTreeNodeType nodeType = node.getNodeType();
 
-                String userObject = node.getUserObject().toString();
+                String userObject = String.valueOf(node.getKey());
                 // 只有JSONArrayElement是没有Value的
                 if (Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType)) {
                     valueList.add(userObject);

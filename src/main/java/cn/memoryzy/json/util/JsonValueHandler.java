@@ -49,14 +49,14 @@ public class JsonValueHandler {
             return false;
         }
 
-        PsiFile psiFile = CommonDataKeys.PSI_FILE.getData(dataContext);
-        if (psiFile instanceof JsonFile) {
-            return containsSpecialTypeInElement(psiFile, handleType);
-
-        } else {
+        // PsiFile psiFile = CommonDataKeys.PSI_FILE.getData(dataContext);
+        // if (psiFile instanceof JsonFile) {
+        //     return containsSpecialTypeInElement(psiFile, handleType);
+        //
+        // } else {
             // 文本判断
             return containsSpecialTypeInJson(dataContext, handleType);
-        }
+        // }
     }
 
 
@@ -282,8 +282,9 @@ public class JsonValueHandler {
         String json = GlobalJsonConverter.parseJson(context, processors);
         // 获取解析成功的处理器
         AbstractGlobalTextConversionProcessor processor = context.getProcessor();
-        // 是否为Json格式
-        boolean isJson = GlobalJsonConverter.isValidJson(processor);
+        // 是否为 JSON 格式
+        boolean isJson = JsonUtil.isJson(json);
+
         // 解析
         JsonWrapper wrapper = isJson ? JsonUtil.parse(json) : Json5Util.parse(json);
         if (wrapper == null) {
@@ -320,7 +321,7 @@ public class JsonValueHandler {
         // 是否可写
         boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, newAllowedFileTypeQualifiedNames);
         // 处理
-        TextTransformUtil.applyProcessedTextToDocument(project, editor, jsonString, processor, canWrite);
+        TextTransformUtil.applyProcessedTextToDocument(project, editor, jsonString, processor, canWrite, null);
     }
 
     /**
@@ -422,7 +423,7 @@ public class JsonValueHandler {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
         if (StrUtil.isBlank(json)) return false;
-        JsonWrapper wrapper = GlobalJsonConverter.isValidJson(context.getProcessor()) ? JsonUtil.parse(json) : Json5Util.parse(json);
+        JsonWrapper wrapper = JsonUtil.isJson(json) ? JsonUtil.parse(json) : Json5Util.parse(json);
 
         if (wrapper instanceof ObjectWrapper) {
             return checkObject((ObjectWrapper) wrapper, handleType);

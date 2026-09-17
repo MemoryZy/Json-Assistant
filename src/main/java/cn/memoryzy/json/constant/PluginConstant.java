@@ -1,5 +1,7 @@
 package cn.memoryzy.json.constant;
 
+import cn.memoryzy.json.JsonAssistantPlugin;
+
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.time.LocalDate;
@@ -12,36 +14,6 @@ import java.util.*;
  * @since 2024/7/12
  */
 public interface PluginConstant {
-
-    /**
-     * Json Assistant 工具窗口 ID
-     */
-    String JSON_ASSISTANT_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.JsonAssistant";
-
-    /**
-     * Json Structure 工具窗口 ID
-     */
-    String AUXILIARY_TREE_TOOLWINDOW_ID = "JsonAssistant.ToolWindow.AuxiliaryTree";
-
-    /**
-     * 选择的软换行状态 Key
-     */
-    String SOFT_WRAPS_SELECT_STATE = JsonAssistantPlugin.PLUGIN_ID_NAME + ".SOFT_WRAPS_SELECT_STATE";
-
-    /**
-     * Json 编辑器卡片名称
-     */
-    String JSON_EDITOR_CARD_NAME = "editor";
-
-    /**
-     * Json 树卡片名称
-     */
-    String JSON_TREE_CARD_NAME = "tree";
-
-    /**
-     * JSONQuery 卡片名
-     */
-    String JSON_QUERY_CARD_NAME = "json_query";
 
     String KOTLIN_TRANSIENT = "kotlin.jvm.Transient";
 
@@ -70,8 +42,7 @@ public interface PluginConstant {
 
     String JSON_EXAMPLE_ID = JsonAssistantPlugin.PLUGIN_ID_NAME + "#EXAMPLE";
 
-    String JSON_ASSISTANT_TOOL_WINDOW_DISPLAY_NAME = "View";
-    String AUXILIARY_TREE_TOOL_WINDOW_DISPLAY_NAME = "Tab";
+    String HISTORY_EDITOR_NAME = "record";
 
     String OUTLINE_PROPERTY = "JComponent.outline";
     String ERROR_VALUE = "error";
@@ -85,6 +56,15 @@ public interface PluginConstant {
 
     String NEW_CLASS_TEMPLATE_NAME = "New Class.java";
 
+    String en_US = "en_US";
+
+    String zh_CN = "zh_CN";
+
+    String MANUAL_SAVE_HISTORY_REMINDER = JsonAssistantPlugin.PLUGIN_ID_NAME + ".MANUAL_SAVE_HISTORY_REMINDER";
+
+    String EXTERNAL_FILE_REMINDER = JsonAssistantPlugin.PLUGIN_ID_NAME + ".EXTERNAL_FILE_REMINDER";
+
+
     String[] COLLECTION_FQN = {
             Iterable.class.getName(),
             Collection.class.getName(),
@@ -94,7 +74,10 @@ public interface PluginConstant {
             LinkedList.class.getName()
     };
 
+    String[] MAP_FQN = {Map.class.getName()};
+
     String[] BIGDECIMAL_FQN = {BigDecimal.class.getName()};
+
 
     String[] DATE_TIME_FQN = {Date.class.getName(), LocalDateTime.class.getName()};
 

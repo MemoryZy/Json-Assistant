@@ -2,7 +2,7 @@ package cn.memoryzy.json.action.toolwindow;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -17,18 +17,18 @@ import org.jetbrains.annotations.NotNull;
 public class JsonMinifyToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public JsonMinifyToolWindowAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonMinifyToolWindowAction(EditorEx editor, CombineCardLayout cardLayout, SimpleToolWindowPanel windowPanel) {
         super();
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.minify.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.minify.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.MINIFY);
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt C"), simpleToolWindowPanel);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt C"), windowPanel);
     }
 
     @Override
@@ -42,8 +42,8 @@ public class JsonMinifyToolWindowAction extends DumbAwareAction implements Updat
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
-                && !editor.isViewer());
+        event.getPresentation().setEnabled(
+                GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                        && cardLayout.isEditorView());
     }
 }

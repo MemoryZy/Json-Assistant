@@ -1,156 +1,191 @@
 package cn.memoryzy.json.ui;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.action.toolwindow.*;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.DataTypeConstant;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
-import cn.memoryzy.json.constant.PluginConstant;
+import cn.memoryzy.json.constant.FileTypeHolder;
+import cn.memoryzy.json.constant.ToolWindowConstant;
 import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.model.EditorInitData;
-import cn.memoryzy.json.model.HistoryLimitedList;
-import cn.memoryzy.json.model.JsonEntry;
-import cn.memoryzy.json.model.StructureConfig;
-import cn.memoryzy.json.model.strategy.ClipboardTextConverter;
-import cn.memoryzy.json.model.strategy.clipboard.Json5ConversionStrategy;
-import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionContext;
-import cn.memoryzy.json.model.strategy.clipboard.context.ClipboardTextConversionStrategy;
+import cn.memoryzy.json.enums.DataFormatType;
+import cn.memoryzy.json.enums.FileTypes;
+import cn.memoryzy.json.enums.HistoryAffectType;
+import cn.memoryzy.json.event.*;
+import cn.memoryzy.json.extension.file.ExternalFileWrapper;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.JsonHistoryPersistentState;
-import cn.memoryzy.json.service.persistent.state.EditorAppearanceState;
-import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
+import cn.memoryzy.json.service.persistent.HistoryManager;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
+import cn.memoryzy.json.service.persistent.state.EditorVisualState;
 import cn.memoryzy.json.service.persistent.state.HistoryState;
+import cn.memoryzy.json.service.persistent.state.JsonRecord;
+import cn.memoryzy.json.toolwindow.HistoryToolWindowManager;
 import cn.memoryzy.json.ui.color.EditorBackgroundScheme;
-import cn.memoryzy.json.ui.dialog.ManuallySaveHistoryDialog;
-import cn.memoryzy.json.ui.dialog.PreviewClipboardDataDialog;
+import cn.memoryzy.json.ui.listener.EditorDocumentMonitor;
+import cn.memoryzy.json.ui.listener.MainWindowFocusMonitor;
 import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
+import cn.memoryzy.json.ui.panel.ResidentBreadcrumbsXmlWrapper;
 import cn.memoryzy.json.util.*;
-import cn.memoryzy.json.util.UIManager;
-import com.google.common.collect.Lists;
 import com.intellij.ide.util.PropertiesComponent;
-import com.intellij.notification.NotificationAction;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ex.ActionUtil;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.diagnostic.Logger;
-import com.intellij.openapi.editor.*;
+import com.intellij.openapi.editor.EditorFactory;
+import com.intellij.openapi.editor.EditorKind;
+import com.intellij.openapi.editor.EditorSettings;
+import com.intellij.openapi.editor.SpellCheckingEditorCustomizationProvider;
 import com.intellij.openapi.editor.actions.AbstractToggleUseSoftWrapsAction;
+import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
-import com.intellij.openapi.editor.event.DocumentEvent;
-import com.intellij.openapi.editor.event.DocumentListener;
-import com.intellij.openapi.editor.ex.DocumentEx;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.ex.EditorGutterComponentEx;
-import com.intellij.openapi.editor.ex.FocusChangeListener;
 import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.util.Disposer;
+import com.intellij.openapi.util.Key;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.codeStyle.CodeStyleManager;
+import com.intellij.openapi.wm.ex.ToolWindowEx;
 import com.intellij.tools.SimpleActionGroup;
 import com.intellij.ui.ErrorStripeEditorCustomization;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.treeStructure.Tree;
-import com.intellij.util.Consumer;
+import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.JBUI;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.util.ui.components.BorderLayoutPanel;
+import com.intellij.xml.breadcrumbs.BreadcrumbsPanel;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.HyperlinkEvent;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Memory
  * @since 2024/8/6
  */
-public class JsonAssistantToolWindowComponentProvider implements Disposable {
-    private static final Logger LOG = Logger.getInstance(JsonAssistantToolWindowComponentProvider.class);
-    public static final String MANUAL_HISTORY_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".MANUAL_HISTORY_GUIDE_KEY";
+public class JsonAssistantToolWindowComponentProvider implements Disposable, EditorColorsListener {
+
+    public static final Key<String> PLUGIN_EDITOR_FLAG = Key.create(JsonAssistantPlugin.PLUGIN_ID_NAME + ".PLUGIN_EDITOR_FLAG");
+    public static final String HISTORY_NAMING_JUMP_KEY = "NAMING";
+    public static final String HISTORY_CAT_JUMP_KEY = "CAT";
+    public static final Object ALLOW_ACTION_PERFORM_WHEN_HIDDEN =
+            JsonAssistantUtil.readStaticFinalFieldValue(ActionUtil.class, "ALLOW_ACTION_PERFORM_WHEN_HIDDEN");
+
+    /**
+     * 消息总线（应用级）
+     */
+    public static final MessageBusConnection APPLICATION_CONNECTION = ApplicationManager.getApplication().getMessageBus().connect(ToolWindowSettings.getInstance());
+
 
     private final Project project;
-    private final FileType editorFileType;
-    private final boolean initTab;
-    private final JsonHistoryPersistentState historyState;
-    private final EditorBehaviorState editorBehaviorState;
-    private final EditorAppearanceState editorAppearanceState;
-    private final HistoryState historyOptionState;
-    private final PropertiesComponent propertiesComponent;
-    private EditorEx editor;
+    private final ToolWindowEx toolWindow;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final Content currentContent;
+    private final VirtualFile sourceFile;
+    private final EditorVisualState visualState;
+    private final HistoryState historyState;
+    private final HistoryManager historyManager;
 
-    private Content content;
+    private final SimpleToolWindowPanel toolWindowPanel;
+    private final CombineCardLayout cardLayout;
+    private final JPanel cardPanel;
+    private final EditorEx currentEditor;
 
-    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-    private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
+    private final JsonStructureComponentProvider treeProvider;
+    private final JsonQueryComponentProvider queryProvider;
+    private final JsonGridComponentProvider gridProvider;
 
-    public JsonAssistantToolWindowComponentProvider(Project project, FileType editorFileType, boolean initTab) {
+    public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, FileType fileType) {
+        this(project, toolWindow, content, PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, fileType));
+    }
+
+    public JsonAssistantToolWindowComponentProvider(Project project, ToolWindowEx toolWindow, Content content, VirtualFile sourceFile) {
         this.project = project;
-        this.editorFileType = editorFileType;
-        this.initTab = initTab;
-        this.historyState = JsonHistoryPersistentState.getInstance(project);
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-        this.editorBehaviorState = persistentState.editorBehaviorState;
-        this.editorAppearanceState = persistentState.editorAppearanceState;
-        this.historyOptionState = persistentState.historyState;
-        this.propertiesComponent = PropertiesComponent.getInstance();
+        this.toolWindow = toolWindow;
+        this.currentContent = content;
+        this.sourceFile = sourceFile;
+
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        this.visualState = toolWindowSettings.getVisualState();
+        this.historyState = toolWindowSettings.getHistoryState();
+        this.historyManager = HistoryManager.getInstance(project);
+
+        this.toolWindowPanel = new SimpleToolWindowPanel(false, false);
+        this.cardLayout = new CombineCardLayout();
+        this.cardPanel = new JPanel(cardLayout);
+        this.currentEditor = (EditorEx) PlatformUtil.createEditor(project, sourceFile, false, EditorKind.MAIN_EDITOR);
+
+        this.treeProvider = new JsonStructureComponentProvider(null, toolWindowPanel, getStructureSetting());
+        this.queryProvider = new JsonQueryComponentProvider(project);
+        this.gridProvider = new JsonGridComponentProvider(null);
+        Disposer.register(this, queryProvider);
     }
 
     public JComponent createComponent() {
-        SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
+        // 配置编辑器的外观
+        configureEditorAppearance();
+        // 配置编辑器的行为
+        configureEditorBehavior();
+        // 注册配置更新事件的处理器
+        registerConfigurationUpdateEventHandlers();
+        // 注册主题更新事件的处理器
+        registerGlobalThemeChangedEventHandlers();
 
-        // 创建编辑器
-        this.editor = createEditor();
+        // 主面板（携带工具栏）
+        toolWindowPanel.setContent(createRootPanel(cardLayout, cardPanel));
+        toolWindowPanel.setToolbar(createToolbar());
+        toolWindowPanel.setProvideQuickActions(true);
+        return toolWindowPanel;
+    }
 
-        // 卡片布局
-        CombineCardLayout cardLayout = new CombineCardLayout();
-        // 卡片面板
-        JPanel cardPanel = new JPanel(cardLayout);
 
-        JsonStructureComponentProvider treeProvider = new JsonStructureComponentProvider(null, simpleToolWindowPanel, StructureConfig.of(false, 3));
-        JsonQueryComponentProvider queryProvider = new JsonQueryComponentProvider(project);
-        Disposer.register(this, queryProvider);
-
-        JsonAssistantToolWindowPanel rootPanel = createToolWindowPanel(treeProvider, queryProvider, cardLayout);
+    private JsonAssistantToolWindowPanel createRootPanel(CombineCardLayout cardLayout, JPanel cardPanel) {
+        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout())
+                .setEditor(this.currentEditor)
+                .setTreeProvider(treeProvider)
+                .setQueryProvider(queryProvider)
+                .setGridProvider(gridProvider)
+                .setCardLayout(cardLayout);
 
         // Json 编辑器
-        JComponent editorComponent = editor.getComponent();
+        JComponent editorComponent = currentEditor.getComponent();
+        // 面包屑
+        BreadcrumbsPanel wrapper = new ResidentBreadcrumbsXmlWrapper(currentEditor);
+        // 组合
+        BorderLayoutPanel editorPanel = new BorderLayoutPanel().addToCenter(editorComponent).addToBottom(wrapper);
+
         // Json 树
         JPanel treeComponent = treeProvider.getTreeComponent();
         // Json 查询界面
         JComponent queryComponent = queryProvider.createComponent();
+        // 表格组件
+        JPanel tableComponent = gridProvider.getTableComponent();
 
         // 在工具窗口中，可能字体需略微调大一点
         resizeTreeFont(treeProvider);
 
         // 添加 Json 编辑器
-        cardPanel.add(editorComponent, PluginConstant.JSON_EDITOR_CARD_NAME);
+        cardPanel.add(editorPanel, UIUtils.JSON_EDITOR_CARD_NAME);
         // 添加 Json 树
-        cardPanel.add(treeComponent, PluginConstant.JSON_TREE_CARD_NAME);
-        // 添加 JsonPath 界面
-        cardPanel.add(queryComponent, PluginConstant.JSON_QUERY_CARD_NAME);
+        cardPanel.add(treeComponent, UIUtils.JSON_TREE_CARD_NAME);
+        // 添加 Json 查询界面
+        cardPanel.add(queryComponent, UIUtils.JSON_QUERY_CARD_NAME);
+        // 添加 表格 界面
+        cardPanel.add(tableComponent, UIUtils.JSON_GRID_CARD_NAME);
         // 默认显示编辑器
-        cardLayout.show(cardPanel, PluginConstant.JSON_EDITOR_CARD_NAME);
+        cardLayout.show(cardPanel, UIUtils.JSON_EDITOR_CARD_NAME);
         // 添加到面板
         rootPanel.add(cardPanel, BorderLayout.CENTER);
 
-        simpleToolWindowPanel.setContent(rootPanel);
-        simpleToolWindowPanel.setToolbar(createToolbar(simpleToolWindowPanel));
-        // simpleToolWindowPanel.setProvideQuickActions(true);
-        return simpleToolWindowPanel;
+        return rootPanel;
     }
 
     private void resizeTreeFont(JsonStructureComponentProvider treeProvider) {
@@ -159,352 +194,111 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
         tree.setFont(font.deriveFont((float) (font.getSize() + 1)));
     }
 
-    private JsonAssistantToolWindowPanel createToolWindowPanel(JsonStructureComponentProvider treeProvider, JsonQueryComponentProvider queryProvider, CombineCardLayout cardLayout) {
-        JsonAssistantToolWindowPanel rootPanel = new JsonAssistantToolWindowPanel(new BorderLayout());
-        rootPanel.setEditor(this.editor);
-        rootPanel.setTreeProvider(treeProvider);
-        rootPanel.setQueryProvider(queryProvider);
-        rootPanel.setCardLayout(cardLayout);
-        return rootPanel;
-    }
-
-
-    private EditorEx createEditor() {
-        EditorInitData initData = getInitData();
-        boolean hasText = initData.isHasText();
-        String jsonString = initData.getJsonString();
-        String parseType = initData.getParseType();
-        String originalText = initData.getOriginalText();
-        boolean needPrompt = hasText && editorBehaviorState.promptBeforeImport;
-
-        // 若是json5，则粘贴原文
-        boolean isJson5 = DataTypeConstant.JSON5.equals(parseType);
-        String editorText = isJson5 ? originalText : jsonString;
-
-        EditorEx editor = (EditorEx) PlatformUtil.createEditor(
-                project,
-                "View." + editorFileType.getDefaultExtension(),
-                editorFileType,
-                false,
-                EditorKind.MAIN_EDITOR,
-                needPrompt ? "" : editorText);
-
-        // 补充编辑器的外观
-        changeEditorAppearance(editor, hasText);
-
-        // 是否需要提示询问
-        if (needPrompt) {
-            new PreviewClipboardDataDialog(project, editor, parseType, jsonString, originalText).show();
-        }
-
-        if (hasText && !needPrompt) {
-            // 格式化文本
-            if (isJson5) {
-                DocumentEx document = editor.getDocument();
-                PsiFile psiFile = PlatformUtil.getPsiFile(project, document);
-                WriteCommandAction.runWriteCommandAction(project,
-                        () -> CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength()));
-            }
-
-            ToolWindowManager.getInstance(project).notifyByBalloon(
-                    PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
-                    MessageType.INFO,
-                    JsonAssistantBundle.messageOnSystem("hint.paste.json"));
-        }
-
-        // 第一次提示
-        String value = propertiesComponent.getValue(MANUAL_HISTORY_GUIDE_KEY);
-        if (StrUtil.isBlank(value)) {
-            // 提示
-            NotificationAction configureAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.configure.text"),
-                    () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, JsonAssistantBundle.message("setting.display.name")));
-            NotificationAction notAskAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.not.ask.text"), () -> {
-            });
-            ArrayList<NotificationAction> notificationActions = Lists.newArrayList(configureAction, notAskAction);
-            Notifications.showFullStickyNotification("Json Assistant", JsonAssistantBundle.messageOnSystem("notification.manual.history.content"), NotificationType.INFORMATION, notificationActions, project);
-            propertiesComponent.setValue(MANUAL_HISTORY_GUIDE_KEY, "1");
-        }
-
-        return editor;
-    }
-
-    private void changeEditorAppearance(EditorEx editor, boolean hasText) {
-        EditorSettings settings = editor.getSettings();
+    private void configureEditorAppearance() {
+        EditorSettings settings = currentEditor.getSettings();
         // 行号显示
-        settings.setLineNumbersShown(editorAppearanceState.displayLineNumbers);
+        settings.setLineNumbersShown(visualState.isShowLineNumbers());
         // 设置显示的缩进导轨
         settings.setIndentGuidesShown(true);
         // 折叠块显示
-        settings.setFoldingOutlineShown(editorAppearanceState.foldingOutline);
+        settings.setFoldingOutlineShown(visualState.isShowFoldingOutline());
         // 折叠块、行号所展示的区域
         settings.setLineMarkerAreaShown(false);
         // 显示设置插入符行（光标选中行会变黄）
-        settings.setCaretRowShown(hasText);
+        settings.setCaretRowShown(true);
 
-        ErrorStripeEditorCustomization.DISABLED.customize(editor);
-        Objects.requireNonNull(SpellCheckingEditorCustomizationProvider.getInstance().getDisabledCustomization()).customize(editor);
+        ErrorStripeEditorCustomization.DISABLED.customize(currentEditor);
+        Objects.requireNonNull(SpellCheckingEditorCustomizationProvider.getInstance().getDisabledCustomization()).customize(currentEditor);
 
-        EditorGutterComponentEx gutterComponentEx = editor.getGutterComponentEx();
         // 设置绘画背景
+        EditorGutterComponentEx gutterComponentEx = currentEditor.getGutterComponentEx();
         gutterComponentEx.setPaintBackground(false);
 
+        currentEditor.setBorder(JBUI.Borders.empty());
+
         // 指定配色方案
-        toggleColorSchema(editor, editor.getColorsScheme(), editorAppearanceState);
+        applyColorScheme(currentEditor.getColorsScheme(), visualState.getColorScheme());
 
-        editor.setBorder(JBUI.Borders.empty());
-
-        editor.addFocusListener(new FocusListenerImpl());
-        editor.getDocument().addDocumentListener(new DocumentListenerImpl(editor));
-
-        // 手动储存历史记录
-        DumbAwareAction.create(new ManuallySaveHistoryAction())
-                .registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl S"), editor.getComponent());
-
-        JComponent component = editor.getComponent();
-        component.setFont(UIManager.consolasFont(15));
-        component.setBorder(JBUI.Borders.customLine(editor.getBackgroundColor(), 0, 4, 0, 0));
+        JComponent component = currentEditor.getComponent();
+        component.setFont(FontManager.consolasFont(15));
+        component.setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
 
         // 切换软换行状态
         PropertiesComponent propertiesComponent = PropertiesComponent.getInstance();
-        String value = propertiesComponent.getValue(PluginConstant.SOFT_WRAPS_SELECT_STATE);
+        String value = propertiesComponent.getValue(ToolWindowConstant.Main.SOFT_WRAPS_SELECT_STATE);
         if (null != value) {
-            AbstractToggleUseSoftWrapsAction.toggleSoftWraps(editor, null, Boolean.parseBoolean(value));
+            AbstractToggleUseSoftWrapsAction.toggleSoftWraps(currentEditor, null, Boolean.parseBoolean(value));
+        }
+
+        /* FIXME 在新版IDE中，当切换了卡片时，无法切换回编辑器，
+            原因是因为在Action执行前，会在ActionUtil中验证组件是否可见，他获得到的组件（Component component = event.getData(PlatformCoreDataKeys.CONTEXT_COMPONENT);）
+            是编辑器组件，但是我们可能已经切换回树或表格、搜索界面了，所以他判断出CONTEXT_COMPONENT没有可见，所以不允许执行Action
+
+            1.解决CONTEXT_COMPONENT绑定为编辑器的问题
+            2.下面的取巧的方式
+        */
+        if (null != ALLOW_ACTION_PERFORM_WHEN_HIDDEN) {
+            JComponent contentComponent = currentEditor.getContentComponent();
+            contentComponent.putClientProperty(ALLOW_ACTION_PERFORM_WHEN_HIDDEN, Boolean.TRUE);
         }
     }
 
+    private void configureEditorBehavior() {
+        MainWindowFocusMonitor focusMonitor = new MainWindowFocusMonitor(historyState, historyManager);
+        Disposer.register(this, focusMonitor);
+        currentEditor.addFocusListener(focusMonitor);
+        currentEditor.getDocument().addDocumentListener(new EditorDocumentMonitor(project, currentEditor, sourceFile));
 
-    public JComponent createToolbar(SimpleToolWindowPanel simpleToolWindowPanel) {
+        DumbAwareAction.create(event -> {
+            if (historyState.isEnableHistory() && !historyState.isAutoRecordHistory()) {
+                // 手动储存历史记录
+                saveHistoryManually();
+            }
+        }).registerCustomShortcutSet(CustomShortcutSet.fromString("ctrl S"), currentEditor.getComponent());
+
+        // 添加标记
+        currentEditor.putUserData(PLUGIN_EDITOR_FLAG, JsonAssistantPlugin.PLUGIN_AUTHOR);
+    }
+
+    /**
+     * 注册配置更新事件的处理器
+     */
+    private void registerConfigurationUpdateEventHandlers() {
+        // 切换行号展示
+        APPLICATION_CONNECTION.subscribe(LineNumbersToggleEvent.TOPIC, (LineNumbersToggleEvent) this::toggleLineNumbersVisibility);
+        APPLICATION_CONNECTION.subscribe(FoldingOutlineToggleEvent.TOPIC, (FoldingOutlineToggleEvent) this::toggleFoldingOutlineVisibility);
+        APPLICATION_CONNECTION.subscribe(ColorSchemeChangedEvent.TOPIC, (ColorSchemeChangedEvent) this::applyColorScheme);
+        APPLICATION_CONNECTION.subscribe(ApplyToSourceToggleEvent.TOPIC, (ApplyToSourceToggleEvent) this::applyExternalFileMode);
+    }
+
+    private void registerGlobalThemeChangedEventHandlers() {
+        APPLICATION_CONNECTION.subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) this);
+    }
+
+
+    public JComponent createToolbar() {
         SimpleActionGroup actionGroup = new SimpleActionGroup();
-        actionGroup.add(new JsonBeautifyToolWindowAction(editor, simpleToolWindowPanel));
-        actionGroup.add(new JsonMinifyToolWindowAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new JsonBeautifyToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
+        actionGroup.add(new JsonMinifyToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new JsonStructureToolWindowAction(editor, simpleToolWindowPanel));
-        actionGroup.add(new JsonQueryAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new JsonStructureToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
+        actionGroup.add(new JsonQueryAction(currentEditor, cardLayout, queryProvider, toolWindowPanel));
+        actionGroup.add(new JsonGridToolWindowAction(currentEditor, cardLayout, toolWindowPanel));
         actionGroup.add(Separator.create());
-        actionGroup.add(new ToggleUseSoftWrapsAction(editor, simpleToolWindowPanel));
-        actionGroup.add(new ScrollToTheEndAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new ToggleUseSoftWrapsAction(currentEditor, cardLayout));
+        actionGroup.add(new ScrollToTheEndAction(currentEditor, cardLayout));
         actionGroup.add(Separator.create());
-        actionGroup.add(new SaveToDiskAction(editor, simpleToolWindowPanel));
-        actionGroup.add(new ClearEditorAction(editor, simpleToolWindowPanel));
+        actionGroup.add(new OpenFromFileAction(cardLayout));
+        actionGroup.add(new SaveToDiskAction(currentEditor, cardLayout));
+        actionGroup.add(new ClearEditorAction(currentEditor, currentContent, toolWindow, cardLayout, sourceFile));
 
         ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.TOOLBAR, actionGroup, false);
+        toolbar.setTargetComponent(toolWindowPanel);
         return toolbar.getComponent();
     }
 
-
-    /**
-     * 获取初始化文本
-     *
-     * @return 初始化文本详细信息
-     */
-    private EditorInitData getInitData() {
-        String jsonString = "";
-        String parseType = null;
-        String originalText = null;
-
-        if (initTab) {
-            if (editorBehaviorState.recognizeOtherFormats) {
-                String clipboard = PlatformUtil.getClipboard();
-                if (StrUtil.isNotBlank(clipboard)) {
-                    // 尝试不同格式数据策略
-                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
-                    String processedText = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
-
-                    if (StrUtil.isNotBlank(processedText)) {
-                        ClipboardTextConversionStrategy strategy = context.getStrategy();
-                        parseType = strategy.type();
-                        originalText = StrUtil.trim(clipboard);
-
-                        JsonWrapper wrapper;
-                        if (strategy instanceof Json5ConversionStrategy) {
-                            wrapper = Json5Util.parse(processedText);
-                            jsonString = Json5Util.formatJson5(processedText);
-                        } else {
-                            wrapper = JsonUtil.parse(processedText);
-                            jsonString = JsonUtil.formatJson(processedText);
-                        }
-
-                        // 无属性或在拒绝黑名单里
-                        if ((wrapper != null && wrapper.noItems()) || PreviewClipboardDataDialog.existsInBlacklist(wrapper)) {
-                            jsonString = "";
-                        }
-                    }
-                }
-            }
-        }
-
-        return new EditorInitData(StrUtil.isNotBlank(jsonString), jsonString, parseType, originalText);
-    }
-
-
-    private void pasteJsonToEditor() {
-        if (initTab && editorBehaviorState.recognizeOtherFormats) {
-            String text = editor.getDocument().getText();
-            if (StrUtil.isBlank(text)) {
-                String clipboard = StrUtil.trim(PlatformUtil.getClipboard());
-                if (StrUtil.isNotBlank(clipboard)) {
-                    // 尝试不同格式数据策略
-                    ClipboardTextConversionContext context = new ClipboardTextConversionContext();
-                    String jsonStr = ClipboardTextConverter.applyConversionStrategies(context, clipboard);
-
-                    if (StrUtil.isNotBlank(jsonStr)) {
-                        ClipboardTextConversionStrategy strategy = context.getStrategy();
-                        JsonWrapper wrapper;
-                        String formattedStr;
-                        if (strategy instanceof Json5ConversionStrategy) {
-                            wrapper = Json5Util.parse(jsonStr);
-                            formattedStr = Json5Util.formatJson5(jsonStr);
-                        } else {
-                            wrapper = JsonUtil.parse(jsonStr);
-                            formattedStr = JsonUtil.formatJson(jsonStr);
-                        }
-
-                        // 过滤
-                        if ((wrapper != null && wrapper.noItems()) || PreviewClipboardDataDialog.existsInBlacklist(wrapper)) {
-                            return;
-                        }
-
-                        String type = strategy.type();
-                        if (editorBehaviorState.promptBeforeImport) {
-                            new PreviewClipboardDataDialog(project, editor, type, formattedStr, clipboard).show();
-                        } else {
-                            WriteCommandAction.runWriteCommandAction(project, () -> {
-                                boolean isJson5 = DataTypeConstant.JSON5.equals(type);
-                                DocumentEx document = editor.getDocument();
-                                PsiFile psiFile = PlatformUtil.getPsiFile(project, document);
-
-                                PlatformUtil.setDocumentText(document, isJson5 ? clipboard : formattedStr);
-                                CodeStyleManager.getInstance(project).reformatText(psiFile, 0, document.getTextLength());
-                            });
-
-                            // 提示粘贴成功的消息
-                            ToolWindowManager.getInstance(project).notifyByBalloon(
-                                    PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID,
-                                    MessageType.INFO,
-                                    JsonAssistantBundle.messageOnSystem("hint.paste.json"));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    private void scheduleDebouncedAction() {
-        // 取消之前的任务
-        cancelPendingTask();
-
-        // 提交新任务（500ms防抖窗口）
-        ScheduledFuture<?> newTask = executor.schedule(() ->
-                        SwingUtilities.invokeLater(() -> performAction(true)),
-                3000, TimeUnit.MILLISECONDS
-        );
-
-        pendingTask.set(newTask);
-    }
-
-
-    private void performAction(boolean auto) {
-        HistoryLimitedList historyList = historyState.getHistory();
-
-        boolean isJson5 = false;
-        String text = StrUtil.trim(editor.getDocument().getText());
-        JsonWrapper jsonWrapper = null;
-        if (JsonUtil.isJson(text)) {
-            jsonWrapper = JsonUtil.parse(text);
-
-        } else if (Json5Util.isJson5(text)) {
-            isJson5 = true;
-            jsonWrapper = Json5Util.parse(text);
-            // 由这里再进行格式化（不可避免会去掉一些Array上的注释）
-            text = Json5Util.formatJson5WithComment(text);
-        }
-
-        if (Objects.nonNull(jsonWrapper) && !jsonWrapper.noItems()) {
-            // 判断之前是否存在此数据
-            JsonEntry oldEntry = historyList.filterItem(jsonWrapper);
-            String oldName = (null == oldEntry) ? "" : oldEntry.getName();
-
-            // 保存（如果之前存在，则会将之前的删除，并顶到第一位，不存在则新建）
-            JsonEntry newEntry = isJson5 ? historyList.add(project, jsonWrapper, text) : historyList.add(project, jsonWrapper);
-
-            if (!auto) {
-                NotificationAction skipAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.skip.text"), () -> {});
-                NotificationAction assignNameAction = NotificationAction.createSimpleExpiring(JsonAssistantBundle.messageOnSystem("action.assign.name.text"), () -> {
-                    // 当点击指定名称选项时，弹出窗口，要求填写名称
-                    ManuallySaveHistoryDialog dialog = new ManuallySaveHistoryDialog(project, historyList, oldName);
-                    if (dialog.showAndGet()) {
-                        String newName = dialog.getNewName();
-                        newEntry.setName(newName);
-
-                        // 判断新名称是否与原来的名称一样，若是，则删掉原来的（排除新存储的记录）
-                        JsonEntry jsonEntry = historyList.stream()
-                                .filter(el -> Objects.equals(el.getName(), newName) && !Objects.equals(el.getId(), newEntry.getId()))
-                                .findFirst()
-                                .orElse(null);
-
-                        if (Objects.nonNull(jsonEntry)) {
-                            historyList.removeById(jsonEntry.getId());
-                        }
-
-                        // 1.数据相同，原名存在，更改后
-                        // 2.数据不同，名字存在，覆盖后
-                        // 3.新增，赋名
-                        String tipContent;
-                        if (Objects.isNull(oldEntry)) {
-                            // 新增记录并赋予名称
-                            tipContent = JsonAssistantBundle.messageOnSystem("hint.new.recordName");
-
-                        } else if (!StrUtil.equals(oldName, newName)) {
-                            // 数据相同，新旧名称不同
-                            tipContent = JsonAssistantBundle.messageOnSystem("hint.update.recordName");
-
-                        } else {
-                            // 数据不同，名字相同，把旧数据覆盖
-                            tipContent = JsonAssistantBundle.messageOnSystem("hint.update.recordData");
-                        }
-
-                        // 提示
-                        ToolWindowManager.getInstance(project).notifyByBalloon(PluginConstant.JSON_ASSISTANT_TOOLWINDOW_ID, MessageType.INFO, tipContent);
-                    }
-                });
-
-                // 通知
-                Notifications.showNotification(
-                        null,
-                        JsonAssistantBundle.messageOnSystem("notification.save.history.content"),
-                        NotificationType.INFORMATION,
-                        Lists.newArrayList(assignNameAction, skipAction),
-                        project);
-            }
-        }
-    }
-
-
-    private void cancelPendingTask() {
-        ScheduledFuture<?> task = pendingTask.getAndSet(null);
-        if (task != null && !task.isDone()) {
-            task.cancel(false);
-        }
-    }
-
-    @Override
-    public void dispose() {
-        EditorFactory.getInstance().releaseEditor(editor);
-        // 清理资源
-        cancelPendingTask();
-        executor.shutdownNow();
-        try {
-            if (!executor.awaitTermination(500, TimeUnit.MILLISECONDS)) {
-                LOG.error("The Executor does not shut down properly");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    public static void toggleLineNumbers(EditorEx editor, boolean display) {
-        EditorSettings settings = editor.getSettings();
+    private void toggleLineNumbersVisibility(boolean display) {
+        EditorSettings settings = currentEditor.getSettings();
         // 如果需要显示行号，而编辑器正好是展示状态
         boolean shownLineNumbersStatus = settings.isLineNumbersShown();
 
@@ -514,136 +308,169 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable {
             if (!shownLineNumbersStatus) return;
         }
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            settings.setLineNumbersShown(display);
-            editor.reinitSettings();
-            UIManager.repaintEditor(editor);
-        });
+        settings.setLineNumbersShown(display);
+        currentEditor.reinitSettings();
     }
 
-    public static void toggleColorSchema(EditorEx editor, EditorColorsScheme defaultColorsScheme, EditorAppearanceState appearanceState) {
-        ColorScheme colorScheme = appearanceState.colorScheme;
-        if (ColorScheme.Default.equals(colorScheme)) {
-            // 默认的话，按照默认颜色
-            Color oriColor = editor.getBackgroundColor();
-            Color newColor = defaultColorsScheme.getDefaultBackground();
-
-            if (!Objects.equals(oriColor, newColor)) {
-                // 需设置一遍将颜色变更回来
-                editor.setColorsScheme(defaultColorsScheme);
-            }
-        } else {
-            // 其他的按照自身设定的颜色来操作
-            // 判断是否已经是指定的颜色，防止每次都设置
-            Color newColor = colorScheme.getColor();
-            Color oriColor = editor.getBackgroundColor();
-            // 新颜色不为空，且不等于原先的旧颜色
-            if (Objects.nonNull(newColor) && !Objects.equals(oriColor, newColor)) {
-                editor.setColorsScheme(new EditorBackgroundScheme(defaultColorsScheme, newColor));
-            }
-        }
-
-        editor.getComponent().setBorder(JBUI.Borders.customLine(editor.getBackgroundColor(), 0, 4, 0, 0));
-
-        UIManager.repaintEditor(editor);
-    }
-
-
-    public static void toggleFoldingOutline(EditorEx editor, boolean show) {
-        EditorSettings settings = editor.getSettings();
+    private void toggleFoldingOutlineVisibility(boolean display) {
+        EditorSettings settings = currentEditor.getSettings();
         boolean foldingOutlineShown = settings.isFoldingOutlineShown();
-        if (show) {
+
+        if (display) {
             if (foldingOutlineShown) return;
         } else {
             if (!foldingOutlineShown) return;
         }
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            settings.setFoldingOutlineShown(show);
-            editor.reinitSettings();
-            UIManager.repaintEditor(editor);
-        });
+        settings.setFoldingOutlineShown(display);
+        currentEditor.reinitSettings();
     }
 
-    public Content getContent() {
-        return content;
+    private void applyColorScheme(ColorScheme colorScheme) {
+        applyColorScheme(EditorColorsManager.getInstance().getGlobalScheme(), colorScheme);
     }
 
-    public void setContent(Content content) {
-        this.content = content;
-    }
+    private void applyColorScheme(EditorColorsScheme defaultColorsScheme, ColorScheme colorScheme) {
+        if (ColorScheme.Default.equals(colorScheme)) {
+            // 默认的话，按照默认颜色
+            Color oriColor = currentEditor.getBackgroundColor();
+            Color newColor = defaultColorsScheme.getDefaultBackground();
 
-    private class FocusListenerImpl implements FocusChangeListener {
-
-        @Override
-        public void focusGained(@NotNull Editor e) {
-            // --------------------------- 获取焦点时
-            // 获取剪贴板的 JSON 并设置到编辑器内
-            pasteJsonToEditor();
-            // 行号显示
-            toggleLineNumbers(editor, editorAppearanceState.displayLineNumbers);
-            // 配色切换
-            toggleColorSchema(editor, EditorColorsManager.getInstance().getGlobalScheme(), editorAppearanceState);
-            // 切换展示折叠区域
-            toggleFoldingOutline(editor, editorAppearanceState.foldingOutline);
-        }
-
-        @Override
-        public void focusLost(@NotNull Editor editor) {
-            // --------------------------- 失去焦点时
-            // 添加当前编辑器的 JSON 至历史记录
-            if (historyOptionState.switchHistory && historyOptionState.autoStore) {
-                scheduleDebouncedAction();
+            if (!Objects.equals(oriColor, newColor)) {
+                // 需设置一遍将颜色变更回来
+                currentEditor.setColorsScheme(defaultColorsScheme);
+            }
+        } else {
+            // 其他的按照自身设定的颜色来操作
+            // 判断是否已经是指定的颜色，防止每次都设置
+            Color newColor = colorScheme.getColor();
+            Color oriColor = currentEditor.getBackgroundColor();
+            // 新颜色不为空，且不等于原先的旧颜色
+            if (Objects.nonNull(newColor) && !Objects.equals(oriColor, newColor)) {
+                currentEditor.setColorsScheme(new EditorBackgroundScheme(defaultColorsScheme, newColor));
             }
         }
     }
 
-    private static class DocumentListenerImpl implements DocumentListener {
-        private final EditorEx editor;
-        private int lastLineCount = 0;
+    private void applyExternalFileMode(boolean apply) {
+        // 使编辑器切换到 源文件/安全 模式
+        String text = currentEditor.getDocument().getText();
 
-        public DocumentListenerImpl(EditorEx editor) {
-            this.editor = editor;
+        if (apply) {
+            // 从虚拟文件切换为实体文件
+            ExternalFileWrapper fileWrapper = currentEditor.getUserData(OpenFromFileAction.EXTERNAL_FILE_CACHED);
+            // 判断是否存在包装过的文件
+            if (null == fileWrapper) return;
+            // 标记为可写（允许修改）
+            PlatformUtil.markVirtualFileWritable(fileWrapper, true);
+            // 新开标签页，再关闭旧标签页
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // 切换到真实文件
+                OpenFromFileAction.openSelectedTabIfContentExists(project, toolWindow, fileWrapper, null, text, true);
+                toolWindow.getContentManager().removeContent(currentContent, true);
+            });
+
+        } else {
+            // 从实体文件切换回虚拟文件
+            // 判断是否是包装过的文件
+            if (!(sourceFile instanceof ExternalFileWrapper)) return;
+            // 定义虚拟文件
+            VirtualFile file = PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, text);
+            // 新开标签页，再关闭旧标签页
+            ApplicationManager.getApplication().invokeLater(() -> {
+                // 切换到真实文件
+                OpenFromFileAction.openSelectedTabIfContentExists(project, toolWindow, file, (ExternalFileWrapper) sourceFile, text, false);
+                toolWindow.getContentManager().removeContent(currentContent, true);
+            });
+        }
+    }
+
+    public JComponent getPreferredFocusedComponent() {
+        return currentEditor.getContentComponent();
+    }
+
+    private void saveHistoryManually() {
+        // 获取编辑器内容
+        String content = StrUtil.trim(currentEditor.getDocument().getText());
+        // 检查内容有效性
+        if (StrUtil.isBlank(content)) return;
+
+        // 解析格式
+        JsonWrapper wrapper = null;
+        DataFormatType formatType = DataFormatType.JSON;
+        if (JsonUtil.isJson(content)) {
+            wrapper = JsonUtil.parse(content);
+
+        } else if (Json5Util.isJson5(content)) {
+            formatType = DataFormatType.JSON5;
+            wrapper = Json5Util.parse(content);
+            // 由这里再进行格式化（不可避免会去掉一些Array上的注释）
+            content = Json5Util.formatJson5WithComment(content);
         }
 
-        @Override
-        public void documentChanged(@NotNull DocumentEvent event) {
-            try {
-                // -------------- 开启/关闭光标行
-                EditorSettings settings = editor.getSettings();
-                // 编辑器原来为空，新增不为空，表示新增
-                if (StrUtil.isBlank(event.getOldFragment()) && StrUtil.isNotBlank(event.getNewFragment())) {
-                    if (!settings.isCaretRowShown()) {
-                        settings.setCaretRowShown(true);
+        if (null == wrapper || wrapper.noItems()) return;
+
+        // 查找
+        JsonRecord record = historyManager.findRecord(wrapper);
+        // 判断是否为新增
+        boolean isAdd = (null == record);
+        // 提示信息
+        String message;
+
+        if (isAdd) {
+            // 新增
+            String fileExtension = DataFormatType.JSON == formatType
+                    ? FileTypes.JSON.getExtension()
+                    : FileTypes.JSON5.getExtension();
+
+            record = historyManager.addRecord(content, wrapper, fileExtension, true);
+            // 触发事件
+            if (null != record) {
+                project.getMessageBus().syncPublisher(RefreshHistoryTreeEvent.TOPIC).refresh(project, HistoryAffectType.ADD_RECORD, record.getId());
+                message = JsonAssistantBundle.messageOnSystem("hint.manual.history.add.tip", HISTORY_NAMING_JUMP_KEY);
+
+            } else {
+                record = historyManager.findRecord(wrapper);
+                message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_CAT_JUMP_KEY);
+            }
+
+        } else {
+            message = JsonAssistantBundle.messageOnSystem("hint.manual.history.exist.tip", HISTORY_CAT_JUMP_KEY);
+        }
+
+        // 提示粘贴成功的消息
+        JsonRecord finalRecord = record;
+        ToolWindowManager.getInstance(project).notifyByBalloon(
+                ToolWindowConstant.Main.JSON_ASSISTANT_TOOLWINDOW_ID,
+                MessageType.INFO,
+                message,
+                null,
+                e -> {
+                    if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
+                        String url = e.getDescription();
+                        HistoryToolWindowManager.getInstance(project).show();
+
+                        // 命名：打开工具窗口，选中此记录，并弹出重命名弹窗
+                        // 查看：打开工具窗口，选中此记录
+                        boolean needNaming = Objects.equals(HISTORY_NAMING_JUMP_KEY, url);
+                        project.getMessageBus().syncPublisher(NavigateRecordEvent.TOPIC).navigate(finalRecord.getId(), needNaming);
                     }
-                } else if (StrUtil.isNotBlank(event.getOldFragment()) && StrUtil.isBlank(event.getNewFragment())) {
-                    // 编辑器原来不为空，新增为空，表示全部删除
-                    if (settings.isCaretRowShown()) {
-                        settings.setCaretRowShown(false);
-                    }
-                }
-
-                // -------------- 重新绘制
-                DocumentEx document = editor.getDocument();
-                int newLineCount = document.getLineCount();
-                if (lastLineCount != newLineCount) {
-                    lastLineCount = newLineCount;
-                    UIManager.repaintEditor(editor);
-                }
-
-            } catch (Error error) {
-                LOG.warn(error);
-            }
-        }
+                });
     }
 
-    private class ManuallySaveHistoryAction implements Consumer<AnActionEvent> {
-        @Override
-        public void consume(AnActionEvent event) {
-            if (historyOptionState.switchHistory && !historyOptionState.autoStore) {
-                performAction(false);
-            }
-        }
+    private StructureSetting getStructureSetting() {
+        return new StructureSetting().setNeedBorder(false).setNeedToolbar(true).setExpandLevel(3);
     }
 
+    @Override
+    public void globalSchemeChange(@Nullable EditorColorsScheme scheme) {
+        currentEditor.getComponent().setBorder(JBUI.Borders.customLine(currentEditor.getBackgroundColor(), 0, 4, 0, 0));
+    }
+
+    @Override
+    public void dispose() {
+        if (!currentEditor.isDisposed()) {
+            EditorFactory.getInstance().releaseEditor(currentEditor);
+        }
+    }
 }

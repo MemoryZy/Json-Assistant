@@ -1,19 +1,10 @@
 package cn.memoryzy.json.constant;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * @author Memory
  * @since 2024/7/25
  */
 public class Urls {
-
-    public static final AtomicBoolean reachableAtomic = new AtomicBoolean(false);
 
     public static final String GITHUB_LINK = "https://github.com/MemoryZy/Json-Assistant";
     public static final String GITHUB_ISSUE_LINK = "https://github.com/MemoryZy/Json-Assistant/issues/new";
@@ -29,52 +20,25 @@ public class Urls {
     public static final String VIEW = "https://json.memoryzy.cn/view";
     public static final String MARKETPLACE_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant";
     public static final String MARKETPLACE_REVIEWS_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/reviews";
+    public static final String MARKETPLACE_VERSION_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/versions";
+    public static final String MARKETPLACE_ASSIGN_VERSION_LINK = "https://plugins.jetbrains.com/plugin/24738-json-assistant/versions/stable/{}";
     public static final String EMAIL_LINK = "memoryzk@outlook.com";
 
     public static final String JSONPATH_EXPRESS_DESCRIPTION = "https://goessner.net/articles/JsonPath/";
     public static final String JMESPATH_EXPRESS_DESCRIPTION = "https://jmespath.org/";
     public static final String JSON5_SITE_LINK = "https://json5.org/";
 
+    public static final String ANNOUNCEMENTS_SOURCE_GITHUB_LINK = "https://raw.githubusercontent.com/MemoryZy/Json-Assistant/refs/heads/main/ANNOUNCEMENTS";
+    public static final String ANNOUNCEMENTS_SOURCE_CF_PAGES_LINK = "https://file-memoryzy.pages.dev/ANNOUNCEMENTS_JSON.json";
+
+    public static final String PLUGIN_DETAILS_LINK = "https://plugins.jetbrains.com/plugins/list?pluginId=24738";
+    public static final String PLUGIN_UPDATE_DETAILS_LINK = "https://plugins.jetbrains.com/api/plugins/24738/updates";
+
+    public static final String GITHUB_FONT_URL = "https://github.com/MemoryZy/JetBrainsMapleMono-Font-Distribution/releases/download/v1.0.0/JetBrainsMapleMono-XX-NR-XX.zip";
+    public static final String GITEE_FONT_URL = "https://gitee.com/MemoryZy/JetBrainsMapleMono-Font-Distribution/releases/download/v1.0.0/JetBrainsMapleMono-XX-NR-XX.zip";
+    public static final String CF_FONT_URL = "https://file-memoryzy.pages.dev/JetBrainsMapleMono-XX-NR-XX.zip";
+
+
     public static final String FRONT_URL = "http://0.0.0.0";
 
-    public static void verifyReachable() {
-        new Thread(() -> reachableAtomic.getAndSet(isReachable(OVERVIEW))).start();
-    }
-
-    public static boolean isReachable() {
-        return reachableAtomic.get();
-    }
-
-    /**
-     * 验证地址是否可达
-     *
-     * @param url 网络地址
-     * @return 可达，true；否则为 false
-     */
-    public static boolean isReachable(String url) {
-        return isReachable(url, 5000);
-    }
-
-    /**
-     * 验证地址是否可达
-     *
-     * @param url 网络地址
-     * @return 可达，true；否则为 false
-     */
-    public static boolean isReachable(String url, int timeout) {
-        try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
-            RequestConfig requestConfig = RequestConfig.custom()
-                    // 设置连接超时时间
-                    .setConnectTimeout(timeout)
-                    // 设置读取超时时间
-                    .setSocketTimeout(timeout)
-                    .build();
-            HttpGet request = new HttpGet(url);
-            request.setConfig(requestConfig);
-            httpClient.execute(request);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
 }

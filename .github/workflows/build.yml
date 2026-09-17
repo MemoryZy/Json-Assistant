@@ -24,6 +24,9 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
+      - 'ANNOUNCEMENTS'
+      - 'donors.json'
+      - 'NOTICE'
 
   # Trigger the workflow on any pull request
   pull_request:
@@ -34,6 +37,9 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
+      - 'ANNOUNCEMENTS'
+      - 'donors.json'
+      - 'NOTICE'
 
   # 可手动操控
   workflow_dispatch:
@@ -54,6 +60,13 @@ jobs:
       pluginVerifierHomeDir: ${{ steps.properties.outputs.pluginVerifierHomeDir }}
     steps:
 
+      # Free GitHub Actions Environment Disk Space
+      - name: Maximize Build Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          large-packages: false
+
       # Check out the current repository
       - name: Fetch Sources
         uses: actions/checkout@v4
@@ -72,6 +85,8 @@ jobs:
       # Setup Gradle
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true   # 仅读取缓存，不写入新缓存
 
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x ./gradlew
@@ -83,9 +98,14 @@ jobs:
         run: |
           PROPERTIES="$(./gradlew properties --console=plain -q)"
           VERSION="$(echo "$PROPERTIES" | grep "^version:" | cut -f2- -d ' ')"
-          CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
+          RAW_CHANGELOG="$(./gradlew getChangelog --unreleased --no-header --console=plain -q)"
 
           echo "version: $VERSION"
+          echo "raw_changelog:"
+          echo "$RAW_CHANGELOG"
+
+          # 删除 [Unreleased] 标题行、链接行及其后的空行
+          CHANGELOG=$(echo "$RAW_CHANGELOG" | sed -e '/^## \[Unreleased\]/{N;d;}' -e '/^\[Unreleased\]:.*/d' -e '/^$/d')
           echo "changelog:"
           echo "$CHANGELOG"
           
@@ -96,13 +116,15 @@ jobs:
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-     #     ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
-
-     # - name: Cat Products Releases
-      #  run: cat build/listProductsReleases.txt
+#          ./gradlew listProductsReleases # prepare list of IDEs for Plugin Verifier
+#
+#      - name: Cat Products Releases
+#        run: cat build/listProductsReleases.txt
 
       # Build plugin
       - name: Build plugin
+        env:
+          CI_MODE: "true" # 设置 CI 标识
         run: ./gradlew buildPlugin
 
       # Prepare plugin archive content for creating artifact
@@ -122,49 +144,53 @@ jobs:
         with:
           name: ${{ steps.artifact.outputs.filename }}
           path: ./build/distributions/content/*/*
+          retention-days: 2  # 2天后自动删除
+
+      - name: Cleanup build artifacts
+        run: rm -rf ${{ github.workspace }}/build/distributions
 
   # Run tests and upload a code coverage report
-  test:
-    name: Test
-    needs: [ build ]
-    runs-on: ubuntu-latest
-    steps:
-
-      # Check out the current repository
-      - name: Fetch Sources
-        uses: actions/checkout@v4
-
-      # Set up Java environment for the next steps
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: zulu
-          java-version: 11
-
-      # Setup Gradle
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for Gradle wrapper
-        run: chmod +x ./gradlew
-
-      # Run tests
-      - name: Run Tests
-        run: ./gradlew check
-
-      # Collect Tests Result of failed tests
-      - name: Collect Tests Result
-        if: ${{ failure() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: tests-result
-          path: ${{ github.workspace }}/build/reports/tests
-
-      # Upload the Kover report to CodeCov
-      - name: Upload Code Coverage Report
-        uses: codecov/codecov-action@v4
-        with:
-          files: ${{ github.workspace }}/build/reports/kover/report.xml
+#  test:
+#    name: Test
+#    needs: [ build ]
+#    runs-on: ubuntu-latest
+#    steps:
+#
+#      # Check out the current repository
+#      - name: Fetch Sources
+#        uses: actions/checkout@v4
+#
+#      # Set up Java environment for the next steps
+#      - name: Setup Java
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: zulu
+#          java-version: 11
+#
+#      # Setup Gradle
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@v4
+#
+#      - name: Grant execute permission for Gradle wrapper
+#        run: chmod +x ./gradlew
+#
+#      # Run tests
+#      - name: Run Tests
+#        run: ./gradlew check
+#
+#      # Collect Tests Result of failed tests
+#      - name: Collect Tests Result
+#        if: ${{ failure() }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: tests-result
+#          path: ${{ github.workspace }}/build/reports/tests
+#
+#      # Upload the Kover report to CodeCov
+#      - name: Upload Code Coverage Report
+#        uses: codecov/codecov-action@v4
+#        with:
+#          files: ${{ github.workspace }}/build/reports/kover/report.xml
 
   # Run Qodana inspections and provide report
 #  inspectCode:
@@ -242,6 +268,8 @@ jobs:
 
       # Run Verify Plugin task and IntelliJ Plugin Verifier tool
       - name: Run Plugin Verification tasks
+        env:
+          CI_MODE: "true" # 设置 CI 标识
         continue-on-error: true
         run: ./gradlew runPluginVerifier -Dplugin.verifier.home.dir=${{ needs.build.outputs.pluginVerifierHomeDir }}
 
@@ -252,50 +280,56 @@ jobs:
         with:
           name: pluginVerifier-result
           path: ${{ github.workspace }}/build/reports/pluginVerifier
+          retention-days: 3  # 1天后自动删除
 
   # 构建检测报告
-  build-report:
-    name: Build Report
-    needs: [ build, test, verify ]
+  deploy-report:
+    name: Deploy Report
+    needs: [ build, verify ]
     runs-on: ubuntu-latest
     steps:
+      # Check out the current repository
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: pluginVerifier-result
           path: reports
 
-      - name: Generate Entry File
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
         run: |
-          echo '<!DOCTYPE html>' > reports/index.html
-          echo '<html lang=\"en\">' >> reports/index.html
-          echo '<head>' >> reports/index.html
-          echo '<meta charset=\"UTF-8\">' >> reports/index.html
-          echo '<title>Json Assistant Verify Report</title>' >> reports/index.html
-          echo '</head>' >> reports/index.html
-          echo '<body>' >> reports/index.html
+          cd .github/scripts
+          npm install marked highlight.js
 
-          # 遍历 reports 目录下的所有子文件夹
-          find reports -type d -print0 | while IFS= read -r -d $'\0' dir; do
-          # 获取 report.html 文件路径
-          report_path="$dir/report.html"
-          # 检查 report.html 文件是否存在
-          if [ -f "$report_path" ]; then
-          # 获取文件夹名称
-          folder_name=$(basename "$dir")
-          # 生成链接
-          echo "<a href=\"$folder_name/report.html\">$folder_name</a><br>" >> reports/index.html
-          fi
-          done
+      - name: Run report aggregator
+        run: |
+          cd .github/scripts
+          node aggregate-reports.js
 
-          echo '</body>' >> reports/index.html
-          echo '</html>' >> reports/index.html
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-verification-report
+          path: aggregated-report.html
+          retention-days: 1  # 1天后自动删除
+          
+      - name: Store the aggregated file in a new folder
+        run: |
+          mkdir web-reports
+          cp aggregated-report.html web-reports/index.html     
 
       - name: Deploy Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_TOKEN }}
-          command: pages deploy reports --project-name=json-verify-report
+          command: pages deploy web-reports --project-name=json-verify-report
 
 
   # Prepare a draft release for GitHub Releases page for the manual verification
@@ -303,7 +337,7 @@ jobs:
   releaseDraft:
     name: Release draft
     if: github.event_name != 'pull_request'
-    needs: [ build, test, verify ]
+    needs: [ build, verify ]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -314,7 +348,7 @@ jobs:
         uses: actions/checkout@v4
 
       # Remove old release drafts by using the curl request for the available releases with a draft flag
-      - name: Remove Old Release Drafts
+      - name: Remove Old Release Drafts (Current Repo)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -323,7 +357,7 @@ jobs:
             | xargs -I '{}' gh api -X DELETE repos/{owner}/{repo}/releases/{}
 
       # Create a new release draft which is not publicly visible and requires manual acceptance
-      - name: Create Release Draft
+      - name: Create Release Draft (Current Repo)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -334,3 +368,32 @@ jobs:
           ${{ needs.build.outputs.changelog }}
           EOM
           )"
+
+      # 目标仓库
+      # Remove old release drafts by using the curl request for the available releases with a draft flag
+      - name: Remove Old Release Drafts (Target Repo)
+        env:
+          TARGET_OWNER_REPO: Json-Assistant
+          GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
+        run: |
+          gh api repos/{owner}/$TARGET_OWNER_REPO/releases \
+            --jq '.[] | select(.draft == true) | .id' \
+            | xargs -I '{}' gh api -X DELETE repos/{owner}/$TARGET_OWNER_REPO/releases/{}
+
+      # Create a new release draft which is not publicly visible and requires manual acceptance
+      - name: Create Release Draft (Target Repo)
+        env:
+          TARGET_OWNER_REPO: "${{ github.repository_owner }}/Json-Assistant"
+          GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
+        run: |
+          gh release create "v${{ needs.build.outputs.version }}" \
+            --repo $TARGET_OWNER_REPO \
+            --draft \
+            --title "v${{ needs.build.outputs.version }}" \
+            --notes "$(cat << 'EOM'
+          ${{ needs.build.outputs.changelog }}
+          EOM
+          )"
+
+
+

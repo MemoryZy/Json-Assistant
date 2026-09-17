@@ -245,7 +245,7 @@ public class DataConverter {
     public static boolean isNotJsonArray(DataContext dataContext) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
-        return JsonUtil.isNotJsonArray(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+        return JsonUtil.isNotJsonArray(json, JsonUtil.isJson(json));
     }
 
 

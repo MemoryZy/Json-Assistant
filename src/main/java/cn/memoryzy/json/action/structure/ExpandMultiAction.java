@@ -3,8 +3,9 @@ package cn.memoryzy.json.action.structure;
 import cn.hutool.core.util.ArrayUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonNode;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -19,7 +20,7 @@ public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackgr
     private final Tree tree;
 
     public ExpandMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.expand.multi.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.expand.multi.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.expand.multi.description"),
                 null);
         this.tree = tree;
@@ -30,7 +31,7 @@ public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackgr
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
-                UIManager.expandAll(tree, path);
+                UIUtils.expandAll(tree, path);
             }
         }
     }
@@ -46,7 +47,7 @@ public class ExpandMultiAction extends DumbAwareAction implements UpdateInBackgr
         TreePath[] paths = tree.getSelectionPaths();
         if (ArrayUtil.isNotEmpty(paths)) {
             for (TreePath path : paths) {
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonNode node = JsonFilterableTree.getNode(path);
                 JsonTreeNodeType nodeType = node.getNodeType();
                 if (Objects.equals(nodeType, JsonTreeNodeType.JSONObject)
                         || Objects.equals(nodeType, JsonTreeNodeType.JSONArray)

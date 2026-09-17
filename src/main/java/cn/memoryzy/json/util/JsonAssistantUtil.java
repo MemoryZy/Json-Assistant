@@ -1,24 +1,40 @@
 package cn.memoryzy.json.util;
 
+import cn.hutool.core.codec.Base64;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.text.NamingCase;
 import cn.hutool.core.util.*;
+import com.intellij.openapi.diagnostic.Logger;
+import com.intellij.openapi.util.text.HtmlChunk;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * @author Memory
  * @since 2024/8/3
  */
 public class JsonAssistantUtil {
+
+    private static final Logger LOG = Logger.getInstance(JsonAssistantUtil.class);
 
     private static final long MIN_VALID_TIMESTAMP_SECONDS = 0L; // 1970-01-01T00:00:00Z
     private static final long MAX_VALID_TIMESTAMP_SECONDS = 4102444800L; // 2099-12-31T23:59:59Z
@@ -62,12 +78,16 @@ public class JsonAssistantUtil {
 
     public static Method getMethod(Object obj, String methodName, Object... params) {
         Class<?> clazz = obj.getClass();
+        return getMethod(clazz, methodName, params);
+    }
+
+    public static Method getMethod(Class<?> clz, String methodName, Object... params) {
         Class<?>[] paramTypes = new Class[params.length];
         for (int i = 0; i < params.length; i++) {
             paramTypes[i] = params[i].getClass();
         }
 
-        return ReflectUtil.getMethod(clazz, methodName, paramTypes);
+        return ReflectUtil.getMethod(clz, methodName, paramTypes);
     }
 
 
@@ -79,6 +99,40 @@ public class JsonAssistantUtil {
         }
 
         return null;
+    }
+
+    public static Object invokeStaticMethod(Class<?> clz, String methodName, Object... params) {
+        Method method = getMethod(clz, methodName, params);
+        if (null != method) {
+            return ReflectUtil.invokeStatic(method, params);
+        }
+
+        return null;
+    }
+
+
+    public static <T> Object newInstance(Class<T> clazz, Class<?>[] paramTypes, Object... params) {
+        if (ArrayUtil.isEmpty(params)) {
+            final Constructor<T> constructor = ReflectUtil.getConstructor(clazz);
+            if (null == constructor) {
+                throw new UtilException("No constructor for [{}]", clazz);
+            }
+            try {
+                return constructor.newInstance();
+            } catch (Exception e) {
+                throw new UtilException(e, "Instance class [{}] error!", clazz);
+            }
+        }
+
+        final Constructor<T> constructor = ReflectUtil.getConstructor(clazz, paramTypes);
+        if (null == constructor) {
+            throw new UtilException("No Constructor matched for parameter types: [{}]", new Object[]{paramTypes});
+        }
+        try {
+            return constructor.newInstance(params);
+        } catch (Exception e) {
+            throw new UtilException(e, "Instance class [{}] error!", clazz);
+        }
     }
 
 
@@ -183,7 +237,6 @@ public class JsonAssistantUtil {
 
         return null;
     }
-
 
 
     public static String unicodeToString(String unicodeString) {
@@ -342,11 +395,201 @@ public class JsonAssistantUtil {
         }
     }
 
+    public static boolean isTimestampToday(long timestamp) {
+        if (timestamp <= 0) return false;
+        DateTime date = DateUtil.date(timestamp);
+        long l = DateUtil.betweenDay(date, new Date(), false);
+        return l == 0;
+    }
+
     public static BigDecimal parseNumber(String value) {
         try {
             return new BigDecimal(value);
         } catch (Exception e) {
             return new BigDecimal("0");
+        }
+    }
+
+    public static String calculateSHA256(String content) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(content.getBytes());
+            return Base64.encode(hash);
+        } catch (Exception e) {
+            // 退回到hashCode
+            return String.valueOf(content.hashCode());
+        }
+    }
+
+
+    public static String compressAndEncode(String text) {
+        if (StrUtil.isBlank(text)) return null;
+
+        // 小文本直接返回（避免压缩膨胀，用Base64防止出现XML非法字符串）
+        if (text.length() < 200) return Base64.encode(text);
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzip = new GZIPOutputStream(bos)) {
+            gzip.write(text.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            LOG.error("[Json Assistant] Failed to compress the text.", e);
+            return text;
+        }
+
+        // 添加压缩格式标识头
+        return "GZIP:" + Base64.encode(bos.toByteArray());
+    }
+
+    public static String decodeAndDecompress(String data) {
+        if (StrUtil.isBlank(data)) return "";
+
+        // 检查压缩标识头
+        if (data.startsWith("GZIP:")) {
+            byte[] decoded = Base64.decode(data.substring(5));
+
+            try (ByteArrayInputStream bis = new ByteArrayInputStream(decoded);
+                 GZIPInputStream gzip = new GZIPInputStream(bis);
+                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+
+                // 使用缓冲区流式读取（支持任意大文件）
+                byte[] buffer = new byte[8192];
+                int len;
+                while ((len = gzip.read(buffer)) > 0) {
+                    bos.write(buffer, 0, len);
+                }
+                return bos.toString(StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                LOG.error("[Json Assistant] Failed to extract the text.", e);
+            }
+        } else if (Base64.isBase64(data)) {
+            return StrUtil.str(Base64.decode(data), StandardCharsets.UTF_8);
+        }
+
+        // 未压缩的原始文本
+        return data;
+    }
+
+    /**
+     * 去除文本开头所有连续的前缀
+     *
+     * @param text 输入文本
+     * @return 去除所有前缀后的文本
+     */
+    public static String removePrefixes(String text, String prefix) {
+        if (text == null) {
+            return null;
+        }
+
+        int prefixLength = prefix.length();
+        String trimmed = text.trim();
+
+        // 循环去除所有连续的前缀
+        while (trimmed.length() >= prefixLength &&
+                trimmed.substring(0, prefixLength).equals(prefix)) {
+            trimmed = trimmed.substring(prefixLength).trim();
+        }
+
+        return trimmed;
+    }
+
+    public static String wrapHtml(String text) {
+        return HtmlChunk.raw(text)
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    public static String wrapBody(String text) {
+        return HtmlChunk.raw(text)
+                .wrapWith(HtmlChunk.body())
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    public static String wrapBoldHtml(String text) {
+        return HtmlChunk.raw(text)
+                .bold()
+                .wrapWith(HtmlChunk.body())
+                .wrapWith(HtmlChunk.html())
+                .toString();
+    }
+
+    public static String wrapBold(String text) {
+        return HtmlChunk.raw(text)
+                .bold()
+                .toString();
+    }
+
+    public static Date toDate(Long timestamp) {
+        return null == timestamp ? null : new Date(timestamp);
+    }
+
+    /**
+     * 计算字符在字符串中出现的次数
+     *
+     * @param str 原始字符串
+     * @param ch  要计数的字符
+     * @return 字符出现的次数
+     */
+    public static int countCharacterOccurrences(String str, char ch) {
+        int count = 0;
+        for (char c : str.toCharArray()) {
+            if (c == ch) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 使用整数秒转换为毫秒
+     *
+     * @param seconds 秒数（整数）
+     * @return 对应的毫秒数
+     */
+    public static int secondsToMilliseconds(int seconds) {
+        return seconds * 1000;
+    }
+
+    /**
+     * 分钟转毫秒（整数分钟）
+     *
+     * @param minutes 分钟数
+     * @return 对应的毫秒数
+     */
+    public static int minutesToMilliseconds(int minutes) {
+        return minutes * 60 * 1000;
+    }
+
+    /**
+     * 隐藏URL中的敏感信息
+     *
+     * @param url 原始URL
+     * @return 脱敏后的URL
+     */
+    public static String maskUrl(String url) {
+        if (StrUtil.isBlank(url)) {
+            return "";
+        }
+
+        try {
+            URI uri = new URI(url);
+            String host = uri.getHost();
+            if (host == null) {
+                return url;
+            }
+
+            // 显示协议和主机，隐藏详细路径
+            String protocol = uri.getScheme();
+            int port = uri.getPort();
+
+            if (port == -1 || port == uri.toURL().getDefaultPort()) {
+                return protocol + "://" + host;
+            } else {
+                return protocol + "://" + host + ":" + port;
+            }
+
+        } catch (Exception e) {
+            return url;
         }
     }
 

@@ -4,23 +4,28 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonConversionTarget;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.util.JavaUtil;
-import cn.memoryzy.json.util.JsonUtil;
-import cn.memoryzy.json.util.Notifications;
-import cn.memoryzy.json.util.PlatformUtil;
+import cn.memoryzy.json.model.TypeNamePair;
+import cn.memoryzy.json.service.persistent.SerializationSettings;
+import cn.memoryzy.json.service.persistent.state.SerializationState;
+import cn.memoryzy.json.util.*;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiType;
+import com.intellij.psi.util.PsiTypesUtil;
 import icons.JsonAssistantIcons;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Memory
@@ -45,10 +50,7 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
     public void actionPerformed(@NotNull AnActionEvent event) {
         Project project = event.getProject();
         DataContext dataContext = event.getDataContext();
-        // 在此判断当前光标是在某个对象 或 对象实例 及 List、数组上，那就将该对象 或 对象实例解析为JSON
-        PsiClass psiClass = JavaUtil.getCurrentCursorPositionClass(project, dataContext);
-        // 执行操作
-        convertAttributesToJsonAndNotify(project, psiClass, JsonUtil::formatJson, false, LOG);
+        convertAttributesToJsonAndNotify(project, dataContext, false, JsonUtil::formatJson, false, LOG);
     }
 
 
@@ -64,12 +66,24 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
      * 将 Java 属性转换为 JSON/JSON5 并复制到剪贴板，同时显示忽略的字段（如果有的话）
      *
      * @param project        项目对象
-     * @param psiClass       当前类对象
      * @param jsonConverter  JSON 转换器
      * @param resolveComment 是否解析注释
      * @param log            日志对象
      */
-    public static void convertAttributesToJsonAndNotify(Project project, PsiClass psiClass, Function<Map<String, Object>, String> jsonConverter, boolean resolveComment, Logger log) {
+    public static void convertAttributesToJsonAndNotify(Project project, DataContext dataContext, boolean isKt, Function<Map<String, Object>, String> jsonConverter, boolean resolveComment, Logger log) {
+        PsiClass psiClass;
+        JsonConversionTarget target;
+        if (isKt) {
+            // 获取当前类
+            psiClass = KotlinUtil.getPsiClass(dataContext);
+            target = JsonConversionTarget.CURRENT_CLASS;
+        } else {
+            // 在此判断当前光标是在某个对象 或 对象实例 及 List、数组上，那就将该对象 或 对象实例解析为JSON
+            ImmutablePair<JsonConversionTarget, PsiClass> pair = JavaUtil.getCurrentCursorPositionClass2(project, dataContext);
+            target = pair.getLeft();
+            psiClass = pair.getRight();
+        }
+
         // JsonMap
         Map<String, Object> jsonMap = new LinkedHashMap<>();
         // 忽略的属性
@@ -78,11 +92,14 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         Map<String, String> commentMap = new HashMap<>();
 
         // 相关配置
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+
+        // 获取忽略字段，只有当前类才进行字段筛选
+        List<String> ignoredFields = getIgnoredFields(dataContext, psiClass, target);
 
         try {
             // 递归添加所有属性，包括嵌套属性
-            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, commentMap, resolveComment, persistentState.attributeSerializationState);
+            JavaUtil.recursionAddProperty(project, psiClass, jsonMap, ignoreMap, ignoredFields, commentMap, resolveComment, serializationState);
         } catch (Error e) {
             log.error(e);
             Notifications.showNotification(JsonAssistantBundle.messageOnSystem("error.serialize.recursion"), NotificationType.ERROR, project);
@@ -110,6 +127,101 @@ public class JavaBeanToJsonAction extends AnAction implements UpdateInBackground
         }
     }
 
+    /**
+     * 筛选出不进行序列化的字段
+     *
+     * @return 不进行序列化的字段列表，格式为：类限定名.字段
+     */
+    private static List<String> getIgnoredFields(DataContext dataContext, PsiClass psiClass, JsonConversionTarget target) {
+        List<String> ignoredFields = new ArrayList<>();
+        if (JsonConversionTarget.CURRENT_CLASS != target) return ignoredFields;
+
+        // 选中文本
+        String selectText = PlatformUtil.getSingleSelectText(PlatformUtil.getEditor(dataContext));
+        if (StrUtil.isBlank(selectText)) return ignoredFields;
+
+        // 解析选中文本中的字段
+        List<String> lines = StrUtil.split(selectText, "\n", true, true);
+        List<TypeNamePair> pairs = lines.stream()
+                .map(JavaBeanToJsonAction::parseNonStaticField)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (CollUtil.isEmpty(pairs)) return ignoredFields;
+
+        String qualifiedName = psiClass.getQualifiedName();
+        PsiField[] fields = JavaUtil.getNonStaticFields(psiClass);
+        for (PsiField field : fields) {
+            String fieldName = field.getName();
+            PsiType fieldType = field.getType();
+            String presentableText = fieldType.getPresentableText();
+
+            // 判断内部类
+            PsiClass typeClass = PsiTypesUtil.getPsiClass(fieldType);
+            if (null != typeClass) {
+                PsiClass containingClass = typeClass.getContainingClass();
+                if (null != containingClass) {
+                    presentableText = containingClass.getName() + "." + presentableText;
+                }
+            }
+
+            // 类型、名称匹配
+            String finalPresentableText = presentableText;
+            if (pairs.stream().noneMatch(el -> Objects.equals(finalPresentableText, el.getType()) && Objects.equals(fieldName, el.getName()))) {
+                // 匹配失败的就加入忽略字段中
+                ignoredFields.add(StrUtil.format("{}.{}", qualifiedName, fieldName));
+            }
+        }
+
+        return ignoredFields;
+    }
+
+    /**
+     * 解析非静态字段声明，返回字段类型和名称
+     *
+     * @param declaration 字段声明字符串（如 "private String name;"）
+     * @return 对象[类型, 名称]，若为静态字段或格式错误则返回null
+     */
+    public static TypeNamePair parseNonStaticField(String declaration) {
+        // 正则表达式分解字段声明
+        String regex =
+                "^\\s*" +                                  // 起始空格
+                        "(?:(?:@\\w+\\s+)+)?" +                    // 注解（如 @Autowired）
+                        "\\b(?:(public|protected|private|final|transient|volatile)\\s+)*\\b" + // 修饰符
+                        "(?!.*\\bstatic\\b)" +                     // 排除包含static的字段
+                        "([\\w<>$,.]+)\\s+" +                 // 类型
+                        "(\\w+)\\s*" +                             // 字段名
+                        "(?:=.*?)?\\s*;\\s*$";                     // 忽略初始化部分
+
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(declaration.trim());
+
+        if (matcher.find()) {
+            String type = StrUtil.trim(matcher.group(2));
+            String name = StrUtil.trim(matcher.group(3));
+            return new TypeNamePair(type, name);
+        } else {
+            String arrayRegex =
+                    "^\\s*" +
+                            "(?!.*\\bstatic\\b)" +              // 排除 static
+                            "(?:[\\w.$]+\\s+)*" +               // 修饰符（如 public、private）
+                            "([a-zA-Z_$][\\w.$]*(?:\\s*\\[\\s*]\\s*)+)" +  // 类型（带数组）
+                            "\\s+" +
+                            "(\\w+)" +                          // 字段名
+                            "\\s*;" +                           // 以分号结尾
+                            "$";
+
+            Pattern arrayPattern = Pattern.compile(arrayRegex, Pattern.MULTILINE);
+            Matcher arrayMatcher = arrayPattern.matcher(declaration.trim());
+            if (arrayMatcher.find()) {
+                String type = StrUtil.trim(arrayMatcher.group(1));
+                String name = StrUtil.trim(arrayMatcher.group(2));
+                return new TypeNamePair(type, name);
+            }
+        }
+
+        return null;
+    }
 
     public static boolean updateActionAndCheckEnablement(Project project, DataContext dataContext, Presentation presentation, boolean isJson5) {
         if (Objects.isNull(project)) {

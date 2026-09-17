@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action.deserializer.lombok;
 
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -17,20 +17,20 @@ import java.util.List;
  */
 public class LombokGroup extends DefaultActionGroup implements UpdateInBackground {
 
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
 
-    public LombokGroup(DeserializerState deserializerState) {
+    public LombokGroup(DeserializationState deserializationState) {
         super("Lombok Annotations", true);
-        this.deserializerState = deserializerState;
+        this.deserializationState = deserializationState;
     }
 
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
         List<AnAction> actions = new ArrayList<>();
-        actions.add(new DataToggleAction(deserializerState));
-        actions.add(new AccessorsToggleAction(deserializerState));
-        actions.add(new GetterToggleAction(deserializerState));
-        actions.add(new SetterToggleAction(deserializerState));
+        actions.add(new DataToggleAction(deserializationState));
+        actions.add(new AccessorsToggleAction(deserializationState));
+        actions.add(new GetterToggleAction(deserializationState));
+        actions.add(new SetterToggleAction(deserializationState));
         return actions.toArray(new AnAction[0]);
     }
 

@@ -7,8 +7,7 @@ import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.GlobalTextConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
-import cn.memoryzy.json.ui.panel.JsonAssistantToolWindowPanel;
-import cn.memoryzy.json.util.JsonUtil;
+import cn.memoryzy.json.ui.panel.CombineCardLayout;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -22,38 +21,41 @@ import org.jetbrains.annotations.NotNull;
 public class JsonStructureToolWindowAction extends DumbAwareAction implements UpdateInBackground {
 
     private final EditorEx editor;
-    private final SimpleToolWindowPanel simpleToolWindowPanel;
+    private final CombineCardLayout cardLayout;
 
-    public JsonStructureToolWindowAction(EditorEx editor, SimpleToolWindowPanel simpleToolWindowPanel) {
+    public JsonStructureToolWindowAction(EditorEx editor, CombineCardLayout cardLayout, SimpleToolWindowPanel windowPanel) {
         super();
         this.editor = editor;
-        this.simpleToolWindowPanel = simpleToolWindowPanel;
+        this.cardLayout = cardLayout;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.messageOnSystem("action.structure.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.structure.description"));
         presentation.setIcon(JsonAssistantIcons.ToolWindow.STRUCTURE);
-        registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), simpleToolWindowPanel);
+        registerCustomShortcutSet(CustomShortcutSet.fromString("alt T"), windowPanel);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent event) {
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
-        if (null == editorData) {
-            return;
-        }
+        if (null == editorData) return;
 
         editorData.setParseComment(true);
         String json = GlobalJsonConverter.parseJson(context, editorData);
-        JsonStructureAction.show(event.getDataContext(), json, JsonUtil.canResolveToJson(json), StructureActionSource.TOOLWINDOW_TOOLBAR, false);
+        JsonStructureAction.show(
+                event.getDataContext(),
+                editor,
+                json,
+                StructureActionSource.TOOLWINDOW_TOOLBAR,
+                false);
     }
 
     @Override
     public void update(@NotNull AnActionEvent event) {
-        event.getPresentation().setEnabled(GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
-                && JsonAssistantToolWindowPanel.isEditorCardDisplayed(simpleToolWindowPanel)
-                && !editor.isViewer());
+        event.getPresentation().setEnabled(
+                GlobalJsonConverter.validateEditorAllJson(getEventProject(event), editor)
+                        && cardLayout.isEditorView());
     }
 
 }

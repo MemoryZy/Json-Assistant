@@ -4,7 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.JsonTreeNodeType;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
-import cn.memoryzy.json.ui.node.JsonTreeNode;
+import cn.memoryzy.json.ui.tree.JsonFilterableTree;
+import cn.memoryzy.json.ui.tree.JsonNode;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -22,7 +23,7 @@ public class CopyValueAction extends DumbAwareAction implements UpdateInBackgrou
     private final Tree tree;
 
     public CopyValueAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.copy.value.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.copy.value.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.copy.value.description"),
                 null);
         this.tree = tree;
@@ -35,14 +36,15 @@ public class CopyValueAction extends DumbAwareAction implements UpdateInBackgrou
         if (paths != null) {
             List<String> valueList = new ArrayList<>();
             for (TreePath path : paths) {
-                JsonTreeNode node = (JsonTreeNode) path.getLastPathComponent();
+                JsonNode node = JsonFilterableTree.getNode(path);
                 // 获取value值，多个的话用其他处理方式
                 Object value = node.getValue();
                 JsonTreeNodeType nodeType = node.getNodeType();
+
                 // JSONArrayElement及JSONObjectProperty都是普通类型
-                if (Objects.equals(JsonTreeNodeType.JSONArrayElement, nodeType)
-                        || Objects.equals(JsonTreeNodeType.JSONObjectProperty, nodeType)) {
+                if (JsonTreeNodeType.isLeafNode(nodeType)) {
                     valueList.add(Objects.nonNull(value) ? value.toString() : "null");
+
                 } else {
                     JsonWrapper json = (JsonWrapper) value;
 

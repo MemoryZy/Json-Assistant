@@ -1,0 +1,132 @@
+name: Multi-Repo Docs Sync
+
+on:
+  push:
+    paths:
+      - 'donors.json'       # 监控根目录的 donors.json
+      - 'README.md'         # 监控根目录的英文 README
+      - 'README_zh.md'      # 监控根目录的中文 README
+      - 'CHANGELOG.md'      # 监控变更日志
+      - 'DESCRIPTION.md'    # 监控项目描述文件
+      - 'ANNOUNCEMENTS'    # 公告文件
+      - 'NOTICE'    # NOTICE
+  workflow_dispatch:
+
+env:
+  TARGET_USER: MemoryZy
+  TARGET_REPO: Json-Assistant
+  TARGET_DOC_REPO: Json-Assistant-Doc
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0  # 获取完整历史记录以便 diff-index 准确工作
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # 第一步：修改本仓库的 Readme Donors Table
+      - name: Update README tables
+        run: |
+          python .github/scripts/update_donors.py
+
+      # 第二步：提交本仓库的 Readme 修改
+      # 需要去 Settings → Actions → General 在Workflow permissions中开启以下两项
+      #   Read and write permissions
+      #   Allow GitHub Actions to create and approve pull requests
+      - name: Commit README changes
+        env:
+          # 使用内置的 GITHUB_TOKEN 权限
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动注入的令牌
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # 添加目标文件
+          git add README.md README_zh.md
+          
+          # 检查是否有变更需要提交
+          if ! git diff --quiet --staged; then
+            git commit -m "Update donor tables"
+          
+            # 显式使用 GH_TOKEN 进行推送
+            git remote set-url origin "https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git"
+            git push origin main
+            echo "✅ 提交成功"
+          else
+            echo "🟢 无变更需要提交"
+          fi
+
+      - name: Sync to Public Repo
+        env:
+          TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
+        run: |
+          # 强制删除旧目录（如果存在）
+          rm -rf $TARGET_REPO
+          
+          # 克隆目标仓库（启用深度克隆加速）
+          git clone --depth 1 --branch main https://x-access-token:$TARGET_TOKEN@github.com/$TARGET_USER/$TARGET_REPO.git
+          
+          # 复制文件（显示详情）
+          echo "==== 开始复制文件 ===="
+          echo "当前目录"
+          pwd
+          
+          cp -v README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS NOTICE $TARGET_REPO/
+          
+          # 进入目录并提交
+          cd $TARGET_REPO
+          echo "当前目录"
+          pwd
+          
+          git config user.name "Sync Bot"
+          git config user.email "actions@github.com"
+          
+          # 精确添加变更
+          git add README.md README_zh.md CHANGELOG.md DESCRIPTION.md ANNOUNCEMENTS NOTICE
+          
+          if ! git diff --quiet --staged; then
+            git commit -m "Sync docs from source"
+            git push origin main
+            echo "✅ 提交成功"
+          else
+            echo "🟢 无变更需要提交"
+          fi
+
+      # 第四步：同步捐赠名单信息到文档仓库
+      - name: Sync to Writerside Repo
+        env:
+          TARGET_TOKEN: ${{ secrets.TARGET_TOKEN }}
+          SOURCE_WORKSPACE: ${{ github.workspace }}  # 注入源仓库路径
+        run: |
+          # 克隆目标仓库
+          git clone https://x-access-token:$TARGET_TOKEN@github.com/$TARGET_USER/$TARGET_DOC_REPO.git
+          # 复制脚本到目标仓库
+          cp -r "$SOURCE_WORKSPACE/.github/scripts" $TARGET_DOC_REPO/.github/
+          
+          # 进入目标仓库目录
+          cd $TARGET_DOC_REPO
+          
+          # 执行脚本（现在脚本在目标仓库内）
+          python .github/scripts/update_donors_writerside_zh.py \
+            --donors "$SOURCE_WORKSPACE/donors.json" \
+            --output "$PWD/Writerside/topics/Support.md"
+          
+          # 提交变更
+          git config user.name "Writerside Sync"
+          git config user.email "actions@github.com"
+          if ! git diff --quiet; then
+            git add Writerside/topics/Support.md
+            git commit -m "Update support docs"
+            git push origin main
+            echo "✅ 提交成功"
+          else
+            echo "🟢 无变更需要提交"
+          fi

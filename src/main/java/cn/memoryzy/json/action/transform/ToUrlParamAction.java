@@ -4,6 +4,7 @@ import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.model.strategy.GlobalJsonConverter;
 import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.util.DataConverter;
+import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -35,7 +36,7 @@ public class ToUrlParamAction extends DumbAwareAction implements UpdateInBackgro
         DataContext dataContext = event.getDataContext();
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String json = GlobalJsonConverter.parseJson(context, PlatformUtil.getEditor(dataContext));
-        String urlParamStr = DataConverter.jsonToUrlParams(json, GlobalJsonConverter.isValidJson(context.getProcessor()));
+        String urlParamStr = DataConverter.jsonToUrlParams(json, JsonUtil.isJson(json));
         TextTransformUtil.copyToClipboardAndShowNotification(getEventProject(event), urlParamStr);
     }
 

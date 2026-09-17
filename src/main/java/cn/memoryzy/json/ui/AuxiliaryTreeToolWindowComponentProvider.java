@@ -1,6 +1,7 @@
 package cn.memoryzy.json.ui;
 
-import cn.memoryzy.json.model.StructureConfig;
+import cn.memoryzy.json.model.EditorContext;
+import cn.memoryzy.json.model.structure.StructureSetting;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.ui.panel.AuxiliaryTreeToolWindowPanel;
 import com.intellij.openapi.ui.SimpleToolWindowPanel;
@@ -16,20 +17,19 @@ import java.awt.*;
  */
 public class AuxiliaryTreeToolWindowComponentProvider {
 
-    private final JsonWrapper wrapper;
+    private final JsonStructureComponentProvider provider;
 
     /**
      * 构造器
      *
      * @param wrapper JSON对象
      */
-    public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper) {
-        this.wrapper = wrapper;
+    public AuxiliaryTreeToolWindowComponentProvider(JsonWrapper wrapper, @NotNull JComponent component, EditorContext editorContext) {
+        provider = new JsonStructureComponentProvider(wrapper, component, getStructureSetting(editorContext));
     }
 
-    public JComponent createComponent(@NotNull JComponent component) {
-        // 创建树结构
-        JsonStructureComponentProvider provider = new JsonStructureComponentProvider(wrapper, component, StructureConfig.of(false, 3));
+    public JComponent createComponent() {
+        // 获取树
         JPanel treeComponent = provider.getTreeComponent();
         Tree tree = provider.getTree();
 
@@ -45,6 +45,14 @@ public class AuxiliaryTreeToolWindowComponentProvider {
         SimpleToolWindowPanel simpleToolWindowPanel = new SimpleToolWindowPanel(false, false);
         simpleToolWindowPanel.setContent(panel);
         return simpleToolWindowPanel;
+    }
+
+    public JComponent getPreferredFocusedComponent() {
+        return provider.getTree();
+    }
+
+    private StructureSetting getStructureSetting(EditorContext editorContext) {
+        return new StructureSetting().setNeedBorder(false).setNeedToolbar(true).setExpandLevel(3).setEditorContext(editorContext);
     }
 
 }

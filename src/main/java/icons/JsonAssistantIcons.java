@@ -34,11 +34,17 @@ public class JsonAssistantIcons {
     public static final Icon CHECKMARK = load("/icons/checkmark.svg");
     public static final Icon OPEN = load("/icons/open.svg");
     public static final Icon SWITCH_DISPLAY = load("/icons/switch_display.svg");
+    public static final Icon UPGRADE = load("/icons/upgrade.svg");
+    public static final Icon COFFEE = load("/icons/coffee.svg");
+    public static final Icon SORT = load("/icons/sort.svg");
 
     public static class FileTypes {
         public static final Icon TOML = load("/icons/fileTypes/toml-file.svg");
         public static final Icon URL = load("/icons/fileTypes/url.svg");
         public static final Icon KV = load("/icons/fileTypes/kv.svg");
+        public static final Icon JSON_NODE = load("/icons/fileTypes/jsonNode.svg");
+        public static final Icon JSON5_NODE = load("/icons/fileTypes/json5Node.svg");
+        public static final Icon TYPESCRIPT = load("/icons/fileTypes/typeScript.svg");
     }
 
     /**
@@ -83,6 +89,12 @@ public class JsonAssistantIcons {
         public static final Icon SCROLL_DOWN = load("/icons/toolwindow/scrollDown.svg");
         public static final Icon SWITCH = load("/icons/toolwindow/switch.svg");
         public static final Icon TEXT = load("/icons/toolwindow/text.svg");
+        public static final Icon GRID = load("/icons/toolwindow/grid.svg");
+        public static final Icon EDIT = load("/icons/toolwindow/edit.svg");
+        public static final Icon HISTORY_LOGO = load("/icons/toolwindow/history_logo.svg");
+        public static final Icon SEND = load("/icons/toolwindow/send.svg");
+        public static final Icon IMPORT = load("/icons/toolwindow/import.svg");
+        public static final Icon MODULE = load("/icons/toolwindow/module.svg");
 
     }
 

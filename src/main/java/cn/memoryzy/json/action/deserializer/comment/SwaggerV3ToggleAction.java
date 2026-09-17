@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action.deserializer.comment;
 
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -12,21 +12,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SwaggerV3ToggleAction extends ToggleAction implements UpdateInBackground {
 
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
 
-    public SwaggerV3ToggleAction(DeserializerState deserializerState) {
+    public SwaggerV3ToggleAction(DeserializationState deserializationState) {
         super("@Schema (Swagger V3)", null, null);
-        this.deserializerState = deserializerState;
+        this.deserializationState = deserializationState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializerState.swaggerV3Annotation;
+        return deserializationState.isEnableSwagger3Annotation();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializerState.swaggerV3Annotation = state;
+        deserializationState.setEnableSwagger3Annotation(state);
     }
 
 }

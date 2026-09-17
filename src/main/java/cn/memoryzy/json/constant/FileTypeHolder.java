@@ -24,4 +24,8 @@ public interface FileTypeHolder {
 
     FileType PROPERTIES = PlatformUtil.getFileType(FileTypes.PROPERTIES);
 
+    FileType CSV = PlatformUtil.getFileType(FileTypes.CSV);
+
+    FileType TYPESCRIPT = PlatformUtil.getFileType(FileTypes.TYPESCRIPT);
+
 }

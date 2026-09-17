@@ -35,7 +35,7 @@ public class JavaConstantToJsonAction extends AnAction implements UpdateInBackgr
         // 格式化
         String formatted = JsonUtil.isJson(json) ? JsonUtil.formatJson(json) : Json5Util.formatJson5(json);
         // 输出
-        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), formatted, FileTypeHolder.JSON5);
+        TextTransformUtil.applyTextWhenNotWritable(getEventProject(event), formatted, FileTypeHolder.JSON5, null);
     }
 
     @Override

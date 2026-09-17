@@ -11,13 +11,17 @@
         </action>
 
         <action id="JsonAssistant.Action.JsonToJavaBeanAction" class="cn.memoryzy.json.action.JsonToJavaBeanAction"/>
+        <action id="JsonAssistant.Action.JavaBeanToTypeScriptAction" class="cn.memoryzy.json.action.JavaBeanToTypeScriptAction"/>
         <action id="JsonAssistant.Action.JavaConstantToJsonAction" class="cn.memoryzy.json.action.JavaConstantToJsonAction"/>
+        <action id="JsonAssistant.Action.FillCommentFromJavaAction" class="cn.memoryzy.json.action.extend.FillCommentFromJavaAction"/>
 
         <group id="JsonAssistant.Group.JavaBeanToJsonGroup">
             <separator/>
             <reference ref="JsonAssistant.Action.JavaBeanToJsonAction"/>
             <separator/>
             <reference ref="JsonAssistant.Action.JavaBeanToJson5Action"/>
+            <separator/>
+            <reference ref="JsonAssistant.Action.JavaBeanToTypeScriptAction"/>
             <separator/>
             <reference ref="JsonAssistant.Action.JavaConstantToJsonAction"/>
             <separator/>

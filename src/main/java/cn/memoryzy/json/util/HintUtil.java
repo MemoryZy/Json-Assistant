@@ -2,7 +2,6 @@ package cn.memoryzy.json.util;
 
 import com.intellij.codeInsight.hint.HintManager;
 import com.intellij.codeInsight.hint.HintManagerImpl;
-import com.intellij.ide.IdeBundle;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.ui.LightweightHint;
@@ -58,7 +57,7 @@ public class HintUtil {
         Point p = hintManager.getHintPosition(hint, editor, position);
         int flags = HintManager.HIDE_BY_TEXT_CHANGE | HintManager.HIDE_BY_CARET_MOVE;
 
-        AccessibleContextUtil.setName(hint.getComponent(), IdeBundle.message("information.hint.accessible.context.name"));
+        AccessibleContextUtil.setName(hint.getComponent(), "Hint");
         if (onHintHidden != null) {
             hint.addHintListener((event) -> {
                 onHintHidden.run();

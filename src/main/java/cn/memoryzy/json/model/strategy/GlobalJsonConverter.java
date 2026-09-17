@@ -36,9 +36,7 @@ public class GlobalJsonConverter {
     public static void parseAndProcessJson(DataContext dataContext, Editor editor, boolean needBeautify, String selectionMessage, String globalMessage) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         EditorData editorData = GlobalTextConverter.resolveEditor(editor);
-        if (Objects.isNull(editorData)) {
-            return;
-        }
+        if (Objects.isNull(editorData)) return;
 
         JsonConversionProcessor[] processors = needBeautify
                 ? GlobalTextConversionProcessorContext.getBeautifyAllJsonProcessors(editorData)
@@ -55,7 +53,7 @@ public class GlobalJsonConverter {
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();
             boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, allowedFileTypeQualifiedNames);
-            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite);
+            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite, null);
         }
     }
 
@@ -73,7 +71,7 @@ public class GlobalJsonConverter {
      * @param selectionMessage 选中文本转换成功的消息
      * @param globalMessage    全局文本转换成功的消息
      */
-    public static void convertBetweenJsonAndJson5(DataContext dataContext, Editor editor, Function<String, String> converter, String selectionMessage, String globalMessage) {
+    public static void convertBetweenJsonAndJson5(DataContext dataContext, Editor editor, Function<String, String> converter, String selectionMessage, String globalMessage, String tabName) {
         Project project = CommonDataKeys.PROJECT.getData(dataContext);
         GlobalTextConversionProcessorContext context = new GlobalTextConversionProcessorContext();
         String processedText = converter.apply(parseJson(context, editor));
@@ -85,7 +83,7 @@ public class GlobalJsonConverter {
             boolean hasSelection = processor.getEditorData().getSelectionData().isHasSelection();
             String[] allowedFileTypeQualifiedNames = processor.getFileTypeData().getAllowedFileTypeQualifiedNames();
             boolean canWrite = TextTransformUtil.canWriteToDocument(dataContext, editor, hasSelection, allowedFileTypeQualifiedNames);
-            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite);
+            TextTransformUtil.applyProcessedTextToDocument(project, editor, processedText, processor, canWrite, tabName);
         }
     }
 
@@ -192,13 +190,14 @@ public class GlobalJsonConverter {
 
 
     /**
-     * 判断解析结果是否为 JSON
+     * 判断解析结果是否为 JSON (存在问题，有可能后续 JSON 改变了，那这个判断就存疑了)
      * <p style="color: blue;">这是针对 {@link GlobalTextConversionProcessorContext#getProcessor()} 方法返回值来判断的</p>
      * <p style="color: blue;">因为现在分为了 JSON 和 JSON5，并且此方法也只有两个选择，非 JSON 即 JSON5</p>
      *
      * @param processor 处理器
      * @return true 为 JSON；反之为 JSON5
      */
+    @Deprecated
     public static boolean isValidJson(AbstractGlobalTextConversionProcessor processor) {
         return !(processor instanceof Json5ConversionProcessor);
     }

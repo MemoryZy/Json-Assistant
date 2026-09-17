@@ -1,7 +1,7 @@
 package cn.memoryzy.json.action.structure;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -14,7 +14,7 @@ public class CollapseMultiAction extends DumbAwareAction implements UpdateInBack
     private final Tree tree;
 
     public CollapseMultiAction(Tree tree) {
-        super(JsonAssistantBundle.message("action.structure.collapse.multi.text"),
+        super(JsonAssistantBundle.messageOnSystem("action.structure.collapse.multi.text"),
                 JsonAssistantBundle.messageOnSystem("action.structure.collapse.multi.description"),
                 null);
         this.tree = tree;
@@ -25,7 +25,7 @@ public class CollapseMultiAction extends DumbAwareAction implements UpdateInBack
         TreePath[] paths = tree.getSelectionPaths();
         if (paths != null) {
             for (TreePath path : paths) {
-                UIManager.collapseAll(tree, path);
+                UIUtils.collapseAll(tree, path);
             }
         }
     }

@@ -1,12 +1,14 @@
 package cn.memoryzy.json.model.strategy.clipboard.context;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.enums.DataFormatType;
 import cn.memoryzy.json.model.strategy.clipboard.*;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.EditorBehaviorState;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 维护成功的策略
@@ -15,18 +17,10 @@ import java.util.List;
  * @since 2024/10/31
  */
 public class ClipboardTextConversionContext {
-    private static final EditorBehaviorState STATE = JsonAssistantPersistentState.getInstance().editorBehaviorState;
+
+    private static final EditorBehaviorState STATE = ToolWindowSettings.getInstance().getBehaviorState();
 
     private ClipboardTextConversionStrategy strategy;
-
-    public ClipboardTextConversionStrategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(ClipboardTextConversionStrategy strategy) {
-        this.strategy = strategy;
-    }
-
 
     public String convert(String text) {
         try {
@@ -50,24 +44,37 @@ public class ClipboardTextConversionContext {
         List<ClipboardTextConversionStrategy> conversionStrategies = Lists.newArrayList();
         conversionStrategies.add(new JsonConversionStrategy());
         conversionStrategies.add(new Json5ConversionStrategy());
+        Set<DataFormatType> enabledFormats = STATE.getEnabledFormats();
 
-        if (STATE.recognizeXmlFormat) {
+        if (enabledFormats.contains(DataFormatType.XML)) {
             conversionStrategies.add(new XmlConversionStrategy());
         }
 
-        if (STATE.recognizeYamlFormat) {
+        if (enabledFormats.contains(DataFormatType.YAML)) {
             conversionStrategies.add(new YamlConversionStrategy());
         }
 
-        if (STATE.recognizeTomlFormat) {
+        if (enabledFormats.contains(DataFormatType.TOML)) {
             conversionStrategies.add(new TomlConversionStrategy());
         }
 
-        if (STATE.recognizeUrlParamFormat) {
+        if (enabledFormats.contains(DataFormatType.TYPE_SCRIPT)) {
+            conversionStrategies.add(new TypeScriptConversionStrategy());
+        }
+
+        if (enabledFormats.contains(DataFormatType.URL_PARAM)) {
             conversionStrategies.add(new UrlParamConversionStrategy());
         }
 
         return conversionStrategies;
+    }
+
+    public ClipboardTextConversionStrategy getStrategy() {
+        return strategy;
+    }
+
+    public void setStrategy(ClipboardTextConversionStrategy strategy) {
+        this.strategy = strategy;
     }
 
 }

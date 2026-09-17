@@ -1,12 +1,11 @@
 package cn.memoryzy.json.ui.dialog;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.HtmlConstant;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.enums.UrlType;
 import cn.memoryzy.json.ui.listener.HyperLinkListenerImpl;
 import cn.memoryzy.json.ui.panel.HyperLinkJBLabel;
-import com.intellij.openapi.application.ApplicationManager;
+import cn.memoryzy.json.util.JsonAssistantUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -54,21 +53,21 @@ public class SupportDialog extends DialogWrapper {
         initLinkListener();
 
         supportHeader.setIcon(JsonAssistantIcons.DONATE);
-        supportHeader.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.support.header")));
-        supportContent.setText(HtmlConstant.wrapBody(JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
+        supportHeader.setText(JsonAssistantUtil.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.support.header")));
+        supportContent.setText(JsonAssistantUtil.wrapBody(JsonAssistantBundle.messageOnSystem("dialog.support.support.content",
                 Urls.GITHUB_LINK,
                 Urls.MARKETPLACE_REVIEWS_LINK,
                 UrlType.SHARE.getId())));
 
         donateHeader.setIcon(JsonAssistantIcons.HEART);
-        donateHeader.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.donate.header")));
-        donateContent.setText(HtmlConstant.wrapBody(JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
+        donateHeader.setText(JsonAssistantUtil.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.donate.header")));
+        donateContent.setText(JsonAssistantUtil.wrapBody(JsonAssistantBundle.messageOnSystem("dialog.support.donate.content")));
 
         wechatLabel.setIcon(JsonAssistantIcons.WECHAT_PAY);
-        wechatLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.wechat")));
+        wechatLabel.setText(JsonAssistantUtil.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.wechat")));
 
         alipayLabel.setIcon(JsonAssistantIcons.ALIPAY);
-        alipayLabel.setText(HtmlConstant.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.alipay")));
+        alipayLabel.setText(JsonAssistantUtil.wrapBoldHtml(JsonAssistantBundle.messageOnSystem("dialog.support.alipay")));
 
         donateNote.setIcon(JsonAssistantIcons.LABEL);
         donateNote.setText(JsonAssistantBundle.messageOnSystem("dialog.support.donate.link"));
@@ -121,8 +120,4 @@ public class SupportDialog extends DialogWrapper {
         return actions.toArray(new Action[0]);
     }
 
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
-    }
 }

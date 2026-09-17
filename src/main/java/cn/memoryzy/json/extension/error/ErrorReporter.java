@@ -1,13 +1,12 @@
 package cn.memoryzy.json.extension.error;
 
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.Urls;
 import cn.memoryzy.json.util.JsonAssistantUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import com.intellij.ide.BrowserUtil;
-import com.intellij.ide.IdeBundle;
 import com.intellij.openapi.application.ApplicationNamesInfo;
 import com.intellij.openapi.application.ex.ApplicationInfoEx;
 import com.intellij.openapi.diagnostic.ErrorReportSubmitter;
@@ -105,7 +104,7 @@ public class ErrorReporter extends ErrorReportSubmitter {
         String appName = appInfo.getFullApplicationName(); // NON-NLS
         String edition = ApplicationNamesInfo.getInstance().getEditionName();
         if (edition != null) appName += " (" + edition + ")";
-        String buildInfo = IdeBundle.message("about.box.build.number", appInfo.getBuild().asString());
+        String buildInfo = "Build " + appInfo.getBuild().asString();
 
         Properties properties = System.getProperties();
         String javaVersion = properties.getProperty("java.runtime.version", properties.getProperty("java.version", "unknown"));

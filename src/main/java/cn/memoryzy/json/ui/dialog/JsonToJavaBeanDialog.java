@@ -5,10 +5,10 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.memoryzy.json.action.group.OptionsGroup;
+import cn.memoryzy.json.JsonAssistantPlugin;
+import cn.memoryzy.json.action.deserializer.OptionsGroup;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.DependencyConstant;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.LanguageHolder;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
@@ -21,13 +21,12 @@ import cn.memoryzy.json.model.template.FieldModel;
 import cn.memoryzy.json.model.template.ModelToMapConverter;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.SerializationSettings;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import cn.memoryzy.json.ui.component.ActionGroupPopupButton;
-import cn.memoryzy.json.ui.decorator.TextEditorErrorPopupDecorator;
+import cn.memoryzy.json.ui.decorator.EditorErrorPopupManager;
 import cn.memoryzy.json.ui.editor.CustomizedLanguageTextEditor;
 import cn.memoryzy.json.util.*;
-import cn.memoryzy.json.util.UIManager;
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplate;
@@ -38,7 +37,6 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.Presentation;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -91,16 +89,16 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     public static final String DESERIALIZER_EXAMPLE_GUIDE_KEY = JsonAssistantPlugin.PLUGIN_ID_NAME + ".DESERIALIZER_EXAMPLE_GUIDE";
 
-    private JBTextField classNameTextField;
-    private EditorTextField jsonTextField;
-    private TextEditorErrorPopupDecorator classNameErrorDecorator;
-    private TextEditorErrorPopupDecorator jsonErrorDecorator;
+    private final JBTextField classNameTextField;
+    private final EditorTextField jsonTextField;
+    private final EditorErrorPopupManager classNameErrorDecorator;
+    private final EditorErrorPopupManager jsonErrorDecorator;
 
     private final Project project;
     private final PsiDirectory directory;
     private final Module module;
 
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
     private final PropertiesComponent propertiesComponent;
 
     public JsonToJavaBeanDialog(@Nullable Project project, PsiDirectory directory, Module module) {
@@ -109,11 +107,15 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         this.directory = directory;
         this.module = module;
         this.propertiesComponent = PropertiesComponent.getInstance();
-        JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
-        this.deserializerState = persistentState.deserializerState;
+        this.deserializationState = SerializationSettings.getInstance().getDeserializationState();
 
-        if (this.deserializerState == null) {
-            LOG.error("Deserialized configuration object is empty!");
+        this.classNameTextField = new JBTextField();
+        this.jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
+        this.classNameErrorDecorator = new EditorErrorPopupManager(getRootPane(), classNameTextField);
+        this.jsonErrorDecorator = new EditorErrorPopupManager(getRootPane(), jsonTextField);
+
+        if (this.deserializationState == null) {
+            LOG.error("[Json Assistant] Deserialized configuration object is empty!");
             throw new IllegalArgumentException("Deserialized configuration object is empty!");
         }
 
@@ -126,31 +128,28 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     @Override
     protected @Nullable JComponent createCenterPanel() {
-        classNameTextField = new JBTextField();
-        registerFocusListener();
-
         JBLabel label = new JBLabel(JsonAssistantBundle.messageOnSystem("dialog.deserialize.label.class.name"));
         JPanel firstPanel = SwingHelper.newHorizontalPanel(Component.CENTER_ALIGNMENT, label, classNameTextField);
         firstPanel.setBorder(JBUI.Borders.emptyLeft(4));
 
         JPanel optionPanel = new JPanel();
+        TitledSeparator titledSeparator = new TitledSeparator();
         optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.X_AXIS)); // 水平排列
         optionPanel.setBorder(JBUI.Borders.empty(5, 0, 0, 4));
-        optionPanel.add(new TitledSeparator());
+        optionPanel.add(titledSeparator);
         optionPanel.add(Box.createRigidArea(new Dimension(3, 0)));
         optionPanel.add(createOptionsButton());
 
         BorderLayoutPanel borderLayoutPanel = new BorderLayoutPanel().addToTop(firstPanel).addToCenter(optionPanel);
 
-        jsonTextField = new CustomizedLanguageTextEditor(LanguageHolder.JSON5, project, "", true);
-        jsonTextField.setFont(UIManager.consolasFont(15));
+        jsonTextField.setFont(FontManager.consolasFont(15));
         jsonTextField.setPlaceholder(JsonAssistantBundle.messageOnSystem("dialog.deserialize.placeholder.text") + PluginConstant.JSON_EXAMPLE);
         jsonTextField.setShowPlaceholderWhenFocused(true);
         jsonTextField.addDocumentListener(new JsonValidatorDocumentListener());
         jsonTextField.addNotify();
 
-        classNameErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), classNameTextField);
-        jsonErrorDecorator = new TextEditorErrorPopupDecorator(getRootPane(), jsonTextField);
+        registerFocusListener();
+        new ClickTrigger().init(titledSeparator, el -> resetGuideFlag());
 
         JBSplitter splitter = new JBSplitter(true, 0.06f);
         splitter.setFirstComponent(borderLayoutPanel);
@@ -230,7 +229,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     }
 
     private JComponent createOptionsButton() {
-        OptionsGroup group = new OptionsGroup(module, deserializerState);
+        OptionsGroup group = new OptionsGroup(module, deserializationState);
         Presentation presentation = new Presentation();
         presentation.copyFrom(group.getTemplatePresentation());
         return new ActionGroupPopupButton(group, presentation, ActionPlaces.UNKNOWN, ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE);
@@ -244,11 +243,6 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     @Override
     protected @NonNls @Nullable String getHelpId() {
         return UrlType.SITE_TO_JAVA_BEAN.getId();
-    }
-
-    @Override
-    public void show() {
-        ApplicationManager.getApplication().invokeLater(super::show);
     }
 
     @Override
@@ -415,7 +409,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             } else {
                 // ------------- 非对象，则直接添加字段
                 // 获取字段类型
-                String propertyType = JavaUtil.getStrType(value);
+                String propertyType = JavaUtil.getStrType(value, deserializationState.isUseInferType());
 
                 if (Objects.equals(propertyType, Date.class.getSimpleName())) {
                     importList.add(Date.class.getName());
@@ -445,22 +439,22 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     private void addClassLevelAnnotationModel(ClassModel classModel, Set<String> importList) {
         if (JavaUtil.hasLombokLib(module)) {
             // 增加注解
-            if (deserializerState.dataLombokAnnotation) {
+            if (deserializationState.isEnableLombokData()) {
                 importList.add(LombokAnnotations.DATA.getValue());
                 classModel.addAnnotation(AnnotationModel.of(LombokAnnotations.DATA.getSimpleName()));
             }
 
-            if (deserializerState.accessorsChainLombokAnnotation) {
+            if (deserializationState.isEnableLombokChainAccessors()) {
                 importList.add(LombokAnnotations.ACCESSORS.getValue());
                 classModel.addAnnotation(AnnotationModel.withAttribute(LombokAnnotations.ACCESSORS.getSimpleName(), "chain", true));
             }
 
-            if (deserializerState.setterLombokAnnotation) {
+            if (deserializationState.isEnableLombokSetter()) {
                 importList.add(LombokAnnotations.SETTER.getValue());
                 classModel.addAnnotation(AnnotationModel.of(LombokAnnotations.SETTER.getSimpleName()));
             }
 
-            if (deserializerState.getterLombokAnnotation) {
+            if (deserializationState.isEnableLombokGetter()) {
                 importList.add(LombokAnnotations.GETTER.getValue());
                 classModel.addAnnotation(AnnotationModel.of(LombokAnnotations.GETTER.getSimpleName()));
             }
@@ -469,32 +463,32 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private void addFieldLevelAnnotationModel(FieldModel fieldModel, String key, String comment, Set<String> importList) {
         // 是否存在FastJson依赖
-        if (deserializerState.fastJsonAnnotation && JavaUtil.hasFastJsonLib(module)) {
+        if (deserializationState.isEnableFastJsonAnnotation() && JavaUtil.hasFastJsonLib(module)) {
             // 如果选择添加 fastJson 注解，且存在 fastJson 库
             importList.add(JsonAnnotations.FAST_JSON_JSON_FIELD.getValue());
             fieldModel.addAnnotation(AnnotationModel.withAttribute(JsonAnnotations.FAST_JSON_JSON_FIELD.getSimpleName(), "name", key));
 
-        } else if (deserializerState.fastJson2Annotation && JavaUtil.hasFastJson2Lib(module)) {
+        } else if (deserializationState.isEnableFastJson2Annotation() && JavaUtil.hasFastJson2Lib(module)) {
             // 如果选择添加 fastJson2 注解，且存在 fastJson2 库
             importList.add(JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue());
             fieldModel.addAnnotation(AnnotationModel.withAttribute(JsonAnnotations.FAST_JSON2_JSON_FIELD.getSimpleName(), "name", key));
         }
 
         // 是否存在Jackson依赖
-        if (deserializerState.jacksonAnnotation && JavaUtil.hasJacksonLib(module)) {
+        if (deserializationState.isEnableJacksonAnnotation() && JavaUtil.hasJacksonLib(module)) {
             importList.add(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue());
             fieldModel.addAnnotation(AnnotationModel.withAttribute(JsonAnnotations.JACKSON_JSON_PROPERTY.getSimpleName(), "value", key));
         }
 
         if (StrUtil.isNotBlank(comment)) {
             // swagger
-            if (deserializerState.swaggerAnnotation && JavaUtil.hasSwaggerLib(module)) {
+            if (deserializationState.isEnableSwaggerAnnotation() && JavaUtil.hasSwaggerLib(module)) {
                 importList.add(SwaggerAnnotations.API_MODEL_PROPERTY.getValue());
                 fieldModel.addAnnotation(AnnotationModel.withAttribute(SwaggerAnnotations.API_MODEL_PROPERTY.getSimpleName(), "value", comment));
             }
 
             // swagger v3
-            if (deserializerState.swaggerV3Annotation && JavaUtil.hasSwaggerV3Lib(module)) {
+            if (deserializationState.isEnableSwagger3Annotation() && JavaUtil.hasSwaggerV3Lib(module)) {
                 importList.add(SwaggerAnnotations.SCHEMA.getValue());
                 fieldModel.addAnnotation(AnnotationModel.withAttribute(SwaggerAnnotations.SCHEMA.getSimpleName(), "description", comment));
             }
@@ -638,7 +632,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
             } else {
                 // ------------- 非对象，则直接添加字段
                 // 获取字段类型
-                String propertyType = JavaUtil.getStrType(value);
+                String propertyType = JavaUtil.getStrType(value, deserializationState.isUseInferType());
                 // 定义字段文本
                 String fieldText = StrUtil.format("{} {} {};", PsiModifier.PRIVATE, propertyType, processedKey);
 
@@ -675,23 +669,23 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         boolean hasFastJson2Lib = JavaUtil.hasFastJson2Lib(module);
 
         // 当选择了添加 fastJson/fastJson2 注解，且存在 fastJson/fastJson2 注解
-        if ((deserializerState.fastJsonAnnotation || deserializerState.fastJson2Annotation) && (hasFastJsonLib || hasFastJson2Lib)) {
+        if ((deserializationState.isEnableFastJsonAnnotation() || deserializationState.isEnableFastJson2Annotation()) && (hasFastJsonLib || hasFastJson2Lib)) {
             addFieldLevelFastJsonAnnotation(originalKey, newClass, psiField, factory, hasFastJsonLib, hasFastJson2Lib);
         }
 
         // 是否存在Jackson依赖
-        if (deserializerState.jacksonAnnotation && JavaUtil.hasJacksonLib(module)) {
+        if (deserializationState.isEnableJacksonAnnotation() && JavaUtil.hasJacksonLib(module)) {
             addFieldLevelAnnotation(JsonAnnotations.JACKSON_JSON_PROPERTY.getValue(), "value", originalKey, newClass, psiField, factory);
         }
 
         if (StrUtil.isNotBlank(comment)) {
             // swagger
-            if (deserializerState.swaggerAnnotation && JavaUtil.hasSwaggerLib(module)) {
+            if (deserializationState.isEnableSwaggerAnnotation() && JavaUtil.hasSwaggerLib(module)) {
                 addFieldLevelAnnotation(SwaggerAnnotations.API_MODEL_PROPERTY.getValue(), "value", comment, newClass, psiField, factory);
             }
 
             // swagger v3
-            if (deserializerState.swaggerV3Annotation && JavaUtil.hasSwaggerV3Lib(module)) {
+            if (deserializationState.isEnableSwagger3Annotation() && JavaUtil.hasSwaggerV3Lib(module)) {
                 addFieldLevelAnnotation(SwaggerAnnotations.SCHEMA.getValue(), "description", comment, newClass, psiField, factory);
             }
         }
@@ -701,10 +695,10 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
     private void addFieldLevelFastJsonAnnotation(String originalKey, PsiClass newClass, PsiField psiField,
                                                  PsiElementFactory factory, boolean hasFastJsonLib, boolean hasFastJson2Lib) {
         String annotationName = null;
-        if (deserializerState.fastJsonAnnotation && hasFastJsonLib) {
+        if (deserializationState.isEnableFastJsonAnnotation() && hasFastJsonLib) {
             // 如果选择添加 fastJson 注解，且存在 fastJson 库
             annotationName = JsonAnnotations.FAST_JSON_JSON_FIELD.getValue();
-        } else if (deserializerState.fastJson2Annotation && hasFastJson2Lib) {
+        } else if (deserializationState.isEnableFastJson2Annotation() && hasFastJson2Lib) {
             // 如果选择添加 fastJson2 注解，且存在 fastJson2 库
             annotationName = JsonAnnotations.FAST_JSON2_JSON_FIELD.getValue();
         }
@@ -750,22 +744,22 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         List<String> importQualifiedNames = new ArrayList<>();
 
         // 增加注解
-        if (deserializerState.dataLombokAnnotation) {
+        if (deserializationState.isEnableLombokData()) {
             annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.DATA.getValue()), null));
             importQualifiedNames.add(LombokAnnotations.DATA.getValue());
         }
 
-        if (deserializerState.accessorsChainLombokAnnotation) {
+        if (deserializationState.isEnableLombokChainAccessors()) {
             annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.ACCESSORS.getValue()) + "(chain = true)", null));
             importQualifiedNames.add(LombokAnnotations.ACCESSORS.getValue());
         }
 
-        if (deserializerState.setterLombokAnnotation) {
+        if (deserializationState.isEnableLombokSetter()) {
             annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.SETTER.getValue()), null));
             importQualifiedNames.add(LombokAnnotations.SETTER.getValue());
         }
 
-        if (deserializerState.getterLombokAnnotation) {
+        if (deserializationState.isEnableLombokGetter()) {
             annotations.add(factory.createAnnotationFromText("@" + StringUtil.getShortName(LombokAnnotations.GETTER.getValue()), null));
             importQualifiedNames.add(LombokAnnotations.GETTER.getValue());
         }
@@ -897,7 +891,7 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
 
     private String getFieldName(String originalKey) {
         // 包含下划线或空格，那就转为驼峰格式
-        if (deserializerState.keepCamelCase && (originalKey.contains("_") || originalKey.contains(" "))) {
+        if (deserializationState.isKeepFieldCamelCase() && (originalKey.contains("_") || originalKey.contains(" "))) {
             return JsonAssistantUtil.toCamel(originalKey);
         }
 
@@ -909,6 +903,11 @@ public class JsonToJavaBeanDialog extends DialogWrapper {
         return StrUtil.lowerFirst(originalKey);
     }
 
+
+    private void resetGuideFlag() {
+        propertiesComponent.unsetValue(DESERIALIZER_EXAMPLE_GUIDE_KEY);
+        Notifications.showNotification("", JsonAssistantBundle.messageOnSystem("notification.deserialize.reset.guide.content"), NotificationType.INFORMATION, project);
+    }
 
     /**
      * 类名验证

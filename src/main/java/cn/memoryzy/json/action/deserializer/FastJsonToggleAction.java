@@ -1,6 +1,6 @@
 package cn.memoryzy.json.action.deserializer;
 
-import cn.memoryzy.json.service.persistent.state.DeserializerState;
+import cn.memoryzy.json.service.persistent.state.DeserializationState;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -12,21 +12,21 @@ import org.jetbrains.annotations.NotNull;
  */
 public class FastJsonToggleAction extends ToggleAction implements UpdateInBackground {
 
-    private final DeserializerState deserializerState;
+    private final DeserializationState deserializationState;
 
-    public FastJsonToggleAction(DeserializerState deserializerState) {
+    public FastJsonToggleAction(DeserializationState deserializationState) {
         super("@JSONField (FastJSON)", null, null);
-        this.deserializerState = deserializerState;
+        this.deserializationState = deserializationState;
     }
 
     @Override
     public boolean isSelected(@NotNull AnActionEvent e) {
-        return deserializerState.fastJsonAnnotation;
+        return deserializationState.isEnableFastJsonAnnotation();
     }
 
     @Override
     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-        deserializerState.fastJsonAnnotation = state;
+        deserializationState.setEnableFastJsonAnnotation(state);
     }
 
 }

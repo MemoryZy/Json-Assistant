@@ -2,96 +2,100 @@ package cn.memoryzy.json.ui;
 
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.enums.ColorScheme;
-import cn.memoryzy.json.enums.HistoryViewType;
-import cn.memoryzy.json.enums.TreeDisplayMode;
-import cn.memoryzy.json.service.persistent.JsonAssistantPersistentState;
+import cn.memoryzy.json.enums.DataFormatType;
+import cn.memoryzy.json.enums.TreeViewMode;
+import cn.memoryzy.json.event.*;
+import cn.memoryzy.json.service.persistent.GeneralSettings;
+import cn.memoryzy.json.service.persistent.SerializationSettings;
+import cn.memoryzy.json.service.persistent.ToolWindowSettings;
 import cn.memoryzy.json.service.persistent.state.*;
 import cn.memoryzy.json.ui.dialog.SupportDialog;
 import cn.memoryzy.json.ui.icon.CircleIcon;
 import cn.memoryzy.json.util.PlatformUtil;
-import cn.memoryzy.json.util.UIManager;
+import cn.memoryzy.json.util.UIUtils;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.ColorPicker;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.ActionLink;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBRadioButton;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.intellij.uiDesigner.core.Spacer;
+import com.intellij.util.messages.MessageBus;
 import com.intellij.util.ui.JBEmptyBorder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import icons.JsonAssistantIcons;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Memory
  * @since 2024/10/31
  */
 public class JsonAssistantMainConfigurableComponentProvider {
+
     // region 组件
     private JPanel rootPanel;
-    private TitledSeparator attributeSerializationLabel;
-    private JBCheckBox includeRandomValuesCb;
-    private JBLabel includeRandomValuesDesc;
-    private JBCheckBox fastJsonCb;
-    private JBLabel fastJsonDesc;
-    private JBCheckBox jacksonCb;
-    private JBLabel jacksonDesc;
-    private TitledSeparator windowBehaviorLabel;
-    private JBCheckBox displayLineNumbersCb;
-    private JBCheckBox foldingOutlineCb;
+    private TitledSeparator serializationTitle;
+    private JBCheckBox serializeRandomValuesCheckBox;
+    private JBLabel serializeRandomValuesDesc;
+    private JBCheckBox detectFastJsonAnnotationsCheckBox;
+    private JBLabel detectFastJsonAnnotationsDesc;
+    private JBCheckBox detectJacksonAnnotationsCheckBox;
+    private JBLabel detectJacksonAnnotationsDesc;
+
+    private TitledSeparator editorBehaviorTitle;
+    private JBCheckBox showLineNumbersCheckBox;
+    private JBCheckBox showFoldingOutlineCheckBox;
+    private JBCheckBox autoRecognizeFormatsCheckBox;
+    private JBLabel autoRecognizeFormatsDesc;
+    private JBCheckBox enableXmlFormatsCheckBox;
+    private JBCheckBox enableYamlFormatsCheckBox;
+    private JBCheckBox enableTomlFormatsCheckBox;
+    private JBCheckBox enableTypeScriptFormatsCheckBox;
+    private JBCheckBox enableUrlParamFormatsCheckBox;
+    private JPanel formatsCheckBoxPanel;
+
+    private TitledSeparator editorVisualTitle;
+    private JBLabel backgroundLabel;
+    private ComboBox<ColorScheme> backgroundComboBox;
+    private JPanel backgroundPanel;
+
+    private TitledSeparator historyTitle;
+    private JBCheckBox enableHistoryCheckBox;
+
+    private TitledSeparator generalTitle;
+    private JBLabel treeViewModeLabel;
+    private JBLabel treeViewModeDesc;
+    private ComboBox<TreeViewMode> treeViewModeComboBox;
+    private JBLabel autoRecordHistoryLabel;
+    private JBRadioButton autoRecordHistoryRadioBtn;
+    private JBRadioButton manualRecordHistoryRadioBtn;
+    private JBLabel autoRecordHistoryDesc;
+
     private ActionLink donateLink;
-    private JBCheckBox recognizeOtherFormatsCb;
-    private JBLabel recognizeOtherFormatsDesc;
-    private JBCheckBox xmlFormatsCb;
-    private JBCheckBox yamlFormatsCb;
-    private JBCheckBox tomlFormatsCb;
-    private JBCheckBox urlParamFormatsCb;
-    private JPanel formatCbPanel;
-    private JBLabel backgroundColorTitle;
-    private ComboBox<ColorScheme> backgroundColorBox;
-    private TitledSeparator windowAppearanceLabel;
-    private JPanel backgroundColorPanel;
-    private JBLabel backgroundColorDesc;
-    private TitledSeparator historyLabel;
-    private JBLabel historyStyleTitle;
-    private JBCheckBox recordHistory;
-    private ComboBox<HistoryViewType> historyStyleBox;
-    private TitledSeparator generalLabel;
-    private JBLabel treeDisplayModeTitle;
-    private JBLabel treeDisplayModeDesc;
-    private ComboBox<TreeDisplayMode> treeDisplayModeBox;
-    private JBCheckBox promptBeforeImportCb;
-    private JBLabel promptBeforeImportDesc;
-    private JBLabel autoStoreHistoryTitle;
-    private JBRadioButton autoStoreRb;
-    private JBRadioButton manualStoreRb;
-    private JBLabel autoStoreHistoryDesc;
+    private JBCheckBox applyToSourceCheckBox;
+    private JBLabel applyToSourceDesc;
     // endregion
 
-    // 区分亮暗，防止配置界面还存在时，主题被切换
-    private Color selectedLightColor;
-    private Color selectedDarkColor;
 
-    /**
-     * 标志变量，用于标识是否处于初始加载状态
-     */
-    private boolean isLoading = false;
-    private final JsonAssistantPersistentState persistentState = JsonAssistantPersistentState.getInstance();
     private final boolean isIdea = PlatformUtil.isIdea();
+
 
     public JPanel createComponent() {
         configureGeneralComponents();
-        configureAttributeSerializationComponents();
+        configureSerializationComponents();
         configureToolWindowBehaviorComponents();
         configureToolWindowAppearanceComponents();
         configureHistoryComponents();
@@ -105,198 +109,133 @@ public class JsonAssistantMainConfigurableComponentProvider {
      * 常规
      */
     private void configureGeneralComponents() {
-        generalLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.general.text"));
-        treeDisplayModeTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
-        UIManager.setHelpLabel(treeDisplayModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
+        generalTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.general.text"));
+        treeViewModeLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.text"));
+        UIUtils.setHelpLabel(treeViewModeDesc, JsonAssistantBundle.messageOnSystem("setting.component.tree.display.mode.desc"));
 
-        for (TreeDisplayMode value : TreeDisplayMode.values()) {
-            treeDisplayModeBox.addItem(value);
+        for (TreeViewMode value : TreeViewMode.values()) {
+            treeViewModeComboBox.addItem(value);
         }
+
+        treeViewModeComboBox.setRenderer(new SimpleListCellRenderer<>() {
+            @Override
+            public void customize(@NotNull JList<? extends TreeViewMode> list, TreeViewMode value, int index, boolean selected, boolean hasFocus) {
+                setText(value != null ? JsonAssistantBundle.messageOnSystem(value.getKey()) : "");
+            }
+        });
     }
 
     /**
      * 属性序列化
      */
-    private void configureAttributeSerializationComponents() {
-        attributeSerializationLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
+    private void configureSerializationComponents() {
+        serializationTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.attribute.serialization.text"));
 
-        includeRandomValuesCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
-        UIManager.setCommentLabel(includeRandomValuesDesc, includeRandomValuesCb, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
+        serializeRandomValuesCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.random.value.text"));
+        UIUtils.setCommentLabel(serializeRandomValuesDesc, serializeRandomValuesCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.random.value.desc"));
 
-        fastJsonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.text"));
-        UIManager.setCommentLabel(fastJsonDesc, fastJsonCb, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
+        detectFastJsonAnnotationsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.fastjson.text"));
+        UIUtils.setCommentLabel(detectFastJsonAnnotationsDesc, detectFastJsonAnnotationsCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.fastjson.desc"));
 
-        jacksonCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
-        UIManager.setCommentLabel(jacksonDesc, jacksonCb, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
+        detectJacksonAnnotationsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.jackson.text"));
+        UIUtils.setCommentLabel(detectJacksonAnnotationsDesc, detectJacksonAnnotationsCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.jackson.desc"));
     }
 
     /**
      * 窗口行为
      */
     private void configureToolWindowBehaviorComponents() {
-        windowBehaviorLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
+        editorBehaviorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.behavior.text"));
 
-        recognizeOtherFormatsCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
-        UIManager.setHelpLabel(recognizeOtherFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
+        autoRecognizeFormatsCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.text"));
+        UIUtils.setHelpLabel(autoRecognizeFormatsDesc, JsonAssistantBundle.messageOnSystem("setting.component.recognize.other.formats.desc"));
 
-        xmlFormatsCb.setText("XML");
-        yamlFormatsCb.setText("YAML");
-        tomlFormatsCb.setText("TOML");
-        urlParamFormatsCb.setText("URL Param");
+        enableXmlFormatsCheckBox.setText("XML");
+        enableYamlFormatsCheckBox.setText("YAML");
+        enableTomlFormatsCheckBox.setText("TOML");
+        enableTypeScriptFormatsCheckBox.setText("TypeScript");
+        enableUrlParamFormatsCheckBox.setText("URL Param");
 
-        int left = UIUtil.getCheckBoxTextHorizontalOffset(recognizeOtherFormatsCb);
-        formatCbPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
+        int left = UIUtil.getCheckBoxTextHorizontalOffset(autoRecognizeFormatsCheckBox);
+        formatsCheckBoxPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
 
-        // 识别剪贴板数据后，需要确认才能真正导入到编辑器中
-        promptBeforeImportCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.text"));
-        UIManager.setCommentLabel(promptBeforeImportDesc, promptBeforeImportCb, JsonAssistantBundle.messageOnSystem("setting.component.import.prompt.desc"));
-
-        recognizeOtherFormatsCb.addItemListener(e -> {
+        autoRecognizeFormatsCheckBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIManager.controlEnableCheckBox(xmlFormatsCb, true);
-                UIManager.controlEnableCheckBox(yamlFormatsCb, true);
-                UIManager.controlEnableCheckBox(tomlFormatsCb, true);
-                UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
-                UIManager.controlEnableCheckBox(promptBeforeImportCb, true);
+                UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIManager.controlEnableCheckBox(xmlFormatsCb, false);
-                UIManager.controlEnableCheckBox(yamlFormatsCb, false);
-                UIManager.controlEnableCheckBox(tomlFormatsCb, false);
-                UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
-                UIManager.controlEnableCheckBox(promptBeforeImportCb, false);
+                UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
             }
         });
+
+        applyToSourceCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.apply.to.source.text"));
+        UIUtils.setCommentLabel(applyToSourceDesc, applyToSourceCheckBox, JsonAssistantBundle.messageOnSystem("setting.component.apply.to.source.desc"));
     }
 
     /**
      * 窗口外观
      */
     private void configureToolWindowAppearanceComponents() {
-        windowAppearanceLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
-        displayLineNumbersCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
-        foldingOutlineCb.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
-        // 单独设定背景色
-        configureBackGroundColorComponents();
-    }
+        editorVisualTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.window.appearance.text"));
+        showLineNumbersCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.display.lines.text"));
+        showFoldingOutlineCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.folding.outline.text"));
 
-    private void configureBackGroundColorComponents() {
         if (isIdea) {
-            backgroundColorTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
+            backgroundLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.background.color.text"));
             for (ColorScheme value : ColorScheme.values()) {
-                backgroundColorBox.addItem(value);
+                backgroundComboBox.addItem(value);
             }
 
-            UIManager.setHelpLabel(backgroundColorDesc, JsonAssistantBundle.messageOnSystem("setting.component.background.color.desc"));
-
-            // 当有焦点时，表示内部活动完毕，此时才允许用户选择颜色
-            backgroundColorBox.addFocusListener(new FocusAdapter() {
+            backgroundComboBox.setRenderer(new SimpleListCellRenderer<>() {
                 @Override
-                public void focusGained(FocusEvent e) {
-                    isLoading = false;
-                }
-            });
-
-            backgroundColorBox.addActionListener(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    ColorScheme item = backgroundColorBox.getItem();
-                    if (ColorScheme.Custom.equals(item) && !isLoading) {
-                        backgroundColorBox.hidePopup();
-                        boolean darkTheme = UIUtil.isUnderDarcula();
-                        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-                        Color preselectedColor = darkTheme ? editorAppearanceState.customDarkcolor : editorAppearanceState.customLightColor;
-                        String title = darkTheme ? JsonAssistantBundle.messageOnSystem("dialog.choose.dark.color.title") : JsonAssistantBundle.messageOnSystem("dialog.choose.light.color.title");
-
-                        Color selectedColor = ColorPicker.showDialog(
-                                backgroundColorBox, title,
-                                preselectedColor, true, null, true);
-
-                        if (null != selectedColor) {
-                            if (darkTheme) {
-                                selectedDarkColor = selectedColor;
-                            } else {
-                                selectedLightColor = selectedColor;
-                            }
-
-                            UIManager.repaintComponent(backgroundColorBox);
-                        }
-                    }
-                }
-            });
-
-            backgroundColorBox.setRenderer(new DefaultListCellRenderer() {
-                @Override
-                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                    // 调用父类方法
-                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                    Color color = getColor((ColorScheme) value);
+                public void customize(@NotNull JList<? extends ColorScheme> list, ColorScheme value, int index, boolean selected, boolean hasFocus) {
+                    setText(JsonAssistantBundle.messageOnSystem(value.getKey()));
+                    Color color = value.getColor();
 
                     setIcon(Objects.isNull(color)
                             // 创建一个空白图标
                             ? new ImageIcon(new BufferedImage(14, 14, BufferedImage.TYPE_INT_ARGB))
                             // 创建圆形图标
                             : new CircleIcon(14, color));
-
-                    return this;
-                }
-
-                @Nullable
-                private Color getColor(ColorScheme colorScheme) {
-                    Color color = colorScheme.getColor();
-                    boolean darkTheme = UIUtil.isUnderDarcula();
-                    Color selectColor = darkTheme ? selectedDarkColor : selectedLightColor;
-
-                    // 实现自定义中，颜色选择后，颜色图标跟随变化
-                    // 选择的颜色默认是null，当选择后才会被赋值
-                    // 只要与持久化中的颜色不同，那么表示选中了新颜色，即切换颜色图标
-                    if (ColorScheme.Custom.equals(colorScheme)
-                            && Objects.nonNull(selectColor)
-                            && Objects.nonNull(color)
-                            && !Objects.equals(selectColor, color)) {
-                        color = selectColor;
-                    }
-
-                    return color;
                 }
             });
         } else {
-            backgroundColorPanel.setVisible(false);
+            backgroundPanel.setVisible(false);
         }
     }
+
 
     /**
      * 历史记录
      */
     private void configureHistoryComponents() {
-        historyLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
-        recordHistory.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
-        historyStyleTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.style.text"));
-        for (HistoryViewType value : HistoryViewType.values()) {
-            historyStyleBox.addItem(value);
-        }
+        historyTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.text"));
+        enableHistoryCheckBox.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.record.text"));
 
-        autoStoreHistoryTitle.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
-        autoStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
-        manualStoreRb.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.manual.text"));
-        UIManager.setHelpLabel(autoStoreHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
+        autoRecordHistoryLabel.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.text"));
+        autoRecordHistoryRadioBtn.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.auto.text"));
+        manualRecordHistoryRadioBtn.setText(JsonAssistantBundle.messageOnSystem("setting.component.history.manual.text"));
+        UIUtils.setHelpLabel(autoRecordHistoryDesc, JsonAssistantBundle.messageOnSystem("setting.component.history.auto.store.desc"));
 
         ButtonGroup group = new ButtonGroup();
-        group.add(autoStoreRb);
-        group.add(manualStoreRb);
+        group.add(autoRecordHistoryRadioBtn);
+        group.add(manualRecordHistoryRadioBtn);
 
-        recordHistory.addItemListener(e -> {
+        enableHistoryCheckBox.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
-                UIManager.controlEnableRadioButton(autoStoreRb, true);
-                UIManager.controlEnableRadioButton(manualStoreRb, true);
-                if (!historyStyleBox.isEnabled()) {
-                    historyStyleBox.setEnabled(true);
-                }
+                UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, true);
+                UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, true);
+
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
-                UIManager.controlEnableRadioButton(autoStoreRb, false);
-                UIManager.controlEnableRadioButton(manualStoreRb, false);
-                if (historyStyleBox.isEnabled()) {
-                    historyStyleBox.setEnabled(false);
-                }
+                UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, false);
+                UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, false);
             }
         });
     }
@@ -319,226 +258,448 @@ public class JsonAssistantMainConfigurableComponentProvider {
     // ----------------------------------------------------------------------------------- //
 
     public void reset() {
-        // 属性序列化
-        AttributeSerializationState attributeSerializationState = persistentState.attributeSerializationState;
-        includeRandomValuesCb.setSelected(attributeSerializationState.includeRandomValues);
-        fastJsonCb.setSelected(attributeSerializationState.recognitionFastJsonAnnotation);
-        jacksonCb.setSelected(attributeSerializationState.recognitionJacksonAnnotation);
+        // ----------------------------------- 属性序列化
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+        serializeRandomValuesCheckBox.setSelected(serializationState.isSerializeRandomValues());
+        detectFastJsonAnnotationsCheckBox.setSelected(serializationState.isDetectFastJsonAnnotations());
+        detectJacksonAnnotationsCheckBox.setSelected(serializationState.isDetectJacksonAnnotations());
 
-        // 行为
-        EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        // 控制全部CheckBox
-        boolean recognizeOtherFormats = editorBehaviorState.recognizeOtherFormats;
-        recognizeOtherFormatsCb.setSelected(recognizeOtherFormats);
-        xmlFormatsCb.setSelected(editorBehaviorState.recognizeXmlFormat);
-        yamlFormatsCb.setSelected(editorBehaviorState.recognizeYamlFormat);
-        tomlFormatsCb.setSelected(editorBehaviorState.recognizeTomlFormat);
-        urlParamFormatsCb.setSelected(editorBehaviorState.recognizeUrlParamFormat);
-        promptBeforeImportCb.setSelected(editorBehaviorState.promptBeforeImport);
+        // ----------------------------------- 行为
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
 
-        // 外观
-        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        if (isIdea) {
-            resetBackgroundColorItem(editorAppearanceState);
-        }
+        boolean autoRecognizeFormats = editorBehaviorState.isAutoRecognizeFormats();
+        autoRecognizeFormatsCheckBox.setSelected(autoRecognizeFormats);
 
-        displayLineNumbersCb.setSelected(editorAppearanceState.displayLineNumbers);
-        foldingOutlineCb.setSelected(editorAppearanceState.foldingOutline);
+        Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
+        enableXmlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.XML));
+        enableYamlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.YAML));
+        enableTomlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TOML));
+        enableTypeScriptFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TYPE_SCRIPT));
+        enableUrlParamFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.URL_PARAM));
 
-        // 历史记录
-        HistoryState historyState = persistentState.historyState;
-        boolean switchHistory = historyState.switchHistory;
-        recordHistory.setSelected(switchHistory);
-        historyStyleBox.setItem(historyState.historyViewType);
-        if (historyState.autoStore) {
-            autoStoreRb.setSelected(true);
+        applyToSourceCheckBox.setSelected(editorBehaviorState.isShouldApplyToSource());
+
+        // ----------------------------------- 外观
+        EditorVisualState visualState = toolWindowSettings.getVisualState();
+        showLineNumbersCheckBox.setSelected(visualState.isShowLineNumbers());
+        showFoldingOutlineCheckBox.setSelected(visualState.isShowFoldingOutline());
+        backgroundComboBox.setItem(visualState.getColorScheme());
+
+        // ----------------------------------- 历史记录
+        HistoryState historyState = toolWindowSettings.getHistoryState();
+        boolean enableHistory = historyState.isEnableHistory();
+
+        enableHistoryCheckBox.setSelected(enableHistory);
+        if (historyState.isAutoRecordHistory()) {
+            autoRecordHistoryRadioBtn.setSelected(true);
         } else {
-            manualStoreRb.setSelected(true);
+            manualRecordHistoryRadioBtn.setSelected(true);
         }
 
-        if (switchHistory) {
-            UIManager.controlEnableRadioButton(autoStoreRb, true);
-            UIManager.controlEnableRadioButton(manualStoreRb, true);
-            if (!historyStyleBox.isEnabled()) {
-                historyStyleBox.setEnabled(true);
-            }
+
+        // ----------------------------------- 样式处理
+
+        // ---------------------------- 历史记录
+        if (enableHistory) {
+            UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, true);
+            UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, true);
+
         } else {
-            UIManager.controlEnableRadioButton(autoStoreRb, false);
-            UIManager.controlEnableRadioButton(manualStoreRb, false);
-            if (historyStyleBox.isEnabled()) {
-                historyStyleBox.setEnabled(false);
-            }
+            UIUtils.controlEnableRadioButton(autoRecordHistoryRadioBtn, false);
+            UIUtils.controlEnableRadioButton(manualRecordHistoryRadioBtn, false);
         }
 
-        if (recognizeOtherFormats) {
-            UIManager.controlEnableCheckBox(xmlFormatsCb, true);
-            UIManager.controlEnableCheckBox(yamlFormatsCb, true);
-            UIManager.controlEnableCheckBox(tomlFormatsCb, true);
-            UIManager.controlEnableCheckBox(urlParamFormatsCb, true);
-            UIManager.controlEnableCheckBox(promptBeforeImportCb, true);
+        // ---------------------------- 解析格式
+        if (autoRecognizeFormats) {
+            UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
         } else {
-            UIManager.controlEnableCheckBox(xmlFormatsCb, false);
-            UIManager.controlEnableCheckBox(yamlFormatsCb, false);
-            UIManager.controlEnableCheckBox(tomlFormatsCb, false);
-            UIManager.controlEnableCheckBox(urlParamFormatsCb, false);
-            UIManager.controlEnableCheckBox(promptBeforeImportCb, false);
-        }
-
-        if (isIdea) {
-            UIManager.repaintComponent(backgroundColorBox);
+            UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
         }
 
         // 常规
-        GeneralState generalState = persistentState.generalState;
-        treeDisplayModeBox.setItem(generalState.treeDisplayMode);
+        TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        treeViewModeComboBox.setItem(treeStructureState.getTreeViewMode());
     }
-
-    private void resetBackgroundColorItem(EditorAppearanceState editorAppearanceState) {
-        // 在初始化组件、Reset时，不需要弹出颜色选择窗
-        isLoading = true;
-        backgroundColorBox.setItem(editorAppearanceState.colorScheme);
-        selectedLightColor = editorAppearanceState.customLightColor;
-        selectedDarkColor = editorAppearanceState.customDarkcolor;
-        isLoading = false;
-    }
-
 
     public boolean isModified() {
-        // 属性序列化
-        AttributeSerializationState attributeSerializationState = persistentState.attributeSerializationState;
-        boolean oldIncludeRandomValues = attributeSerializationState.includeRandomValues;
-        boolean oldRecognitionFastJsonAnnotation = attributeSerializationState.recognitionFastJsonAnnotation;
-        boolean oldRecognitionJacksonAnnotation = attributeSerializationState.recognitionJacksonAnnotation;
+        // ----------------------------------- 序列化
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+        boolean oldSerializeRandomValues = serializationState.isSerializeRandomValues();
+        boolean oldDetectFastJsonAnnotations = serializationState.isDetectFastJsonAnnotations();
+        boolean oldDetectJacksonAnnotations = serializationState.isDetectJacksonAnnotations();
 
-        // 行为
-        EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        boolean oldRecognizeOtherFormats = editorBehaviorState.recognizeOtherFormats;
-        boolean oldRecognizeXmlFormat = editorBehaviorState.recognizeXmlFormat;
-        boolean oldRecognizeYamlFormat = editorBehaviorState.recognizeYamlFormat;
-        boolean oldRecognizeTomlFormat = editorBehaviorState.recognizeTomlFormat;
-        boolean oldRecognizeUrlParamFormat = editorBehaviorState.recognizeUrlParamFormat;
-        boolean oldPromptBeforeImport = editorBehaviorState.promptBeforeImport;
+        // ----------------------------------- 行为
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
+        boolean oldAutoRecognizeFormats = editorBehaviorState.isAutoRecognizeFormats();
 
-        // 外观
-        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        boolean oldDisplayLineNumbers = editorAppearanceState.displayLineNumbers;
-        boolean oldFoldingOutline = editorAppearanceState.foldingOutline;
-        ColorScheme oldColorScheme = editorAppearanceState.colorScheme;
-        // 比较自定义颜色是否存在变更
-        Color oldDarkcolor = editorAppearanceState.customDarkcolor;
-        Color oldLightColor = editorAppearanceState.customLightColor;
+        Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
+        boolean oldEnableXmlFormat = enabledFormats.contains(DataFormatType.XML);
+        boolean oldEnableYamlFormat = enabledFormats.contains(DataFormatType.YAML);
+        boolean oldEnableTomlFormat = enabledFormats.contains(DataFormatType.TOML);
+        boolean oldEnableTsFormat = enabledFormats.contains(DataFormatType.TYPE_SCRIPT);
+        boolean oldEnableUrlParamFormat = enabledFormats.contains(DataFormatType.URL_PARAM);
 
-        // 历史记录
-        HistoryState historyState = persistentState.historyState;
-        boolean oldSwitchHistory = historyState.switchHistory;
-        boolean oldAutoStore = historyState.autoStore;
-        HistoryViewType oldHistoryViewType = historyState.historyViewType;
+        boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
 
-        // 常规
-        GeneralState generalState = persistentState.generalState;
-        TreeDisplayMode oldTreeDisplayMode = generalState.treeDisplayMode;
+        // ----------------------------------- 外观
+        EditorVisualState visualState = toolWindowSettings.getVisualState();
+        boolean oldShowLineNumbers = visualState.isShowLineNumbers();
+        boolean oldShowFoldingOutline = visualState.isShowFoldingOutline();
+        ColorScheme oldColorScheme = visualState.getColorScheme();
+
+        // ----------------------------------- 历史记录
+        HistoryState historyState = toolWindowSettings.getHistoryState();
+        boolean oldEnableHistory = historyState.isEnableHistory();
+        boolean oldAutoRecordHistory = historyState.isAutoRecordHistory();
+
+        // ----------------------------------- 常规
+        TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        TreeViewMode oldTreeViewMode = treeStructureState.getTreeViewMode();
+
 
         // ----------------------------------------------------------------------
 
-        // 属性序列化
-        boolean newIncludeRandomValues = includeRandomValuesCb.isSelected();
-        boolean newRecognitionFastJsonAnnotation = fastJsonCb.isSelected();
-        boolean newRecognitionJacksonAnnotation = jacksonCb.isSelected();
+        // ----------------------------------- 属性序列化
+        boolean newSerializeRandomValues = serializeRandomValuesCheckBox.isSelected();
+        boolean newDetectFastJsonAnnotations = detectFastJsonAnnotationsCheckBox.isSelected();
+        boolean newDetectJacksonAnnotations = detectJacksonAnnotationsCheckBox.isSelected();
 
-        // 外观
-        ColorScheme newColorScheme = backgroundColorBox.getItem();
-        boolean newDisplayLineNumbers = displayLineNumbersCb.isSelected();
-        boolean newFoldingOutline = foldingOutlineCb.isSelected();
+        // ----------------------------------- 外观
+        boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
+        boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
+        ColorScheme newColorScheme = backgroundComboBox.getItem();
 
-        // 解析
-        boolean newRecognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
-        boolean newRecognizeXmlFormat = xmlFormatsCb.isSelected();
-        boolean newRecognizeYamlFormat = yamlFormatsCb.isSelected();
-        boolean newRecognizeTomlFormat = tomlFormatsCb.isSelected();
-        boolean newRecognizeUrlParamFormat = urlParamFormatsCb.isSelected();
-        boolean newPromptBeforeImport = promptBeforeImportCb.isSelected();
+        // ----------------------------------- 行为
+        boolean newAutoRecognizeFormats = autoRecognizeFormatsCheckBox.isSelected();
+        boolean newEnableXmlFormat = enableXmlFormatsCheckBox.isSelected();
+        boolean newEnableYamlFormat = enableYamlFormatsCheckBox.isSelected();
+        boolean newEnableTomlFormat = enableTomlFormatsCheckBox.isSelected();
+        boolean newEnableTsFormat = enableTypeScriptFormatsCheckBox.isSelected();
+        boolean newEnableUrlParamFormat = enableUrlParamFormatsCheckBox.isSelected();
+        boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
 
-        // 历史记录
-        boolean newSwitchHistory = recordHistory.isSelected();
-        boolean newAutoStore = autoStoreRb.isSelected();
-        HistoryViewType newHistoryViewType = historyStyleBox.getItem();
+        // ----------------------------------- 历史记录
+        boolean newEnableHistory = enableHistoryCheckBox.isSelected();
+        boolean newAutoRecordHistory = autoRecordHistoryRadioBtn.isSelected();
 
-        // 常规
-        TreeDisplayMode newTreeDisplayMode = treeDisplayModeBox.getItem();
+        // ----------------------------------- 常规
+        TreeViewMode newTreeViewMode = treeViewModeComboBox.getItem();
 
-        // 比较是否更改
-        return !Objects.equals(oldIncludeRandomValues, newIncludeRandomValues)
-                || !Objects.equals(oldRecognitionFastJsonAnnotation, newRecognitionFastJsonAnnotation)
-                || !Objects.equals(oldRecognitionJacksonAnnotation, newRecognitionJacksonAnnotation)
+        // ------------------------------------------- 对比
+
+        return !Objects.equals(oldSerializeRandomValues, newSerializeRandomValues)
+                || !Objects.equals(oldDetectFastJsonAnnotations, newDetectFastJsonAnnotations)
+                || !Objects.equals(oldDetectJacksonAnnotations, newDetectJacksonAnnotations)
 
                 || (isIdea && !Objects.equals(oldColorScheme, newColorScheme))
-                || (isIdea && (ColorScheme.Custom.equals(newColorScheme)
-                // 自定义颜色比较
-                && !Objects.equals(oldLightColor, selectedLightColor) || !Objects.equals(oldDarkcolor, selectedDarkColor)))
 
-                || !Objects.equals(oldDisplayLineNumbers, newDisplayLineNumbers)
-                || !Objects.equals(oldFoldingOutline, newFoldingOutline)
+                || !Objects.equals(oldShowLineNumbers, newShowLineNumbers)
+                || !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline)
 
-                || !Objects.equals(oldRecognizeOtherFormats, newRecognizeOtherFormats)
-                || !Objects.equals(oldRecognizeXmlFormat, newRecognizeXmlFormat)
-                || !Objects.equals(oldRecognizeYamlFormat, newRecognizeYamlFormat)
-                || !Objects.equals(oldRecognizeTomlFormat, newRecognizeTomlFormat)
-                || !Objects.equals(oldRecognizeUrlParamFormat, newRecognizeUrlParamFormat)
-                || !Objects.equals(oldPromptBeforeImport, newPromptBeforeImport)
-                || !Objects.equals(oldSwitchHistory, newSwitchHistory)
-                || !Objects.equals(oldAutoStore, newAutoStore)
-                || !Objects.equals(oldHistoryViewType, newHistoryViewType)
-                || !Objects.equals(oldTreeDisplayMode, newTreeDisplayMode)
+                || !Objects.equals(oldAutoRecognizeFormats, newAutoRecognizeFormats)
+                || !Objects.equals(oldEnableXmlFormat, newEnableXmlFormat)
+                || !Objects.equals(oldEnableYamlFormat, newEnableYamlFormat)
+                || !Objects.equals(oldEnableTomlFormat, newEnableTomlFormat)
+                || !Objects.equals(oldEnableTsFormat, newEnableTsFormat)
+                || !Objects.equals(oldEnableUrlParamFormat, newEnableUrlParamFormat)
+                || !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource)
+
+                || !Objects.equals(oldEnableHistory, newEnableHistory)
+                || !Objects.equals(oldAutoRecordHistory, newAutoRecordHistory)
+                || !Objects.equals(oldTreeViewMode, newTreeViewMode)
 
                 ;
     }
 
     public void apply() {
-        // 属性序列化
-        AttributeSerializationState attributeSerializationState = persistentState.attributeSerializationState;
-        attributeSerializationState.includeRandomValues = includeRandomValuesCb.isSelected();
-        attributeSerializationState.recognitionFastJsonAnnotation = fastJsonCb.isSelected();
-        attributeSerializationState.recognitionJacksonAnnotation = jacksonCb.isSelected();
+        // ----------------------------------- 序列化
+        SerializationState serializationState = SerializationSettings.getInstance().getSerializationState();
+        serializationState.setSerializeRandomValues(serializeRandomValuesCheckBox.isSelected());
+        serializationState.setDetectFastJsonAnnotations(detectFastJsonAnnotationsCheckBox.isSelected());
+        serializationState.setDetectJacksonAnnotations(detectJacksonAnnotationsCheckBox.isSelected());
 
-        // 行为
-        EditorBehaviorState editorBehaviorState = persistentState.editorBehaviorState;
-        editorBehaviorState.recognizeOtherFormats = recognizeOtherFormatsCb.isSelected();
-        editorBehaviorState.recognizeXmlFormat = xmlFormatsCb.isSelected();
-        editorBehaviorState.recognizeYamlFormat = yamlFormatsCb.isSelected();
-        editorBehaviorState.recognizeTomlFormat = tomlFormatsCb.isSelected();
-        editorBehaviorState.recognizeUrlParamFormat = urlParamFormatsCb.isSelected();
-        editorBehaviorState.promptBeforeImport = promptBeforeImportCb.isSelected();
+        // ----------------------------------- 行为
+        ToolWindowSettings toolWindowSettings = ToolWindowSettings.getInstance();
+        EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
+        editorBehaviorState.setAutoRecognizeFormats(autoRecognizeFormatsCheckBox.isSelected());
+        Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
+        if (enableXmlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.XML);
+        if (enableYamlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.YAML);
+        if (enableTomlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TOML);
+        if (enableTypeScriptFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TYPE_SCRIPT);
+        if (enableUrlParamFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.URL_PARAM);
 
-        // 历史记录
-        HistoryState historyState = persistentState.historyState;
-        historyState.switchHistory = recordHistory.isSelected();
-        historyState.autoStore = autoStoreRb.isSelected();
-        historyState.historyViewType = historyStyleBox.getItem();
+        boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
+        editorBehaviorState.setShouldApplyToSource(applyToSourceCheckBox.isSelected());
 
-        // 外观
-        EditorAppearanceState editorAppearanceState = persistentState.editorAppearanceState;
-        editorAppearanceState.displayLineNumbers = displayLineNumbersCb.isSelected();
-        editorAppearanceState.foldingOutline = foldingOutlineCb.isSelected();
+        // ----------------------------------- 历史记录
+        HistoryState historyState = toolWindowSettings.getHistoryState();
+        boolean oldEnableHistory = historyState.isEnableHistory();
 
-        if (isIdea) {
-            ColorScheme selectedScheme = backgroundColorBox.getItem();
-            editorAppearanceState.colorScheme = selectedScheme;
+        historyState.setEnableHistory(enableHistoryCheckBox.isSelected());
+        historyState.setAutoRecordHistory(autoRecordHistoryRadioBtn.isSelected());
 
-            // 如果选择的是Custom，那么将选择的颜色赋值给customColor，这个color可以暂时缓存起来
-            if (ColorScheme.Custom.equals(selectedScheme)) {
-                if (Objects.nonNull(selectedDarkColor)) {
-                    editorAppearanceState.customDarkcolor = selectedDarkColor;
-                }
+        // ----------------------------------- 外观
+        EditorVisualState visualState = toolWindowSettings.getVisualState();
+        boolean oldShowLineNumbers = visualState.isShowLineNumbers();
+        boolean oldShowFoldingOutline = visualState.isShowFoldingOutline();
+        ColorScheme oldColorScheme = visualState.getColorScheme();
 
-                if (Objects.nonNull(selectedLightColor)) {
-                    editorAppearanceState.customLightColor = selectedLightColor;
-                }
-            }
-        }
+        visualState.setShowLineNumbers(showLineNumbersCheckBox.isSelected());
+        visualState.setShowFoldingOutline(showFoldingOutlineCheckBox.isSelected());
+        if (isIdea) visualState.setColorScheme(backgroundComboBox.getItem());
 
         // 常规
-        GeneralState generalState = persistentState.generalState;
-        generalState.treeDisplayMode = treeDisplayModeBox.getItem();
+        TreeStructureState treeStructureState = GeneralSettings.getInstance().getState().getTreeStructureState();
+        treeStructureState.setTreeViewMode(treeViewModeComboBox.getItem());
+
+        // 发布配置更新事件
+        fireConfigurationUpdateEvent(oldShowLineNumbers, oldShowFoldingOutline, oldColorScheme, oldEnableHistory, oldShouldApplyToSource);
+    }
+
+    /**
+     * 针对性地发布配置更新事件
+     */
+    private void fireConfigurationUpdateEvent(boolean oldShowLineNumbers,
+                                              boolean oldShowFoldingOutline,
+                                              ColorScheme oldColorScheme,
+                                              boolean oldEnableHistory,
+                                              boolean oldShouldApplyToSource) {
+
+        boolean newShowLineNumbers = showLineNumbersCheckBox.isSelected();
+        boolean newShowFoldingOutline = showFoldingOutlineCheckBox.isSelected();
+        ColorScheme newColorScheme = backgroundComboBox.getItem();
+        boolean newEnableHistory = enableHistoryCheckBox.isSelected();
+        boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
+
+        boolean showLineNumbersUpdate = !Objects.equals(oldShowLineNumbers, newShowLineNumbers);
+        boolean showFoldingOutlineUpdate = !Objects.equals(oldShowFoldingOutline, newShowFoldingOutline);
+        boolean colorSchemeUpdate = !Objects.equals(oldColorScheme, newColorScheme);
+        boolean enableHistoryUpdate = !Objects.equals(oldEnableHistory, newEnableHistory);
+        boolean shouldApplyToSourceUpdate = !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource);
+
+
+        // 对比新旧配置，针对性的进行事件发布
+        if (showLineNumbersUpdate
+                || showFoldingOutlineUpdate
+                || (isIdea && colorSchemeUpdate)
+                || enableHistoryUpdate
+                || shouldApplyToSourceUpdate) {
+
+            MessageBus messageBus = ApplicationManager.getApplication().getMessageBus();
+
+            // 切换展示行号事件
+            if (showLineNumbersUpdate) {
+                messageBus.syncPublisher(LineNumbersToggleEvent.TOPIC).toggle(newShowLineNumbers);
+            }
+
+            // 切换展示折叠轮廓事件
+            if (showFoldingOutlineUpdate) {
+                messageBus.syncPublisher(FoldingOutlineToggleEvent.TOPIC).toggle(newShowFoldingOutline);
+            }
+
+            // 切换编辑器背景色事件
+            if (isIdea && colorSchemeUpdate) {
+                messageBus.syncPublisher(ColorSchemeChangedEvent.TOPIC).change(newColorScheme);
+            }
+
+            if (enableHistoryUpdate) {
+                messageBus.syncPublisher(HistoryEnabledEvent.TOPIC).enable(newEnableHistory);
+            }
+
+            if (shouldApplyToSourceUpdate) {
+                // 使编辑器切换到 源文件/安全 模式
+                messageBus.syncPublisher(ApplyToSourceToggleEvent.TOPIC).apply(newShouldApplyToSource);
+            }
+        }
+    }
+
+    {
+// GUI initializer generated by IntelliJ IDEA GUI Designer
+// >>> IMPORTANT!! <<<
+// DO NOT EDIT OR ADD ANY CODE HERE!
+        $$$setupUI$$$();
+    }
+
+    /**
+     * Method generated by IntelliJ IDEA GUI Designer
+     * >>> IMPORTANT!! <<<
+     * DO NOT edit this method OR call it in your code!
+     *
+     * @noinspection ALL
+     */
+    private void $$$setupUI$$$() {
+        rootPanel = new JPanel();
+        rootPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(18, 1, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(panel1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(1, 1, new Insets(10, 0, 0, 0), -1, -1));
+        panel1.add(panel2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        serializationTitle = new TitledSeparator();
+        panel2.add(serializationTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final Spacer spacer1 = new Spacer();
+        panel1.add(spacer1, new GridConstraints(16, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridLayoutManager(2, 2, new Insets(4, 17, 0, 0), -1, -1));
+        panel1.add(panel3, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        serializeRandomValuesCheckBox = new JBCheckBox();
+        panel3.add(serializeRandomValuesCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer2 = new Spacer();
+        panel3.add(spacer2, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        serializeRandomValuesDesc = new JBLabel();
+        panel3.add(serializeRandomValuesDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(2, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel4, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        detectFastJsonAnnotationsCheckBox = new JBCheckBox();
+        panel4.add(detectFastJsonAnnotationsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer3 = new Spacer();
+        panel4.add(spacer3, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        detectFastJsonAnnotationsDesc = new JBLabel();
+        panel4.add(detectFastJsonAnnotationsDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new GridLayoutManager(2, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel5, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        detectJacksonAnnotationsCheckBox = new JBCheckBox();
+        panel5.add(detectJacksonAnnotationsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer4 = new Spacer();
+        panel5.add(spacer4, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        detectJacksonAnnotationsDesc = new JBLabel();
+        panel5.add(detectJacksonAnnotationsDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new GridLayoutManager(1, 1, new Insets(5, 0, 4, 0), -1, -1));
+        panel1.add(panel6, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        editorBehaviorTitle = new TitledSeparator();
+        panel6.add(editorBehaviorTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel7 = new JPanel();
+        panel7.setLayout(new GridLayoutManager(2, 4, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel7, new GridConstraints(7, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel8 = new JPanel();
+        panel8.setLayout(new GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
+        panel7.add(panel8, new GridConstraints(0, 0, 1, 4, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer5 = new Spacer();
+        panel8.add(spacer5, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        autoRecognizeFormatsCheckBox = new JBCheckBox();
+        panel8.add(autoRecognizeFormatsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        autoRecognizeFormatsDesc = new JBLabel();
+        panel8.add(autoRecognizeFormatsDesc, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        formatsCheckBoxPanel = new JPanel();
+        formatsCheckBoxPanel.setLayout(new GridLayoutManager(1, 5, new Insets(0, 0, 0, 0), -1, -1));
+        panel7.add(formatsCheckBoxPanel, new GridConstraints(1, 0, 1, 4, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        enableXmlFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableXmlFormatsCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer6 = new Spacer();
+        formatsCheckBoxPanel.add(spacer6, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        enableYamlFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableYamlFormatsCheckBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        enableTomlFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableTomlFormatsCheckBox, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        enableTypeScriptFormatsCheckBox = new JBCheckBox();
+        formatsCheckBoxPanel.add(enableTypeScriptFormatsCheckBox, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        final JPanel panel9 = new JPanel();
+        panel9.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel9, new GridConstraints(10, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        showLineNumbersCheckBox = new JBCheckBox();
+        panel9.add(showLineNumbersCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer7 = new Spacer();
+        panel9.add(spacer7, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel10 = new JPanel();
+        panel10.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel10, new GridConstraints(11, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        showFoldingOutlineCheckBox = new JBCheckBox();
+        panel10.add(showFoldingOutlineCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer8 = new Spacer();
+        panel10.add(spacer8, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel11 = new JPanel();
+        panel11.setLayout(new GridLayoutManager(1, 2, new Insets(20, 10, 0, 0), -1, -1));
+        panel1.add(panel11, new GridConstraints(17, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        donateLink = new ActionLink();
+        panel11.add(donateLink, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer9 = new Spacer();
+        panel11.add(spacer9, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        backgroundPanel = new JPanel();
+        backgroundPanel.setLayout(new GridLayoutManager(1, 3, new Insets(0, 20, 0, 0), -1, -1));
+        panel1.add(backgroundPanel, new GridConstraints(12, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        backgroundLabel = new JBLabel();
+        backgroundPanel.add(backgroundLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        backgroundComboBox = new ComboBox();
+        backgroundPanel.add(backgroundComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer10 = new Spacer();
+        backgroundPanel.add(spacer10, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel12 = new JPanel();
+        panel12.setLayout(new GridLayoutManager(1, 1, new Insets(5, 0, 4, 0), -1, -1));
+        panel1.add(panel12, new GridConstraints(9, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        editorVisualTitle = new TitledSeparator();
+        panel12.add(editorVisualTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel13 = new JPanel();
+        panel13.setLayout(new GridLayoutManager(1, 1, new Insets(8, 0, 4, 0), -1, -1));
+        panel1.add(panel13, new GridConstraints(13, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        historyTitle = new TitledSeparator();
+        panel13.add(historyTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel14 = new JPanel();
+        panel14.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 4, 0), -1, -1));
+        panel1.add(panel14, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        generalTitle = new TitledSeparator();
+        panel14.add(generalTitle, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        final JPanel panel15 = new JPanel();
+        panel15.setLayout(new GridLayoutManager(1, 4, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel15, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        treeViewModeLabel = new JBLabel();
+        panel15.add(treeViewModeLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer11 = new Spacer();
+        panel15.add(spacer11, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        treeViewModeComboBox = new ComboBox();
+        panel15.add(treeViewModeComboBox, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        treeViewModeDesc = new JBLabel();
+        panel15.add(treeViewModeDesc, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel16 = new JPanel();
+        panel16.setLayout(new GridLayoutManager(1, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel16, new GridConstraints(14, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        enableHistoryCheckBox = new JBCheckBox();
+        panel16.add(enableHistoryCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer12 = new Spacer();
+        panel16.add(spacer12, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        final JPanel panel17 = new JPanel();
+        panel17.setLayout(new GridLayoutManager(1, 5, new Insets(4, 20, 2, 0), -1, -1));
+        panel1.add(panel17, new GridConstraints(15, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer13 = new Spacer();
+        panel17.add(spacer13, new GridConstraints(0, 4, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        autoRecordHistoryLabel = new JBLabel();
+        panel17.add(autoRecordHistoryLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        autoRecordHistoryRadioBtn = new JBRadioButton();
+        panel17.add(autoRecordHistoryRadioBtn, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        manualRecordHistoryRadioBtn = new JBRadioButton();
+        panel17.add(manualRecordHistoryRadioBtn, new GridConstraints(0, 2, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 1, false));
+        autoRecordHistoryDesc = new JBLabel();
+        panel17.add(autoRecordHistoryDesc, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel18 = new JPanel();
+        panel18.setLayout(new GridLayoutManager(2, 2, new Insets(0, 17, 0, 0), -1, -1));
+        panel1.add(panel18, new GridConstraints(8, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        applyToSourceCheckBox = new JBCheckBox();
+        panel18.add(applyToSourceCheckBox, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final Spacer spacer14 = new Spacer();
+        panel18.add(spacer14, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
+        applyToSourceDesc = new JBLabel();
+        panel18.add(applyToSourceDesc, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    public JComponent $$$getRootComponent$$$() {
+        return rootPanel;
     }
 
 }

@@ -35,7 +35,7 @@ public class MoveToEditorAction extends DumbAwareAction implements UpdateInBackg
         this.toolWindow = toolWindow;
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();
-        presentation.setText(JsonAssistantBundle.message("action.move.to.editor.text"));
+        presentation.setText(JsonAssistantBundle.messageOnSystem("action.move.to.editor.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.move.to.editor.description"));
         registerCustomShortcutSet(CustomShortcutSet.fromString("alt M"), toolWindow.getComponent());
     }

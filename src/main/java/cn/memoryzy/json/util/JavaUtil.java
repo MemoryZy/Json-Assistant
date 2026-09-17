@@ -6,13 +6,13 @@ import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.*;
-import cn.memoryzy.json.constant.JsonAssistantPlugin;
+import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.PluginConstant;
 import cn.memoryzy.json.enums.JsonAnnotations;
 import cn.memoryzy.json.enums.JsonConversionTarget;
 import cn.memoryzy.json.enums.LombokAnnotations;
 import cn.memoryzy.json.enums.SwaggerAnnotations;
-import cn.memoryzy.json.service.persistent.state.AttributeSerializationState;
+import cn.memoryzy.json.service.persistent.state.SerializationState;
 import com.intellij.ide.highlighter.JavaFileType;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
@@ -47,20 +47,23 @@ public class JavaUtil {
     /**
      * 递归将属性转成Map元素
      *
-     * @param psiClass        class
-     * @param jsonMap         Map
-     * @param ignoreMap       忽略元素列表
-     * @param commentMap      最外层的注释Map
-     * @param resolveComment  是否解析注释
-     * @param persistentState 持久化配置
+     * @param psiClass           class
+     * @param jsonMap            Map
+     * @param ignoreMap          忽略元素列表
+     * @param commentMap         最外层的注释Map
+     * @param resolveComment     是否解析注释
+     * @param serializationState 持久化配置
      */
     public static void recursionAddProperty(Project project,
                                             PsiClass psiClass,
                                             Map<String, Object> jsonMap,
                                             Map<String, List<String>> ignoreMap,
+                                            List<String> ignoredFields,
                                             Map<String, String> commentMap,
                                             boolean resolveComment,
-                                            AttributeSerializationState persistentState) {
+                                            SerializationState serializationState) {
+        // 类限定名
+        String qualifiedName = psiClass.getQualifiedName();
         // 获取该类所有字段
         PsiField[] allFields = JavaUtil.getNonStaticFields(psiClass);
         List<String> fieldNameList = new ArrayList<>();
@@ -76,7 +79,7 @@ public class JavaUtil {
 
             // -------------------------- 注解支持
             // 获取Json键名
-            String jsonKeyName = getAnnotationJsonKeyName(psiField, persistentState);
+            String jsonKeyName = getAnnotationJsonKeyName(psiField, serializationState);
 
             // 如果加了忽略，则忽略该属性；或属性为临时属性，也忽略
             if (Objects.equals(JsonAssistantPlugin.PLUGIN_ID_NAME, jsonKeyName)
@@ -84,6 +87,12 @@ public class JavaUtil {
                     || psiField.hasAnnotation(PluginConstant.KOTLIN_TRANSIENT)) {
 
                 fieldNameList.add(fieldName);
+                continue;
+            }
+
+            // 忽略字段
+            String qName = qualifiedName + "." + fieldName;
+            if (ignoredFields.stream().anyMatch(el -> Objects.equals(qName, el))) {
                 continue;
             }
 
@@ -130,7 +139,7 @@ public class JavaUtil {
                             nestedJsonMap = new LinkedHashMap<>();
                             Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, nestedCommentMap, resolveComment, persistentState);
+                            recursionAddProperty(project, fieldClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, serializationState);
                         }
                         // 添加至主Map
                         jsonMap.put(propertyName, nestedJsonMap);
@@ -150,12 +159,12 @@ public class JavaUtil {
                             Map<String, Object> nestedJsonMap = new LinkedHashMap<>();
                             Map<String, String> nestedCommentMap = new HashMap<>();
                             // 递归
-                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, nestedCommentMap, resolveComment, persistentState);
+                            recursionAddProperty(project, psiClz, nestedJsonMap, ignoreMap, ignoredFields, nestedCommentMap, resolveComment, serializationState);
                             // 添加至list
                             list.add(nestedJsonMap);
                         }
                     } else {
-                        Object defaultValue = getDefaultValue(psiField, classType, persistentState.includeRandomValues);
+                        Object defaultValue = getDefaultValue(psiField, classType, serializationState.isSerializeRandomValues());
                         if (Objects.nonNull(defaultValue)) {
                             list.add(defaultValue);
                         }
@@ -165,7 +174,7 @@ public class JavaUtil {
                 jsonMap.put(propertyName, list);
             } else {
                 // key，名称；value，根据全限定名判断生成具体的内容
-                jsonMap.put(propertyName, getDefaultValueWithAnnotation(psiField, psiType, persistentState));
+                jsonMap.put(propertyName, getDefaultValueWithAnnotation(psiField, psiType, serializationState));
             }
         }
     }
@@ -195,10 +204,10 @@ public class JavaUtil {
         return comment;
     }
 
-    private static Object getDefaultValueWithAnnotation(PsiField psiField, PsiType psiType, AttributeSerializationState persistentState) {
+    private static Object getDefaultValueWithAnnotation(PsiField psiField, PsiType psiType, SerializationState serializationState) {
         // 如果是加了时间序列化注解，但是类型不属于时间相关类型，那注解不生效
-        boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;
-        boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
+        boolean recognitionJacksonAnnotation = serializationState.isDetectJacksonAnnotations();
+        boolean recognitionFastJsonAnnotation = serializationState.isDetectFastJsonAnnotations();
 
         // 因为 @JsonFormat 是独立注解，如果存在，则直接返回时间类型
         if (recognitionJacksonAnnotation) {
@@ -251,7 +260,7 @@ public class JavaUtil {
             }
         }
 
-        return getDefaultValue(psiField, psiType, persistentState.includeRandomValues);
+        return getDefaultValue(psiField, psiType, serializationState.isSerializeRandomValues());
     }
 
 
@@ -300,14 +309,14 @@ public class JavaUtil {
     /**
      * 获取Json注解中的键名称
      *
-     * @param psiField        字段属性
-     * @param persistentState 持久化配置
+     * @param psiField           字段属性
+     * @param serializationState 持久化配置
      * @return 键名（如果是{@link JsonAssistantPlugin#PLUGIN_ID_NAME}）则表示忽略该字段
      */
-    private static String getAnnotationJsonKeyName(PsiField psiField, AttributeSerializationState persistentState) {
+    public static String getAnnotationJsonKeyName(PsiField psiField, SerializationState serializationState) {
         // ---------------------------------- 获取注解判断是否忽略序列化
-        boolean recognitionFastJsonAnnotation = persistentState.recognitionFastJsonAnnotation;
-        boolean recognitionJacksonAnnotation = persistentState.recognitionJacksonAnnotation;
+        boolean recognitionFastJsonAnnotation = serializationState.isDetectFastJsonAnnotations();
+        boolean recognitionJacksonAnnotation = serializationState.isDetectJacksonAnnotations();
 
         // jackson 通过 @JsonIgnore 注解标记是否忽略序列化字段
         if (recognitionJacksonAnnotation) {
@@ -764,17 +773,23 @@ public class JavaUtil {
     /**
      * 根据对象获取其类型字符串
      *
-     * @param obj 对象
+     * @param obj          对象
+     * @param useInferType 是否使用推断类型
      * @return 类型名
      */
     @SuppressWarnings("rawtypes")
-    public static String getStrType(Object obj) {
+    public static String getStrType(Object obj, boolean useInferType) {
         String type = Object.class.getSimpleName();
         if ((obj instanceof Double) || (obj instanceof Integer) || (obj instanceof Boolean)) {
             type = obj.getClass().getSimpleName();
 
         } else if (obj instanceof String) {
             String str = (String) obj;
+            // 不启用类型推断，只判断时间
+            if (!useInferType) {
+                return isDateType(str);
+            }
+
             // 判断纯数字类型
             String numberType = NumberUtil.isNumber(str) ? Long.class.getSimpleName() : null;
             // 时间类型判断
@@ -789,7 +804,7 @@ public class JavaUtil {
             if (list.isEmpty()) {
                 type = List.class.getSimpleName();
             } else {
-                String genericsType = getStrType(list.get(0));
+                String genericsType = getStrType(list.get(0), useInferType);
                 type = StrUtil.format("{}<{}>", List.class.getSimpleName(), genericsType);
             }
         }
@@ -809,6 +824,7 @@ public class JavaUtil {
         try {
             DateTime time = DateUtil.parse(str);
             if (Objects.nonNull(time)) {
+                // TODO 是否要换成JDK8的LocalDateTime
                 type = Date.class.getSimpleName();
             }
         } catch (DateException ignored) {

@@ -9,44 +9,57 @@ import com.intellij.openapi.actionSystem.AnAction;
  */
 public interface ActionHolder {
 
-    String MAIN_ACTION_ID = "JsonAssistant.Action.Main";
+    interface Main {
+        AnAction JSON_BEAUTIFY_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.JSON_BEAUTIFY_ACTION_ID);
+        AnAction JSON_MINIFY_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.JSON_MINIFY_ACTION_ID);
+        AnAction JSON_STRUCTURE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.JSON_STRUCTURE_ACTION_ID);
+        AnAction JSON_GRID_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.JSON_GRID_ACTION_ID);
+        AnAction JSON_TEXT_DIFF_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.JSON_TEXT_DIFF_ACTION_ID);
+        AnAction JSON_ESCAPE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.JSON_ESCAPE_ACTION_ID);
+        AnAction SHORTCUT_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.SHORTCUT_ACTION_ID);
+    }
 
-    String JSON_BEAUTIFY_ACTION_ID = "JsonAssistant.Action.JsonBeautifyAction";
-    String JSON_MINIFY_ACTION_ID = "JsonAssistant.Action.JsonMinifyAction";
-    String JSON_STRUCTURE_ACTION_ID = "JsonAssistant.Action.JsonStructureAction";
-    String JSON_TEXT_DIFF_ACTION_ID = "JsonAssistant.Action.JsonTextDiffAction";
-    String CONVERT_OTHER_FORMATS_GROUP_ID = "JsonAssistant.Group.ConvertOtherFormatsGroup";
-    String SHORTCUT_ACTION_ID = "JsonAssistant.Action.ShortcutAction";
-    String JSON_ESCAPE_ACTION_ID = "JsonAssistant.Action.JsonEscapeAction";
-    String CONVERT_ALL_TIMESTAMP_ACTION_ID = "JsonAssistant.Action.ConvertAllTimestampAction";
-    String EXPAND_ALL_NESTED_JSON_ACTION_ID = "JsonAssistant.Action.ExpandAllNestedJsonAction";
-    String CONVERT_ALL_READABLE_TIME_ACTION_ID = "JsonAssistant.Action.ConvertAllReadableTimeAction";
-    String EXTEND_GROUP_ID = "JsonAssistant.Group.ExtendGroup";
-    String TO_XML_ACTION_ID = "JsonAssistant.Action.ToXmlAction";
-    String TO_YAML_ACTION_ID = "JsonAssistant.Action.ToYamlAction";
-    String TO_TOML_ACTION_ID = "JsonAssistant.Action.ToTomlAction";
-    String TO_URL_PARAM_ACTION_ID = "JsonAssistant.Action.ToUrlParamAction";
-    String TO_PROPERTIES_ACTION_ID = "JsonAssistant.Action.ToPropertiesAction";
-    String TO_JSON5_ACTION_ID = "JsonAssistant.Action.ToJson5Action";
-    String TO_JSON_ACTION_ID = "JsonAssistant.Action.ToJsonAction";
+    interface Convert {
+        AnAction CONVERT_OTHER_FORMATS_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Convert.CONVERT_OTHER_FORMATS_GROUP_ID);
+        AnAction TO_XML_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_XML_ACTION_ID);
+        AnAction TO_YAML_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_YAML_ACTION_ID);
+        AnAction TO_TOML_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_TOML_ACTION_ID);
+        AnAction TO_URL_PARAM_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_URL_PARAM_ACTION_ID);
+        AnAction TO_PROPERTIES_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_PROPERTIES_ACTION_ID);
+        AnAction TO_JSON5_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_JSON5_ACTION_ID);
+        AnAction TO_JSON_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_JSON_ACTION_ID);
+        AnAction TO_TYPESCRIPT_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_TYPESCRIPT_ACTION_ID);
+        AnAction TO_CSV_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_CSV_ACTION_ID);
+        AnAction CSV_TO_JSON_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.CSV_TO_JSON_ACTION_ID);
+    }
 
-    AnAction JSON_BEAUTIFY_ACTION = ActionManager.getInstance().getAction(JSON_BEAUTIFY_ACTION_ID);
-    AnAction JSON_MINIFY_ACTION = ActionManager.getInstance().getAction(JSON_MINIFY_ACTION_ID);
-    AnAction JSON_STRUCTURE_ACTION = ActionManager.getInstance().getAction(JSON_STRUCTURE_ACTION_ID);
-    AnAction JSON_TEXT_DIFF_ACTION = ActionManager.getInstance().getAction(JSON_TEXT_DIFF_ACTION_ID);
-    AnAction CONVERT_OTHER_FORMATS_GROUP = ActionManager.getInstance().getAction(CONVERT_OTHER_FORMATS_GROUP_ID);
-    AnAction SHORTCUT_ACTION = ActionManager.getInstance().getAction(SHORTCUT_ACTION_ID);
-    AnAction JSON_ESCAPE_ACTION = ActionManager.getInstance().getAction(JSON_ESCAPE_ACTION_ID);
-    AnAction CONVERT_ALL_TIMESTAMP_ACTION = ActionManager.getInstance().getAction(CONVERT_ALL_TIMESTAMP_ACTION_ID);
-    AnAction EXPAND_ALL_NESTED_JSON_ACTION = ActionManager.getInstance().getAction(EXPAND_ALL_NESTED_JSON_ACTION_ID);
-    AnAction CONVERT_ALL_READABLE_TIME_ACTION = ActionManager.getInstance().getAction(CONVERT_ALL_READABLE_TIME_ACTION_ID);
-    AnAction EXTEND_GROUP = ActionManager.getInstance().getAction(EXTEND_GROUP_ID);
-    AnAction TO_XML_ACTION = ActionManager.getInstance().getAction(TO_XML_ACTION_ID);
-    AnAction TO_YAML_ACTION = ActionManager.getInstance().getAction(TO_YAML_ACTION_ID);
-    AnAction TO_TOML_ACTION = ActionManager.getInstance().getAction(TO_TOML_ACTION_ID);
-    AnAction TO_URL_PARAM_ACTION = ActionManager.getInstance().getAction(TO_URL_PARAM_ACTION_ID);
-    AnAction TO_PROPERTIES_ACTION = ActionManager.getInstance().getAction(TO_PROPERTIES_ACTION_ID);
-    AnAction TO_JSON5_ACTION = ActionManager.getInstance().getAction(TO_JSON5_ACTION_ID);
-    AnAction TO_JSON_ACTION = ActionManager.getInstance().getAction(TO_JSON_ACTION_ID);
+    interface Extend {
+        AnAction EXTEND_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Extend.EXTEND_GROUP_ID);
+        AnAction CONVERT_ALL_TIMESTAMP_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extend.CONVERT_ALL_TIMESTAMP_ACTION_ID);
+        AnAction EXPAND_ALL_NESTED_JSON_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extend.EXPAND_ALL_NESTED_JSON_ACTION_ID);
+        AnAction CONVERT_ALL_READABLE_TIME_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extend.CONVERT_ALL_READABLE_TIME_ACTION_ID);
 
+        AnAction FILL_COMMENT_FROM_JAVA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extend.FILL_COMMENT_FROM_JAVA_ACTION_ID);
+    }
+
+    interface Sort {
+        AnAction SORT_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Sort.SORT_GROUP_ID);
+
+        AnAction CASE_SENSITIVE_AZ_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_SENSITIVE_AZ_ACTION_ID);
+        AnAction CASE_SENSITIVE_ZA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_SENSITIVE_ZA_ACTION_ID);
+        AnAction CASE_INSENSITIVE_AZ_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_INSENSITIVE_AZ_ACTION_ID);
+        AnAction CASE_INSENSITIVE_ZA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.CASE_INSENSITIVE_ZA_ACTION_ID);
+        AnAction NATURAL_AZ_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.NATURAL_AZ_ACTION_ID);
+        AnAction NATURAL_ZA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.NATURAL_ZA_ACTION_ID);
+        AnAction HEXA_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.HEXA_ACTION_ID);
+        AnAction REVERSE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.REVERSE_ACTION_ID);
+        AnAction SHUFFLE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.SHUFFLE_ACTION_ID);
+        AnAction LENGTH_ASC_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.LENGTH_ASC_ACTION_ID);
+        AnAction LENGTH_DESC_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Sort.LENGTH_DESC_ACTION_ID);
+
+    }
+
+    interface Float {
+        AnAction EDITOR_FLOAT_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Float.EDITOR_FLOAT_GROUP_ID);
+    }
 }
