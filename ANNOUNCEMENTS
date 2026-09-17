@@ -63,7 +63,7 @@
     "type": "info",
     "priority": 100,
     "effectiveDate": "2026-04-23",
-    "expirationDate": "2027-08-23",
+    "expirationDate": "2026-05-23",
     "versionConstraints": ">=1.8.0",
     "display": 2,
     "autoHide": false,
