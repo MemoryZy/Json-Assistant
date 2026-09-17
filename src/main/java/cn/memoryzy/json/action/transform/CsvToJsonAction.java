@@ -3,7 +3,6 @@ package cn.memoryzy.json.action.transform;
 import cn.memoryzy.json.bundle.JsonAssistantBundle;
 import cn.memoryzy.json.constant.FileTypeHolder;
 import cn.memoryzy.json.model.strategy.GlobalTextConverter;
-import cn.memoryzy.json.model.strategy.formats.context.GlobalTextConversionProcessorContext;
 import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.util.CsvUtil;
 import cn.memoryzy.json.util.PlatformUtil;

@@ -1,6 +1,5 @@
 package cn.memoryzy.json.service.persistent;
 
-import cn.memoryzy.json.JsonAssistantPlugin;
 import cn.memoryzy.json.constant.DataStorages;
 import cn.memoryzy.json.service.persistent.state.GeneralState;
 import com.intellij.openapi.application.ApplicationManager;
