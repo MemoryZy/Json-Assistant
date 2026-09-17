@@ -13,6 +13,7 @@ public enum FileTypes {
     YAML("yaml", "org.jetbrains.yaml.YAMLFileType", "YML", "org.jetbrains.yaml.YAMLLanguage", "INSTANCE"),
     TOML("toml", "org.toml.lang.psi.TomlFileType", "INSTANCE", "org.toml.lang.TomlLanguage", "INSTANCE"),
     PROPERTIES("properties", "com.intellij.lang.properties.PropertiesFileType", "INSTANCE", "com.intellij.lang.properties.PropertiesLanguage", "INSTANCE"),
+    CSV("csv", "com.intellij.ide.highlighter.CsvFileType", "INSTANCE", "com.intellij.lang.PlainTextLanguage", "INSTANCE"),
     TYPESCRIPT("ts", "com.intellij.lang.typescript.TypeScriptFileType", "INSTANCE", "com.intellij.lang.typescript.TypeScriptLanguage", "INSTANCE"),
     JAVA("java", "com.intellij.ide.highlighter.JavaFileType", "INSTANCE", "com.intellij.lang.java.JavaLanguage", "INSTANCE");
 

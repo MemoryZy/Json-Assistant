@@ -37,6 +37,7 @@
   },
   {
     "id": "recommendation_v1",
+    "enabled": false,
     "locales": {
       "en_US": {
         "title": "Json Assistant",

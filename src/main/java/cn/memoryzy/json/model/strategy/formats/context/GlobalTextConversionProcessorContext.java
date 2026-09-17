@@ -97,6 +97,7 @@ public class GlobalTextConversionProcessorContext {
                 new TomlConversionProcessor(editorData),
                 new UrlParamConversionProcessor(editorData),
                 new PropertiesConversionProcessor(editorData),
+                new CsvConversionProcessor(editorData),
                 // 待实现其他的处理器
         };
     }

@@ -114,6 +114,8 @@
         <action id="JsonAssistant.Action.ToPropertiesAction" class="cn.memoryzy.json.action.transform.ToPropertiesAction"/>
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
+        <action id="JsonAssistant.Action.ToCsvAction" class="cn.memoryzy.json.action.transform.ToCsvAction"/>
+        <action id="JsonAssistant.Action.CsvToJsonAction" class="cn.memoryzy.json.action.transform.CsvToJsonAction"/>
         <action id="JsonAssistant.Action.ToTypeScriptAction" class="cn.memoryzy.json.action.transform.ToTypeScriptAction"/>
 
         <!-- Diff组 -->
@@ -185,6 +187,7 @@
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
             <separator/>
             <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
+            <reference ref="JsonAssistant.Action.CsvToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>

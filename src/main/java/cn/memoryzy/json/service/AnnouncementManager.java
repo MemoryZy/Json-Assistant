@@ -266,6 +266,8 @@ public final class AnnouncementManager implements Disposable {
         // 过滤以下公告
         announcements.removeIf(el ->
                 Objects.isNull(el.getId())
+                        // 未启用
+                        || Boolean.FALSE.equals(el.getEnabled())
                         // 标题内容不存在
                         || MapUtil.isEmpty(el.getLocales())
                         // 已展示过，并且展示次数超出设定值
@@ -311,6 +313,8 @@ public final class AnnouncementManager implements Disposable {
 
         // 展示次数若为空，则默认1次
         int displayNum = null == display ? 1 : display;
+        if (displayNum <= 0) return true;
+
         // 已展示的次数
         int displayCount = announcementStats.getDisplayCount();
 

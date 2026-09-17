@@ -21,6 +21,11 @@ public class Announcement {
     private String id;
 
     /**
+     * 是否启用
+     */
+    private Boolean enabled;
+
+    /**
      * 国际化
      */
     private Map<String, LocaleContent> locales;
@@ -214,6 +219,14 @@ public class Announcement {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     public Map<String, LocaleContent> getLocales() {

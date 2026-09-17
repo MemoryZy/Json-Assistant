@@ -28,6 +28,8 @@ public interface ActionIdHolder {
         String TO_JSON5_ACTION_ID = "JsonAssistant.Action.ToJson5Action";
         String TO_JSON_ACTION_ID = "JsonAssistant.Action.ToJsonAction";
         String TO_TYPESCRIPT_ACTION_ID = "JsonAssistant.Action.ToTypeScriptAction";
+        String TO_CSV_ACTION_ID = "JsonAssistant.Action.ToCsvAction";
+        String CSV_TO_JSON_ACTION_ID = "JsonAssistant.Action.CsvToJsonAction";
     }
 
     interface Extend {
