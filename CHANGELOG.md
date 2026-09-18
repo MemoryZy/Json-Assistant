@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+- 增加 CSV 与 JSON 的互相转换能力。
+- 移除无关内容。
+- 优化插件性能。
+- 修复一些BUG。
+- Added the ability to convert between CSV and JSON.
+- Removed irrelevant content.
+- Optimized plugin performance.
+- Fixed some bugs.
+
 ## [1.9.2] - 2026-09-03
 
 - [增加 JavaBean 转 TypeScript Type，JSON 转 TypeScript Type 功能](https://github.com/MemoryZy/Json-Assistant/issues/90)。
