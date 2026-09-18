@@ -2,6 +2,7 @@ package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
 import cn.memoryzy.json.model.wrapper.ObjectWrapper;
 
@@ -37,8 +38,7 @@ public class CsvUtil {
         }
 
         if (wrapper == null || !wrapper.isArray()) return false;
-        List<Object> items = asList(wrapper);
-        if (items == null) return false;
+        ArrayWrapper items = (ArrayWrapper) wrapper;
         for (Object item : items) {
             if (!(item instanceof Map)) return false;
         }
