@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.9.3] - 2026-09-18
+
 - 增加 CSV 与 JSON 的互相转换能力。
 - 移除无关内容。
 - 优化插件性能。
@@ -424,7 +426,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.2...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.3...HEAD
+[1.9.3]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.2...v1.9.3
 [1.9.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/MemoryZy/Json-Assistant/compare/v1.8.7...v1.9.0
