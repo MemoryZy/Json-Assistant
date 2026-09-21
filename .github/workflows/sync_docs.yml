@@ -16,6 +16,9 @@ env:
   TARGET_REPO: Json-Assistant
   TARGET_DOC_REPO: Json-Assistant-Doc
 
+permissions:
+  contents: write  # 仅对此 job 授予写权限
+
 jobs:
   update-readme:
     runs-on: ubuntu-latest
