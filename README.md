@@ -170,6 +170,7 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | - |  |  | 10.00 CNY |
 | **强 |  |  | 10.00 CNY |
 | 日行千里 |  | 加油💪💪💪 | 10.00 CNY |
+| 爱心人士 |  | Tenshin希望长久维护👍 | 10.00 CNY |
 | AC |  |  | 8.88 CNY |
 | 爱心人士 |  | 很好用，加油 | 8.88 CNY |
 | **乐 |  |  | 8.88 CNY |
@@ -190,10 +191,12 @@ Heartfelt thanks to every donor who supports us! Your generosity helps us improv
 | 爱心人士 |  | 很方便补充单测哈哈 | 6.66 CNY |
 | 刘帅 |  |  | 6.66 CNY |
 | 朝仓慕玄 |  | 支持 | 6.66 CNY |
+| 安德 |  |  | 6.66 CNY |
 | **成 |  |  | 6.60 CNY |
 | *瑞 |  |  | 5.00 CNY |
 | JiaoJunWei |  |  | 5.00 CNY |
 | HALOS |  |  | 5.00 CNY |
+| 爱心人士 |  |  | 5.00 CNY |
 | **权 |  |  | 1.00 CNY |
 | **成 |  |  | 1.00 CNY |
 | *伟 |  |  | 1.00 CNY |
