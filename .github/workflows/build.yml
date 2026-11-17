@@ -24,7 +24,6 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
-      - 'ANNOUNCEMENTS'
       - 'donors.json'
       - 'NOTICE'
 
@@ -37,7 +36,6 @@ on:
       - 'README_zh.md'
       - 'CHANGELOG.md'
       - 'DESCRIPTION.md'
-      - 'ANNOUNCEMENTS'
       - 'donors.json'
       - 'NOTICE'
 
@@ -369,31 +367,31 @@ jobs:
           EOM
           )"
 
-      # 目标仓库
-      # Remove old release drafts by using the curl request for the available releases with a draft flag
-      - name: Remove Old Release Drafts (Target Repo)
-        env:
-          TARGET_OWNER_REPO: Json-Assistant
-          GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
-        run: |
-          gh api repos/{owner}/$TARGET_OWNER_REPO/releases \
-            --jq '.[] | select(.draft == true) | .id' \
-            | xargs -I '{}' gh api -X DELETE repos/{owner}/$TARGET_OWNER_REPO/releases/{}
-
-      # Create a new release draft which is not publicly visible and requires manual acceptance
-      - name: Create Release Draft (Target Repo)
-        env:
-          TARGET_OWNER_REPO: "${{ github.repository_owner }}/Json-Assistant"
-          GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
-        run: |
-          gh release create "v${{ needs.build.outputs.version }}" \
-            --repo $TARGET_OWNER_REPO \
-            --draft \
-            --title "v${{ needs.build.outputs.version }}" \
-            --notes "$(cat << 'EOM'
-          ${{ needs.build.outputs.changelog }}
-          EOM
-          )"
+#      # 目标仓库
+#      # Remove old release drafts by using the curl request for the available releases with a draft flag
+#      - name: Remove Old Release Drafts (Target Repo)
+#        env:
+#          TARGET_OWNER_REPO: Json-Assistant
+#          GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
+#        run: |
+#          gh api repos/{owner}/$TARGET_OWNER_REPO/releases \
+#            --jq '.[] | select(.draft == true) | .id' \
+#            | xargs -I '{}' gh api -X DELETE repos/{owner}/$TARGET_OWNER_REPO/releases/{}
+#
+#      # Create a new release draft which is not publicly visible and requires manual acceptance
+#      - name: Create Release Draft (Target Repo)
+#        env:
+#          TARGET_OWNER_REPO: "${{ github.repository_owner }}/Json-Assistant"
+#          GITHUB_TOKEN: ${{ secrets.TARGET_TOKEN }}
+#        run: |
+#          gh release create "v${{ needs.build.outputs.version }}" \
+#            --repo $TARGET_OWNER_REPO \
+#            --draft \
+#            --title "v${{ needs.build.outputs.version }}" \
+#            --notes "$(cat << 'EOM'
+#          ${{ needs.build.outputs.changelog }}
+#          EOM
+#          )"
 
 
 

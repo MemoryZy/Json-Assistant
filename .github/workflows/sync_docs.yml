@@ -4,12 +4,11 @@ on:
   push:
     paths:
       - 'donors.json'       # 监控根目录的 donors.json
-      - 'README.md'         # 监控根目录的英文 README
-      - 'README_zh.md'      # 监控根目录的中文 README
-      - 'CHANGELOG.md'      # 监控变更日志
-      - 'DESCRIPTION.md'    # 监控项目描述文件
-      - 'ANNOUNCEMENTS'    # 公告文件
-      - 'NOTICE'    # NOTICE
+#      - 'README.md'         # 监控根目录的英文 README
+#      - 'README_zh.md'      # 监控根目录的中文 README
+#      - 'CHANGELOG.md'      # 监控变更日志
+#      - 'DESCRIPTION.md'    # 监控项目描述文件
+#      - 'NOTICE'    # NOTICE
   workflow_dispatch:
 
 env:
