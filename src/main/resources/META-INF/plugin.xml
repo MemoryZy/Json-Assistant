@@ -99,6 +99,13 @@
         <action id="JsonAssistant.Action.JsonEscapeAction" class="cn.memoryzy.json.action.JsonEscapeAction"/>
         <action id="JsonAssistant.Action.ShortcutAction" class="cn.memoryzy.json.action.ShortcutAction"/>
 
+        <!-- Organize（整理 Json…：去除 null 值 / 空值 / 0 值，以及全部去除） -->
+        <group id="JsonAssistant.Group.OrganizeJson" class="cn.memoryzy.json.action.OrganizeJsonGroup"/>
+        <action id="JsonAssistant.Action.RemoveNullValueAction" class="cn.memoryzy.json.action.organize.RemoveNullValueAction"/>
+        <action id="JsonAssistant.Action.RemoveEmptyValueAction" class="cn.memoryzy.json.action.organize.RemoveEmptyValueAction"/>
+        <action id="JsonAssistant.Action.RemoveZeroValueAction" class="cn.memoryzy.json.action.organize.RemoveZeroValueAction"/>
+        <action id="JsonAssistant.Action.RemoveAllValuesAction" class="cn.memoryzy.json.action.organize.RemoveAllValuesAction"/>
+
         <!-- Extend -->
         <group id="JsonAssistant.Group.Extend" class="cn.memoryzy.json.action.ExtendGroup"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>

@@ -70,6 +70,14 @@ public class MainGroup extends DumbAwareBaseActionGroup {
 
         actions.add(Separator.create());
         actions.add(ActionHolder.Main.JSON_TEXT_DIFF_ACTION);
+        actions.add(Separator.create());
+        // 整理 Json…（紧邻「Json 文本对比」下方；子菜单为去除 null 值 / 空值 / 0 值，以及全部去除）
+        // 与排序分组一致：弹窗（或新 UI）时用弹窗实例，以便显示带文字的分隔线；否则用注册实例
+        if (showSeparatorText) {
+            actions.add(new OrganizeJsonGroup(true));
+        } else {
+            actions.add(ActionHolder.Organize.ORGANIZE_JSON_GROUP);
+        }
         // ------- 分隔符
         actions.add(Separator.create());
         if (showSeparatorText) {

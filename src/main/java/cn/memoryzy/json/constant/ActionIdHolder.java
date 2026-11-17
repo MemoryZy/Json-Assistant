@@ -32,6 +32,14 @@ public interface ActionIdHolder {
         String CSV_TO_JSON_ACTION_ID = "JsonAssistant.Action.CsvToJsonAction";
     }
 
+    interface Organize {
+        String ORGANIZE_JSON_GROUP_ID = "JsonAssistant.Group.OrganizeJson";
+        String REMOVE_NULL_VALUE_ACTION_ID = "JsonAssistant.Action.RemoveNullValueAction";
+        String REMOVE_EMPTY_VALUE_ACTION_ID = "JsonAssistant.Action.RemoveEmptyValueAction";
+        String REMOVE_ZERO_VALUE_ACTION_ID = "JsonAssistant.Action.RemoveZeroValueAction";
+        String REMOVE_ALL_VALUES_ACTION_ID = "JsonAssistant.Action.RemoveAllValuesAction";
+    }
+
     interface Extend {
         String EXTEND_GROUP_ID = "JsonAssistant.Group.Extend";
         String CONVERT_ALL_TIMESTAMP_ACTION_ID = "JsonAssistant.Action.ConvertAllTimestampAction";

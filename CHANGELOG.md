@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+- 新增 `Json 整理…` 功能组，用于去除 JSON 中无意义的 null 值、空值与 0 值。
+- 修复类型转换问题。
+- 兼容性优化。
+- Added the `Json Tidy…` group (below `Json Text Diff`) to remove meaningless null, empty and zero values from JSON.
+- Fix the type conversion issue.
+- Optimize compatibility.
+
 ## [1.9.3] - 2026-09-18
 
 - 增加 CSV 与 JSON 的互相转换能力。

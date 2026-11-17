@@ -19,6 +19,15 @@ public interface ActionHolder {
         AnAction SHORTCUT_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Main.SHORTCUT_ACTION_ID);
     }
 
+    interface Organize {
+        AnAction ORGANIZE_JSON_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Organize.ORGANIZE_JSON_GROUP_ID);
+
+        AnAction REMOVE_NULL_VALUE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Organize.REMOVE_NULL_VALUE_ACTION_ID);
+        AnAction REMOVE_EMPTY_VALUE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Organize.REMOVE_EMPTY_VALUE_ACTION_ID);
+        AnAction REMOVE_ZERO_VALUE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Organize.REMOVE_ZERO_VALUE_ACTION_ID);
+        AnAction REMOVE_ALL_VALUES_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Organize.REMOVE_ALL_VALUES_ACTION_ID);
+    }
+
     interface Convert {
         AnAction CONVERT_OTHER_FORMATS_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Convert.CONVERT_OTHER_FORMATS_GROUP_ID);
         AnAction TO_XML_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_XML_ACTION_ID);
