@@ -72,7 +72,12 @@ public class RenameDiffTitleAction extends DumbAwareAction implements UpdateInBa
     }
 
     public static ImmutablePair<JBLabel, JBLabel> getTwoLabel(DataContext dataContext) {
-        JBPanelWithEmptyText coreComponent = (JBPanelWithEmptyText) PlatformDataKeys.CONTEXT_COMPONENT.getData(dataContext);
+        JBPanelWithEmptyText coreComponent = null;
+        Component component = PlatformDataKeys.CONTEXT_COMPONENT.getData(dataContext);
+        if (component instanceof JBPanelWithEmptyText) {
+            coreComponent = (JBPanelWithEmptyText) component;
+        }
+
         if (coreComponent == null || coreComponent.getComponentCount() == 0) return null;
 
         JBSplitter splitter = findComponent(coreComponent, JBSplitter.class);
