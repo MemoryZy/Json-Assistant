@@ -65,6 +65,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
     private JBCheckBox enableTomlFormatsCheckBox;
     private JBCheckBox enableTypeScriptFormatsCheckBox;
     private JBCheckBox enableUrlParamFormatsCheckBox;
+    private JBCheckBox enableBulkLineFormatsCheckBox;
     private JPanel formatsCheckBoxPanel;
 
     private TitledSeparator editorVisualTitle;
@@ -155,6 +156,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         enableTomlFormatsCheckBox.setText("TOML");
         enableTypeScriptFormatsCheckBox.setText("TypeScript");
         enableUrlParamFormatsCheckBox.setText("URL Param");
+        enableBulkLineFormatsCheckBox.setText("Bulk KV Lines");
 
         int left = UIUtil.getCheckBoxTextHorizontalOffset(autoRecognizeFormatsCheckBox);
         formatsCheckBoxPanel.setBorder(new JBEmptyBorder(JBUI.insets(1, left, 4, 0)));
@@ -166,12 +168,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, true);
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
+                UIUtils.controlEnableCheckBox(enableBulkLineFormatsCheckBox, true);
             } else if (e.getStateChange() == ItemEvent.DESELECTED) {
                 UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, false);
                 UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
+                UIUtils.controlEnableCheckBox(enableBulkLineFormatsCheckBox, false);
             }
         });
 
@@ -277,6 +281,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         enableTomlFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TOML));
         enableTypeScriptFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.TYPE_SCRIPT));
         enableUrlParamFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.URL_PARAM));
+        enableBulkLineFormatsCheckBox.setSelected(enabledFormats.contains(DataFormatType.BULK_KV_LINE));
 
         applyToSourceCheckBox.setSelected(editorBehaviorState.isShouldApplyToSource());
 
@@ -317,12 +322,14 @@ public class JsonAssistantMainConfigurableComponentProvider {
             UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, true);
             UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, true);
+            UIUtils.controlEnableCheckBox(enableBulkLineFormatsCheckBox, true);
         } else {
             UIUtils.controlEnableCheckBox(enableXmlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableYamlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableTomlFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableTypeScriptFormatsCheckBox, false);
             UIUtils.controlEnableCheckBox(enableUrlParamFormatsCheckBox, false);
+            UIUtils.controlEnableCheckBox(enableBulkLineFormatsCheckBox, false);
         }
 
         // 常规
@@ -348,6 +355,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean oldEnableTomlFormat = enabledFormats.contains(DataFormatType.TOML);
         boolean oldEnableTsFormat = enabledFormats.contains(DataFormatType.TYPE_SCRIPT);
         boolean oldEnableUrlParamFormat = enabledFormats.contains(DataFormatType.URL_PARAM);
+        boolean oldEnableBulkLineFormat = enabledFormats.contains(DataFormatType.BULK_KV_LINE);
 
         boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
 
@@ -386,6 +394,7 @@ public class JsonAssistantMainConfigurableComponentProvider {
         boolean newEnableTomlFormat = enableTomlFormatsCheckBox.isSelected();
         boolean newEnableTsFormat = enableTypeScriptFormatsCheckBox.isSelected();
         boolean newEnableUrlParamFormat = enableUrlParamFormatsCheckBox.isSelected();
+        boolean newEnableBulkLineFormat = enableBulkLineFormatsCheckBox.isSelected();
         boolean newShouldApplyToSource = applyToSourceCheckBox.isSelected();
 
         // ----------------------------------- 历史记录
@@ -412,6 +421,8 @@ public class JsonAssistantMainConfigurableComponentProvider {
                 || !Objects.equals(oldEnableTomlFormat, newEnableTomlFormat)
                 || !Objects.equals(oldEnableTsFormat, newEnableTsFormat)
                 || !Objects.equals(oldEnableUrlParamFormat, newEnableUrlParamFormat)
+                || !Objects.equals(oldEnableBulkLineFormat, newEnableBulkLineFormat)
+
                 || !Objects.equals(oldShouldApplyToSource, newShouldApplyToSource)
 
                 || !Objects.equals(oldEnableHistory, newEnableHistory)
@@ -433,11 +444,42 @@ public class JsonAssistantMainConfigurableComponentProvider {
         EditorBehaviorState editorBehaviorState = toolWindowSettings.getBehaviorState();
         editorBehaviorState.setAutoRecognizeFormats(autoRecognizeFormatsCheckBox.isSelected());
         Set<DataFormatType> enabledFormats = editorBehaviorState.getEnabledFormats();
-        if (enableXmlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.XML);
-        if (enableYamlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.YAML);
-        if (enableTomlFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TOML);
-        if (enableTypeScriptFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.TYPE_SCRIPT);
-        if (enableUrlParamFormatsCheckBox.isSelected()) enabledFormats.add(DataFormatType.URL_PARAM);
+        // 解决取消选中不生效的问题
+        if (enableXmlFormatsCheckBox.isSelected()) {
+            enabledFormats.add(DataFormatType.XML);
+        } else {
+            enabledFormats.remove(DataFormatType.XML);
+        }
+
+        if (enableYamlFormatsCheckBox.isSelected()) {
+            enabledFormats.add(DataFormatType.YAML);
+        } else {
+            enabledFormats.remove(DataFormatType.YAML);
+        }
+
+        if (enableTomlFormatsCheckBox.isSelected()) {
+            enabledFormats.add(DataFormatType.TOML);
+        } else {
+            enabledFormats.remove(DataFormatType.TOML);
+        }
+
+        if (enableTypeScriptFormatsCheckBox.isSelected()) {
+            enabledFormats.add(DataFormatType.TYPE_SCRIPT);
+        } else {
+            enabledFormats.remove(DataFormatType.TYPE_SCRIPT);
+        }
+
+        if (enableUrlParamFormatsCheckBox.isSelected()) {
+            enabledFormats.add(DataFormatType.URL_PARAM);
+        } else {
+            enabledFormats.remove(DataFormatType.URL_PARAM);
+        }
+
+        if (enableBulkLineFormatsCheckBox.isSelected()) {
+            enabledFormats.add(DataFormatType.BULK_KV_LINE);
+        } else {
+            enabledFormats.remove(DataFormatType.BULK_KV_LINE);
+        }
 
         boolean oldShouldApplyToSource = editorBehaviorState.isShouldApplyToSource();
         editorBehaviorState.setShouldApplyToSource(applyToSourceCheckBox.isSelected());

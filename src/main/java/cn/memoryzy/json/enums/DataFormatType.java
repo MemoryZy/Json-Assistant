@@ -20,7 +20,12 @@ public enum DataFormatType {
 
     TOML("TOML"),
 
-    URL_PARAM("URL Param");
+    URL_PARAM("URL Param"),
+
+    BULK_KV_LINE("Bulk KV Line")
+
+
+    ;
 
     private final String value;
 
