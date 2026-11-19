@@ -27,6 +27,7 @@ import cn.memoryzy.json.ui.panel.NewItemPopupPanel;
 import cn.memoryzy.json.ui.tree.HistoryFilterableTree;
 import cn.memoryzy.json.ui.tree.HistoryNode;
 import cn.memoryzy.json.ui.tree.HistoryTreeRenderer;
+import cn.memoryzy.json.ui.tree.HistoryTreeTransferHandler;
 import cn.memoryzy.json.util.FontManager;
 import cn.memoryzy.json.util.Notifications;
 import cn.memoryzy.json.util.PlatformUtil;
@@ -209,10 +210,13 @@ public class HistoryToolWindowComponentProvider implements Disposable {
         tree.setCellRenderer(new HistoryTreeRenderer(fontSize));
         tree.setExpandableItemsEnabled(true);
 
-        // 增加拖动效果
+        // 增加拖动效果：允许把记录/分组拖动到其他分组或根节点，从而调整归属
         tree.setDragEnabled(true);
-        tree.setDropMode(DropMode.ON_OR_INSERT);
-        // tree.setTransferHandler(new NoteTransferHandler(this));
+        // 只允许“放到节点上”，不支持“插入到节点之间”：
+        // 树的排序是按“类型 + 名称 + 更新时间”重新计算的，插入位置无法持久化保存
+        tree.setDropMode(DropMode.ON);
+        // 注册拖拽处理器，真正的归属变更与持久化都在这里完成
+        tree.setTransferHandler(new HistoryTreeTransferHandler(this));
 
         setEmptyTextForNoElements(tree.getEmptyText());
         tree.addMouseListener(new TreeRightClickPopupMenuMouseAdapter(tree, createRightMousePopupMenu()));
@@ -1076,6 +1080,20 @@ public class HistoryToolWindowComponentProvider implements Disposable {
 
     public Tree getTree() {
         return tree;
+    }
+
+    /**
+     * 获取可过滤树（拖拽时需要借助它把树节点转换回 {@link HistoryNode}）
+     */
+    public HistoryFilterableTree getFilterableTree() {
+        return filterableTree;
+    }
+
+    /**
+     * 获取历史记录管理器（拖拽时会直接修改分组与记录的归属关系）
+     */
+    public HistoryManager getHistoryManager() {
+        return historyManager;
     }
 
     public Project getProject() {

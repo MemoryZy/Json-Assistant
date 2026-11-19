@@ -26,6 +26,11 @@ public interface FileTypeHolder {
 
     FileType CSV = PlatformUtil.getFileType(FileTypes.CSV);
 
+    /**
+     * 纯文本类型（Postman Bulk Edit 等无专属高亮的文本用它展示）
+     */
+    FileType PLAIN_TEXT = PlatformUtil.getFileType(FileTypes.PLAIN_TEXT);
+
     FileType TYPESCRIPT = PlatformUtil.getFileType(FileTypes.TYPESCRIPT);
 
 }

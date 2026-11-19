@@ -66,6 +66,12 @@ public class ClipboardTextConversionContext {
             conversionStrategies.add(new UrlParamConversionStrategy());
         }
 
+        // Bulk KV Lines（批量键值行格式）：始终启用（与 JSON、JSON5 一致，不提供开关）。
+        // 必须放在最后：key: value 这类带空格的写法同时也是合法 YAML，
+        // 排在其他格式之后，保证「能按其他格式解析的内容优先由其他格式处理」，
+        // 只有当其他格式都不成立（例如 key:value 冒号后无空格、或含 list[0] 下标）时才按 Bulk KV Lines 处理。
+        conversionStrategies.add(new BulkKvLinesConversionStrategy());
+
         return conversionStrategies;
     }
 

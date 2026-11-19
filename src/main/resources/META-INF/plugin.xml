@@ -125,6 +125,10 @@
         <action id="JsonAssistant.Action.CsvToJsonAction" class="cn.memoryzy.json.action.transform.CsvToJsonAction"/>
         <action id="JsonAssistant.Action.ToTypeScriptAction" class="cn.memoryzy.json.action.transform.ToTypeScriptAction"/>
 
+        <!-- Bulk KV Lines（批量键值行格式）互转：JSON → Bulk KV Lines、Bulk KV Lines → JSON -->
+        <action id="JsonAssistant.Action.ToBulkKvLinesAction" class="cn.memoryzy.json.action.transform.ToBulkKvLinesAction"/>
+        <action id="JsonAssistant.Action.BulkKvLinesToJsonAction" class="cn.memoryzy.json.action.transform.BulkKvLinesToJsonAction"/>
+
         <!-- Diff组 -->
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
         <action id="JsonAssistant.Action.OptimizeSortAction" class="cn.memoryzy.json.action.structure.OptimizeSortAction"/>
@@ -195,6 +199,7 @@
             <separator/>
             <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
             <reference ref="JsonAssistant.Action.CsvToJsonAction"/>
+            <reference ref="JsonAssistant.Action.BulkKvLinesToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>

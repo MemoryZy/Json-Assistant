@@ -20,4 +20,9 @@ public interface DataTypeConstant {
 
     String URL_PARAM = "URL Param";
 
+    /**
+     * Bulk KV Lines（批量键值行格式）：每行一个「键:值」，嵌套用点号与 [下标] 表达
+     */
+    String BULK_KV_LINES = "Bulk KV Lines";
+
 }

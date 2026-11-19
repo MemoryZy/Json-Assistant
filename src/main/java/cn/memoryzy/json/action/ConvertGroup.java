@@ -31,7 +31,9 @@ public class ConvertGroup extends DumbAwareBaseActionGroup {
                 ActionHolder.Convert.TO_CSV_ACTION,
                 ActionHolder.Convert.TO_TYPESCRIPT_ACTION,
                 ActionHolder.Convert.TO_PROPERTIES_ACTION,
-                ActionHolder.Convert.TO_URL_PARAM_ACTION
+                ActionHolder.Convert.TO_URL_PARAM_ACTION,
+                // Bulk KV Lines：每行一个「键:值」，嵌套用点号与 [下标] 表达
+                ActionHolder.Convert.TO_BULK_KV_LINES_ACTION
         };
     }
 

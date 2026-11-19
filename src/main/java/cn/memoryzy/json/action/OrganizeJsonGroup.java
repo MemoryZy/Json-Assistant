@@ -64,17 +64,17 @@ public class OrganizeJsonGroup extends DumbAwareBaseActionGroup {
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         // 与 SortGroup 一致：主弹窗展示或新 UI 时，才显示带文字的分隔线
-        boolean showSeparatorText = fromPopup || PlatformUtil.isNewUi();
+        // boolean showSeparatorText = fromPopup || PlatformUtil.isNewUi();
 
         List<AnAction> actions = new ArrayList<>();
-        if (showSeparatorText) {
-            actions.add(Separator.create(JsonAssistantBundle.message("separator.organize.json")));
-        }
+        // if (showSeparatorText) {
+        //     actions.add(Separator.create(JsonAssistantBundle.message("separator.organize.json")));
+        // }
 
         // 三个单项按「null → 空值 → 0 值」的顺序排列，与菜单中常见的阅读顺序一致
-        actions.add(ActionHolder.Organize.REMOVE_NULL_VALUE_ACTION);
         actions.add(ActionHolder.Organize.REMOVE_EMPTY_VALUE_ACTION);
         actions.add(ActionHolder.Organize.REMOVE_ZERO_VALUE_ACTION);
+        actions.add(ActionHolder.Organize.REMOVE_NULL_VALUE_ACTION);
 
         // 分隔线：下面是「全部去除」，一次性完成上面三项
         actions.add(Separator.create());
