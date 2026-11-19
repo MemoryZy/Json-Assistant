@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.9.4] - 2026-11-19
+
 - 新增 `Json 整理…` 功能组，用于去除 JSON 中无意义的 null 值、空值与 0 值。
 - 新增 JSON 与 `Bulk KV Lines`（批量键值行格式）互转，并支持工具窗口识别剪贴板中的 Bulk 文本。
 - 解决设置页的窗口识别其他格式文本选项取消选中不生效的问题。
@@ -439,7 +441,8 @@
 - 支持主要的IDE
 - 多语言国际化
 
-[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.3...HEAD
+[Unreleased]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.4...HEAD
+[1.9.4]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.3...v1.9.4
 [1.9.3]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.2...v1.9.3
 [1.9.2]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/MemoryZy/Json-Assistant/compare/v1.9.0...v1.9.1
