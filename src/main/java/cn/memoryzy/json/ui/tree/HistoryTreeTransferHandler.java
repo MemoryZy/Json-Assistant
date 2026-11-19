@@ -11,6 +11,7 @@ import cn.memoryzy.json.util.Notifications;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.Tree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,7 @@ import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,11 @@ import java.util.Objects;
  *     <li>拖到「分组」上：记录 / 分组移动进该分组</li>
  *     <li>拖到「记录」上：视为拖到该记录所在的分组（顶层记录则为根节点）</li>
  *     <li>拖到「根节点」上：记录 / 分组回到顶层</li>
+ *     <li>拖到「主编辑器区域」：记录对应的源文件（{@code histories/<id>.<ext>}）以文件形式交给 IDE，
+ *     由编辑器的文件拖放支持直接打开该 JSON 文件</li>
  * </ul>
+ * 为了让“拖到编辑器即打开文件”生效，拖拽数据除了内部的节点列表风味外，还额外提供
+ * {@link DataFlavor#javaFileListFlavor}：编辑器只认识文件/文本，不认识本插件内部的节点对象。
  * 出于以下两点，目标只允许是节点本身（{@code DropMode.ON}），不支持“插入到兄弟节点之间”：
  * 第一，树的排序是按“类型 + 名称 + 更新时间”重新计算的，插入位置无法持久化；
  * 第二，数据模型里也没有同级顺序字段。
@@ -58,6 +64,14 @@ public class HistoryTreeTransferHandler extends TransferHandler {
      * 历史记录树只接受“本插件内部拖出来的节点列表”。
      */
     private static final DataFlavor NODE_LIST_FLAVOR = createNodeListFlavor();
+
+    /**
+     * 文件列表风味：用于把记录拖到主编辑器区域时打开对应的 JSON 文件。
+     * <p>
+     * 这是 Swing/AWT 的标准风味（{@code application/x-java-file-list}），IDE 的编辑器、项目管理器等
+     * 组件都内置了对它的支持；这里只负责“把记录映射成磁盘上的源文件”。
+     */
+    private static final DataFlavor FILE_LIST_FLAVOR = DataFlavor.javaFileListFlavor;
 
     /**
      * 拖拽失败提示：目标位置已存在同名项
@@ -109,15 +123,20 @@ public class HistoryTreeTransferHandler extends TransferHandler {
             return null;
         }
 
-        return new HistoryNodesTransferable(nodes);
+        // 记录的真实磁盘文件：拖到主编辑器区域时，IDE 会用它打开文件
+        // 分组没有对应文件，因此这里的文件列表只可能包含记录
+        return new HistoryNodesTransferable(nodes, collectSourceFiles(nodes));
     }
 
     /**
-     * 只允许“移动”，不复制：历史记录是同一份数据的归属变化，复制没有意义。
+     * 允许“移动”和“复制”。
+     * <p>
+     * 树内部拖拽使用 MOVE（调整归属关系）；拖到主编辑器时使用 COPY（打开文件，不改变文件本身），
+     * 因此这里需要同时声明两种动作，由放置目标自行选择。
      */
     @Override
     public int getSourceActions(JComponent component) {
-        return MOVE;
+        return COPY_OR_MOVE;
     }
 
     // ---------------------------------- 拖拽放置 ---------------------------------- //
@@ -413,6 +432,38 @@ public class HistoryTreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * 收集被拖动记录对应的磁盘源文件。
+     * <p>
+     * 记录的源文件位于插件历史目录（{@code histories/<id>.<ext>}），内容就是该记录的 JSON 文本；
+     * 把它放进文件列表后，拖到主编辑器区域时 IDE 会像打开普通文件一样打开它。
+     * 若源文件尚未就绪（例如被外部删除、指针失效），则跳过该记录：此时拖拽仍然可以用于树内移动。
+     *
+     * @param nodes 被拖动的节点
+     * @return 有效的源文件列表（可能为空）
+     */
+    @NotNull
+    private List<File> collectSourceFiles(@NotNull List<HistoryNode> nodes) {
+        List<File> files = new ArrayList<>();
+        for (HistoryNode node : nodes) {
+            if (!node.isRecord()) {
+                continue;
+            }
+
+            JsonRecord record = (JsonRecord) node.getValue();
+            VirtualFile sourceFile = record.getSourceFile();
+            if (sourceFile == null || !sourceFile.isValid()) {
+                continue;
+            }
+
+            File file = new File(sourceFile.getPath());
+            if (file.isFile()) {
+                files.add(file);
+            }
+        }
+        return files;
+    }
+
+    /**
      * 创建拖拽数据风味：JVM 内部对象风味，承载 {@code List<HistoryNode>}
      */
     @NotNull
@@ -421,7 +472,7 @@ public class HistoryTreeTransferHandler extends TransferHandler {
     }
 
     /**
-     * 拖拽数据的载体：只包装一个节点列表
+     * 拖拽数据的载体：内部节点列表 + 记录对应的磁盘文件列表
      */
     private static class HistoryNodesTransferable implements Transferable {
 
@@ -430,26 +481,39 @@ public class HistoryTreeTransferHandler extends TransferHandler {
          */
         private final List<HistoryNode> nodes;
 
-        HistoryNodesTransferable(@NotNull List<HistoryNode> nodes) {
+        /**
+         * 被拖动记录对应的磁盘文件（用于拖到主编辑器时打开文件）
+         */
+        private final List<File> files;
+
+        HistoryNodesTransferable(@NotNull List<HistoryNode> nodes, @NotNull List<File> files) {
             this.nodes = nodes;
+            this.files = files;
         }
 
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[]{NODE_LIST_FLAVOR};
+            // 没有可用文件时（例如只拖动了一个分组），不声明文件风味，避免放置目标给出“不支持”的怪异提示
+            return files.isEmpty() ? new DataFlavor[]{NODE_LIST_FLAVOR} : new DataFlavor[]{NODE_LIST_FLAVOR, FILE_LIST_FLAVOR};
         }
 
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return NODE_LIST_FLAVOR.equals(flavor);
+            if (NODE_LIST_FLAVOR.equals(flavor)) {
+                return true;
+            }
+            return !files.isEmpty() && FILE_LIST_FLAVOR.equals(flavor);
         }
 
         @Override
         public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            if (!isDataFlavorSupported(flavor)) {
-                throw new UnsupportedFlavorException(flavor);
+            if (NODE_LIST_FLAVOR.equals(flavor)) {
+                return nodes;
             }
-            return nodes;
+            if (!files.isEmpty() && FILE_LIST_FLAVOR.equals(flavor)) {
+                return files;
+            }
+            throw new UnsupportedFlavorException(flavor);
         }
     }
 }

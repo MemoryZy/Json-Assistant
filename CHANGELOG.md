@@ -6,12 +6,12 @@
 - 修复类型转换问题。
 - 兼容性优化。
 - 新增 JSON 与 `Bulk KV Lines`（批量键值行格式）互转，并支持工具窗口识别剪贴板中的 Bulk 文本。
-- 历史记录树支持拖拽，可将记录、分组移动到其他分组或顶层，放置失败时提示原因。
+- 历史记录树支持拖拽，可将记录、分组移动到其他分组或顶层（放置失败时提示原因），拖到主编辑器可直接打开该记录的 JSON 文件。
 - Added the `Json Tidy…` group (below `Json Text Diff`) to remove meaningless null, empty and zero values from JSON.
 - Fix the type conversion issue.
 - Optimize compatibility.
 - Added bidirectional conversion between JSON and `Bulk KV Lines`, including clipboard recognition in the tool window.
-- Added drag-and-drop support to the history tree to move records and groups into other groups or the top level, with a hint when a drop is rejected.
+- Added drag-and-drop support to the history tree to move records and groups into other groups or the top level (with a hint when a drop is rejected); dropping a record onto the main editor opens its JSON file.
 
 ## [1.9.3] - 2026-09-18
 
