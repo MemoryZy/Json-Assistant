@@ -94,6 +94,12 @@ public class GlobalTextConversionProcessorContext {
         return new AbstractGlobalTextConversionProcessor[]{
                 new XmlConversionProcessor(editorData),
                 new YamlConversionProcessor(editorData),
+                // Bulk KV Lines（批量键值行格式）必须排在 YAML 之后：
+                // 该格式的每一行「键:值」本身也是合法的 YAML，若排在 YAML 之前，
+                // 嵌套的 YAML 段（如 person 后换行缩进的 name: John）会被拆成平铺的键值对。
+                // 排在 YAML 之后时：name:John（冒号后没有空格，不算 YAML）与 a.b:1（方括号使 YAML 解析失败）
+                // 这类 Bulk 文本都会自然落到本处理器；扁平的 name: John 虽由 YAML 接管，结果与 Bulk 等价。
+                new BulkKvLinesConversionProcessor(editorData),
                 new TomlConversionProcessor(editorData),
                 new UrlParamConversionProcessor(editorData),
                 new PropertiesConversionProcessor(editorData),

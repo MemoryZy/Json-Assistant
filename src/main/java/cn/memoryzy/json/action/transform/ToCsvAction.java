@@ -8,6 +8,7 @@ import cn.memoryzy.json.util.CsvUtil;
 import cn.memoryzy.json.util.JsonUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
@@ -29,6 +30,7 @@ public class ToCsvAction extends DumbAwareAction implements UpdateInBackground {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.csv.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.csv.description"));
+        presentation.setIcon(AllIcons.FileTypes.Text);
     }
 
     @Override

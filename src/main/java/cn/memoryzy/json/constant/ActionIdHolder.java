@@ -31,7 +31,6 @@ public interface ActionIdHolder {
         String TO_CSV_ACTION_ID = "JsonAssistant.Action.ToCsvAction";
         String CSV_TO_JSON_ACTION_ID = "JsonAssistant.Action.CsvToJsonAction";
         String TO_BULK_KV_LINES_ACTION_ID = "JsonAssistant.Action.ToBulkKvLinesAction";
-        String BULK_KV_LINES_TO_JSON_ACTION_ID = "JsonAssistant.Action.BulkKvLinesToJsonAction";
     }
 
     interface Organize {

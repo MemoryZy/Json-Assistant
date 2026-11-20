@@ -23,12 +23,12 @@ public class ConvertGroup extends DumbAwareBaseActionGroup {
     @Override
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         return new AnAction[]{
+                ActionHolder.Convert.TO_CSV_ACTION,
                 ActionHolder.Convert.TO_XML_ACTION,
                 ActionHolder.Convert.TO_YAML_ACTION,
                 ActionHolder.Convert.TO_TOML_ACTION,
                 ActionHolder.Convert.TO_JSON5_ACTION,
                 ActionHolder.Convert.TO_JSON_ACTION,
-                ActionHolder.Convert.TO_CSV_ACTION,
                 ActionHolder.Convert.TO_TYPESCRIPT_ACTION,
                 ActionHolder.Convert.TO_PROPERTIES_ACTION,
                 ActionHolder.Convert.TO_URL_PARAM_ACTION,

@@ -125,9 +125,10 @@
         <action id="JsonAssistant.Action.CsvToJsonStringValueAction" class="cn.memoryzy.json.action.transform.CsvToJsonStringValueAction"/>
         <action id="JsonAssistant.Action.ToTypeScriptAction" class="cn.memoryzy.json.action.transform.ToTypeScriptAction"/>
 
-        <!-- Bulk KV Lines（批量键值行格式）互转：JSON → Bulk KV Lines、Bulk KV Lines → JSON -->
+        <!-- Bulk KV Lines（批量键值行格式）：JSON → Bulk KV Lines。
+             反向的 Bulk KV Lines → JSON 已合并进 OtherFormatsToJsonAction 的自动识别链，
+             由 BulkKvLinesConversionProcessor 处理，不再单独注册 action。 -->
         <action id="JsonAssistant.Action.ToBulkKvLinesAction" class="cn.memoryzy.json.action.transform.ToBulkKvLinesAction"/>
-        <action id="JsonAssistant.Action.BulkKvLinesToJsonAction" class="cn.memoryzy.json.action.transform.BulkKvLinesToJsonAction"/>
 
         <!-- Diff组 -->
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
@@ -199,7 +200,6 @@
             <separator/>
             <reference ref="JsonAssistant.Action.CsvToJsonStringValueAction"/>
             <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
-            <reference ref="JsonAssistant.Action.BulkKvLinesToJsonAction"/>
             <separator/>
 
             <add-to-group group-id="BasicEditorPopupMenu" anchor="first"/>

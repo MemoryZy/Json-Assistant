@@ -3,7 +3,9 @@
 ## [Unreleased]
 
 - 将 `Bulk KV Lines` 转换为 JSON 时，超过 15 位的数字按字符串处理，避免超长数值丢失精度。
+- 优化插件页面。
 - When converting `Bulk KV Lines` to JSON, numbers longer than 15 digits are treated as strings to avoid precision loss.
+- Optimized plugin page.
 
 ## [1.9.4] - 2026-11-19
 

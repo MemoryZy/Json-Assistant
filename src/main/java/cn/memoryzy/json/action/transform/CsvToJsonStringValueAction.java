@@ -7,6 +7,7 @@ import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.util.CsvUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
@@ -31,6 +32,7 @@ public class CsvToJsonStringValueAction extends DumbAwareAction implements Updat
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.csv.to.json.string.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.csv.to.json.string.description"));
+        presentation.setIcon(AllIcons.FileTypes.Text);
     }
 
     @Override

@@ -41,7 +41,6 @@ public interface ActionHolder {
         AnAction TO_CSV_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_CSV_ACTION_ID);
         AnAction CSV_TO_JSON_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.CSV_TO_JSON_ACTION_ID);
         AnAction TO_BULK_KV_LINES_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_BULK_KV_LINES_ACTION_ID);
-        AnAction BULK_KV_LINES_TO_JSON_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.BULK_KV_LINES_TO_JSON_ACTION_ID);
     }
 
     interface Extend {
