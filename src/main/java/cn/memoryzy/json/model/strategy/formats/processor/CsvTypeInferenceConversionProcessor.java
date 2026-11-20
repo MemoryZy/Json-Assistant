@@ -15,9 +15,9 @@ import com.intellij.icons.AllIcons;
  * @author Memory
  * @since 2026/09/16
  */
-public class CsvConversionProcessor extends AbstractGlobalTextConversionProcessor {
+public class CsvTypeInferenceConversionProcessor extends AbstractGlobalTextConversionProcessor {
 
-    public CsvConversionProcessor(EditorData editorData) {
+    public CsvTypeInferenceConversionProcessor(EditorData editorData) {
         super(editorData, true);
     }
 

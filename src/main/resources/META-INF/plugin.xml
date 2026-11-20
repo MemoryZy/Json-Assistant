@@ -122,7 +122,7 @@
         <action id="JsonAssistant.Action.ToJson5Action" class="cn.memoryzy.json.action.transform.ToJson5Action"/>
         <action id="JsonAssistant.Action.ToJsonAction" class="cn.memoryzy.json.action.transform.ToJsonAction"/>
         <action id="JsonAssistant.Action.ToCsvAction" class="cn.memoryzy.json.action.transform.ToCsvAction"/>
-        <action id="JsonAssistant.Action.CsvToJsonAction" class="cn.memoryzy.json.action.transform.CsvToJsonAction"/>
+        <action id="JsonAssistant.Action.CsvToJsonStringValueAction" class="cn.memoryzy.json.action.transform.CsvToJsonStringValueAction"/>
         <action id="JsonAssistant.Action.ToTypeScriptAction" class="cn.memoryzy.json.action.transform.ToTypeScriptAction"/>
 
         <!-- Bulk KV Lines（批量键值行格式）互转：JSON → Bulk KV Lines、Bulk KV Lines → JSON -->
@@ -197,8 +197,8 @@
 
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
             <separator/>
+            <reference ref="JsonAssistant.Action.CsvToJsonStringValueAction"/>
             <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
-            <reference ref="JsonAssistant.Action.CsvToJsonAction"/>
             <reference ref="JsonAssistant.Action.BulkKvLinesToJsonAction"/>
             <separator/>
 

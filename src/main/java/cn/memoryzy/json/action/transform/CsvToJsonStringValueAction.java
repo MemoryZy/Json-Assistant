@@ -16,14 +16,16 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * 将 CSV 文本转换为 JSON 数组（不进行类型推断，所有值按字符串处理）。
- * <p>用于显式控制类型推断策略；默认推断版本由 {@link cn.memoryzy.json.action.OtherFormatsToJsonAction} 自动识别触发。</p>
- *
+ * <br/>
+ * <br/>
+ * <p style="color:red">因为 OtherFormatsToJsonAction 类提供了一个类型推断功能的 CSV 转 JSON 的Action，他同时只能展示一个处理器，</p>
+ * <p style="color:red">所以在此新增一个 Action，用于处理 CSV 转 JSON（默认使用 String 做值，不做类型推断）的功能</p>
  * @author Memory
  * @since 2026/09/16
  */
-public class CsvToJsonAction extends DumbAwareAction implements UpdateInBackground {
+public class CsvToJsonStringValueAction extends DumbAwareAction implements UpdateInBackground {
 
-    public CsvToJsonAction() {
+    public CsvToJsonStringValueAction() {
         super();
         setEnabledInModalContext(true);
         Presentation presentation = getTemplatePresentation();

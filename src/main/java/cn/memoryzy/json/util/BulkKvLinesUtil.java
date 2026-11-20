@@ -24,7 +24,8 @@ import java.util.regex.Pattern;
  *     {@code coll[0].actions[1].label}，因此嵌套对象、嵌套数组对象都可以表达；</li>
  *     <li>在行首加 {@code //} 表示该行保留但暂时禁用；</li>
  *     <li>值按字面量推断类型：{@code true} / {@code false} 为布尔，{@code null} 为空值，
- *     纯数字为数字，被双引号包裹的按字符串处理，其余都按字符串处理，冒号后什么都不写即空字符串。</li>
+ *     纯数字为数字，被双引号包裹的按字符串处理，其余都按字符串处理，冒号后什么都不写即空字符串；
+ *     位数超过 {@value #MAX_PLAIN_DIGITS} 的数值也按字符串处理（避免超长数字在 JSON 中丢失精度）。</li>
  * </ol>
  * 该类只做纯文本与 JSON 之间的转换，不依赖任何 IntelliJ 平台类，便于单独验证与复用。
  * <p>
@@ -61,6 +62,15 @@ public class BulkKvLinesUtil {
      * 例如 {@code [0].a:1}、{@code [0][0]:1}、{@code [0]:1}；用于把它与 JSON 数组区分开。
      */
     private static final Pattern ROOT_INDEX_ROW = Pattern.compile("^\\[[0-9]+\\](?:[.\\[:])");
+
+    /**
+     * 数字按“字符串”处理的最大位数
+     * <p>
+     * 超过该位数的数值（例如 19 位的雪花 ID、超长订单号）默认按字符串处理：
+     * 这类数字在 JavaScript 等消费端会超出安全整数范围（2^53 - 1 只有 16 位），
+     * 用数字类型承载会静默丢失精度，而它们的语义通常本身就是标识而非可运算的量。
+     */
+    private static final int MAX_PLAIN_DIGITS = 15;
 
     /**
      * 私有用构造方法，工具类不允许实例化
@@ -485,7 +495,12 @@ public class BulkKvLinesUtil {
         if (NUMBER_PATTERN.matcher(raw).matches()) {
             try {
                 // 使用 BigDecimal 保留精度与原始量级（例如 1e-400 不会被压成 0）
-                return new BigDecimal(raw);
+                BigDecimal decimal = new BigDecimal(raw);
+                // 超长数字默认按字符串处理：这类值多是 ID / 单号，用数字承载会在 JSON 消费端丢精度
+                if (isTooLongNumber(decimal)) {
+                    return raw;
+                }
+                return decimal;
             } catch (NumberFormatException ignored) {
                 // 数字格式异常时退化为字符串
             }
@@ -497,6 +512,39 @@ public class BulkKvLinesUtil {
         }
 
         return raw;
+    }
+
+    /**
+     * 判断一个数字是否“过长”，过长时应当按字符串处理
+     * <p>
+     * 位数按普通写法（非科学计数法）统计：整数部分与小数部分的数字个数之和，
+     * 跳过符号、小数点以及整数 / 小数开头的前导 0，并忽略小数末尾无意义的 0。
+     * 例如 {@code 1234567890123456}（16 位）与 {@code 1e400}（普通写法有 401 位）都算过长，
+     * 而 {@code 1e-400}、{@code 0.5} 这类有效位数很少的数字仍按数字处理。
+     *
+     * @param decimal 已解析出的数字
+     * @return 位数超过 {@link #MAX_PLAIN_DIGITS} 时返回 true
+     */
+    private static boolean isTooLongNumber(BigDecimal decimal) {
+        // 去掉小数末尾的 0 后再取普通写法，避免 1.500 被算成 4 位
+        String plain = decimal.abs().stripTrailingZeros().toPlainString();
+
+        int digitCount = 0;
+        // 是否仍处于“前导 0”阶段（0.000123 中的那些 0 不算有效位）
+        boolean leadingZero = true;
+        for (char c : plain.toCharArray()) {
+            if (c < '0' || c > '9') {
+                // 跳过小数点
+                continue;
+            }
+            if (leadingZero && c == '0') {
+                continue;
+            }
+            leadingZero = false;
+            digitCount++;
+        }
+
+        return digitCount > MAX_PLAIN_DIGITS;
     }
 
     /**

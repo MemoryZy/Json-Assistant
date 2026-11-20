@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+- 将 `Bulk KV Lines` 转换为 JSON 时，超过 15 位的数字按字符串处理，避免超长数值丢失精度。
+- When converting `Bulk KV Lines` to JSON, numbers longer than 15 digits are treated as strings to avoid precision loss.
+
 ## [1.9.4] - 2026-11-19
 
 - 新增 `Json 整理…` 功能组，用于去除 JSON 中无意义的 null 值、空值与 0 值。
