@@ -1,6 +1,7 @@
 package cn.memoryzy.json.util;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.memoryzy.json.model.wrapper.ArrayWrapper;
 import cn.memoryzy.json.model.wrapper.JsonWrapper;
@@ -15,12 +16,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import com.intellij.openapi.diagnostic.Logger;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,6 +51,55 @@ public class JsonUtil {
             .disable(JsonWriteFeature.WRITE_NAN_AS_STRINGS)
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .build();
+
+    /**
+     * 日期的输出格式，沿用「原文风格」的 yyyy-MM-dd HH:mm:ss
+     */
+    private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
+
+    /**
+     * {@link Date} 及其子类的 Gson 适配器（序列化时输出固定格式的字符串）
+     * <p>
+     * 没有它时，Gson 只会为 {@code java.util.Date} 本体注册日期适配器，遇到子类
+     * （例如 {@link cn.hutool.core.date.DateTime}、{@code java.sql.Timestamp}）会退化为反射序列化，
+     * 进而访问 {@code Calendar → TimeZone → sun.util.calendar.ZoneInfo}；
+     * 在 JDK 16+ 的强封装下这种反射会抛 {@code InaccessibleObjectException}，
+     * 在更早的 JDK 上则会把日历内部状态整段写进 JSON。
+     */
+    private static final TypeAdapter<Date> DATE_TYPE_ADAPTER = new TypeAdapter<Date>() {
+        @Override
+        public void write(JsonWriter out, Date value) throws IOException {
+            if (value == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(DateUtil.format(value, DATE_PATTERN));
+        }
+
+        @Override
+        public Date read(JsonReader in) throws IOException {
+            // 本适配器只用于「对象 → JSON 文本」的序列化，反序列化时直接跳过该值
+            in.skipValue();
+            return null;
+        }
+    };
+
+    /**
+     * 把 {@link Date} 适配器挂到所有日期类型上的工厂
+     * <p>
+     * Gson 在序列化 {@code Map<String, Object>} 时会按运行时类型查找适配器，
+     * 因此注册在工厂里可以同时覆盖 {@code Date} 与它的各个子类。
+     */
+    private static final TypeAdapterFactory DATE_TYPE_ADAPTER_FACTORY = new TypeAdapterFactory() {
+        @Override
+        @SuppressWarnings("unchecked")
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (!Date.class.isAssignableFrom(type.getRawType())) {
+                return null;
+            }
+            return (TypeAdapter<T>) DATE_TYPE_ADAPTER;
+        }
+    };
 
     /**
      * 检查字符串是否为JSON格式。
@@ -156,6 +213,8 @@ public class JsonUtil {
             }
 
             return new GsonBuilder()
+                    // 日期（含 hutool 的 DateTime 等子类）统一输出为字符串，避免反射序列化日历内部结构
+                    .registerTypeAdapterFactory(DATE_TYPE_ADAPTER_FACTORY)
                     .serializeSpecialFloatingPointValues()
                     .serializeNulls()
                     .setPrettyPrinting()

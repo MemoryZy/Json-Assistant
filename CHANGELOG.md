@@ -3,8 +3,14 @@
 ## [Unreleased]
 
 - 将 `Bulk KV Lines` 转换为 JSON 时，超过 15 位的数字按字符串处理，避免超长数值丢失精度。
+- 新增 `Bulk KV Lines` 转 JSON（字符串类型）入口，转换结果中的值均按字符串处理。
+- 修复日期值在转换时的格式化失败问题，日期统一按 `yyyy-MM-dd HH:mm:ss` 输出。
+- 优化 CSV 与 `Bulk KV Lines` 转换菜单的展示逻辑，避免同类入口重复出现。
 - 优化插件页面。
 - When converting `Bulk KV Lines` to JSON, numbers longer than 15 digits are treated as strings to avoid precision loss.
+- Added a Bulk KV Lines to JSON (String type) entry that keeps all values as strings.
+- Fixed a formatting failure caused by date values during conversion; dates are now output as yyyy-MM-dd HH:mm:ss.
+- Improved the visibility logic of CSV and Bulk KV Lines conversion menu items so duplicate entries no longer appear together.
 - Optimized plugin page.
 
 ## [1.9.4] - 2026-11-19

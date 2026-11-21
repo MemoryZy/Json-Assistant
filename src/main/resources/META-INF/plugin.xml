@@ -129,6 +129,9 @@
              反向的 Bulk KV Lines → JSON 已合并进 OtherFormatsToJsonAction 的自动识别链，
              由 BulkKvLinesConversionProcessor 处理，不再单独注册 action。 -->
         <action id="JsonAssistant.Action.ToBulkKvLinesAction" class="cn.memoryzy.json.action.transform.ToBulkKvLinesAction"/>
+        <!-- Bulk KV Lines → JSON（字符串类型）：与 CsvToJsonStringValueAction 一样，
+             专门提供「不推断类型、所有值按字符串处理」的转换入口 -->
+        <action id="JsonAssistant.Action.BulkKvLinesToJsonStringValueAction" class="cn.memoryzy.json.action.transform.BulkKvLinesToJsonStringValueAction"/>
 
         <!-- Diff组 -->
         <action id="JsonAssistant.Action.RenameDiffTitleAction" class="cn.memoryzy.json.action.structure.RenameDiffTitleAction"/>
@@ -199,6 +202,7 @@
         <group id="JsonAssistant.Group.SecondaryPopupMenu" text="JsonAssistant Secondary Popup Menu Actions">
             <separator/>
             <reference ref="JsonAssistant.Action.CsvToJsonStringValueAction"/>
+            <reference ref="JsonAssistant.Action.BulkKvLinesToJsonStringValueAction"/>
             <reference ref="JsonAssistant.Action.OtherFormatsToJsonAction"/>
             <separator/>
 

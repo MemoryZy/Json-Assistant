@@ -25,7 +25,8 @@ import java.util.regex.Pattern;
  *     <li>在行首加 {@code //} 表示该行保留但暂时禁用；</li>
  *     <li>值按字面量推断类型：{@code true} / {@code false} 为布尔，{@code null} 为空值，
  *     纯数字为数字，被双引号包裹的按字符串处理，其余都按字符串处理，冒号后什么都不写即空字符串；
- *     位数超过 {@value #MAX_PLAIN_DIGITS} 的数值也按字符串处理（避免超长数字在 JSON 中丢失精度）。</li>
+ *     位数超过 {@value #MAX_PLAIN_DIGITS} 的数值也按字符串处理（避免超长数字在 JSON 中丢失精度）。
+ *     该推断可通过 {@link #bulkToJson(String, boolean)} 关闭，关闭后所有值都按字符串处理。</li>
  * </ol>
  * 该类只做纯文本与 JSON 之间的转换，不依赖任何 IntelliJ 平台类，便于单独验证与复用。
  * <p>
@@ -265,17 +266,36 @@ public class BulkKvLinesUtil {
     // ================================ Bulk -> JSON ================================ //
 
     /**
-     * 将 Bulk KV Lines 文本转换为格式化的 JSON 文本。
+     * 将 Bulk KV Lines 文本转换为格式化的 JSON 文本（对值做类型推断）。
      *
      * @param bulk Bulk 文本
      * @return 格式化后的 JSON 文本；没有有效行或解析失败时返回 null
      */
     public static String bulkToJson(String bulk) {
+        return bulkToJson(bulk, true);
+    }
+
+    /**
+     * 将 Bulk KV Lines 文本转换为格式化的 JSON 文本，可选择是否对值做类型推断。
+     * <p>
+     * 两个入口共用同一套解析逻辑，只有「值」的处理不同：
+     * <ul>
+     *     <li>{@code inferTypes = true}：按字面量推断 {@code null} / 布尔 / 数字；</li>
+     *     <li>{@code inferTypes = false}：所有值都保持字符串，{@code null}、{@code true}、{@code 1}
+     *     这类文本原样写入，不做任何类型转换。被双引号包裹的值在两种模式下都会去掉引号并反转义
+     *     （引号只表示「这一定是字符串」）。</li>
+     * </ul>
+     *
+     * @param bulk       Bulk 文本
+     * @param inferTypes 是否对值做类型推断
+     * @return 格式化后的 JSON 文本；没有有效行或解析失败时返回 null
+     */
+    public static String bulkToJson(String bulk, boolean inferTypes) {
         if (StrUtil.isBlank(bulk)) {
             return null;
         }
 
-        List<Row> rows = parseRows(bulk);
+        List<Row> rows = parseRows(bulk, inferTypes);
         if (rows.isEmpty()) {
             return null;
         }
@@ -356,10 +376,11 @@ public class BulkKvLinesUtil {
     /**
      * 逐行解析 Bulk 文本，得到「键路径 + 值」的列表
      *
-     * @param bulk Bulk 文本
+     * @param bulk       Bulk 文本
+     * @param inferTypes 是否对值做类型推断（false 时所有值按字符串处理）
      * @return 解析结果（不含空行与禁用行）
      */
-    private static List<Row> parseRows(String bulk) {
+    private static List<Row> parseRows(String bulk, boolean inferTypes) {
         List<Row> rows = new ArrayList<>();
         for (String line : bulk.split("\\r?\\n")) {
             String trimmed = StrUtil.trim(line);
@@ -389,7 +410,7 @@ public class BulkKvLinesUtil {
                 continue;
             }
 
-            rows.add(new Row(tokens, parseValue(StrUtil.trim(valuePart))));
+            rows.add(new Row(tokens, parseValue(StrUtil.trim(valuePart), inferTypes)));
         }
 
         return rows;
@@ -469,15 +490,28 @@ public class BulkKvLinesUtil {
     }
 
     /**
-     * 解析 Bulk KV Lines 中的「值」，按该格式的规则推断类型
+     * 解析 Bulk KV Lines 中的「值」
+     * <p>
+     * 类型推断开启时按该格式的规则推断 null / 布尔 / 数字 / 字符串；
+     * 关闭时所有值都按字符串处理（双引号包裹的值仍然会去掉引号并反转义）。
      *
-     * @param raw 已去除首尾空白的值文本
-     * @return 推断后的值（null / Boolean / BigDecimal / String）
+     * @param raw        已去除首尾空白的值文本
+     * @param inferTypes 是否对值做类型推断
+     * @return 解析后的值（推断时为 null / Boolean / BigDecimal / String，不推断时一定是 String）
      */
-    private static Object parseValue(String raw) {
+    private static Object parseValue(String raw, boolean inferTypes) {
         // 冒号后为空，表示空字符串
         if (raw.isEmpty()) {
             return "";
+        }
+
+        // 双引号包裹的值按字符串处理，需要反转义；这一步在两种模式下都要做
+        boolean quoted = raw.length() >= 2 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"';
+        String quotedContent = quoted ? unescape(raw.substring(1, raw.length() - 1)) : null;
+
+        // 不推断类型：所有值都原样保留为字符串，null / true / false / 数字都不做转换
+        if (!inferTypes) {
+            return quoted ? quotedContent : raw;
         }
 
         if ("null".equalsIgnoreCase(raw)) {
@@ -506,12 +540,7 @@ public class BulkKvLinesUtil {
             }
         }
 
-        // 双引号包裹的值按字符串处理，需要反转义
-        if (raw.length() >= 2 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"') {
-            return unescape(raw.substring(1, raw.length() - 1));
-        }
-
-        return raw;
+        return quoted ? quotedContent : raw;
     }
 
     /**

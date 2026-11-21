@@ -7,6 +7,7 @@ import cn.memoryzy.json.model.strategy.formats.data.EditorData;
 import cn.memoryzy.json.model.strategy.formats.data.MessageData;
 import cn.memoryzy.json.util.CsvUtil;
 import com.intellij.icons.AllIcons;
+import icons.JsonAssistantIcons;
 
 /**
  * CSV → JSON 转换策略处理器（带类型推断）。
@@ -52,7 +53,7 @@ public class CsvTypeInferenceConversionProcessor extends AbstractGlobalTextConve
         return super.createActionData()
                 .setActionName(JsonAssistantBundle.message("action.csv.to.json.inference.text"))
                 .setActionDescription(JsonAssistantBundle.messageOnSystem("action.csv.to.json.inference.description"))
-                .setActionIcon(AllIcons.FileTypes.Text);
+                .setActionIcon(JsonAssistantIcons.FileTypes.CSV);
     }
 
     @Override

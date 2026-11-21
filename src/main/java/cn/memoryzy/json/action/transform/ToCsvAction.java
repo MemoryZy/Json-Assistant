@@ -14,6 +14,7 @@ import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.project.DumbAwareAction;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,7 +31,7 @@ public class ToCsvAction extends DumbAwareAction implements UpdateInBackground {
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.json.to.csv.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.json.to.csv.description"));
-        presentation.setIcon(AllIcons.FileTypes.Text);
+        presentation.setIcon(JsonAssistantIcons.FileTypes.CSV);
     }
 
     @Override
