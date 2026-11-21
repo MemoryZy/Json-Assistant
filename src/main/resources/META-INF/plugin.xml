@@ -106,6 +106,13 @@
         <action id="JsonAssistant.Action.RemoveZeroValueAction" class="cn.memoryzy.json.action.organize.RemoveZeroValueAction"/>
         <action id="JsonAssistant.Action.RemoveAllValuesAction" class="cn.memoryzy.json.action.organize.RemoveAllValuesAction"/>
 
+        <!-- Extract（提取光标处的 Json 键 / 值 / 键值对 / 路径；仅 Json 编辑器可见） -->
+        <group id="JsonAssistant.Group.Extract" class="cn.memoryzy.json.action.extract.ExtractGroup"/>
+        <action id="JsonAssistant.Action.CopyJsonKeyAction" class="cn.memoryzy.json.action.extract.CopyJsonKeyAction"/>
+        <action id="JsonAssistant.Action.CopyJsonValueAction" class="cn.memoryzy.json.action.extract.CopyJsonValueAction"/>
+        <action id="JsonAssistant.Action.CopyJsonKeyValueAction" class="cn.memoryzy.json.action.extract.CopyJsonKeyValueAction"/>
+        <action id="JsonAssistant.Action.CopyJsonPathAction" class="cn.memoryzy.json.action.extract.CopyJsonPathAction"/>
+
         <!-- Extend -->
         <group id="JsonAssistant.Group.Extend" class="cn.memoryzy.json.action.ExtendGroup"/>
         <action id="JsonAssistant.Action.ConvertAllTimestampAction" class="cn.memoryzy.json.action.extend.ConvertAllTimestampAction"/>

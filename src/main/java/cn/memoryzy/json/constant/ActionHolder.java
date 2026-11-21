@@ -28,6 +28,14 @@ public interface ActionHolder {
         AnAction REMOVE_ALL_VALUES_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Organize.REMOVE_ALL_VALUES_ACTION_ID);
     }
 
+    interface Extract {
+        AnAction EXTRACT_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Extract.EXTRACT_GROUP_ID);
+        AnAction COPY_JSON_PATH_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extract.COPY_JSON_PATH_ACTION_ID);
+        AnAction COPY_JSON_KEY_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extract.COPY_JSON_KEY_ACTION_ID);
+        AnAction COPY_JSON_VALUE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extract.COPY_JSON_VALUE_ACTION_ID);
+        AnAction COPY_JSON_KEY_VALUE_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Extract.COPY_JSON_KEY_VALUE_ACTION_ID);
+    }
+
     interface Convert {
         AnAction CONVERT_OTHER_FORMATS_GROUP = ActionManager.getInstance().getAction(ActionIdHolder.Convert.CONVERT_OTHER_FORMATS_GROUP_ID);
         AnAction TO_XML_ACTION = ActionManager.getInstance().getAction(ActionIdHolder.Convert.TO_XML_ACTION_ID);

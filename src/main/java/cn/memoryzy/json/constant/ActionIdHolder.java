@@ -41,6 +41,14 @@ public interface ActionIdHolder {
         String REMOVE_ALL_VALUES_ACTION_ID = "JsonAssistant.Action.RemoveAllValuesAction";
     }
 
+    interface Extract {
+        String EXTRACT_GROUP_ID = "JsonAssistant.Group.Extract";
+        String COPY_JSON_PATH_ACTION_ID = "JsonAssistant.Action.CopyJsonPathAction";
+        String COPY_JSON_KEY_ACTION_ID = "JsonAssistant.Action.CopyJsonKeyAction";
+        String COPY_JSON_VALUE_ACTION_ID = "JsonAssistant.Action.CopyJsonValueAction";
+        String COPY_JSON_KEY_VALUE_ACTION_ID = "JsonAssistant.Action.CopyJsonKeyValueAction";
+    }
+
     interface Extend {
         String EXTEND_GROUP_ID = "JsonAssistant.Group.Extend";
         String CONVERT_ALL_TIMESTAMP_ACTION_ID = "JsonAssistant.Action.ConvertAllTimestampAction";
