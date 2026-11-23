@@ -36,6 +36,8 @@
   - 压缩
   - 树视图
   - 表格视图
+  - 整理（去除 null 值、空值与 0 值）
+  - 提取（复制光标处的键、值、键值对或路径）
   - 排序
   - 比较
   - 转义
@@ -49,12 +51,14 @@
   - Kotlin 属性转为 JSON
   - 提取 Java 常量为 JSON
 - 格式转换
+  - CSV
   - XML
   - YAML
   - Toml
   - TypeScript
   - Properties
   - URL Params
+  - 批量键值行格式（每行一个 key:value，可直接粘贴到 Postman 批量编辑）
 - 扩展
   - 时间戳与时间格式互相转换
   - 解析嵌套 JSON 字符串为对象/数组

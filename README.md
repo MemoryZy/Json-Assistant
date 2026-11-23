@@ -38,6 +38,8 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Minify
   - Tree View
   - GridView
+  - Organize (Remove null, empty and zero values)
+  - Extract (Copy the key, value, key-value pair or path at the caret)
   - Sort
   - Compare
   - Escape
@@ -51,12 +53,14 @@ JSON Tool Plugin based on IntelliJ IDEs.It makes JSON processing a breeze!
   - Kotlin Properties to JSON
   - Extract Java Constants to JSON
 - Format Conversion
+  - CSV
   - XML
   - YAML
   - Toml
   - TypeScript
   - Properties
   - URL Params
+  - Bulk KV Lines (One key:value pair per line, ready for Postman bulk edit)
 - Extensions
   - Convert between Timestamp and Standard Date Format
   - Parse nested JSON strings into objects/arrays
