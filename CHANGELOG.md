@@ -9,6 +9,7 @@
 - 优化 CSV 与 `Bulk KV Lines` 转换菜单的展示逻辑，避免同类入口重复出现。
 - 新增 `Json 提取…` 功能组，可在 JSON 文本中复制光标处的键、值、键值对与路径。
 - 优化插件样式。
+- 用户体验优化与改进。
 - When converting `Bulk KV Lines` to JSON, numbers longer than 15 digits are treated as strings to avoid precision loss.
 - Added a Bulk KV Lines to JSON (String type) entry that keeps all values as strings.
 - When converting JSON to Bulk KV Lines, string values are no longer wrapped in double quotes (only line breaks and tabs are escaped), so the result can be pasted into tools such as Postman directly.
@@ -16,6 +17,7 @@
 - Improved the visibility logic of CSV and Bulk KV Lines conversion menu items so duplicate entries no longer appear together.
 - Added the Json Extract… feature group to copy the key, value, key-value pair or path at the caret.
 - Optimized plugin style.
+- User experience improvements.
 
 ## [1.9.4] - 2026-11-19
 
