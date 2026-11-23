@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public class CopyJsonKeyAction extends AbstractExtractAction {
 
     public CopyJsonKeyAction() {
-        super("action.extract.key.text", "action.extract.key.description", JsonAssistantIcons.Structure.JSON_KEY);
+        super("action.extract.key.text", "action.extract.key.description", null);
     }
 
     @Override
