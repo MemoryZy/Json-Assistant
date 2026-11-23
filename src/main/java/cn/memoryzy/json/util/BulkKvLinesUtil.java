@@ -34,7 +34,9 @@ import java.util.regex.Pattern;
  * <ul>
  *     <li><b>JSON → Bulk KV Lines</b>：按 JSON 的原始顺序深度优先遍历，对象成员拼成 {@code a.b}，
  *     数组元素拼成 {@code a[0]}，叶子节点输出为一行；空对象 / 空数组在该格式中没有对应写法，
- *     会被跳过（该限制由格式本身决定，不是本实现的取舍）。</li>
+ *     会被跳过（该限制由格式本身决定，不是本实现的取舍）。字符串值原样输出、不加双引号，
+ *     因为该格式常被粘贴到 Postman 等工具中，引号会被当作值的一部分发送；只有换行与制表符
+ *     会转义为 {@code \n}、{@code \r}、{@code \t} 以保持「一行一个键值对」。</li>
  *     <li><b>Bulk KV Lines → JSON</b>：逐行解析键路径与值，按路径重建 {@code LinkedHashMap} / {@code ArrayList}，
  *     保持行序；数组下标可以不连续（缺失的位置补 {@code null}），
  *     与常见实现一致；以 {@code //} 开头的禁用行会被跳过。</li>
@@ -51,7 +53,7 @@ public class BulkKvLinesUtil {
     private static final String DISABLED_ROW_PREFIX = "//";
 
     /**
-     * 数字字面量：用于「值类型推断」与「字符串是否需要在输出时加引号」两处判断
+     * 数字字面量：用于「Bulk 值类型推断」判断
      * <p>
      * 覆盖整数、小数与科学计数法（例如 {@code 0}、{@code -0.0}、{@code 1e-400}），
      * 与 JSON 数字的写法保持一致。
@@ -162,7 +164,7 @@ public class BulkKvLinesUtil {
             return formatNumber((Number) value);
         }
 
-        return quoteIfNeeded(String.valueOf(value));
+        return escapeLineBreaks(String.valueOf(value));
     }
 
     /**
@@ -180,86 +182,51 @@ public class BulkKvLinesUtil {
     }
 
     /**
-     * 按需给字符串值加双引号
+     * 转义会破坏「一行一个键值对」结构的字符
      * <p>
-     * 加引号的目的只有一个：让「值」在回读时仍然是字符串，而不是被推断成数字 / 布尔 / null。
-     * 例如 JSON 中的字符串 {@code "0"}、{@code "true"}、{@code "null"}，
-     * 若不加引号写入 Bulk KV Lines，回读时会分别被推断成数字 0、布尔 true 与 null，类型就丢了。
-     * 另外，含换行 / 引号 / 反斜杠 / 首尾空格的字符串也需要靠引号与转义才能安全表达。
+     * 字符串值在此处<b>不加双引号</b>：该格式常被粘贴到 Postman 等工具的表单里使用，
+     * 这些工具会把引号当成值的一部分原样发送，导致请求内容出错。
+     * 因此只有换行与制表符需要转义成 {@code \n}、{@code \r}、{@code \t}，
+     * 引号、反斜杠等其余字符一律原样输出。
      *
      * @param text 字符串值
      * @return 可直接写入 Bulk 的值文本
      */
-    private static String quoteIfNeeded(String text) {
-        // 空字符串直接写成「键:」，回读时同样是空字符串，无需加引号
-        if (text.isEmpty()) {
-            return text;
-        }
-
-        return needsQuote(text) ? quote(text) : text;
-    }
-
-    /**
-     * 判断字符串是否需要加双引号
-     *
-     * @param text 字符串值
-     * @return 需要加引号返回 true
-     */
-    private static boolean needsQuote(String text) {
-        // 会被推断成数字 / 布尔 / null 的文本，必须加引号才能保住字符串类型
-        if (NUMBER_PATTERN.matcher(text).matches()
-                || "true".equalsIgnoreCase(text)
-                || "false".equalsIgnoreCase(text)
-                || "null".equalsIgnoreCase(text)) {
-            return true;
-        }
-
-        // 首尾空格在解析时会被裁掉，需要加引号保留
-        if (text.startsWith(" ") || text.endsWith(" ")) {
-            return true;
-        }
-
-        // 换行、制表符、引号、反斜杠都需要转义后才能写在一行里
-        for (char c : text.toCharArray()) {
-            if (c == '"' || c == '\\' || c == '\n' || c == '\r' || c == '\t') {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * 给字符串值加双引号，并转义其中的特殊字符
-     *
-     * @param text 字符串值
-     * @return 加引号后的值文本
-     */
-    private static String quote(String text) {
-        StringBuilder builder = new StringBuilder(text.length() + 2).append('"');
-        for (char c : text.toCharArray()) {
+    private static String escapeLineBreaks(String text) {
+        int length = text.length();
+        StringBuilder builder = null;
+        for (int i = 0; i < length; i++) {
+            char c = text.charAt(i);
+            String escaped;
             switch (c) {
-                case '"':
-                    builder.append("\\\"");
-                    break;
-                case '\\':
-                    builder.append("\\\\");
-                    break;
                 case '\n':
-                    builder.append("\\n");
+                    escaped = "\\n";
                     break;
                 case '\r':
-                    builder.append("\\r");
+                    escaped = "\\r";
                     break;
                 case '\t':
-                    builder.append("\\t");
+                    escaped = "\\t";
                     break;
                 default:
-                    builder.append(c);
+                    escaped = null;
             }
+
+            if (escaped == null) {
+                if (builder != null) {
+                    builder.append(c);
+                }
+                continue;
+            }
+
+            // 首次命中需要转义的字符时才创建 Builder，普通值不产生额外开销
+            if (builder == null) {
+                builder = new StringBuilder(length + 8).append(text, 0, i);
+            }
+            builder.append(escaped);
         }
 
-        return builder.append('"').toString();
+        return builder == null ? text : builder.toString();
     }
 
 

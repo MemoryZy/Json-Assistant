@@ -9,12 +9,12 @@ import cn.memoryzy.json.model.strategy.formats.processor.BulkKvLinesConversionPr
 import cn.memoryzy.json.util.BulkKvLinesUtil;
 import cn.memoryzy.json.util.PlatformUtil;
 import cn.memoryzy.json.util.TextTransformUtil;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.actionSystem.UpdateInBackground;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import icons.JsonAssistantIcons;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -42,7 +42,7 @@ public class BulkKvLinesToJsonStringValueAction extends DumbAwareAction implemen
         Presentation presentation = getTemplatePresentation();
         presentation.setText(JsonAssistantBundle.message("action.bulk.kv.lines.to.json.string.text"));
         presentation.setDescription(JsonAssistantBundle.messageOnSystem("action.bulk.kv.lines.to.json.string.description"));
-        presentation.setIcon(AllIcons.FileTypes.Text);
+        presentation.setIcon(JsonAssistantIcons.FileTypes.KV);
     }
 
     @Override
