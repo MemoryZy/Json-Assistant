@@ -4,12 +4,14 @@
 
 - 将 `Bulk KV Lines` 转换为 JSON 时，超过 15 位的数字按字符串处理，避免超长数值丢失精度。
 - 新增 `Bulk KV Lines` 转 JSON（字符串类型）入口，转换结果中的值均按字符串处理。
+- `JSON` 转换为 `Bulk KV Lines` 时，字符串值不再额外加双引号（仅转义换行与制表符），可直接粘贴到 Postman 等工具使用。
 - 修复日期值在转换时的格式化失败问题，日期统一按 `yyyy-MM-dd HH:mm:ss` 输出。
 - 优化 CSV 与 `Bulk KV Lines` 转换菜单的展示逻辑，避免同类入口重复出现。
 - 新增 `Json 提取…` 功能组，可在 JSON 文本中复制光标处的键、值、键值对与路径。
 - 优化插件样式。
 - When converting `Bulk KV Lines` to JSON, numbers longer than 15 digits are treated as strings to avoid precision loss.
 - Added a Bulk KV Lines to JSON (String type) entry that keeps all values as strings.
+- When converting JSON to Bulk KV Lines, string values are no longer wrapped in double quotes (only line breaks and tabs are escaped), so the result can be pasted into tools such as Postman directly.
 - Fixed a formatting failure caused by date values during conversion; dates are now output as yyyy-MM-dd HH:mm:ss.
 - Improved the visibility logic of CSV and Bulk KV Lines conversion menu items so duplicate entries no longer appear together.
 - Added the Json Extract… feature group to copy the key, value, key-value pair or path at the caret.
