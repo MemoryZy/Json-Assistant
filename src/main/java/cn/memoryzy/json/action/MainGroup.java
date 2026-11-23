@@ -86,6 +86,10 @@ public class MainGroup extends DumbAwareBaseActionGroup {
             actions.add(ActionHolder.Sort.SORT_GROUP);
         }
 
+        // Json 文本对比：位于转换组上方
+        actions.add(Separator.create());
+        actions.add(ActionHolder.Main.JSON_TEXT_DIFF_ACTION);
+
         // ------- 转换（转换组内部再以分割线隔出 Json 转义）
         actions.add(Separator.create());
         if (showSeparatorText) {
@@ -93,10 +97,6 @@ public class MainGroup extends DumbAwareBaseActionGroup {
         }
 
         actions.add(ActionHolder.Convert.CONVERT_OTHER_FORMATS_GROUP);
-
-        // Json 文本对比：紧跟在转换组下方
-        actions.add(Separator.create());
-        actions.add(ActionHolder.Main.JSON_TEXT_DIFF_ACTION);
 
         // ------- 扩展
         actions.add(Separator.create());
