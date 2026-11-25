@@ -374,8 +374,8 @@ public class JsonAssistantToolWindowComponentProvider implements Disposable, Edi
             // 从实体文件切换回虚拟文件
             // 判断是否是包装过的文件
             if (!(sourceFile instanceof ExternalFileWrapper)) return;
-            // 定义虚拟文件
-            VirtualFile file = PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, text);
+            // 定义虚拟文件，文件名沿用外部文件名
+            VirtualFile file = PlatformUtil.createLightVirtualFile(sourceFile.getName(), FileTypeHolder.JSON5, text);
             // 新开标签页，再关闭旧标签页
             ApplicationManager.getApplication().invokeLater(() -> {
                 // 切换到真实文件

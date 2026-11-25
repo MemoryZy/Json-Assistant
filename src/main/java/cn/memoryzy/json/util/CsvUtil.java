@@ -103,6 +103,14 @@ public class CsvUtil {
 
     /**
      * 判断给定文本是否可被解析为 CSV（用于反向转换的策略识别）。
+     * <p>
+     * 判定口径：
+     * <ul>
+     *   <li>能解析成等宽的二维网格；</li>
+     *   <li>至少有一行表头与一行数据；</li>
+     *   <li>每行至少两列，即必须真的含有分隔符 —— 否则普通多行文本
+     *   （例如 Java 源码、日志、散文）都会被当成单列表格而误判。</li>
+     * </ul>
      *
      * @param csv CSV 文本
      * @return 可解析为 CSV 时返回 true
@@ -111,7 +119,13 @@ public class CsvUtil {
         if (StrUtil.isBlank(csv)) return false;
         // 已经是 JSON 或 JSON5 的文本不按 CSV 处理
         if (JsonUtil.canResolveToJson(csv) || Json5Util.isJson5(csv)) return false;
-        return parseGrid(csv) != null;
+
+        List<List<String>> grid = parseGrid(csv);
+        // 表头 + 至少一行数据，才构成可转换的表格
+        if (grid == null || grid.size() < 2) return false;
+
+        // 单列内容没有分隔符，无法与普通文本区分，不按 CSV 处理
+        return grid.get(0).size() >= 2;
     }
 
 

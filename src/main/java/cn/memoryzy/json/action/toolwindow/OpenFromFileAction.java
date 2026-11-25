@@ -120,8 +120,8 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
 
         // 如果选择修改不作用于源文件，那么只拷贝内容
         if (!editorBehaviorState.isShouldApplyToSource()) {
-            // 使用 LightVirtualFile，只处理内容
-            selectFile = PlatformUtil.createLightVirtualFile(ToolWindowConstant.Main.MAIN_WINDOW_DISPLAY_NAME, FileTypeHolder.JSON5, content);
+            // 使用 LightVirtualFile，只处理内容；文件名沿用外部文件名
+            selectFile = PlatformUtil.createLightVirtualFile(fileWrapper.getName(), FileTypeHolder.JSON5, content);
         }
 
         // 获取当前选择的窗口页，判断其是否存在内容，若存在，则新开标签页
@@ -163,10 +163,15 @@ public class OpenFromFileAction extends DumbAwareAction implements CustomCompone
                                                       ExternalFileWrapper fileWrapper,
                                                       String newText,
                                                       boolean shouldApplyToSource) {
-        String tag = shouldApplyToSource ? JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.sourceFile.tag") : JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.copy.tag");
+        // 标签名使用外部文件名；生成副本时再补一个副本标识
+        String displayName = fileWrapper != null ? fileWrapper.getName() : selectFile.getName();
+        if (!shouldApplyToSource) {
+            displayName = displayName + " (" + JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.copy.tag") + ")";
+        }
+
         if (null == toolWindow) toolWindow = (ToolWindowEx) ToolWindowUtil.getJsonAssistantWindow(project);
         Content content = ToolWindowUtil.addNewContent(project, toolWindow, ContentFactory.SERVICE.getInstance(), selectFile);
-        content.setDisplayName(ToolWindowUtil.generateTagName(toolWindow.getContentManager(), JsonAssistantBundle.messageOnSystem("toolwindow.content.importData.title") + " (" + tag + ")"));
+        content.setDisplayName(ToolWindowUtil.generateTagName(toolWindow.getContentManager(), displayName));
 
         // 补充标记
         EditorEx editor = ToolWindowUtil.getEditorOnContent(content);
