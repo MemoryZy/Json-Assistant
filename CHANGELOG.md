@@ -8,6 +8,9 @@
 - 修复日期值在转换时的格式化失败问题，日期统一按 `yyyy-MM-dd HH:mm:ss` 输出。
 - 优化 CSV 与 `Bulk KV Lines` 转换菜单的展示逻辑，避免同类入口重复出现。
 - 新增 `Json 提取…` 功能组，可在 JSON 文本中复制光标处的键、值、键值对与路径。
+- 修复普通文本被误判为 CSV、导致出现多余转换入口的问题。
+- 工具窗口导入外部文件后，标签页名称改为外部文件名，仅在生成副本时附加副本标识。
+- 历史记录拖入主编辑器时，标签页显示记录自身的名称。
 - 优化插件样式。
 - 用户体验优化与改进。
 - When converting `Bulk KV Lines` to JSON, numbers longer than 15 digits are treated as strings to avoid precision loss.
@@ -16,6 +19,9 @@
 - Fixed a formatting failure caused by date values during conversion; dates are now output as yyyy-MM-dd HH:mm:ss.
 - Improved the visibility logic of CSV and Bulk KV Lines conversion menu items so duplicate entries no longer appear together.
 - Added the Json Extract… feature group to copy the key, value, key-value pair or path at the caret.
+- Fixed the issue where ordinary text was mistakenly recognized as CSV and produced redundant conversion entries.
+- Imported external files in the tool window now use the file name as the tab title, with a copy marker added only when a copy is generated.
+- When a history record is dragged into the main editor, the tab now shows the record's own name.
 - Optimized plugin style.
 - User experience improvements.
 
