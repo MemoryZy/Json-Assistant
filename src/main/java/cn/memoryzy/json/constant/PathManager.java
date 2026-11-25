@@ -22,7 +22,11 @@ public class PathManager {
     private static final String FONTS_DIRECTORY_NAME = "Fonts";
 
     private static final String PROJECT_PLUGIN_DIRECTORY_NAME = "JsonAssistant";
-    private static final String PROJECT_HISTORIES_DIRECTORY_NAME = ".histories";
+
+    /**
+     * 项目下存放历史记录源文件的目录名
+     */
+    public static final String PROJECT_HISTORIES_DIRECTORY_NAME = ".histories";
 
     public static final String PROJECTS_DIRECTORY_NAME = "Projects";
 

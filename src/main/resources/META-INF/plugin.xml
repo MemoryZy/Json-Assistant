@@ -50,6 +50,7 @@
         <postStartupActivity implementation="cn.memoryzy.json.service.PluginActivityManager"/>
         <errorHandler implementation="cn.memoryzy.json.extension.error.ErrorReporter"/>
         <webHelpProvider implementation="cn.memoryzy.json.extension.provider.HelpProvider"/>
+        <editorTabTitleProvider implementation="cn.memoryzy.json.extension.provider.HistoryRecordTabTitleProvider"/>
         <fileEditorProvider implementation="cn.memoryzy.json.extension.editor.JsonTreeFileEditorProvider"/>
         <fileTemplateGroup implementation="cn.memoryzy.json.extension.template.JsonAssistantFileTemplateDescriptorFactory"/>
         <editorFloatingToolbarProvider implementation="cn.memoryzy.json.extension.editor.PasteFloatingToolbarProvider"/>
